@@ -63,7 +63,7 @@ class FlueBackend extends EventEmitter {
   }
 
   private serverPath(): string {
-    // dist/main/main.js (this bundle) -> dist/server.mjs
+    // dist/main/main.cjs (this bundle) -> dist/server.mjs
     return path.join(__dirname, '..', 'server.mjs')
   }
 
@@ -254,6 +254,11 @@ class FlueBackend extends EventEmitter {
     const scheduleFlush = () => {
       if (!flushTimer) flushTimer = setTimeout(flush, STREAM_FLUSH_MS)
     }
+    // Shared terminal-success path: drain buffered text, then emit the done.
+    const settle = () => {
+      flush()
+      this.finishPrompt(requestId, conversationId, assembled)
+    }
 
     try {
       const admission = await client.agents.send(AGENT_NAME, conversationId, {
@@ -307,10 +312,25 @@ class FlueBackend extends EventEmitter {
             }
             break
           }
-          case 'idle':
           case 'submission_settled': {
-            flush()
-            this.finishPrompt(requestId, conversationId, assembled)
+            // Recovery settled an interrupted submission. If it failed, surface
+            // the error rather than reporting the partial text as a clean done.
+            if (event.outcome === 'failed') {
+              flush()
+              this.active.delete(requestId)
+              this.emit('stream', {
+                requestId,
+                conversationId,
+                kind: 'error',
+                error: event.error || 'The request failed.',
+              } satisfies FlueStreamMessage)
+              return
+            }
+            settle()
+            return
+          }
+          case 'idle': {
+            settle()
             return
           }
           default:
@@ -318,8 +338,7 @@ class FlueBackend extends EventEmitter {
         }
       }
       // Stream ended without an explicit terminal event.
-      flush()
-      this.finishPrompt(requestId, conversationId, assembled)
+      settle()
     } catch (err) {
       if (flushTimer) clearTimeout(flushTimer)
       this.active.delete(requestId)

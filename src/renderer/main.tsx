@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
 import { router } from './router'
 import { ThemeContext, type Theme } from './theme'
+import { NaviChatProvider } from './flue/NaviChatContext'
 
 import './styles/tokens.css'
 import './styles/app.css'
@@ -28,7 +29,9 @@ function App() {
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <RouterProvider router={router} />
+      <NaviChatProvider>
+        <RouterProvider router={router} />
+      </NaviChatProvider>
     </ThemeContext.Provider>
   )
 }

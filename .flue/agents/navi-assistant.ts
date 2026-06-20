@@ -1,4 +1,5 @@
 import { createAgent, type AgentRouteHandler } from '@flue/runtime'
+import { MODEL_ID } from '../../src/shared/flue'
 
 // Expose the agent over HTTP. Flue only marks an agent's `transports.http` when
 // its module exports a `route` middleware (see normalizeBuiltModules in the
@@ -8,7 +9,7 @@ import { createAgent, type AgentRouteHandler } from '@flue/runtime'
 export const route: AgentRouteHandler = async (_c, next) => next()
 
 export default createAgent(() => ({
-  model: 'openai/gpt-5.4-nano-2026-03-17',
+  model: MODEL_ID,
   instructions: [
     'You are Navi, an AI assistant inside a local-first desktop app.',
     'Be concise and helpful with writing, coding, analysis, and questions.',

@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { flue } from '@flue/runtime/routing'
 import { registerProvider } from '@flue/runtime'
+import { MODEL_NAME } from '../src/shared/flue'
 
 // User-supplied app owns the entire request pipeline (see the generated
 // server entry). We mirror createDefaultFlueApp()'s composition — mount the
@@ -28,7 +29,7 @@ registerProvider('openai', {
   api: 'openai-completions',
   ...(openaiBaseUrl ? { baseUrl: openaiBaseUrl } : {}),
   models: {
-    'gpt-5.4-nano-2026-03-17': { contextWindow: 400_000, maxTokens: 128_000 },
+    [MODEL_NAME]: { contextWindow: 400_000, maxTokens: 128_000 },
   },
 })
 

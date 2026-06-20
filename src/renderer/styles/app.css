@@ -99,12 +99,12 @@ textarea {
 *::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: 999px;
-  background: var(--scrollbar-thumb);
+  background: var(--ds-scrollbar-thumb);
   background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
+  background: var(--ds-scrollbar-thumb-hover);
   background-clip: padding-box;
 }
 
@@ -273,6 +273,57 @@ textarea {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Conversation list rows: a full-width open button with a hover-reveal delete */
+.conv-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.conv-open {
+  padding-right: 34px; /* reserve room for the delete affordance */
+}
+
+.conv-delete {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ds-text-faint);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.14s ease, background 0.14s ease, color 0.14s ease;
+}
+
+.conv-item:hover .conv-delete,
+.conv-delete:focus-visible {
+  opacity: 1;
+}
+
+.conv-delete:hover {
+  background: var(--ds-sidebar-row-hover);
+  color: var(--ds-danger);
+}
+
+.conv-delete svg {
+  width: 15px;
+  height: 15px;
+}
+
+.sidebar-empty {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--ds-text-faint);
 }
 
 /* Footer with mascot + focus toggle + settings */

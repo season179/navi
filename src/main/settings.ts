@@ -66,16 +66,6 @@ export async function setApiKey(key: string): Promise<void> {
   await write({ ...current, apiKeyEnc: enc })
 }
 
-export async function clearApiKey(): Promise<void> {
-  const current = await read()
-  delete current.apiKeyEnc
-  await write(current)
-}
-
-export async function hasApiKey(): Promise<boolean> {
-  return (await getApiKey()) !== undefined
-}
-
 /**
  * Resolve the OpenAI base URL: an explicit env var wins (dev parity with
  * getApiKey), otherwise the value the user saved in settings. Returns undefined

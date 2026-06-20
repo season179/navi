@@ -3,9 +3,15 @@
 // SDK client and the bearer token, so the renderer only ever sees plain text.
 
 import { BrowserWindow, ipcMain } from 'electron'
-import type { FlueStatus, FlueStreamMessage } from '../shared/flue'
+import type { FlueStatus, FlueStreamMessage, PersistedMessage } from '../shared/flue'
 import { flueBackend } from './flue-backend'
-import { setApiKey, clearApiKey, setBaseUrl } from './settings'
+import { setApiKey, setBaseUrl } from './settings'
+import {
+  listConversations,
+  getConversation,
+  saveConversation,
+  deleteConversation,
+} from './conversations'
 
 function broadcast(channel: string, payload: FlueStreamMessage | FlueStatus) {
   for (const win of BrowserWindow.getAllWindows()) {
@@ -42,11 +48,6 @@ export function registerFlueIpc(): void {
     }
   })
 
-  ipcMain.handle('flue:clearApiKey', async () => {
-    await clearApiKey()
-    await flueBackend.refreshApiKey()
-  })
-
   ipcMain.handle('flue:setBaseUrl', async (_evt, url: string) => {
     try {
       await setBaseUrl(url)
@@ -56,4 +57,16 @@ export function registerFlueIpc(): void {
       return { ok: false, error: err instanceof Error ? err.message : String(err) }
     }
   })
+
+  ipcMain.handle('conversations:list', () => listConversations())
+
+  ipcMain.handle('conversations:get', (_evt, id: string) => getConversation(id))
+
+  ipcMain.handle(
+    'conversations:save',
+    (_evt, id: string, title: string, messages: PersistedMessage[]) =>
+      saveConversation(id, title, messages),
+  )
+
+  ipcMain.handle('conversations:delete', (_evt, id: string) => deleteConversation(id))
 }

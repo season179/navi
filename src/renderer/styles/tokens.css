@@ -127,6 +127,8 @@
   --ds-shadow-shell: var(--shadow-shell);
   --ds-shadow-composer: var(--shadow-composer);
   --ds-shadow-chip: var(--shadow-chip);
+  --ds-scrollbar-thumb: var(--scrollbar-thumb);
+  --ds-scrollbar-thumb-hover: var(--scrollbar-thumb-hover);
 }
 
 /* ---- Dark theme (Kun deep-ocean navy) ---- */
@@ -253,4 +255,6 @@
   --ds-shadow-shell: var(--shadow-shell);
   --ds-shadow-composer: var(--shadow-composer);
   --ds-shadow-chip: var(--shadow-chip);
+  --ds-scrollbar-thumb: var(--scrollbar-thumb);
+  --ds-scrollbar-thumb-hover: var(--scrollbar-thumb-hover);
 }

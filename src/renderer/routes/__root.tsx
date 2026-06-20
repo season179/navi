@@ -1,105 +1,90 @@
-import { useState } from 'react'
-import { createRootRoute, Outlet, Link } from '@tanstack/react-router'
-import {
-  Plus,
-  Clock3,
-  Settings,
-  PanelLeft,
-  Sun,
-  Moon,
-} from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { createRootRoute, Outlet } from '@tanstack/react-router'
+import { Plus, Settings, PanelLeft, Sun, Moon, MessageSquare, Trash2 } from 'lucide-react'
 import { useTheme } from '../theme'
-
-type NavItem = {
-  to: string
-  label: string
-  icon: typeof Plus
-}
-
-const PRIMARY_COMMANDS: NavItem[] = [
-  { to: '/', label: 'New Agent', icon: Plus },
-]
-
-const SECONDARY_COMMANDS: NavItem[] = [
-  { to: '/archive', label: 'Schedule', icon: Clock3 },
-]
-
-function useActivePath(): (to: string) => boolean {
-  const hash = typeof window !== 'undefined' ? window.location.hash : ''
-  return (to: string) => {
-    if (to === '/') return hash === '' || hash === '#/'
-    return hash === `#${to}` || hash.startsWith(`#${to}`)
-  }
-}
+import { SidebarContext } from '../sidebar'
+import { useNaviList } from '../flue/NaviChatContext'
 
 function RootLayout() {
   const { theme, toggleTheme } = useTheme()
-  const isActive = useActivePath()
-  const [focusMode, setFocusMode] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
+  const toggle = useCallback(() => setCollapsed((v) => !v), [])
+  const { conversations, currentId, newConversation, selectConversation, deleteConversation } =
+    useNaviList()
+
+  const handleNew = () => newConversation()
+  const handleSelect = (id: string) => void selectConversation(id)
 
   return (
-    <div className="workbench" style={{ ['--sidebar-width' as string]: focusMode ? '0px' : '264px' }}>
-      {!focusMode ? (
-        <aside className="sidebar">
-          <div className="sidebar-header">
-            <button
-              className="sidebar-titlebar-toggle"
-              onClick={() => setFocusMode(true)}
-              aria-label="Collapse sidebar"
-              title="Collapse sidebar"
-            >
-              <PanelLeft />
-            </button>
-          </div>
-
-          <div className="sidebar-body">
-            {PRIMARY_COMMANDS.map((item) => {
-              const Icon = item.icon
-              return (
-                <Link key={item.to} to={item.to} className="cmd-row is-accent">
-                  <Icon />
-                  <span className="cmd-label">{item.label}</span>
-                </Link>
-              )
-            })}
-
-            <div className="sidebar-section-header">
-              <span>Workspace</span>
+    <SidebarContext.Provider value={{ collapsed, toggle }}>
+      <div className="workbench" style={{ ['--sidebar-width' as string]: collapsed ? '0px' : '264px' }}>
+        {!collapsed ? (
+          <aside className="sidebar">
+            <div className="sidebar-header">
+              <button
+                className="sidebar-titlebar-toggle"
+                onClick={() => setCollapsed(true)}
+                aria-label="Collapse sidebar"
+                title="Collapse sidebar"
+              >
+                <PanelLeft />
+              </button>
             </div>
 
-            {SECONDARY_COMMANDS.map((item) => {
-              const Icon = item.icon
-              const active = isActive(item.to)
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={active ? 'cmd-row is-active' : 'cmd-row'}
-                >
-                  <Icon />
-                  <span className="cmd-label">{item.label}</span>
-                </Link>
-              )
-            })}
-          </div>
+            <div className="sidebar-body">
+              <button className="cmd-row is-accent" onClick={handleNew}>
+                <Plus />
+                <span className="cmd-label">New conversation</span>
+              </button>
 
-          <div className="sidebar-footer">
-            <button className="cmd-row" onClick={toggleTheme} title="Toggle theme">
-              {theme === 'dark' ? <Sun /> : <Moon />}
-              <span className="cmd-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
-            </button>
-            <button className="cmd-row" title="Settings">
-              <Settings />
-              <span className="cmd-label">Settings</span>
-            </button>
-          </div>
-        </aside>
-      ) : null}
+              <div className="sidebar-section-header">
+                <span>Conversations</span>
+              </div>
 
-      <main className="stage">
-        <Outlet />
-      </main>
-    </div>
+              {conversations.length === 0 ? (
+                <div className="sidebar-empty">No conversations yet</div>
+              ) : (
+                conversations.map((c) => (
+                  <div key={c.id} className="conv-item">
+                    <button
+                      className={c.id === currentId ? 'cmd-row conv-open is-active' : 'cmd-row conv-open'}
+                      onClick={() => handleSelect(c.id)}
+                      title={c.title}
+                    >
+                      <MessageSquare />
+                      <span className="cmd-label">{c.title}</span>
+                    </button>
+                    <button
+                      className="conv-delete"
+                      onClick={() => void deleteConversation(c.id)}
+                      aria-label="Delete conversation"
+                      title="Delete conversation"
+                    >
+                      <Trash2 />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="sidebar-footer">
+              <button className="cmd-row" onClick={toggleTheme} title="Toggle theme">
+                {theme === 'dark' ? <Sun /> : <Moon />}
+                <span className="cmd-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+              </button>
+              <button className="cmd-row" title="Settings">
+                <Settings />
+                <span className="cmd-label">Settings</span>
+              </button>
+            </div>
+          </aside>
+        ) : null}
+
+        <main className="stage">
+          <Outlet />
+        </main>
+      </div>
+    </SidebarContext.Provider>
   )
 }
 

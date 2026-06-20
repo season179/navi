@@ -1,7 +1,18 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import path from 'path'
 import { flueBackend } from './flue-backend'
 import { registerFlueIpc } from './ipc'
+
+// Schemes we are willing to hand to the OS browser. Everything else is dropped.
+function isExternalUrl(url: string): boolean {
+  return /^(https?:|mailto:)/i.test(url)
+}
+
+// Hand http(s)/mailto URLs to the OS browser instead of letting them open a new
+// in-app BrowserWindow or replace the app frame. Other schemes are dropped.
+function openExternalIfSafe(url: string): void {
+  if (isExternalUrl(url)) void shell.openExternal(url)
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -13,10 +24,31 @@ function createWindow() {
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 16, y: 16 },
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
+      // The preload only touches contextBridge/ipcRenderer (no Node built-ins),
+      // so it runs fine under the OS sandbox — the strongest renderer isolation.
+      sandbox: true,
     },
+  })
+
+  // Assistant markdown renders links with target="_blank"; route those (and any
+  // window.open) to the OS browser and never spawn a child window.
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    openExternalIfSafe(url)
+    return { action: 'deny' }
+  })
+
+  // The app shell is the loaded index.html; nothing should replace the top
+  // frame. Block every will-navigate unconditionally (covers file:/data:/
+  // javascript: and relative URLs, not just http/mailto), then externalize the
+  // safe schemes. Hash-history route changes fire did-navigate-in-page (not
+  // will-navigate) and reloads don't emit it either, so TanStack routing and
+  // Cmd-R are unaffected.
+  win.webContents.on('will-navigate', (event, url) => {
+    event.preventDefault()
+    openExternalIfSafe(url)
   })
 
   win.loadFile(path.join(__dirname, '../../index.html'))

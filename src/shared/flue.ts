@@ -4,6 +4,13 @@
 
 export const AGENT_NAME = 'navi-assistant'
 
+// Single source of truth for the model, shared by the Flue backend
+// (.flue/app.ts registerProvider key + .flue/agents/navi-assistant.ts) and the
+// renderer (the composer chip). Change it here and all three stay in sync.
+/** Provider-local model id (no provider prefix) — the registerProvider key. */
+export const MODEL_NAME = 'gpt-5.4-nano-2026-03-17'
+/** Fully-qualified model specifier passed to createAgent. */
+export const MODEL_ID = `openai/${MODEL_NAME}`
 /** Human-readable label for the active model, shown in the composer chip. */
 export const MODEL_LABEL = 'GPT-5.4 nano'
 
@@ -43,17 +50,40 @@ export interface FlueSendResult {
   requestId: string
 }
 
+/** One persisted message bubble (a settled turn — never mid-stream). */
+export interface PersistedMessage {
+  id: string
+  role: 'user' | 'assistant'
+  text: string
+  status: 'done' | 'error'
+}
+
+/** Lightweight conversation descriptor for the sidebar list (no message bodies). */
+export interface ConversationMeta {
+  id: string
+  title: string
+  createdAt: number
+  updatedAt: number
+}
+
 /** The API exposed on `window.navi.flue` by the preload bridge. */
 export interface FlueBridge {
   status(): Promise<FlueStatus>
   send(conversationId: string, message: string): Promise<FlueSendResult>
   cancel(requestId: string): Promise<void>
   setApiKey(key: string): Promise<{ ok: boolean; error?: string }>
-  clearApiKey(): Promise<void>
   /** Set (or clear, with an empty string) the OpenAI base URL and restart the backend. */
   setBaseUrl(url: string): Promise<{ ok: boolean; error?: string }>
   /** Subscribe to streamed prompt events. Returns an unsubscribe function. */
   onEvent(listener: (message: FlueStreamMessage) => void): () => void
   /** Subscribe to backend status changes. Returns an unsubscribe function. */
   onStatus(listener: (status: FlueStatus) => void): () => void
+  /** List stored conversations, most-recently-updated first. */
+  listConversations(): Promise<ConversationMeta[]>
+  /** Load the persisted message thread for one conversation (empty if unknown). */
+  getConversation(id: string): Promise<PersistedMessage[]>
+  /** Upsert a conversation's title + thread (bumps its updatedAt). */
+  saveConversation(id: string, title: string, messages: PersistedMessage[]): Promise<void>
+  /** Delete a stored conversation thread. */
+  deleteConversation(id: string): Promise<void>
 }
