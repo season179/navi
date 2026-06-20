@@ -1,6 +1,6 @@
 # Plan: Integrate Flue into Navi (agreed)
 
-**Status**: **Implemented** — Phases 1–5 built and verified at the app-boot level (full vertical slice runs in Electron). The only step outstanding is the **live model round-trip (Gate 2)**, which needs an Anthropic API key; that is now enterable in-app via the Settings flow.
+**Status**: **Implemented** — Phases 1–5 built and verified at the app-boot level (full vertical slice runs in Electron). Provider is now the **OpenAI Chat Completions API** (see the 2026-06-20 provider-swap update below). The only step outstanding is the **live model round-trip (Gate 2)**, which needs an OpenAI API key; that is now enterable in-app via the Settings flow.
 **Goal**: Turn Navi from a UI shell into a working AI chat app powered by [Flue](https://flueframework.com).
 **Authors**: Converged plan by **Claude + pi**. Supersedes `integrate-flue-into-navi-by-cmd.md` (kept for history). Every API claim below was verified against the Flue docs, the Cloudflare/Flue blog, the `withastro/flue` repo (DeepWiki), and — for `node:sqlite` — empirically against the installed Electron.
 
@@ -24,6 +24,30 @@ Phase 0 surfaced one fact that the original transport assumption (decision #1 be
 **Verified end-to-end (no API key needed):** a standalone harness spawned the patched server under Electron's Node and confirmed loopback-only binding (lsof: `127.0.0.1:<eph> (LISTEN)`, no `0.0.0.0`/`*`), real ephemeral port via `FLUE_READY`, the token gate (401 / 401 / 200), and the on-disk db. Then the **full app** booted in Electron: main spawned the child (`Electron --no-warnings dist/server.mjs`, listening on `127.0.0.1:51512`), the renderer loaded, and `before-quit` tore the child down cleanly.
 
 **New/changed files vs the layout in §2:** added `.flue/app.ts`, `.flue/db.ts`, `scripts/patch-flue-server.mjs`, `src/shared/flue.ts` (IPC contract), `src/main/settings.ts` (safeStorage), `src/renderer/flue/useNaviChat.ts`, `src/renderer/components/{ChatThread,ApiKeyBanner}.tsx`; `package.json` gained `hono` + a `build:flue` step prepended to `build`.
+
+---
+
+## Update (2026-06-20) — model provider swapped to OpenAI Chat Completions
+
+The deferred provider decision is resolved: Navi now uses the **OpenAI Chat Completions API**
+(`/v1/chat/completions`), not Anthropic. Model: `openai/gpt-5.4-nano-2026-03-17`.
+
+- **Wire protocol.** `@flue/runtime` resolves `openai/<model>` to the catalog default
+  (`openai-responses`, the newer Responses API) unless a provider is registered. `.flue/app.ts`
+  now calls `registerProvider('openai', { api: 'openai-completions', … })` so requests hit
+  Chat Completions. Verified: `resolveModel('openai/gpt-5.4-nano-2026-03-17')` →
+  `{ api: 'openai-completions', provider: 'openai', baseUrl: 'https://api.openai.com/v1' }`.
+- **Pinned dated model not in catalog.** pi-ai@0.79.8 knows `gpt-5.4-nano` but not the dated
+  snapshot, so it would resolve with zero metadata; the registration supplies
+  `{ contextWindow: 400000, maxTokens: 128000 }` (mirrors the catalog alias). Request shaping is
+  still correct because `detectCompat` keys off provider/baseUrl (→ `max_completion_tokens`).
+  Caveat: the runtime treats it as non-reasoning (`reasoning: false`); OpenAI still applies its
+  default reasoning server-side.
+- **Key + base URL.** Key env renamed `ANTHROPIC_API_KEY` → `OPENAI_API_KEY` (pi-ai reads it via
+  `withEnvApiKey`). A new optional, user-editable base URL (`OPENAI_BASE_URL`, persisted in
+  settings, surfaced/edited via the Settings gear) points Navi at an OpenAI-compatible gateway;
+  default is direct OpenAI. No new npm dep (`openai` ships inside pi-ai, bundled by `flue build`).
+- **Gate 2 (live round-trip)** still pending — now needs an **OpenAI** key entered in-app.
 
 ---
 

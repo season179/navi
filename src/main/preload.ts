@@ -7,6 +7,7 @@ const flue: FlueBridge = {
   cancel: (requestId) => ipcRenderer.invoke('flue:cancel', requestId),
   setApiKey: (key) => ipcRenderer.invoke('flue:setApiKey', key),
   clearApiKey: () => ipcRenderer.invoke('flue:clearApiKey'),
+  setBaseUrl: (url) => ipcRenderer.invoke('flue:setBaseUrl', url),
   onEvent: (listener) => {
     const handler = (_evt: unknown, message: FlueStreamMessage) => listener(message)
     ipcRenderer.on('flue:event', handler)

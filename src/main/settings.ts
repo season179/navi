@@ -1,7 +1,9 @@
-// Encrypted local settings for the main process. The Anthropic API key never
+// Encrypted local settings for the main process. The OpenAI API key never
 // touches the renderer or plain disk: it is encrypted at rest with Electron's
 // safeStorage (OS keychain-backed where available) and only decrypted in the
-// main process to hand to the spawned Flue child via an env var.
+// main process to hand to the spawned Flue child via an env var. The optional
+// base URL (for an OpenAI-compatible gateway) is not a secret, so it is stored
+// in plaintext alongside the encrypted key.
 
 import { app, safeStorage } from 'electron'
 import { promises as fs } from 'fs'
@@ -10,6 +12,8 @@ import path from 'path'
 interface StoredSettings {
   /** Base64 of safeStorage.encryptString(apiKey). */
   apiKeyEnc?: string
+  /** Optional OpenAI-compatible base URL; empty/absent means direct OpenAI. */
+  baseUrl?: string
 }
 
 function settingsPath(): string {
@@ -32,12 +36,12 @@ async function write(settings: StoredSettings): Promise<void> {
 }
 
 /**
- * Resolve the Anthropic API key: an explicit env var wins (useful for dev),
+ * Resolve the OpenAI API key: an explicit env var wins (useful for dev),
  * otherwise the safeStorage-encrypted value the user saved in settings.
  * Returns undefined when neither is present.
  */
 export async function getApiKey(): Promise<string | undefined> {
-  const fromEnv = process.env.ANTHROPIC_API_KEY?.trim()
+  const fromEnv = process.env.OPENAI_API_KEY?.trim()
   if (fromEnv) return fromEnv
 
   const { apiKeyEnc } = await read()
@@ -70,4 +74,29 @@ export async function clearApiKey(): Promise<void> {
 
 export async function hasApiKey(): Promise<boolean> {
   return (await getApiKey()) !== undefined
+}
+
+/**
+ * Resolve the OpenAI base URL: an explicit env var wins (dev parity with
+ * getApiKey), otherwise the value the user saved in settings. Returns undefined
+ * for the default (direct OpenAI, api.openai.com).
+ */
+export async function getBaseUrl(): Promise<string | undefined> {
+  const fromEnv = process.env.OPENAI_BASE_URL?.trim()
+  if (fromEnv) return fromEnv
+
+  const { baseUrl } = await read()
+  return baseUrl?.trim() || undefined
+}
+
+/** Persist a custom base URL; an empty/blank value clears it (back to default). */
+export async function setBaseUrl(url: string): Promise<void> {
+  const trimmed = url.trim()
+  const current = await read()
+  if (!trimmed) {
+    delete current.baseUrl
+    await write(current)
+    return
+  }
+  await write({ ...current, baseUrl: trimmed })
 }

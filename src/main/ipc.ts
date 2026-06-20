@@ -5,7 +5,7 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import type { FlueStatus, FlueStreamMessage } from '../shared/flue'
 import { flueBackend } from './flue-backend'
-import { setApiKey, clearApiKey } from './settings'
+import { setApiKey, clearApiKey, setBaseUrl } from './settings'
 
 function broadcast(channel: string, payload: FlueStreamMessage | FlueStatus) {
   for (const win of BrowserWindow.getAllWindows()) {
@@ -45,5 +45,15 @@ export function registerFlueIpc(): void {
   ipcMain.handle('flue:clearApiKey', async () => {
     await clearApiKey()
     await flueBackend.refreshApiKey()
+  })
+
+  ipcMain.handle('flue:setBaseUrl', async (_evt, url: string) => {
+    try {
+      await setBaseUrl(url)
+      await flueBackend.restart()
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) }
+    }
   })
 }

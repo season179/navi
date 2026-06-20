@@ -1015,6 +1015,34 @@ textarea {
   color: var(--ds-danger);
 }
 
+.apikey-close {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ds-text-faint);
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.apikey-close:hover {
+  background: var(--ds-surface-elevated);
+  color: var(--ds-text);
+}
+
+.apikey-close svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 0;
+  color: inherit;
+}
+
 .spin {
   width: 15px;
   height: 15px;

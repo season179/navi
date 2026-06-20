@@ -18,7 +18,8 @@ function statusLabel(ready: boolean, hasApiKey: boolean, error?: string): string
 function HomePage() {
   const [collapsed, setCollapsed] = useState(false)
   const [draft, setDraft] = useState('')
-  const { messages, status, busy, send, cancel, setApiKey } = useNaviChat()
+  const [showSettings, setShowSettings] = useState(false)
+  const { messages, status, busy, send, cancel, setApiKey, setBaseUrl } = useNaviChat()
 
   const empty = messages.length === 0
   const composerDisabled = !status.ready || !status.hasApiKey
@@ -36,7 +37,23 @@ function HomePage() {
         subtitle={statusLabel(status.ready, status.hasApiKey, status.error)}
         sidebarCollapsed={collapsed}
         onToggleSidebar={() => setCollapsed((v) => !v)}
+        onOpenSettings={() => setShowSettings((v) => !v)}
+        settingsActive={showSettings}
       />
+
+      {showSettings ? (
+        <div className="composer-wrap">
+          <div style={{ width: '100%', maxWidth: 760 }}>
+            <ApiKeyBanner
+              mode="settings"
+              currentBaseUrl={status.baseUrl}
+              onSaveKey={setApiKey}
+              onSaveBaseUrl={setBaseUrl}
+              onClose={() => setShowSettings(false)}
+            />
+          </div>
+        </div>
+      ) : null}
 
       {empty ? (
         <div className="stage-scroll">
@@ -46,17 +63,27 @@ function HomePage() {
             <p className="hero-sub">
               Navi is your local-first companion. Start a conversation below.
             </p>
-            {!status.hasApiKey ? <ApiKeyBanner onSave={setApiKey} /> : null}
+            {!status.hasApiKey && !showSettings ? (
+              <ApiKeyBanner
+                currentBaseUrl={status.baseUrl}
+                onSaveKey={setApiKey}
+                onSaveBaseUrl={setBaseUrl}
+              />
+            ) : null}
           </div>
         </div>
       ) : (
         <ChatThread messages={messages} />
       )}
 
-      {!empty && !status.hasApiKey ? (
+      {!empty && !status.hasApiKey && !showSettings ? (
         <div className="composer-wrap">
           <div style={{ width: '100%', maxWidth: 760 }}>
-            <ApiKeyBanner onSave={setApiKey} />
+            <ApiKeyBanner
+              currentBaseUrl={status.baseUrl}
+              onSaveKey={setApiKey}
+              onSaveBaseUrl={setBaseUrl}
+            />
           </div>
         </div>
       ) : null}

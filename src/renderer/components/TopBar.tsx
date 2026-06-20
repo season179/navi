@@ -10,6 +10,7 @@ import {
   Globe,
   Terminal,
   Files,
+  Settings,
 } from 'lucide-react'
 
 type TopBarProps = {
@@ -17,9 +18,18 @@ type TopBarProps = {
   subtitle?: string
   sidebarCollapsed?: boolean
   onToggleSidebar?: () => void
+  onOpenSettings?: () => void
+  settingsActive?: boolean
 }
 
-export function TopBar({ title, subtitle, sidebarCollapsed, onToggleSidebar }: TopBarProps) {
+export function TopBar({
+  title,
+  subtitle,
+  sidebarCollapsed,
+  onToggleSidebar,
+  onOpenSettings,
+  settingsActive,
+}: TopBarProps) {
   return (
     <header className="topbar">
       <div className="topbar-session">
@@ -62,6 +72,14 @@ export function TopBar({ title, subtitle, sidebarCollapsed, onToggleSidebar }: T
         </button>
         <button className="icon-pill" title="Files" aria-label="Files">
           <Files />
+        </button>
+        <button
+          className={settingsActive ? 'icon-pill is-active' : 'icon-pill'}
+          onClick={onOpenSettings}
+          title="Connection settings"
+          aria-label="Connection settings"
+        >
+          <Settings />
         </button>
       </div>
     </header>

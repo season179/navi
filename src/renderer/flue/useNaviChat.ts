@@ -27,6 +27,7 @@ export interface NaviChat {
   cancel(): void
   reset(): void
   setApiKey(key: string): Promise<{ ok: boolean; error?: string }>
+  setBaseUrl(url: string): Promise<{ ok: boolean; error?: string }>
 }
 
 export function useNaviChat(): NaviChat {
@@ -148,5 +149,11 @@ export function useNaviChat(): NaviChat {
     return res
   }, [])
 
-  return { messages, status, busy, send, cancel, reset, setApiKey }
+  const setBaseUrl = useCallback(async (url: string) => {
+    const res = await window.navi.flue.setBaseUrl(url)
+    if (res.ok) setStatus(await window.navi.flue.status())
+    return res
+  }, [])
+
+  return { messages, status, busy, send, cancel, reset, setApiKey, setBaseUrl }
 }

@@ -4,12 +4,17 @@
 
 export const AGENT_NAME = 'navi-assistant'
 
+/** Human-readable label for the active model, shown in the composer chip. */
+export const MODEL_LABEL = 'GPT-5.4 nano'
+
 /** Backend readiness, surfaced to the UI so it can prompt for an API key. */
 export interface FlueStatus {
   /** The spawned Flue child is listening and the SDK client is connected. */
   ready: boolean
-  /** An Anthropic API key is configured (env or stored via safeStorage). */
+  /** An OpenAI API key is configured (env or stored via safeStorage). */
   hasApiKey: boolean
+  /** Effective OpenAI base URL, or undefined for the default (direct OpenAI). */
+  baseUrl?: string
   /** Last fatal error from the backend, if any. */
   error?: string
 }
@@ -45,6 +50,8 @@ export interface FlueBridge {
   cancel(requestId: string): Promise<void>
   setApiKey(key: string): Promise<{ ok: boolean; error?: string }>
   clearApiKey(): Promise<void>
+  /** Set (or clear, with an empty string) the OpenAI base URL and restart the backend. */
+  setBaseUrl(url: string): Promise<{ ok: boolean; error?: string }>
   /** Subscribe to streamed prompt events. Returns an unsubscribe function. */
   onEvent(listener: (message: FlueStreamMessage) => void): () => void
   /** Subscribe to backend status changes. Returns an unsubscribe function. */

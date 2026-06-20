@@ -5,6 +5,7 @@
 
 import { useEffect, useRef, type KeyboardEvent } from 'react'
 import { Plus, ChevronDown, ArrowUp, Square } from 'lucide-react'
+import { MODEL_LABEL } from '../../shared/flue'
 
 interface ComposerProps {
   value: string
@@ -63,7 +64,7 @@ export function Composer({
               <Plus />
             </button>
             <button className="model-chip" aria-label="Model">
-              Claude Sonnet 4.6
+              {MODEL_LABEL}
               <ChevronDown />
             </button>
           </div>

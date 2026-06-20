@@ -16,7 +16,7 @@ import { EventEmitter } from 'events'
 import path from 'path'
 import { createFlueClient, type FlueClient } from '@flue/sdk'
 import { AGENT_NAME, type FlueStatus, type FlueStreamMessage } from '../shared/flue'
-import { getApiKey } from './settings'
+import { getApiKey, getBaseUrl } from './settings'
 
 /** How long to wait for the child to print FLUE_READY before giving up. */
 const READY_TIMEOUT_MS = 20_000
@@ -38,6 +38,7 @@ class FlueBackend extends EventEmitter {
   private ready = false
   private lastError: string | undefined
   private hasKey = false
+  private baseUrl: string | undefined
   private starting: Promise<void> | null = null
   private readonly active = new Map<string, ActivePrompt>()
 
@@ -54,7 +55,7 @@ class FlueBackend extends EventEmitter {
   }
 
   status(): FlueStatus {
-    return { ready: this.ready, hasApiKey: this.hasKey, error: this.lastError }
+    return { ready: this.ready, hasApiKey: this.hasKey, baseUrl: this.baseUrl, error: this.lastError }
   }
 
   private emitStatus() {
@@ -80,6 +81,8 @@ class FlueBackend extends EventEmitter {
 
     const apiKey = await getApiKey()
     this.hasKey = apiKey !== undefined
+    const baseUrl = await getBaseUrl()
+    this.baseUrl = baseUrl
     this.lastError = undefined
 
     const token = randomBytes(32).toString('hex')
@@ -93,8 +96,10 @@ class FlueBackend extends EventEmitter {
       FLUE_TOKEN: token,
       FLUE_DB_PATH: dbPath,
     }
-    if (apiKey) env.ANTHROPIC_API_KEY = apiKey
-    else delete env.ANTHROPIC_API_KEY
+    if (apiKey) env.OPENAI_API_KEY = apiKey
+    else delete env.OPENAI_API_KEY
+    if (baseUrl) env.OPENAI_BASE_URL = baseUrl
+    else delete env.OPENAI_BASE_URL
 
     const child = spawn(process.execPath, ['--no-warnings', this.serverPath()], {
       env,
@@ -208,7 +213,7 @@ class FlueBackend extends EventEmitter {
       throw new Error('Flue backend is not ready.')
     }
     if (!this.hasKey) {
-      throw new Error('No Anthropic API key configured. Add one in Settings.')
+      throw new Error('No OpenAI API key configured. Add one in Settings.')
     }
 
     const requestId = randomUUID()
