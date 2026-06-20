@@ -1,7 +1,8 @@
 /* =====================================================
-   Navi Design Tokens — extracted from Kun design system
-   Two layers: primitives (--bg-*) + semantic aliases (--ds-*)
-   Components reference --ds-* only.
+   Navi Design Tokens — ported from the Kun design system.
+   Two layers: primitives (--bg-*, --text-*) + semantic
+   aliases (--ds-*). Components reference --ds-* only.
+   The dark theme follows Kun's deep-ocean navy palette.
    ===================================================== */
 
 /* ---- Light theme (default) ---- */
@@ -11,14 +12,14 @@
   --bg-app: #f3f5fc;
   --bg-sidebar: #eef2fa;
   --bg-canvas: #fafbff;
-  --surface-1: rgba(255, 255, 255, 0.90);
+  --surface-1: rgba(255, 255, 255, 0.9);
   --surface-2: rgba(255, 255, 255, 0.98);
   --surface-3: #ffffff;
   --surface-subtle: #eaf0f9;
   --surface-hover: rgba(59, 110, 187, 0.065);
   --border-soft: rgba(20, 47, 95, 0.13);
   --border-muted: rgba(20, 47, 95, 0.085);
-  --border-strong: rgba(20, 47, 95, 0.20);
+  --border-strong: rgba(20, 47, 95, 0.2);
   --text-primary: #233659;
   --text-secondary: #54678c;
   --text-tertiary: #8492b1;
@@ -26,20 +27,69 @@
   --accent: #3b82d8;
   --accent-soft: rgba(59, 130, 216, 0.15);
   --success: #128a4a;
-  --success-soft: rgba(17, 185, 129, 0.14);
   --danger: #d6493f;
-  --danger-soft: rgba(244, 116, 100, 0.14);
-  --warning-soft: rgba(240, 162, 63, 0.16);
-  --selection: rgba(59, 130, 216, 0.20);
-  --scrollbar-thumb: rgba(84, 103, 140, 0.24);
-  --scrollbar-thumb-hover: rgba(84, 103, 140, 0.34);
+
+  /* Stage + topbar + sidebar layered surfaces */
+  --ds-stage-gradient: linear-gradient(180deg, #fafbff 0%, #ffffff 100%);
+  --ds-topbar-bg:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 255, 255, 0.58) 58%, rgba(255, 255, 255, 0.3) 100%);
+  --ds-topbar-shadow:
+    0 16px 42px rgba(20, 47, 95, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.64);
+  --ds-sidebar-gradient:
+    linear-gradient(180deg, rgba(246, 249, 254, 0.98) 0%, rgba(237, 243, 252, 0.98) 100%);
+  --ds-sidebar-haze:
+    radial-gradient(circle at 62% -14%, rgba(133, 193, 241, 0.16), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0) 30%);
+  --ds-sidebar-border: rgba(108, 162, 221, 0.26);
+  --ds-sidebar-shadow: none;
+  --ds-sidebar-row-hover: rgba(108, 162, 221, 0.1);
+  --ds-sidebar-row-active: rgba(216, 232, 249, 0.85);
+  --ds-sidebar-row-ring: rgba(108, 162, 221, 0.2);
+  --ds-sidebar-field-bg: rgba(244, 248, 253, 0.8);
+  --ds-sidebar-field-focus: rgba(255, 255, 255, 0.92);
+  --ds-sidebar-divider: rgba(108, 162, 221, 0.22);
+
+  /* Cards / chips / code surfaces */
+  --ds-card-soft: rgba(255, 255, 255, 0.8);
+  --ds-card-strong: rgba(255, 255, 255, 0.96);
+  --ds-card-muted: rgba(245, 248, 253, 0.86);
+  --ds-chip-bg: rgba(255, 255, 255, 0.9);
+  --ds-chip-border: rgba(20, 47, 95, 0.13);
+
+  /* Body backdrop washes */
+  --ds-body-before: linear-gradient(180deg, #f7f9fe 0%, #f0f4fb 100%);
+  --ds-body-after:
+    radial-gradient(circle at 78% -10%, rgba(133, 193, 241, 0.16), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 22%),
+    linear-gradient(120deg, rgba(191, 225, 252, 0.2), transparent 34%, rgba(255, 255, 255, 0.12) 74%, transparent);
 
   /* Elevation shadows */
   --shadow-card-soft: 0 10px 28px rgba(20, 47, 95, 0.06);
   --shadow-card-strong: 0 14px 36px rgba(20, 47, 95, 0.09);
   --shadow-panel: 0 16px 44px rgba(20, 47, 95, 0.06);
   --shadow-shell: 0 12px 30px rgba(20, 47, 95, 0.08);
+  --shadow-composer:
+    0 18px 46px rgba(20, 47, 95, 0.1),
+    0 5px 16px rgba(20, 47, 95, 0.06);
   --shadow-chip: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  --selection: rgba(59, 130, 216, 0.2);
+  --scrollbar-thumb: rgba(84, 103, 140, 0.24);
+  --scrollbar-thumb-hover: rgba(84, 103, 140, 0.34);
+
+  /* Hero stage mascot palette */
+  --stage-canvas-top: #ffffff;
+  --stage-canvas-bottom: #f3f6fd;
+  --stage-nav: rgba(108, 162, 221, 0.16);
+  --stage-nav-active: rgba(108, 162, 221, 0.32);
+  --stage-thread: rgba(133, 193, 241, 0.22);
+  --stage-composer: rgba(255, 255, 255, 0.92);
+  --stage-ring: rgba(133, 193, 241, 0.4);
+  --mascot-body: #6ca2dd;
+  --mascot-belly: #cfe6fb;
+  --mascot-beak: #f0a23f;
+  --mascot-foot: #e08a3a;
+  --mascot-water: rgba(94, 156, 220, 0.22);
 
   /* Semantic aliases — components use these exclusively */
   --ds-bg-main: var(--bg-app);
@@ -59,19 +109,20 @@
   --ds-accent: var(--accent);
   --ds-accent-soft: var(--accent-soft);
   --ds-success: var(--success);
-  --ds-success-soft: var(--success-soft);
+  --ds-success-soft: rgba(17, 185, 129, 0.14);
   --ds-danger: var(--danger);
-  --ds-danger-soft: var(--danger-soft);
-  --ds-warning-soft: var(--warning-soft);
+  --ds-danger-soft: rgba(244, 116, 100, 0.14);
+  --ds-warning-soft: rgba(240, 162, 63, 0.16);
   --ds-selection: var(--selection);
   --ds-shadow-card-soft: var(--shadow-card-soft);
   --ds-shadow-card-strong: var(--shadow-card-strong);
   --ds-shadow-panel: var(--shadow-panel);
   --ds-shadow-shell: var(--shadow-shell);
+  --ds-shadow-composer: var(--shadow-composer);
   --ds-shadow-chip: var(--shadow-chip);
 }
 
-/* ---- Dark theme ---- */
+/* ---- Dark theme (Kun deep-ocean navy) ---- */
 [data-theme='dark'] {
   /* Primitives */
   --bg-app: #0f1422;
@@ -80,31 +131,84 @@
   --surface-1: rgba(22, 29, 47, 0.92);
   --surface-2: #1b2338;
   --surface-subtle: #1b2338;
-  --surface-hover: rgba(151, 192, 235, 0.10);
+  --surface-hover: rgba(151, 192, 235, 0.1);
   --border-soft: rgba(151, 192, 235, 0.13);
-  --border-muted: rgba(151, 192, 235, 0.10);
-  --border-strong: rgba(151, 192, 235, 0.20);
+  --border-muted: rgba(151, 192, 235, 0.1);
+  --border-strong: rgba(151, 192, 235, 0.2);
   --text-primary: #f0f5fc;
   --text-secondary: #bdc9de;
   --text-tertiary: #8593b1;
-  --text-placeholder: #6a7894;
+  --text-placeholder: #76839e;
   --accent: #6fb0e8;
   --accent-soft: rgba(111, 176, 232, 0.18);
   --success: #40c977;
-  --success-soft: rgba(64, 201, 119, 0.18);
   --danger: #f8736a;
-  --danger-soft: rgba(248, 115, 106, 0.18);
-  --warning-soft: rgba(242, 162, 63, 0.18);
+
+  /* Stage + topbar + sidebar layered surfaces */
+  --ds-stage-gradient: linear-gradient(180deg, #1c2440 0%, #161d30 48%, #0f1422 100%);
+  --ds-topbar-bg:
+    linear-gradient(180deg, rgba(27, 35, 56, 0.86) 0%, rgba(22, 29, 47, 0.7) 58%, rgba(15, 20, 34, 0.42) 100%);
+  --ds-topbar-shadow:
+    0 18px 44px rgba(2, 6, 16, 0.24),
+    inset 0 1px 0 rgba(151, 192, 235, 0.08);
+  --ds-sidebar-gradient:
+    linear-gradient(180deg, rgba(24, 31, 50, 0.96) 0%, rgba(19, 25, 42, 0.94) 48%, rgba(14, 19, 32, 0.96) 100%);
+  --ds-sidebar-haze:
+    radial-gradient(circle at 58% -12%, rgba(111, 176, 232, 0.14), transparent 36%),
+    linear-gradient(180deg, rgba(151, 192, 235, 0.05), rgba(151, 192, 235, 0) 28%);
+  --ds-sidebar-border: rgba(151, 192, 235, 0.12);
+  --ds-sidebar-shadow:
+    0 24px 64px rgba(2, 6, 16, 0.42),
+    0 4px 18px rgba(2, 6, 16, 0.28);
+  --ds-sidebar-row-hover: rgba(151, 192, 235, 0.09);
+  --ds-sidebar-row-active: rgba(151, 192, 235, 0.13);
+  --ds-sidebar-row-ring: rgba(151, 192, 235, 0.1);
+  --ds-sidebar-field-bg: rgba(151, 192, 235, 0.06);
+  --ds-sidebar-field-focus: rgba(151, 192, 235, 0.1);
+  --ds-sidebar-divider: rgba(151, 192, 235, 0.12);
+
+  /* Cards / chips */
+  --ds-card-soft:
+    linear-gradient(180deg, rgba(27, 35, 56, 0.94), rgba(21, 28, 45, 0.9));
+  --ds-card-strong:
+    linear-gradient(180deg, rgba(33, 43, 68, 0.98), rgba(24, 32, 51, 0.96));
+  --ds-card-muted: rgba(27, 35, 56, 0.86);
+  --ds-chip-bg: rgba(27, 35, 56, 0.94);
+  --ds-chip-border: rgba(151, 192, 235, 0.13);
+
+  /* Body backdrop washes */
+  --ds-body-before: linear-gradient(180deg, #0f1422 0%, #161d30 100%);
+  --ds-body-after:
+    radial-gradient(circle at 76% -12%, rgba(111, 176, 232, 0.1), transparent 38%),
+    linear-gradient(180deg, rgba(151, 192, 235, 0.05), transparent 24%),
+    linear-gradient(120deg, rgba(151, 192, 235, 0.04), transparent 35%, rgba(151, 192, 235, 0.025) 72%, transparent);
+
+  /* Elevation shadows */
+  --shadow-card-soft: 0 16px 42px rgba(2, 6, 16, 0.22);
+  --shadow-card-strong: 0 22px 56px rgba(2, 6, 16, 0.3);
+  --shadow-panel: 0 22px 58px rgba(2, 6, 16, 0.35);
+  --shadow-shell: 0 38px 96px rgba(2, 6, 16, 0.55);
+  --shadow-composer:
+    0 28px 78px rgba(2, 6, 16, 0.45),
+    0 0 0 1px rgba(151, 192, 235, 0.07);
+  --shadow-chip: inset 0 1px 0 rgba(151, 192, 235, 0.06);
   --selection: rgba(111, 176, 232, 0.26);
   --scrollbar-thumb: rgba(151, 178, 215, 0.28);
   --scrollbar-thumb-hover: rgba(171, 198, 233, 0.38);
 
-  /* Elevation shadows */
-  --shadow-card-soft: 0 16px 42px rgba(2, 6, 16, 0.22);
-  --shadow-card-strong: 0 22px 56px rgba(2, 6, 16, 0.30);
-  --shadow-panel: 0 22px 58px rgba(2, 6, 16, 0.35);
-  --shadow-shell: 0 38px 96px rgba(2, 6, 16, 0.55);
-  --shadow-chip: inset 0 1px 0 rgba(151, 192, 235, 0.06);
+  /* Hero stage mascot palette (dark) */
+  --stage-canvas-top: #1c2440;
+  --stage-canvas-bottom: #0f1422;
+  --stage-nav: rgba(151, 192, 235, 0.14);
+  --stage-nav-active: rgba(151, 192, 235, 0.28);
+  --stage-thread: rgba(151, 192, 235, 0.16);
+  --stage-composer: rgba(22, 29, 47, 0.92);
+  --stage-ring: rgba(151, 192, 235, 0.32);
+  --mascot-body: #6fb0e8;
+  --mascot-belly: #d4ebfb;
+  --mascot-beak: #f0a23f;
+  --mascot-foot: #e08a3a;
+  --mascot-water: rgba(151, 192, 235, 0.3);
 
   /* Semantic aliases */
   --ds-bg-main: var(--bg-app);
@@ -124,14 +228,15 @@
   --ds-accent: var(--accent);
   --ds-accent-soft: var(--accent-soft);
   --ds-success: var(--success);
-  --ds-success-soft: var(--success-soft);
+  --ds-success-soft: rgba(64, 201, 119, 0.18);
   --ds-danger: var(--danger);
-  --ds-danger-soft: var(--danger-soft);
-  --ds-warning-soft: var(--warning-soft);
+  --ds-danger-soft: rgba(248, 115, 106, 0.18);
+  --ds-warning-soft: rgba(242, 162, 63, 0.18);
   --ds-selection: var(--selection);
   --ds-shadow-card-soft: var(--shadow-card-soft);
   --ds-shadow-card-strong: var(--shadow-card-strong);
   --ds-shadow-panel: var(--shadow-panel);
   --ds-shadow-shell: var(--shadow-shell);
+  --ds-shadow-composer: var(--shadow-composer);
   --ds-shadow-chip: var(--shadow-chip);
 }

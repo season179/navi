@@ -3,8 +3,13 @@ import path from 'path'
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 820,
+    minWidth: 720,
+    minHeight: 480,
+    backgroundColor: '#0f1422',
+    titleBarStyle: 'hiddenInset',
+    trafficLightPosition: { x: 16, y: 16 },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

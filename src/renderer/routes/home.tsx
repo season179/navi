@@ -1,41 +1,71 @@
+import { useState } from 'react'
 import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
+import { FolderOpen, Bug, Lightbulb } from 'lucide-react'
+import { TopBar } from '../components/TopBar'
+import { HeroStage } from '../components/HeroStage'
+import { Composer } from '../components/Composer'
+
+const STARTERS = [
+  {
+    icon: FolderOpen,
+    tone: 'tone-blue',
+    title: 'Structure a project',
+    sub: 'Scaffold a clean architecture for a new app.',
+  },
+  {
+    icon: Bug,
+    tone: 'tone-emerald',
+    title: 'Debug an issue',
+    sub: 'Track down a failing test or a tricky error.',
+  },
+  {
+    icon: Lightbulb,
+    tone: 'tone-violet',
+    title: 'Plan a feature',
+    sub: 'Sketch out requirements and an approach.',
+  },
+]
 
 function HomePage() {
+  const [collapsed, setCollapsed] = useState(false)
+
   return (
-    <div className="page-card">
-      <h1 className="page-title">Home</h1>
-      <p className="page-subtitle">Welcome back. Here's what's new.</p>
-
-      <div className="card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 13, color: 'var(--ds-text-muted)', marginBottom: 8 }}>
-          You have 3 unread notifications in your inbox.
-        </p>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-primary">View inbox</button>
-          <button className="btn btn-secondary">Dismiss all</button>
+    <>
+      <TopBar
+        title="New conversation"
+        subtitle="agent · just now"
+        sidebarCollapsed={collapsed}
+        onToggleSidebar={() => setCollapsed((v) => !v)}
+      />
+      <div className="stage-scroll">
+        <div className="hero">
+          <HeroStage />
+          <h1 className="hero-greeting">Good to see you</h1>
+          <p className="hero-sub">
+            Navi is your local-first companion. Start a conversation or pick a
+            starting point below.
+          </p>
+          <div className="hero-cards">
+            {STARTERS.map((card) => {
+              const Icon = card.icon
+              return (
+                <button key={card.title} className="starter-card">
+                  <span className={`starter-icon ${card.tone}`}>
+                    <Icon />
+                  </span>
+                  <span style={{ minWidth: 0 }}>
+                    <span className="starter-title">{card.title}</span>
+                    <span className="starter-sub">{card.sub}</span>
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
-
-      <div className="card-strong">
-        <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>Recent activity</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {['Note "Ideas" was updated', 'New message in Inbox', 'Archive cleaned'].map((item) => (
-            <div
-              key={item}
-              style={{
-                fontSize: 13,
-                color: 'var(--ds-text-muted)',
-                padding: '8px 0',
-                borderBottom: '1px solid var(--ds-border-muted)',
-              }}
-            >
-              {item}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+      <Composer />
+    </>
   )
 }
 
