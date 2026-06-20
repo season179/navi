@@ -1,5 +1,7 @@
-This is an Electron app for own use.
-Use deepwiki to learn about packages and libraries.
-Make sure there are no flaky test.
-All tests must be protecting something real.
-Use agent-browser to test the Electron app.
+Personal-use Electron app.
+Use deepwiki for package/library docs.
+Use agent-browser to test it.
+No flaky tests; every test must protect something real.
+
+## pi (collaborating coding agent)
+`pi` is preconfigured — never reconfigure it. Delegate with `pi -p "prompt"` (one-shot) and `pi @file "prompt"` to attach files. Add `--mode json` for parseable output, `--tools read,grep,find,ls` for read-only review, `--session-id <id>` for continuity, `--wt` to isolate in a git worktree.
