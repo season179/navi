@@ -101,7 +101,12 @@ export function useNaviChat(): NaviChat {
   const persistCurrent = useCallback(async () => {
     const msgs = messagesRef.current
     if (msgs.length === 0) return
-    await window.navi.flue.saveConversation(conversationIdRef.current, deriveTitle(msgs), toPersisted(msgs))
+    await window.navi.flue.saveConversation(
+      conversationIdRef.current,
+      'navi-default',
+      deriveTitle(msgs),
+      toPersisted(msgs),
+    )
     await refreshList()
   }, [refreshList])
 

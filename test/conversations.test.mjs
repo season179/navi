@@ -18,6 +18,7 @@ import { buildSync } from 'esbuild'
 const require = createRequire(import.meta.url)
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 
+const DEFAULT_PROJECT_ID = 'navi-default'
 let tmp
 let store
 let storeFile
@@ -50,8 +51,8 @@ test('starts empty when no store file exists', async () => {
 })
 
 test('lists meta only (no message bodies), most-recently-updated first', async () => {
-  await store.saveConversation('A', 'First', [{ id: 'm1', role: 'user', text: 'hi', status: 'done' }])
-  await store.saveConversation('B', 'Second', [{ id: 'm2', role: 'user', text: 'yo', status: 'done' }])
+  await store.saveConversation('A', DEFAULT_PROJECT_ID, 'First', [{ id: 'm1', role: 'user', text: 'hi', status: 'done' }])
+  await store.saveConversation('B', DEFAULT_PROJECT_ID, 'Second', [{ id: 'm2', role: 'user', text: 'yo', status: 'done' }])
   const list = await store.listConversations()
   assert.equal(list.length, 2)
   assert.equal(list[0].id, 'B', 'most recently saved sorts first')
@@ -71,7 +72,7 @@ test('updatedAt is strictly monotonic across saves (no same-millisecond ties)', 
 })
 
 test('upsert replaces the thread and bumps recency without duplicating', async () => {
-  await store.saveConversation('A', 'First', [
+  await store.saveConversation('A', DEFAULT_PROJECT_ID, 'First', [
     { id: 'm1', role: 'user', text: 'hi', status: 'done' },
     { id: 'm3', role: 'assistant', text: 'hello!', status: 'done' },
   ])
@@ -90,9 +91,9 @@ test('writes atomically — no leftover temp file', () => {
 
 test('serializes concurrent saves without losing writes', async () => {
   await Promise.all([
-    store.saveConversation('C', 'c', [{ id: 'c1', role: 'user', text: 'c', status: 'done' }]),
-    store.saveConversation('D', 'd', [{ id: 'd1', role: 'user', text: 'd', status: 'done' }]),
-    store.saveConversation('E', 'e', [{ id: 'e1', role: 'user', text: 'e', status: 'done' }]),
+    store.saveConversation('C', DEFAULT_PROJECT_ID, 'c', [{ id: 'c1', role: 'user', text: 'c', status: 'done' }]),
+    store.saveConversation('D', DEFAULT_PROJECT_ID, 'd', [{ id: 'd1', role: 'user', text: 'd', status: 'done' }]),
+    store.saveConversation('E', DEFAULT_PROJECT_ID, 'e', [{ id: 'e1', role: 'user', text: 'e', status: 'done' }]),
   ])
   assert.equal((await store.listConversations()).length, 5, 'all five conversations present')
 })

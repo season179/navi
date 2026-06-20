@@ -2,7 +2,7 @@
 // these via the preload-exposed window.navi.flue API; the main process owns the
 // SDK client and the bearer token, so the renderer only ever sees plain text.
 
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, dialog, ipcMain } from 'electron'
 import type { FlueStatus, FlueStreamMessage, PersistedMessage } from '../shared/flue'
 import { flueBackend } from './flue-backend'
 import { setApiKey, setBaseUrl } from './settings'
@@ -11,6 +11,9 @@ import {
   getConversation,
   saveConversation,
   deleteConversation,
+  listProjects,
+  createProject,
+  deleteProject,
 } from './conversations'
 
 function broadcast(channel: string, payload: FlueStreamMessage | FlueStatus) {
@@ -58,14 +61,33 @@ export function registerFlueIpc(): void {
     }
   })
 
+  ipcMain.handle('projects:list', () => listProjects())
+
+  ipcMain.handle('projects:create', async (evt) => {
+    const win = BrowserWindow.fromWebContents(evt.sender) ?? BrowserWindow.getAllWindows()[0]
+    const opts = {
+      title: 'Select project folder',
+      properties: ['openDirectory', 'createDirectory', 'dontAddToRecent'] as (
+        | 'openDirectory'
+        | 'createDirectory'
+        | 'dontAddToRecent'
+      )[],
+    }
+    const res = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts)
+    if (res.canceled || !res.filePaths[0]) return null
+    return createProject(res.filePaths[0])
+  })
+
+  ipcMain.handle('projects:delete', (_e, id: string) => deleteProject(id))
+
   ipcMain.handle('conversations:list', () => listConversations())
 
   ipcMain.handle('conversations:get', (_evt, id: string) => getConversation(id))
 
   ipcMain.handle(
     'conversations:save',
-    (_evt, id: string, title: string, messages: PersistedMessage[]) =>
-      saveConversation(id, title, messages),
+    (_evt, id: string, projectId: string, title: string, messages: PersistedMessage[]) =>
+      saveConversation(id, projectId, title, messages),
   )
 
   ipcMain.handle('conversations:delete', (_evt, id: string) => deleteConversation(id))
