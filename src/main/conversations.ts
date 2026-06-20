@@ -226,8 +226,9 @@ export function saveConversation(
     // Strictly monotonic: a save is always newer than every existing record,
     // even when two saves land in the same wall-clock millisecond. Keeps the
     // most-recent-first ordering deterministic (Date.now() alone can tie).
-    const newest = store.conversations.reduce((max, c) => Math.max(max, c.updatedAt), 0)
-    const now = Math.max(Date.now(), newest + 1)
+    const newestConv = store.conversations.reduce((max, c) => Math.max(max, c.updatedAt), 0)
+    const newestProj = store.projects.reduce((max, p) => Math.max(max, p.updatedAt), 0)
+    const now = Math.max(Date.now(), newestConv + 1, newestProj + 1)
     const existing = store.conversations.find((c) => c.id === id)
     if (existing) {
       if (title) existing.title = title
