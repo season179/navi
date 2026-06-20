@@ -1,0 +1,13 @@
+{
+  "name": "navi",
+  "version": "0.0.1",
+  "private": true,
+  "description": "a local-first desktop app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^39.8.10"
+  }
+}
