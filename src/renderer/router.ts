@@ -12,9 +12,10 @@ const routeTree = rootRoute.addChildren([
   archiveRoute,
 ])
 
-const hashHistory = createHashHistory()
-
-export const router = createRouter({ routeTree, history: hashHistory })
+export const router = createRouter({
+  routeTree,
+  history: createHashHistory(),
+})
 
 declare module '@tanstack/react-router' {
   interface Register {

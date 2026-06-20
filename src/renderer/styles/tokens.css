@@ -1,0 +1,137 @@
+/* =====================================================
+   Navi Design Tokens — extracted from Kun design system
+   Two layers: primitives (--bg-*) + semantic aliases (--ds-*)
+   Components reference --ds-* only.
+   ===================================================== */
+
+/* ---- Light theme (default) ---- */
+:root,
+[data-theme='light'] {
+  /* Primitives */
+  --bg-app: #f3f5fc;
+  --bg-sidebar: #eef2fa;
+  --bg-canvas: #fafbff;
+  --surface-1: rgba(255, 255, 255, 0.90);
+  --surface-2: rgba(255, 255, 255, 0.98);
+  --surface-3: #ffffff;
+  --surface-subtle: #eaf0f9;
+  --surface-hover: rgba(59, 110, 187, 0.065);
+  --border-soft: rgba(20, 47, 95, 0.13);
+  --border-muted: rgba(20, 47, 95, 0.085);
+  --border-strong: rgba(20, 47, 95, 0.20);
+  --text-primary: #233659;
+  --text-secondary: #54678c;
+  --text-tertiary: #8492b1;
+  --text-placeholder: #93a1c0;
+  --accent: #3b82d8;
+  --accent-soft: rgba(59, 130, 216, 0.15);
+  --success: #128a4a;
+  --success-soft: rgba(17, 185, 129, 0.14);
+  --danger: #d6493f;
+  --danger-soft: rgba(244, 116, 100, 0.14);
+  --warning-soft: rgba(240, 162, 63, 0.16);
+  --selection: rgba(59, 130, 216, 0.20);
+  --scrollbar-thumb: rgba(84, 103, 140, 0.24);
+  --scrollbar-thumb-hover: rgba(84, 103, 140, 0.34);
+
+  /* Elevation shadows */
+  --shadow-card-soft: 0 10px 28px rgba(20, 47, 95, 0.06);
+  --shadow-card-strong: 0 14px 36px rgba(20, 47, 95, 0.09);
+  --shadow-panel: 0 16px 44px rgba(20, 47, 95, 0.06);
+  --shadow-shell: 0 12px 30px rgba(20, 47, 95, 0.08);
+  --shadow-chip: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+
+  /* Semantic aliases — components use these exclusively */
+  --ds-bg-main: var(--bg-app);
+  --ds-bg-sidebar: var(--bg-sidebar);
+  --ds-bg-canvas: var(--bg-canvas);
+  --ds-surface-card: var(--surface-1);
+  --ds-surface-elevated: var(--surface-2);
+  --ds-surface-subtle: var(--surface-subtle);
+  --ds-surface-hover: var(--surface-hover);
+  --ds-border: var(--border-soft);
+  --ds-border-muted: var(--border-muted);
+  --ds-border-strong: var(--border-strong);
+  --ds-text: var(--text-primary);
+  --ds-text-muted: var(--text-secondary);
+  --ds-text-faint: var(--text-tertiary);
+  --ds-text-placeholder: var(--text-placeholder);
+  --ds-accent: var(--accent);
+  --ds-accent-soft: var(--accent-soft);
+  --ds-success: var(--success);
+  --ds-success-soft: var(--success-soft);
+  --ds-danger: var(--danger);
+  --ds-danger-soft: var(--danger-soft);
+  --ds-warning-soft: var(--warning-soft);
+  --ds-selection: var(--selection);
+  --ds-shadow-card-soft: var(--shadow-card-soft);
+  --ds-shadow-card-strong: var(--shadow-card-strong);
+  --ds-shadow-panel: var(--shadow-panel);
+  --ds-shadow-shell: var(--shadow-shell);
+  --ds-shadow-chip: var(--shadow-chip);
+}
+
+/* ---- Dark theme ---- */
+[data-theme='dark'] {
+  /* Primitives */
+  --bg-app: #0f1422;
+  --bg-sidebar: #121829;
+  --bg-canvas: #161d30;
+  --surface-1: rgba(22, 29, 47, 0.92);
+  --surface-2: #1b2338;
+  --surface-subtle: #1b2338;
+  --surface-hover: rgba(151, 192, 235, 0.10);
+  --border-soft: rgba(151, 192, 235, 0.13);
+  --border-muted: rgba(151, 192, 235, 0.10);
+  --border-strong: rgba(151, 192, 235, 0.20);
+  --text-primary: #f0f5fc;
+  --text-secondary: #bdc9de;
+  --text-tertiary: #8593b1;
+  --text-placeholder: #6a7894;
+  --accent: #6fb0e8;
+  --accent-soft: rgba(111, 176, 232, 0.18);
+  --success: #40c977;
+  --success-soft: rgba(64, 201, 119, 0.18);
+  --danger: #f8736a;
+  --danger-soft: rgba(248, 115, 106, 0.18);
+  --warning-soft: rgba(242, 162, 63, 0.18);
+  --selection: rgba(111, 176, 232, 0.26);
+  --scrollbar-thumb: rgba(151, 178, 215, 0.28);
+  --scrollbar-thumb-hover: rgba(171, 198, 233, 0.38);
+
+  /* Elevation shadows */
+  --shadow-card-soft: 0 16px 42px rgba(2, 6, 16, 0.22);
+  --shadow-card-strong: 0 22px 56px rgba(2, 6, 16, 0.30);
+  --shadow-panel: 0 22px 58px rgba(2, 6, 16, 0.35);
+  --shadow-shell: 0 38px 96px rgba(2, 6, 16, 0.55);
+  --shadow-chip: inset 0 1px 0 rgba(151, 192, 235, 0.06);
+
+  /* Semantic aliases */
+  --ds-bg-main: var(--bg-app);
+  --ds-bg-sidebar: var(--bg-sidebar);
+  --ds-bg-canvas: var(--bg-canvas);
+  --ds-surface-card: var(--surface-1);
+  --ds-surface-elevated: var(--surface-2);
+  --ds-surface-subtle: var(--surface-subtle);
+  --ds-surface-hover: var(--surface-hover);
+  --ds-border: var(--border-soft);
+  --ds-border-muted: var(--border-muted);
+  --ds-border-strong: var(--border-strong);
+  --ds-text: var(--text-primary);
+  --ds-text-muted: var(--text-secondary);
+  --ds-text-faint: var(--text-tertiary);
+  --ds-text-placeholder: var(--text-placeholder);
+  --ds-accent: var(--accent);
+  --ds-accent-soft: var(--accent-soft);
+  --ds-success: var(--success);
+  --ds-success-soft: var(--success-soft);
+  --ds-danger: var(--danger);
+  --ds-danger-soft: var(--danger-soft);
+  --ds-warning-soft: var(--warning-soft);
+  --ds-selection: var(--selection);
+  --ds-shadow-card-soft: var(--shadow-card-soft);
+  --ds-shadow-card-strong: var(--shadow-card-strong);
+  --ds-shadow-panel: var(--shadow-panel);
+  --ds-shadow-shell: var(--shadow-shell);
+  --ds-shadow-chip: var(--shadow-chip);
+}

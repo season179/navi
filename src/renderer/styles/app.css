@@ -1,0 +1,259 @@
+/* =====================================================
+   Navi — Application styles
+   Uses --ds-* tokens only. Never references primitives.
+   ===================================================== */
+
+/* ---- Reset & Base ---- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--ds-bg-main);
+  color: var(--ds-text);
+  line-height: 1.5;
+}
+
+#root {
+  height: 100%;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* ---- Selection ---- */
+::selection {
+  background: var(--ds-selection);
+}
+
+/* ---- Shell Layout ---- */
+.shell {
+  display: flex;
+  height: 100vh;
+  background: var(--ds-bg-main);
+}
+
+/* ---- Sidebar ---- */
+.sidebar {
+  width: 240px;
+  background: var(--ds-bg-sidebar);
+  border-right: 1px solid var(--ds-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--ds-border);
+}
+
+.brand {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+}
+
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+}
+
+.nav-item {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  text-decoration: none;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.nav-item:hover {
+  background: var(--ds-accent-soft);
+  color: var(--ds-accent);
+}
+
+.nav-item.active {
+  background: var(--ds-accent-soft);
+  color: var(--ds-accent);
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--ds-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-chip {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ds-text-faint);
+}
+
+.theme-toggle {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface-card);
+  color: var(--ds-text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--ds-accent-soft);
+  color: var(--ds-accent);
+}
+
+/* ---- Content Area ---- */
+.content {
+  flex: 1;
+  background: var(--ds-bg-canvas);
+  overflow-y: auto;
+  padding: 40px 48px;
+}
+
+/* Page header with card */
+.page-card {
+  max-width: 720px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--ds-text-faint);
+  margin-bottom: 28px;
+}
+
+/* ---- Card component ---- */
+.card {
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface-card);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--ds-shadow-card-soft);
+}
+
+.card-strong {
+  border-color: var(--ds-border-strong);
+  background: var(--ds-surface-elevated);
+  box-shadow: var(--ds-shadow-card-strong);
+}
+
+/* ---- Button component ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.14s ease, opacity 0.14s ease;
+}
+
+.btn-primary {
+  background: var(--ds-accent);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  background: var(--ds-surface-elevated);
+  color: var(--ds-text);
+  border: 1px solid var(--ds-border);
+}
+
+.btn-secondary:hover {
+  background: var(--ds-surface-hover);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Empty state ---- */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-state-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+.empty-state-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ds-text);
+  margin-bottom: 4px;
+}
+
+.empty-state-desc {
+  font-size: 13px;
+  color: var(--ds-text-faint);
+  margin-bottom: 20px;
+}
+
+/* ---- Loading skeleton ---- */
+.skeleton {
+  border-radius: 8px;
+  background: var(--ds-surface-subtle);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
