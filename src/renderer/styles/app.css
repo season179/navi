@@ -37,6 +37,7 @@ summary,
 [role='button'],
 [contenteditable='true'],
 .stage-scroll,
+.chat-thread,
 .page {
   -webkit-app-region: no-drag;
 }
@@ -811,4 +812,217 @@ textarea {
   border-radius: 8px;
   background: var(--ds-surface-subtle);
   animation: navi-pulse 1.8s ease-in-out infinite;
+}
+
+/* =====================================================
+   Chat thread
+   ===================================================== */
+.chat-thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-thread-inner {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.msg {
+  display: flex;
+  width: 100%;
+}
+
+.msg-user {
+  justify-content: flex-end;
+}
+
+.msg-assistant {
+  justify-content: flex-start;
+}
+
+.msg-bubble {
+  position: relative;
+  max-width: 82%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+.msg-user .msg-bubble {
+  background: var(--ds-accent);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+}
+
+[data-theme='dark'] .msg-user .msg-bubble {
+  color: #0f1422;
+}
+
+.msg-assistant .msg-bubble {
+  background: var(--ds-card-soft);
+  border: 1px solid var(--ds-border);
+  color: var(--ds-text);
+  border-bottom-left-radius: 6px;
+  box-shadow: var(--ds-shadow-card-soft);
+}
+
+.msg-bubble.is-error {
+  background: var(--ds-danger-soft);
+  border-color: var(--ds-danger);
+  color: var(--ds-danger);
+}
+
+.msg-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Soft blinking caret while streaming */
+.msg-caret {
+  display: inline-block;
+  width: 7px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.6;
+  animation: navi-pulse 1.1s ease-in-out infinite;
+}
+
+/* Typing indicator (three dots) before the first token */
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 1.05em;
+}
+
+.typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ds-text-faint);
+  animation: navi-pulse 1.2s ease-in-out infinite;
+}
+
+.typing span:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.typing span:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+/* Stop button (composer, while streaming) */
+.send-btn.is-stop {
+  background: var(--ds-danger);
+  color: #fff;
+  box-shadow: none;
+}
+
+.send-btn.is-stop:hover {
+  background: var(--ds-danger);
+  opacity: 0.9;
+}
+
+[data-theme='dark'] .send-btn.is-stop {
+  background: var(--ds-danger);
+  color: #fff;
+}
+
+/* =====================================================
+   API key gate
+   ===================================================== */
+.apikey-card {
+  width: 100%;
+  max-width: 520px;
+  margin: 18px auto 0;
+  padding: 18px;
+  text-align: left;
+  border: 1px solid var(--ds-border);
+  border-radius: 16px;
+  background: var(--ds-card-soft);
+  box-shadow: var(--ds-shadow-card-soft);
+}
+
+.apikey-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.apikey-head svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--ds-accent);
+}
+
+.apikey-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.apikey-desc {
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ds-text-muted);
+}
+
+.apikey-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.apikey-input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--ds-border-strong);
+  background: var(--ds-surface-elevated);
+  color: var(--ds-text);
+  font-size: 13.5px;
+  outline: none;
+}
+
+.apikey-input:focus {
+  border-color: var(--ds-accent);
+}
+
+.apikey-input::placeholder {
+  color: var(--ds-text-placeholder);
+}
+
+.apikey-error {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--ds-danger);
+}
+
+.spin {
+  width: 15px;
+  height: 15px;
+  animation: navi-spin 0.8s linear infinite;
+}
+
+@keyframes navi-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

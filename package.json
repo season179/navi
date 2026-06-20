@@ -9,10 +9,14 @@
     "build:main": "esbuild src/main/main.ts --bundle --platform=node --external:electron --outfile=dist/main/main.js --sourcemap",
     "build:preload": "esbuild src/main/preload.ts --bundle --platform=node --external:electron --outfile=dist/main/preload.js --sourcemap",
     "build:renderer": "esbuild src/renderer/main.tsx --bundle --platform=browser --define:process.env.NODE_ENV='\"production\"' --outfile=dist/renderer/renderer.js --sourcemap",
-    "build": "npm run build:main && npm run build:preload && npm run build:renderer",
-    "start": "npm run build && electron ."
+    "build:flue": "flue build --target node && node scripts/patch-flue-server.mjs",
+    "build": "npm run build:flue && npm run build:main && npm run build:preload && npm run build:renderer",
+    "start": "npm run build && electron .",
+    "pretest": "npm run build:flue",
+    "test": "node --test \"test/**/*.test.mjs\""
   },
   "devDependencies": {
+    "@flue/cli": "^1.0.0-beta.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "electron": "^39.8.10",
@@ -20,7 +24,10 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@flue/runtime": "^1.0.0-beta.2",
+    "@flue/sdk": "^1.0.0-beta.1",
     "@tanstack/react-router": "^1.170.16",
+    "hono": "^4.12.26",
     "lucide-react": "^1.21.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
