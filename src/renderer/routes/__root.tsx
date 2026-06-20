@@ -2,17 +2,13 @@ import { useState } from 'react'
 import { createRootRoute, Outlet, Link } from '@tanstack/react-router'
 import {
   Plus,
-  FileQuestion,
-  LayoutGrid,
   Clock3,
-  Focus,
   Settings,
   PanelLeft,
   Sun,
   Moon,
 } from 'lucide-react'
 import { useTheme } from '../theme'
-import { SidebarMascot } from '../components/Mascot'
 
 type NavItem = {
   to: string
@@ -21,12 +17,10 @@ type NavItem = {
 }
 
 const PRIMARY_COMMANDS: NavItem[] = [
-  { to: '/', label: 'New chat', icon: Plus },
-  { to: '/notes', label: 'New note', icon: FileQuestion },
+  { to: '/', label: 'New Agent', icon: Plus },
 ]
 
 const SECONDARY_COMMANDS: NavItem[] = [
-  { to: '/inbox', label: 'Inbox', icon: LayoutGrid },
   { to: '/archive', label: 'Schedule', icon: Clock3 },
 ]
 
@@ -90,21 +84,6 @@ function RootLayout() {
           </div>
 
           <div className="sidebar-footer">
-            <div className="sidebar-footer-top">
-              <span className="sidebar-mascot">
-                <SidebarMascot />
-              </span>
-              <button
-                className={focusMode ? 'focus-toggle is-on' : 'focus-toggle'}
-                onClick={() => setFocusMode((v) => !v)}
-                aria-pressed={focusMode}
-                title="Focus mode"
-              >
-                <Focus />
-                <span>Focus</span>
-                <span className="focus-knob" />
-              </button>
-            </div>
             <button className="cmd-row" onClick={toggleTheme} title="Toggle theme">
               {theme === 'dark' ? <Sun /> : <Moon />}
               <span className="cmd-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>

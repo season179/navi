@@ -45,24 +45,6 @@ export function SleepingMascot({ className, style }: MascotProps) {
 }
 
 /**
- * Compact standing whale used in the sidebar footer.
- */
-export function SidebarMascot({ className, style }: MascotProps) {
-  return (
-    <svg viewBox="0 0 48 48" className={className} style={style} aria-hidden="true">
-      <ellipse cx="24" cy="42" rx="16" ry="3" fill="var(--mascot-water)" />
-      <path
-        d="M10 28 C10 19 17 14 26 14 C36 14 42 19 43 26 C43 30 40 32 36 32 L16 32 C12 32 10 31 10 28 Z"
-        fill="var(--mascot-body)"
-      />
-      <path d="M14 29 C16 24 22 22 28 22 C35 22 40 24 42 29 Z" fill="var(--mascot-belly)" opacity="0.85" />
-      <circle cx="20" cy="22" r="1.8" fill="#14305f" />
-      <path d="M9 27 C5 25 3 22 4 20 C7 21 9 24 11 26 Z" fill="var(--mascot-body)" />
-    </svg>
-  )
-}
-
-/**
  * A small bird figure (Kun's companion) perched near the whale.
  */
 export function CompanionBird({ className, style }: MascotProps) {

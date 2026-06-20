@@ -10,10 +10,7 @@ import {
   Globe,
   Terminal,
   Files,
-  Sun,
-  Moon,
 } from 'lucide-react'
-import { useTheme } from '../theme'
 
 type TopBarProps = {
   title: string
@@ -23,7 +20,6 @@ type TopBarProps = {
 }
 
 export function TopBar({ title, subtitle, sidebarCollapsed, onToggleSidebar }: TopBarProps) {
-  const { theme, toggleTheme } = useTheme()
   return (
     <header className="topbar">
       <div className="topbar-session">
@@ -66,14 +62,6 @@ export function TopBar({ title, subtitle, sidebarCollapsed, onToggleSidebar }: T
         </button>
         <button className="icon-pill" title="Files" aria-label="Files">
           <Files />
-        </button>
-        <button
-          className="icon-pill"
-          onClick={toggleTheme}
-          title="Toggle theme"
-          aria-label="Toggle theme"
-        >
-          {theme === 'dark' ? <Sun /> : <Moon />}
         </button>
       </div>
     </header>
