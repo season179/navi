@@ -12,14 +12,33 @@
   box-sizing: border-box;
 }
 
+/* The whole chrome is the macOS window-drag surface (titleBarStyle hiddenInset).
+   Interactive elements and scroll regions opt back out below — mirrors Kun's
+   base-shell.css approach. */
 html,
 body,
 #root {
   height: 100%;
+  -webkit-app-region: drag;
 }
 
 html {
   color-scheme: light;
+}
+
+/* Stay clickable/editable/selectable — opt out of window-drag. */
+button,
+input,
+select,
+textarea,
+option,
+a,
+summary,
+[role='button'],
+[contenteditable='true'],
+.stage-scroll,
+.page {
+  -webkit-app-region: no-drag;
 }
 
 [data-theme='dark'] {
