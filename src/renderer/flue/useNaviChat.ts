@@ -15,7 +15,10 @@ import type {
   FlueStatus,
   FlueStreamMessage,
   PersistedMessage,
+  ProjectMeta,
 } from '../../shared/flue'
+
+const DEFAULT_PROJECT_ID = 'navi-default'
 
 export interface ChatMessage {
   id: string
@@ -57,15 +60,23 @@ export interface NaviChat {
   status: FlueStatus
   busy: boolean
   conversations: ConversationMeta[]
+  projects: ProjectMeta[]
   currentId: string
+  currentProjectId: string
   send(text: string): Promise<void>
   cancel(): void
   /** Start a fresh conversation (persisting the current one first). */
-  newConversation(): void
+  newConversation(projectId?: string): void
   /** Switch to a stored conversation, loading its thread. */
   selectConversation(id: string): Promise<void>
   /** Delete a stored conversation; if it was active, start a fresh one. */
   deleteConversation(id: string): Promise<void>
+  /** Open folder picker and select the new project for the next conversation. */
+  createProject(): Promise<void>
+  /** Select a project for the next new conversation (does not open one). */
+  selectProject(id: string): Promise<void>
+  /** Delete a project and its conversations. */
+  deleteProject(id: string): Promise<void>
   setApiKey(key: string): Promise<{ ok: boolean; error?: string }>
   setBaseUrl(url: string): Promise<{ ok: boolean; error?: string }>
 }
@@ -75,9 +86,12 @@ export function useNaviChat(): NaviChat {
   const [status, setStatus] = useState<FlueStatus>({ ready: false, hasApiKey: false })
   const [busy, setBusy] = useState(false)
   const [conversations, setConversations] = useState<ConversationMeta[]>([])
+  const [projects, setProjects] = useState<ProjectMeta[]>([])
+  const [currentProjectId, setCurrentProjectId] = useState(DEFAULT_PROJECT_ID)
 
   const conversationIdRef = useRef<string>(newId())
   const [currentId, setCurrentId] = useState<string>(conversationIdRef.current)
+  const currentProjectIdRef = useRef(DEFAULT_PROJECT_ID)
   const messagesRef = useRef<ChatMessage[]>([])
   const requestToMessage = useRef(new Map<string, string>())
   const pendingEvents = useRef(new Map<string, FlueStreamMessage[]>())
@@ -98,17 +112,22 @@ export function useNaviChat(): NaviChat {
     setConversations(await window.navi.flue.listConversations())
   }, [])
 
+  const refreshProjects = useCallback(async () => {
+    setProjects(await window.navi.flue.listProjects())
+  }, [])
+
   const persistCurrent = useCallback(async () => {
     const msgs = messagesRef.current
     if (msgs.length === 0) return
     await window.navi.flue.saveConversation(
       conversationIdRef.current,
-      'navi-default',
+      currentProjectIdRef.current,
       deriveTitle(msgs),
       toPersisted(msgs),
     )
     await refreshList()
-  }, [refreshList])
+    await refreshProjects()
+  }, [refreshList, refreshProjects])
 
   const applyEvent = useCallback(
     (msg: FlueStreamMessage) => {
@@ -165,25 +184,30 @@ export function useNaviChat(): NaviChat {
     }
   }, [applyEvent])
 
-  // On launch, load the conversation list and reopen the most recent thread.
-  // Capture the pristine initial id: if the user starts typing/sending or
-  // switches conversations before this async load resolves, bail rather than
-  // clobbering their in-flight conversation.
+  // On launch, load projects (triggers migration + persist) and the conversation
+  // list, then reopen the most recent thread. Capture the pristine initial id:
+  // if the user starts typing/sending or switches conversations before this
+  // async load resolves, bail rather than clobbering their in-flight conversation.
   useEffect(() => {
     let mounted = true
     const initialId = conversationIdRef.current
     const pristine = () =>
       mounted && conversationIdRef.current === initialId && messagesRef.current.length === 0
     ;(async () => {
+      const projectList = await window.navi.flue.listProjects()
+      if (!mounted) return
+      setProjects(projectList)
       const list = await window.navi.flue.listConversations()
       if (!mounted) return
       setConversations(list)
       if (list.length === 0 || !pristine()) return
-      const id = list[0].id
-      const loaded = await window.navi.flue.getConversation(id)
+      const meta = list[0]
+      const loaded = await window.navi.flue.getConversation(meta.id)
       if (!pristine()) return
-      conversationIdRef.current = id
-      setCurrentId(id)
+      conversationIdRef.current = meta.id
+      setCurrentId(meta.id)
+      currentProjectIdRef.current = meta.projectId
+      setCurrentProjectId(meta.projectId)
       commit(fromPersisted(loaded))
     })()
     return () => {
@@ -201,9 +225,10 @@ export function useNaviChat(): NaviChat {
       const assistantMsg: ChatMessage = { id: assistantId, role: 'assistant', text: '', status: 'streaming' }
       commit([...messagesRef.current, userMsg, assistantMsg])
       setBusy(true)
-      // Persist now (the streaming placeholder is excluded) so the conversation
-      // appears in the list immediately, before the first token arrives.
-      void persistCurrent()
+      // Load-bearing order [review R2]: commit first (non-empty thread, so
+      // persistCurrent won't no-op), then await persist (project binding on
+      // disk before the Flue child reads the store), then send.
+      await persistCurrent()
 
       const convAtSend = conversationIdRef.current
       try {
@@ -280,23 +305,69 @@ export function useNaviChat(): NaviChat {
     [commit, persistCurrent, stopActive],
   )
 
-  const newConversation = useCallback(() => startBlank(true), [startBlank])
+  const newConversation = useCallback(
+    (projectId?: string) => {
+      if (projectId && projectId !== currentProjectIdRef.current) {
+        currentProjectIdRef.current = projectId
+        setCurrentProjectId(projectId)
+      }
+      startBlank(true)
+    },
+    [startBlank],
+  )
 
   const selectConversation = useCallback(
     async (id: string) => {
       if (id === conversationIdRef.current) return
-      void persistCurrent()
+      await persistCurrent()
       stopActive()
       // Mark the target current *before* the async load so rapid switches
       // dedupe correctly and an out-of-order load for a stale target is
       // discarded rather than overwriting the thread we actually landed on.
       conversationIdRef.current = id
       setCurrentId(id)
+      const list = await window.navi.flue.listConversations()
+      const meta = list.find((c) => c.id === id)
+      if (meta) {
+        currentProjectIdRef.current = meta.projectId
+        setCurrentProjectId(meta.projectId)
+      }
       const loaded = await window.navi.flue.getConversation(id)
       if (conversationIdRef.current !== id) return
       commit(fromPersisted(loaded))
     },
     [commit, persistCurrent, stopActive],
+  )
+
+  const selectProject = useCallback(
+    async (id: string) => {
+      await persistCurrent()
+      currentProjectIdRef.current = id
+      setCurrentProjectId(id)
+      startBlank(false)
+    },
+    [persistCurrent, startBlank],
+  )
+
+  const createProject = useCallback(async () => {
+    const p = await window.navi.flue.createProject()
+    if (!p) return
+    await refreshProjects()
+    await selectProject(p.id)
+  }, [refreshProjects, selectProject])
+
+  const deleteProject = useCallback(
+    async (id: string) => {
+      if (id === currentProjectIdRef.current) {
+        currentProjectIdRef.current = DEFAULT_PROJECT_ID
+        setCurrentProjectId(DEFAULT_PROJECT_ID)
+        startBlank(false)
+      }
+      await window.navi.flue.deleteProject(id)
+      await refreshProjects()
+      await refreshList()
+    },
+    [refreshList, refreshProjects, startBlank],
   )
 
   const deleteConversation = useCallback(
@@ -328,12 +399,17 @@ export function useNaviChat(): NaviChat {
     status,
     busy,
     conversations,
+    projects,
     currentId,
+    currentProjectId,
     send,
     cancel,
     newConversation,
     selectConversation,
     deleteConversation,
+    createProject,
+    selectProject,
+    deleteProject,
     setApiKey,
     setBaseUrl,
   }
