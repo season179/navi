@@ -6,6 +6,7 @@ import { ThemeContext, type Theme } from './theme'
 
 import './styles/tokens.css'
 import './styles/app.css'
+import './styles/markdown.css'
 
 function getInitialTheme(): Theme {
   const stored = localStorage.getItem('navi-theme') as Theme | null

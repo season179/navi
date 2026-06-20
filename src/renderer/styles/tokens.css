@@ -57,6 +57,13 @@
   --ds-chip-bg: rgba(255, 255, 255, 0.9);
   --ds-chip-border: rgba(20, 47, 95, 0.13);
 
+  /* Markdown code surfaces (light) */
+  --ds-pre-bg: rgba(245, 248, 253, 0.96);
+  --ds-code-bg: rgba(243, 247, 252, 0.96);
+  --ds-inline-code-bg: rgba(240, 245, 251, 0.92);
+  --ds-inline-code-hover-bg: rgba(228, 238, 250, 0.98);
+  --ds-table-head-bg: rgba(242, 246, 252, 0.96);
+
   /* Body backdrop washes */
   --ds-body-before: linear-gradient(180deg, #f7f9fe 0%, #f0f4fb 100%);
   --ds-body-after:
@@ -175,6 +182,13 @@
   --ds-card-muted: rgba(27, 35, 56, 0.86);
   --ds-chip-bg: rgba(27, 35, 56, 0.94);
   --ds-chip-border: rgba(151, 192, 235, 0.13);
+
+  /* Markdown code surfaces (dark) */
+  --ds-pre-bg: #151c2e;
+  --ds-code-bg: #1b2338;
+  --ds-inline-code-bg: rgba(151, 192, 235, 0.09);
+  --ds-inline-code-hover-bg: rgba(111, 176, 232, 0.2);
+  --ds-table-head-bg: rgba(27, 35, 56, 0.94);
 
   /* Body backdrop washes */
   --ds-body-before: linear-gradient(180deg, #0f1422 0%, #161d30 100%);
