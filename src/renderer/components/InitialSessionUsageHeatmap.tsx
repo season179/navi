@@ -11,7 +11,7 @@ import {
   RefreshCw,
   Sparkles,
 } from 'lucide-react'
-import { HeroStage } from './HeroStage'
+import { RuntimeWakeStage } from './RuntimeWakeStage'
 
 export type DailyUsageBucket = {
   date: string
@@ -829,7 +829,7 @@ function UsageHeroSection({
   return (
     <div className="usage-heatmap-hero">
       <div className="usage-heatmap-hero-stage">
-        <HeroStage />
+        <RuntimeWakeStage />
       </div>
       {showText ? (
         <>

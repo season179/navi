@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
 import { TopBar } from '../components/TopBar'
-import { HeroStage } from '../components/HeroStage'
-import { ChatStarterGrid } from '../components/ChatStarterGrid'
 import {
   ContextCapacityPopover,
   CONTEXT_CAPACITY_PREVIEW,
@@ -321,6 +319,7 @@ import {
 } from '../components/ClawEmptyHero'
 import { WorkspaceSelectEmptyHero } from '../components/WorkspaceSelectEmptyHero'
 import {
+  MessageTimelineEmptyHero,
   MessageTimelineEmptyHeroPreview,
   type MessageTimelineEmptyHeroPreviewMode,
 } from '../components/MessageTimelineEmptyHero'
@@ -3366,23 +3365,12 @@ function HomePage() {
           ) : initialSessionUsageHeatmapPreviewMode ? (
             <InitialSessionUsageHeatmap previewMode={initialSessionUsageHeatmapPreviewMode} />
           ) : (
-            <div className="hero">
-              <HeroStage />
-              <h1 className="hero-greeting">Good to see you</h1>
-              <p className="hero-sub">
-                Navi is your local-first companion. Start a conversation below.
-              </p>
-              {!hasProvider ? (
-                <button
-                  className="btn btn-primary connect-provider"
-                  onClick={() => openSettingsTab('providers')}
-                >
-                  Connect a provider
-                </button>
-              ) : (
-                <ChatStarterGrid onSelectSuggestion={setDraft} />
-              )}
-            </div>
+            <MessageTimelineEmptyHero
+              ready={status.ready}
+              hasWorkspace={Boolean(projectPath)}
+              runtimeError={status.error}
+              onOpenSettings={() => openSettingsTab('providers')}
+            />
           )}
         </div>
       ) : (
