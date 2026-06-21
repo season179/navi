@@ -377,6 +377,10 @@ import {
   ScheduleDefaultsDialogPreview,
   type ScheduleDefaultsDialogPreviewMode,
 } from '../components/ScheduleDefaultsDialog'
+import {
+  ScheduleTasksViewPreview,
+  type ScheduleTasksPreviewMode,
+} from '../components/ScheduleTasksView'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -1012,6 +1016,25 @@ function HomePage() {
       if (value === 'singleProvider') return 'singleProvider'
       return 'default'
     }, [])
+
+  // Visual preview for the ported ScheduleTasksView
+  // (?scheduleTasksViewPreview=1|empty|filterEmpty|loading|error|running|expandedResult|createDialog|editDialog|settingsDialog).
+  const scheduleTasksViewPreviewMode = useMemo((): ScheduleTasksPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('scheduleTasksViewPreview')) return null
+    const value = params.get('scheduleTasksViewPreview')
+    if (value === 'empty') return 'empty'
+    if (value === 'filterEmpty') return 'filterEmpty'
+    if (value === 'loading') return 'loading'
+    if (value === 'error') return 'error'
+    if (value === 'running') return 'running'
+    if (value === 'expandedResult') return 'expandedResult'
+    if (value === 'createDialog') return 'createDialog'
+    if (value === 'editDialog') return 'editDialog'
+    if (value === 'settingsDialog') return 'settingsDialog'
+    return 'default'
+  }, [])
 
   // Visual preview for the ported WindowsTitleBar
   // (?windowsTitleBarPreview=1|menuOpen|maximized|linux).
@@ -1953,6 +1976,10 @@ function HomePage() {
 
   if (clawAddImDialogPreviewMode) {
     return <ClawAddImDialogPreview mode={clawAddImDialogPreviewMode} />
+  }
+
+  if (scheduleTasksViewPreviewMode) {
+    return <ScheduleTasksViewPreview mode={scheduleTasksViewPreviewMode} />
   }
 
   if (scheduleDefaultsDialogPreviewMode) {
