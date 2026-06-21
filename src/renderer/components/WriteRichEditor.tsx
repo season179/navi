@@ -9,6 +9,7 @@ import { WriteHtmlEmbed } from './WriteHtmlEmbed'
 import { WriteInfographicPending } from './WriteInfographicPending'
 import {
   imageWidgetSnapshotForMode,
+  isWriteRichEditorImageWidgetMode,
   type WriteRichEditorImageWidgetPreviewMode,
   type WriteRichEditorImageWidgetSnapshot,
 } from '../lib/writeRichEditorImageWidgets'
@@ -324,13 +325,9 @@ type PreviewProps = {
 export function WriteRichEditorPreview({ mode }: PreviewProps): ReactElement {
   const inlineCompletionPreview =
     mode === 'inlineCompletion' ? 'completion' : mode === 'inlineEdit' ? 'edit' : undefined
-  const imageWidgetSnapshot =
-    mode === 'imageError' ||
-    mode === 'infographic' ||
-    mode === 'infographicStale' ||
-    mode === 'htmlEmbed'
-      ? imageWidgetSnapshotForMode(mode)
-      : undefined
+  const imageWidgetSnapshot = isWriteRichEditorImageWidgetMode(mode)
+    ? imageWidgetSnapshotForMode(mode)
+    : undefined
 
   return (
     <div className="write-rich-editor-preview">

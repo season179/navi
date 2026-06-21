@@ -1489,7 +1489,7 @@ function HomePage() {
     return 'default'
   }, [])
 
-  // (?writeRichEditor=1|readonly|fallback|requirementBadges|inlineCompletion|inlineEdit|imageError|infographic|infographicStale|htmlEmbed).
+  // (?writeRichEditor=1|readonly|fallback|requirementBadges|inlineCompletion|inlineEdit|imageError|loadedImage|infographic|infographicStale|infographicDesign|infographicPrototype|htmlEmbed|htmlEmbedLoaded).
   const writeRichEditorPreviewMode = useMemo((): WriteRichEditorPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)

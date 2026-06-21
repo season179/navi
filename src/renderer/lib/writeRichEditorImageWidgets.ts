@@ -9,9 +9,13 @@ import type {
 
 export type WriteRichEditorImageWidgetPreviewMode =
   | 'imageError'
+  | 'loadedImage'
   | 'infographic'
   | 'infographicStale'
+  | 'infographicDesign'
+  | 'infographicPrototype'
   | 'htmlEmbed'
+  | 'htmlEmbedLoaded'
 
 const PREVIEW_BROKEN_IMAGE_ALT = 'Hero screenshot'
 const PREVIEW_BROKEN_IMAGE_TITLE = 'File not found: ./assets/missing-hero.png'
@@ -55,6 +59,14 @@ export function imageWidgetSnapshotForMode(
       },
     }
   }
+  if (mode === 'loadedImage') {
+    return {
+      loadedImage: {
+        src: WRITE_RICH_EDITOR_PREVIEW_IMAGE_DATA_URL,
+        alt: 'Hero screenshot',
+      },
+    }
+  }
   if (mode === 'infographic') {
     return {
       infographic: {
@@ -73,6 +85,33 @@ export function imageWidgetSnapshotForMode(
       },
     }
   }
+  if (mode === 'infographicDesign') {
+    return {
+      infographic: {
+        pendingId: PREVIEW_INFOGRAPHIC_ID,
+        kind: 'design',
+        state: 'active',
+      },
+    }
+  }
+  if (mode === 'infographicPrototype') {
+    return {
+      infographic: {
+        pendingId: PREVIEW_INFOGRAPHIC_ID,
+        kind: 'prototype',
+        state: 'active',
+      },
+    }
+  }
+  if (mode === 'htmlEmbedLoaded') {
+    return {
+      htmlEmbed: {
+        rawSrc: PREVIEW_HTML_EMBED_SRC,
+        alt: PREVIEW_HTML_EMBED_ALT,
+        visualState: 'loaded',
+      },
+    }
+  }
   return {
     htmlEmbed: {
       rawSrc: PREVIEW_HTML_EMBED_SRC,
@@ -87,8 +126,12 @@ export function isWriteRichEditorImageWidgetMode(
 ): value is WriteRichEditorImageWidgetPreviewMode {
   return (
     value === 'imageError' ||
+    value === 'loadedImage' ||
     value === 'infographic' ||
     value === 'infographicStale' ||
-    value === 'htmlEmbed'
+    value === 'infographicDesign' ||
+    value === 'infographicPrototype' ||
+    value === 'htmlEmbed' ||
+    value === 'htmlEmbedLoaded'
   )
 }
