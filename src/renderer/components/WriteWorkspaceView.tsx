@@ -7,7 +7,10 @@ import { WriteWorkspaceEmptyState } from './WriteWorkspaceEmptyState'
 import {
   WriteAssistantPanel,
   WRITE_ASSISTANT_PANEL_PREVIEW_DEFAULT,
+  WRITE_ASSISTANT_PANEL_PREVIEW_NO_FILE,
+  WRITE_ASSISTANT_PANEL_PREVIEW_PDF,
   WRITE_ASSISTANT_PANEL_PREVIEW_QUOTED,
+  WRITE_ASSISTANT_PANEL_PREVIEW_STREAMING,
   WRITE_ASSISTANT_PANEL_PREVIEW_TIMELINE,
   type WriteAssistantPanelSnapshot,
 } from './WriteAssistantPanel'
@@ -198,6 +201,14 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       runtimeBanner: null,
       ...baseText,
     }
+  }
+
+  if (mode === 'assistantPdf') {
+    return previewSnapshot('pdf')
+  }
+
+  if (mode === 'assistantNoFile') {
+    return previewSnapshot('start')
   }
 
   if (mode === 'pdf') {
@@ -786,22 +797,24 @@ type PreviewProps = {
   mode: WriteWorkspaceViewPreviewMode
 }
 
+const ASSISTANT_PANEL_PREVIEW_MODES = new Set<WriteWorkspaceViewPreviewMode>([
+  'assistant',
+  'assistantTimeline',
+  'assistantQuoted',
+  'assistantPdf',
+  'assistantNoFile',
+  'assistantStreaming',
+])
+
 function resolveProductionWriteAssistantPreviewOpen(): boolean {
   const value = resolveProductionWriteWorkspaceParam()
-  return value === 'assistant' || value === 'assistantTimeline' || value === 'assistantQuoted'
+  return value != null && ASSISTANT_PANEL_PREVIEW_MODES.has(value as WriteWorkspaceViewPreviewMode)
 }
 
 function resolveProductionWriteAssistantSnapshot(): Partial<WriteAssistantPanelSnapshot> {
-  const activeFileLabel = WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel
   const value = resolveProductionWriteWorkspaceParam()
-  if (value === 'assistantTimeline') {
-    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_TIMELINE, activeFileLabel }
-  }
-  if (value === 'assistantQuoted') {
-    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_QUOTED, activeFileLabel }
-  }
-  if (value === 'assistant') {
-    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_DEFAULT, activeFileLabel }
+  if (value && ASSISTANT_PANEL_PREVIEW_MODES.has(value as WriteWorkspaceViewPreviewMode)) {
+    return assistantPanelPreviewSnapshot(value as WriteWorkspaceViewPreviewMode) ?? {}
   }
   return {}
 }
@@ -862,29 +875,33 @@ export function WriteWorkspaceProductionView({
 function assistantPanelPreviewSnapshot(
   mode: WriteWorkspaceViewPreviewMode,
 ): Partial<WriteAssistantPanelSnapshot> | undefined {
+  const activeFileLabel = WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel
   if (mode === 'assistantTimeline') {
-    return {
-      ...WRITE_ASSISTANT_PANEL_PREVIEW_TIMELINE,
-      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
-    }
+    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_TIMELINE, activeFileLabel }
   }
   if (mode === 'assistantQuoted') {
+    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_QUOTED, activeFileLabel }
+  }
+  if (mode === 'assistantPdf') {
+    return WRITE_ASSISTANT_PANEL_PREVIEW_PDF
+  }
+  if (mode === 'assistantNoFile') {
+    return WRITE_ASSISTANT_PANEL_PREVIEW_NO_FILE
+  }
+  if (mode === 'assistantStreaming') {
     return {
-      ...WRITE_ASSISTANT_PANEL_PREVIEW_QUOTED,
-      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
+      ...WRITE_ASSISTANT_PANEL_PREVIEW_STREAMING,
+      activeFileLabel,
     }
   }
   if (mode === 'assistant') {
-    return {
-      ...WRITE_ASSISTANT_PANEL_PREVIEW_DEFAULT,
-      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
-    }
+    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_DEFAULT, activeFileLabel }
   }
   return undefined
 }
 
 function assistantPanelPreviewOpen(mode: WriteWorkspaceViewPreviewMode): boolean {
-  return mode === 'assistant' || mode === 'assistantTimeline' || mode === 'assistantQuoted'
+  return ASSISTANT_PANEL_PREVIEW_MODES.has(mode)
 }
 
 /** Full-page preview shell for ?writeWorkspaceView URL hooks. */

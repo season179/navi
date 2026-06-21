@@ -52,3 +52,18 @@ test('routes exportMenu and modeMenu toolbar dropdown preview modes', () => {
     'modeMenu',
   )
 })
+
+test('routes assistant panel preview modes', () => {
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=assistantPdf')),
+    'assistantPdf',
+  )
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=assistantNoFile')),
+    'assistantNoFile',
+  )
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=assistantStreaming')),
+    'assistantStreaming',
+  )
+})
