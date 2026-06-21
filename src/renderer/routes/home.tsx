@@ -357,6 +357,10 @@ import {
   WriteWorkspaceViewPreview,
   type WriteWorkspaceViewPreviewMode,
 } from '../components/WriteWorkspaceView'
+import {
+  WriteDebugLogModalPreview,
+  type WriteDebugLogModalPreviewMode,
+} from '../components/WriteDebugLogModal'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -942,6 +946,20 @@ function HomePage() {
     if (value === 'dirty') return 'dirty'
     if (value === 'saving') return 'saving'
     return 'split'
+  }, [])
+
+  // Visual preview for the ported WriteDebugLogModal
+  // (?writeDebugLogPreview=1|empty|error|loading|failed).
+  const writeDebugLogPreviewMode = useMemo((): WriteDebugLogModalPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writeDebugLogPreview')) return null
+    const value = params.get('writeDebugLogPreview')
+    if (value === 'empty') return 'empty'
+    if (value === 'error') return 'error'
+    if (value === 'loading') return 'loading'
+    if (value === 'failed') return 'failed'
+    return 'default'
   }, [])
 
   // Visual preview for the ported InitialSessionUsageHeatmap
@@ -1849,6 +1867,10 @@ function HomePage() {
 
   if (writePdfViewerPreviewMode) {
     return <WritePdfViewerPreview mode={writePdfViewerPreviewMode} />
+  }
+
+  if (writeDebugLogPreviewMode) {
+    return <WriteDebugLogModalPreview mode={writeDebugLogPreviewMode} />
   }
 
   if (writeWorkspaceViewPreviewMode) {
