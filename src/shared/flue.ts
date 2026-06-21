@@ -17,11 +17,13 @@ export const AGENT_NAME = 'navi-assistant'
  * against @earendil-works/pi-agent-core; there is no 'off'). pi-ai maps these
  * per-provider via `thinkingFormat` (e.g. deepseek collapses minimal/low/medium
  * → null, effectively "no reasoning"). Flue defaults to 'medium' when unset.
+ *
+ * Single source of truth: this ordered list (lowest → highest) drives the
+ * reasoning-effort submenu, and the ReasoningLevel union is derived from it so
+ * the runtime array and the type can never drift out of sync.
  */
-export type ReasoningLevel = 'minimal' | 'low' | 'medium' | 'high' | 'xhigh'
-
-/** Ordered for the reasoning-effort submenu (lowest → highest). */
-export const REASONING_LEVELS: ReasoningLevel[] = ['minimal', 'low', 'medium', 'high', 'xhigh']
+export const REASONING_LEVELS = ['minimal', 'low', 'medium', 'high', 'xhigh'] as const
+export type ReasoningLevel = (typeof REASONING_LEVELS)[number]
 
 /** One model offered by a provider, as stored in a profile / preset. */
 export interface ProviderModel {
@@ -113,9 +115,15 @@ export interface FlueStatus {
   error?: string
 }
 
-/** True when at least one configured provider has a usable (decryptable) key. */
-export function hasUsableProvider(status: FlueStatus): boolean {
-  return status.providers.some((p) => p.keyState === 'ok')
+/**
+ * True when at least one configured provider is actually usable for chatting: it
+ * has a decryptable key AND at least one model to select. A keyed provider with
+ * no models would otherwise enable the composer but leave the picker empty, and
+ * send() would fall back to an unconfigured default and fail on the first turn.
+ */
+export function hasUsableProvider(status: FlueStatus, providers: ProviderProfile[]): boolean {
+  const keyed = new Set(status.providers.filter((p) => p.keyState === 'ok').map((p) => p.id))
+  return providers.some((p) => keyed.has(p.id) && p.models.length > 0)
 }
 
 /** Token/cost usage for one prompt, forwarded on the terminal event. */
@@ -187,8 +195,6 @@ export interface FlueBridge {
   upsertProvider(profile: ProviderProfile, apiKey?: string): Promise<{ ok: boolean; error?: string }>
   /** Delete a provider, cascade-clear conversation pointers, then restart. */
   deleteProvider(id: string): Promise<{ ok: boolean; error?: string }>
-  /** Store/replace a provider's API key (encrypted in main), then restart. */
-  setProviderKey(id: string, key: string): Promise<{ ok: boolean; error?: string }>
   /** The app-default selection applied to new conversations. */
   getDefaultSelection(): Promise<DefaultSelection | undefined>
   /** Set the app-default selection (used by new conversations). */

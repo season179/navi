@@ -17,11 +17,14 @@ const DEFAULT_MODEL_ID = `openai/${OPENAI_PINNED_MODEL.id}`
 // this is a passthrough.
 export const route: AgentRouteHandler = async (_c, next) => next()
 
-function projectCwdFor(id: string, storePath: string | undefined): string | undefined {
+// Read + parse the app-owned conversation store once per turn. The factory runs
+// per interaction and previously parsed this file twice (project cwd + model
+// selection); parse it once here and feed both resolvers. Returns undefined on a
+// missing/corrupt store; logs only unexpected (non-ENOENT) failures.
+function readStore(storePath: string | undefined): unknown {
   if (!storePath) return undefined
   try {
-    const store = JSON.parse(readFileSync(storePath, 'utf8'))
-    return resolveProjectCwd(store, id)
+    return JSON.parse(readFileSync(storePath, 'utf8'))
   } catch (e: unknown) {
     const err = e as { code?: string; message?: string }
     if (err?.code !== 'ENOENT') {
@@ -31,8 +34,19 @@ function projectCwdFor(id: string, storePath: string | undefined): string | unde
   }
 }
 
+function projectCwdFrom(store: unknown, id: string): string | undefined {
+  if (!store) return undefined
+  try {
+    return resolveProjectCwd(store, id)
+  } catch (e: unknown) {
+    const err = e as { message?: string }
+    process.stderr.write(`[navi-agent] resolveProjectCwd failed: ${err?.message ?? e}\n`)
+    return undefined
+  }
+}
+
 function isReasoning(v: unknown): v is ReasoningLevel {
-  return typeof v === 'string' && (REASONING_LEVELS as string[]).includes(v)
+  return typeof v === 'string' && (REASONING_LEVELS as readonly string[]).includes(v)
 }
 
 /**
@@ -42,36 +56,32 @@ function isReasoning(v: unknown): v is ReasoningLevel {
  * the factory reads. The factory re-runs per turn, so a switch takes effect next
  * turn with no restart. Falls through to the env default on any miss.
  */
-function activeSelectionFor(
+function activeSelectionFrom(
+  store: unknown,
   id: string,
-  storePath: string | undefined,
 ): { model?: string; reasoning?: ReasoningLevel } {
-  if (!storePath) return {}
-  try {
-    const store = JSON.parse(readFileSync(storePath, 'utf8'))
-    const conv = (store.conversations as { id: string; providerId?: string; modelId?: string; reasoning?: unknown }[] | undefined)?.find(
-      (c) => c.id === id,
-    )
-    if (conv?.providerId && conv?.modelId) {
-      return {
-        model: `${conv.providerId}/${conv.modelId}`,
-        reasoning: isReasoning(conv.reasoning) ? conv.reasoning : undefined,
-      }
+  const conv = (
+    (store as { conversations?: { id: string; providerId?: string; modelId?: string; reasoning?: unknown }[] } | undefined)
+      ?.conversations
+  )?.find((c) => c.id === id)
+  if (conv?.providerId && conv?.modelId) {
+    return {
+      model: `${conv.providerId}/${conv.modelId}`,
+      reasoning: isReasoning(conv.reasoning) ? conv.reasoning : undefined,
     }
-  } catch {
-    // fall through to the env default
   }
   return {}
 }
 
 export default createAgent((ctx) => {
-  const sel = activeSelectionFor(ctx.id, ctx.env.NAVI_CONVERSATIONS_PATH)
+  const store = readStore(ctx.env.NAVI_CONVERSATIONS_PATH)
+  const sel = activeSelectionFrom(store, ctx.id)
   const model = sel.model ?? ctx.env.NAVI_DEFAULT_MODEL ?? DEFAULT_MODEL_ID
   const envReasoning = ctx.env.NAVI_DEFAULT_REASONING
   const thinkingLevel: ReasoningLevel =
     sel.reasoning ?? (isReasoning(envReasoning) ? envReasoning : 'medium')
 
-  const cwd = projectCwdFor(ctx.id, ctx.env.NAVI_CONVERSATIONS_PATH)
+  const cwd = projectCwdFrom(store, ctx.id)
   const base = [
     'You are Navi, an AI assistant inside a local-first desktop app.',
     'Be concise and helpful with writing, coding, analysis, and questions.',

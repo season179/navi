@@ -34,7 +34,7 @@ function HomePage() {
   } = useNaviList()
 
   const empty = messages.length === 0
-  const hasProvider = hasUsableProvider(status)
+  const hasProvider = hasUsableProvider(status, providerProfiles)
   const composerDisabled = !status.ready || !hasProvider
 
   const handleSend = () => {

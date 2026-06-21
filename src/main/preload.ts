@@ -8,7 +8,6 @@ const flue: FlueBridge = {
   listProviders: () => ipcRenderer.invoke('providers:list'),
   upsertProvider: (profile, apiKey) => ipcRenderer.invoke('providers:upsert', profile, apiKey),
   deleteProvider: (id) => ipcRenderer.invoke('providers:delete', id),
-  setProviderKey: (id, key) => ipcRenderer.invoke('providers:setKey', id, key),
   getDefaultSelection: () => ipcRenderer.invoke('providers:getDefault'),
   setDefaultSelection: (sel) => ipcRenderer.invoke('providers:setDefault', sel),
   probeProvider: (req) => ipcRenderer.invoke('providers:probe', req),

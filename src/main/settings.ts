@@ -45,6 +45,16 @@ function settingsPath(): string {
 function migrate(s: StoredSettings): StoredSettings {
   if (s.providers) return s // already multi-provider
 
+  // Only a legacy single-provider file ({ apiKeyEnc, baseUrl }) is migrated into a
+  // seeded OpenAI profile + default. A brand-new install (no legacy fields at all)
+  // must start with NO providers and NO default: that lets onboarding pick the
+  // first provider, and lets ProvidersSettings set the first *keyed* provider as
+  // the default. Seeding a keyless `openai` here instead would leave the app
+  // default pinned to an unconfigured provider that every new conversation fails
+  // against — even after the user configures a different provider.
+  const isLegacy = s.apiKeyEnc !== undefined || s.baseUrl !== undefined
+  if (!isLegacy) return { providers: [], providerKeys: {} }
+
   const openai: ProviderProfile = {
     id: 'openai',
     name: 'OpenAI',
@@ -112,10 +122,14 @@ export function deleteProvider(id: string): Promise<void> {
     const providers = (s.providers ?? []).filter((p) => p.id !== id)
     const providerKeys = { ...(s.providerKeys ?? {}) }
     delete providerKeys[id]
-    // Reset the default selection if it pointed at the removed provider.
+    // Reset the default selection if it pointed at the removed provider. Prefer a
+    // provider that still has a key so the new default actually authenticates;
+    // only fall back to a keyless one (then to none) if nothing is keyed.
     let defaultSelection = s.defaultSelection
     if (defaultSelection?.providerId === id) {
-      const fallback = providers.find((p) => p.models.length > 0)
+      const fallback =
+        providers.find((p) => providerKeys[p.id] && p.models.length > 0) ??
+        providers.find((p) => p.models.length > 0)
       defaultSelection = fallback
         ? { providerId: fallback.id, modelId: fallback.models[0].id, reasoning: 'medium' }
         : undefined

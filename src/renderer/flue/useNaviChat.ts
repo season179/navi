@@ -180,8 +180,7 @@ export function useNaviChat(): NaviChat {
       deriveTitle(msgs),
       toPersisted(msgs),
     )
-    await refreshList()
-    await refreshProjects()
+    await Promise.all([refreshList(), refreshProjects()])
   }, [refreshList, refreshProjects])
 
   const applyEvent = useCallback(
@@ -304,8 +303,13 @@ export function useNaviChat(): NaviChat {
         // agent reads the picked model on the very first turn (not the default).
         const sel = activeSelectionRef.current
         if (sel) {
-          await window.navi.flue.setActiveModel(convAtSend, sel.providerId, sel.modelId)
-          await window.navi.flue.setReasoning(convAtSend, sel.reasoning)
+          // Two independent pointer writes on the same (already-persisted) record;
+          // issue both round-trips concurrently. Main-side they still serialize
+          // through conversations.ts enqueue(), so there's no lost-update race.
+          await Promise.all([
+            window.navi.flue.setActiveModel(convAtSend, sel.providerId, sel.modelId),
+            window.navi.flue.setReasoning(convAtSend, sel.reasoning),
+          ])
         }
         const { requestId } = await window.navi.flue.send(convAtSend, trimmed)
         // The user switched/started another conversation while admission was in
@@ -467,10 +471,7 @@ export function useNaviChat(): NaviChat {
   const upsertProvider = useCallback(
     async (profile: ProviderProfile, apiKey?: string) => {
       const res = await window.navi.flue.upsertProvider(profile, apiKey)
-      if (res.ok) {
-        await refreshProviders()
-        await refreshStatus()
-      }
+      if (res.ok) await Promise.all([refreshProviders(), refreshStatus()])
       return res
     },
     [refreshProviders, refreshStatus],
@@ -479,10 +480,7 @@ export function useNaviChat(): NaviChat {
   const removeProvider = useCallback(
     async (id: string) => {
       const res = await window.navi.flue.deleteProvider(id)
-      if (res.ok) {
-        await refreshProviders()
-        await refreshStatus()
-      }
+      if (res.ok) await Promise.all([refreshProviders(), refreshStatus()])
       return res
     },
     [refreshProviders, refreshStatus],
@@ -507,7 +505,10 @@ export function useNaviChat(): NaviChat {
     (providerId: string, modelId: string) => {
       const reasoning = activeSelectionRef.current?.reasoning ?? defaultSelectionRef.current?.reasoning ?? 'medium'
       commitSelection({ providerId, modelId, reasoning })
-      void window.navi.flue.setActiveModel(conversationIdRef.current, providerId, modelId)
+      // Fire-and-forget: no-ops on disk until the conversation has a record, at
+      // which point send()'s flush rewrites it. Swallow rejections so a transient
+      // IPC/write error can't become an unhandled promise rejection.
+      void window.navi.flue.setActiveModel(conversationIdRef.current, providerId, modelId).catch(() => {})
     },
     [commitSelection],
   )
@@ -518,7 +519,7 @@ export function useNaviChat(): NaviChat {
       const cur = activeSelectionRef.current ?? defaultSelectionRef.current
       if (!cur) return
       commitSelection({ ...cur, reasoning: level })
-      void window.navi.flue.setReasoning(conversationIdRef.current, level)
+      void window.navi.flue.setReasoning(conversationIdRef.current, level).catch(() => {})
     },
     [commitSelection],
   )

@@ -36,14 +36,25 @@ const token = process.env.FLUE_TOKEN?.trim()
 // only resolves keys for *catalog* ids, so a non-catalog id (zai-coding-plan,
 // any custom provider) would be silently unauthenticated. Passing apiKey into
 // registerProvider works uniformly and short-circuits the env fallback (§F4).
-const providersPath = process.env.NAVI_PROVIDERS_PATH
-const providers: NaviProvider[] = providersPath
-  ? (JSON.parse(readFileSync(providersPath, 'utf8')) as NaviProvider[])
-  : []
-const keysPath = process.env.NAVI_PROVIDER_KEYS_PATH
-const keys: Record<string, string> = keysPath
-  ? (JSON.parse(readFileSync(keysPath, 'utf8')) as Record<string, string>)
-  : {}
+// Read + parse a JSON file injected by the main process. A corrupt, truncated,
+// or empty file (e.g. an interrupted writeFileSync) must NOT throw at module
+// load — that would crash the child before it prints FLUE_READY and leave the
+// backend permanently not-ready with no recovery. On any failure we fall back to
+// the empty case (which preserves single-OpenAI behavior below), mirroring the
+// guarded store read in navi-assistant.ts.
+function readJsonFile<T>(path: string | undefined, fallback: T): T {
+  if (!path) return fallback
+  try {
+    return JSON.parse(readFileSync(path, 'utf8')) as T
+  } catch {
+    return fallback
+  }
+}
+
+const providersRaw = readJsonFile<NaviProvider[]>(process.env.NAVI_PROVIDERS_PATH, [])
+const providers: NaviProvider[] = Array.isArray(providersRaw) ? providersRaw : []
+const keysRaw = readJsonFile<Record<string, string>>(process.env.NAVI_PROVIDER_KEYS_PATH, {})
+const keys: Record<string, string> = keysRaw && typeof keysRaw === 'object' ? keysRaw : {}
 
 if (providers.length === 0) {
   // Legacy / pre-migration fallback — preserves today's exact single-OpenAI

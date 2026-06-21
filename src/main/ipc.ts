@@ -91,21 +91,19 @@ export function registerFlueIpc(): void {
     }
   })
 
-  ipcMain.handle('providers:setKey', async (_evt, id: string, key: string) => {
-    try {
-      await setProviderKey(id, key)
-      await flueBackend.restart()
-      return { ok: true }
-    } catch (err) {
-      return { ok: false, error: err instanceof Error ? err.message : String(err) }
-    }
-  })
-
   ipcMain.handle('providers:getDefault', () => getDefaultSelection())
 
   ipcMain.handle('providers:setDefault', async (_evt, sel: DefaultSelection) => {
     await setDefaultSelection(sel)
-    await flueBackend.restart() // refresh NAVI_DEFAULT_MODEL/_REASONING in the child
+    // Refresh NAVI_DEFAULT_MODEL/_REASONING in the child. A restart failure (e.g.
+    // the ready-timeout) is reported via the status emitter, so swallow it here
+    // rather than rejecting the invoke — this handler returns void and the
+    // renderer's awaited call has no catch (unlike the upsert/delete handlers).
+    try {
+      await flueBackend.restart()
+    } catch {
+      // surfaced through the 'status' event (lastError / ready=false)
+    }
   })
 
   // Probe with the request's key, or fall back to the stored key for an
