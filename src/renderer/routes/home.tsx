@@ -198,11 +198,14 @@ import {
 } from '../components/DevBrowserPanel'
 import {
   PlanPanel,
-  PLAN_PANEL_PREVIEW,
-  PREVIEW_COVERAGE,
-  PREVIEW_DRIFT,
-  type PlanPanelPreviewMode,
 } from '../components/PlanPanel'
+import {
+  resolvePlanPanelPreviewSnapshot,
+  resolveProductionPlanPanelMode,
+  resolveProductionPlanPanelParam,
+  type PlanPanelPreviewMode,
+  type PlanPanelSnapshotProps,
+} from '../lib/planPanelPreviewModes'
 import {
   ChatFileTreePanel,
   CHAT_FILE_TREE_PREVIEW,
@@ -538,6 +541,7 @@ const PRODUCTION_TERMINAL_HEIGHT = 360
 function renderProductionRightPanel(
   mode: RightPanelMode,
   onCollapse: () => void,
+  planPanelSnapshot?: PlanPanelSnapshotProps,
 ): ReactElement | null {
   switch (mode) {
     case 'todo':
@@ -564,14 +568,26 @@ function renderProductionRightPanel(
           onCollapse={onCollapse}
         />
       )
-    case 'plan':
+    case 'plan': {
+      const snapshot = planPanelSnapshot ?? resolvePlanPanelPreviewSnapshot('default')
       return (
         <PlanPanel
-          {...PLAN_PANEL_PREVIEW}
+          workspaceRoot={snapshot.workspaceRoot}
+          activePlan={snapshot.activePlan}
+          saveStatus={snapshot.saveStatus}
+          operationStatus={snapshot.operationStatus}
+          error={snapshot.error}
+          coverage={snapshot.coverage}
+          showRichFallback={snapshot.showRichFallback}
           className="h-full max-h-full w-full"
           onCollapse={onCollapse}
+          onVerifyPlan={snapshot.coverage ? () => undefined : undefined}
+          onReplanChanged={
+            snapshot.coverage?.driftIds.length ? () => undefined : undefined
+          }
         />
       )
+    }
     case 'file':
       return (
         <WorkspaceFilePreviewPanel
@@ -661,7 +677,13 @@ function HomePage() {
   )
   const [productionExecutionSettings, setProductionExecutionSettings] =
     useState<ComposerExecutionSettings>(() => EXECUTION_PICKER_PREVIEW)
-  const [productionRightPanelMode, setProductionRightPanelMode] = useState<RightPanelMode>(null)
+  const [productionRightPanelMode, setProductionRightPanelMode] = useState<RightPanelMode>(() =>
+    resolveProductionPlanPanelParam() ? 'plan' : null,
+  )
+  const productionPlanPanelSnapshot = useMemo(
+    () => resolvePlanPanelPreviewSnapshot(resolveProductionPlanPanelMode()),
+    [],
+  )
   const [productionTerminalOpen, setProductionTerminalOpen] = useState(false)
   const [productionFileTreeOpen, setProductionFileTreeOpen] = useState(false)
   const [productionSideChatOpen, setProductionSideChatOpen] = useState(false)
@@ -2059,57 +2081,7 @@ function HomePage() {
   }, [])
   const planPanelPreviewProps = useMemo(() => {
     if (!planPanelPreviewMode) return null
-    if (planPanelPreviewMode === 'noworkspace') {
-      return {
-        workspaceRoot: '',
-        activePlan: null,
-        saveStatus: 'saved' as const,
-        operationStatus: 'idle' as const,
-        error: null,
-        coverage: null,
-      }
-    }
-    if (planPanelPreviewMode === 'empty') {
-      return {
-        workspaceRoot: PLAN_PANEL_PREVIEW.workspaceRoot,
-        activePlan: null,
-        saveStatus: 'saved' as const,
-        operationStatus: 'idle' as const,
-        error: null,
-        coverage: null,
-      }
-    }
-    if (planPanelPreviewMode === 'dirty') {
-      return {
-        ...PLAN_PANEL_PREVIEW,
-        saveStatus: 'dirty' as const,
-      }
-    }
-    if (planPanelPreviewMode === 'saving') {
-      return {
-        ...PLAN_PANEL_PREVIEW,
-        saveStatus: 'saving' as const,
-      }
-    }
-    if (planPanelPreviewMode === 'coverage') {
-      return {
-        ...PLAN_PANEL_PREVIEW,
-        coverage: PREVIEW_COVERAGE,
-      }
-    }
-    if (planPanelPreviewMode === 'drift') {
-      return {
-        ...PLAN_PANEL_PREVIEW,
-        coverage: PREVIEW_DRIFT,
-      }
-    }
-    if (planPanelPreviewMode === 'error') {
-      return {
-        ...PLAN_PANEL_PREVIEW,
-        error: 'Could not start the agent turn for this plan.',
-      }
-    }
-    return { ...PLAN_PANEL_PREVIEW }
+    return resolvePlanPanelPreviewSnapshot(planPanelPreviewMode)
   }, [planPanelPreviewMode])
 
   // Visual preview for the ported ChatFileTreePanel (?chatFileTreePanelPreview=1|loading|empty|error).
@@ -4050,8 +4022,10 @@ function HomePage() {
                 className="workbench-right-panel"
                 style={{ width: PRODUCTION_RIGHT_SIDEBAR_WIDTH }}
               >
-                {renderProductionRightPanel(productionRightPanelMode, () =>
-                  setProductionRightPanelMode(null),
+                {renderProductionRightPanel(
+                  productionRightPanelMode,
+                  () => setProductionRightPanelMode(null),
+                  productionPlanPanelSnapshot,
                 )}
               </div>
             </>
@@ -4286,7 +4260,7 @@ function HomePage() {
             operationStatus={planPanelPreviewProps.operationStatus}
             error={planPanelPreviewProps.error}
             coverage={planPanelPreviewProps.coverage}
-            showRichFallback={planPanelPreviewMode === 'richFallback'}
+            showRichFallback={planPanelPreviewProps.showRichFallback}
             onCollapse={() => undefined}
             onOpenPlanFile={() => undefined}
             onBuildPlan={() => undefined}

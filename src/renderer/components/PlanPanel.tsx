@@ -16,33 +16,25 @@ import {
 } from 'lucide-react'
 import { WriteMarkdownEditor } from './WriteMarkdownEditor'
 import { WriteRichEditor } from './WriteRichEditor'
+import {
+  PLAN_PANEL_PREVIEW,
+  PREVIEW_COVERAGE,
+  PREVIEW_DRIFT,
+  type PlanActivePlan,
+  type PlanCoverageTrace,
+  type PlanOperationStatus,
+  type PlanPanelPreviewMode,
+  type PlanSaveStatus,
+} from '../lib/planPanelPreviewModes'
 
-export type PlanSaveStatus = 'saved' | 'dirty' | 'saving' | 'error'
-
-export type PlanOperationStatus = 'idle' | 'drafting' | 'refining' | 'building' | 'error'
-
-export type PlanActivePlan = {
-  featureName: string
-  relativePath: string
-}
-
-export type PlanCoverageTrace = {
-  covered: number
-  total: number
-  uncoveredIds: string[]
-  driftIds: string[]
-}
-
-export type PlanPanelPreviewMode =
-  | 'default'
-  | 'empty'
-  | 'noworkspace'
-  | 'dirty'
-  | 'saving'
-  | 'coverage'
-  | 'drift'
-  | 'error'
-  | 'richFallback'
+export type {
+  PlanActivePlan,
+  PlanCoverageTrace,
+  PlanOperationStatus,
+  PlanPanelPreviewMode,
+  PlanSaveStatus,
+} from '../lib/planPanelPreviewModes'
+export { PLAN_PANEL_PREVIEW, PREVIEW_COVERAGE, PREVIEW_DRIFT } from '../lib/planPanelPreviewModes'
 
 type Props = {
   workspaceRoot?: string
@@ -88,37 +80,6 @@ const COPY = {
   sddChangedBanner: (ids: string) =>
     `Requirements ${ids} changed after planning; the plan may be stale`,
   sddReplanButton: 'Replan affected steps',
-}
-
-const PREVIEW_PLAN: PlanActivePlan = {
-  featureName: 'Refactor auth middleware',
-  relativePath: 'docs/plans/refactor-auth-middleware.md',
-}
-
-const PREVIEW_WORKSPACE = '/Users/season/Personal/navi'
-
-export const PREVIEW_COVERAGE: PlanCoverageTrace = {
-  covered: 3,
-  total: 5,
-  uncoveredIds: ['R-4', 'R-5'],
-  driftIds: [],
-}
-
-export const PREVIEW_DRIFT: PlanCoverageTrace = {
-  covered: 4,
-  total: 5,
-  uncoveredIds: [],
-  driftIds: ['R-2', 'R-3'],
-}
-
-/** Default snapshot for ?planPanelPreview=1 visual verification. */
-export const PLAN_PANEL_PREVIEW = {
-  workspaceRoot: PREVIEW_WORKSPACE,
-  activePlan: PREVIEW_PLAN,
-  saveStatus: 'saved' as PlanSaveStatus,
-  operationStatus: 'idle' as PlanOperationStatus,
-  error: null as string | null,
-  coverage: null as PlanCoverageTrace | null,
 }
 
 function statusLabel(saveStatus: PlanSaveStatus, operationStatus: PlanOperationStatus): string {
@@ -210,8 +171,8 @@ function PlanRichEditorSampleContent(): ReactElement {
 }
 
 export function PlanPanel({
-  workspaceRoot = PREVIEW_WORKSPACE,
-  activePlan = PREVIEW_PLAN,
+  workspaceRoot = PLAN_PANEL_PREVIEW.workspaceRoot,
+  activePlan = PLAN_PANEL_PREVIEW.activePlan,
   saveStatus = 'saved',
   operationStatus = 'idle',
   error = null,
