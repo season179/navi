@@ -3,6 +3,7 @@ import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
 import { TopBar } from '../components/TopBar'
 import { HeroStage } from '../components/HeroStage'
+import { ChatStarterGrid } from '../components/ChatStarterGrid'
 import { Composer } from '../components/Composer'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -137,7 +138,9 @@ function HomePage() {
               >
                 Connect a provider
               </button>
-            ) : null}
+            ) : (
+              <ChatStarterGrid onSelectSuggestion={setDraft} />
+            )}
           </div>
         </div>
       ) : (
