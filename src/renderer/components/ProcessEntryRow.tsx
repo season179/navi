@@ -2,7 +2,7 @@
 // (../Kun/src/renderer/src/components/chat/message-timeline-process.tsx).
 // Visual only: parent supplies entry snapshots and optional toggle callbacks.
 
-import { useState, type ReactElement } from 'react'
+import { useState, type KeyboardEvent, type ReactElement } from 'react'
 import { ChevronDown, ChevronRight, Minimize2 } from 'lucide-react'
 import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
@@ -229,6 +229,13 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
     setInternalExpanded((value) => !value)
   }
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
+    if (!canToggle) return
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    event.preventDefault()
+    handleToggle()
+  }
+
   const summaryContent = (
     <>
       {showCompactionIcon ? (
@@ -276,20 +283,18 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
 
   return (
     <div className="process-entry-row">
-      {canToggle ? (
-        <button
-          type="button"
-          aria-expanded={isOpen}
-          className={`process-entry-row-header ${entry.error ? 'is-error' : ''}`}
-          onClick={handleToggle}
-        >
-          {summaryContent}
-        </button>
-      ) : (
-        <div className={`process-entry-row-header is-static ${entry.error ? 'is-error' : ''}`}>
-          {summaryContent}
-        </div>
-      )}
+      <div
+        role={canToggle ? 'button' : undefined}
+        tabIndex={canToggle ? 0 : undefined}
+        aria-expanded={canToggle ? isOpen : undefined}
+        className={`process-entry-row-header ${canToggle ? 'is-interactive' : 'is-static'} ${
+          entry.error ? 'is-error' : ''
+        }`}
+        onClick={canToggle ? handleToggle : undefined}
+        onKeyDown={handleKeyDown}
+      >
+        {summaryContent}
+      </div>
 
       {entry.meta ? (
         <RuntimeMetaChips meta={entry.meta} placement="process-entry" />

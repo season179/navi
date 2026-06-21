@@ -1800,16 +1800,16 @@ html[data-theme='dark'] .process-section-row-error-dot {
   cursor: default;
 }
 
-button.process-stack-entry-row {
+.process-stack-entry-row.is-interactive {
   cursor: pointer;
   transition:
     color 0.15s ease,
     background-color 0.15s ease;
 }
 
-button.process-stack-entry-row:hover {
+.process-stack-entry-row.is-interactive:hover {
   color: var(--ds-text-muted);
-  background: color-mix(in srgb, var(--ds-hover) 70%, transparent);
+  background: color-mix(in srgb, var(--ds-hover) 45%, transparent);
 }
 
 .process-stack-entry-row.is-error {
@@ -1995,14 +1995,14 @@ html[data-theme='dark'] .process-stack-entry-error-text {
   cursor: default;
 }
 
-button.process-entry-row-header {
+.process-entry-row-header.is-interactive {
   cursor: pointer;
   transition:
     color 0.15s ease,
     background-color 0.15s ease;
 }
 
-button.process-entry-row-header:hover {
+.process-entry-row-header.is-interactive:hover {
   color: var(--ds-text);
   background: color-mix(in srgb, var(--ds-hover) 70%, transparent);
 }

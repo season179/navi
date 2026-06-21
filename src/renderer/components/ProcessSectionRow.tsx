@@ -2,7 +2,7 @@
 // (../Kun/src/renderer/src/components/chat/message-timeline-process.tsx).
 // Visual only: parent supplies section snapshots and optional toggle callbacks.
 
-import { useState, type MouseEvent, type ReactElement } from 'react'
+import { useState, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
@@ -430,6 +430,13 @@ function ProcessStackEntryRow({
     onToggle()
   }
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
+    if (!canToggle) return
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    event.preventDefault()
+    onToggle()
+  }
+
   const row = (
     <>
       <span
@@ -460,20 +467,18 @@ function ProcessStackEntryRow({
 
   return (
     <div className="process-stack-entry">
-      {canToggle ? (
-        <button
-          type="button"
-          aria-expanded={open}
-          className={`process-stack-entry-row ${entry.error ? 'is-error' : ''}`}
-          onClick={onToggle}
-        >
-          {row}
-        </button>
-      ) : (
-        <div className={`process-stack-entry-row is-static ${entry.error ? 'is-error' : ''}`}>
-          {row}
-        </div>
-      )}
+      <div
+        role={canToggle ? 'button' : undefined}
+        tabIndex={canToggle ? 0 : undefined}
+        aria-expanded={canToggle ? open : undefined}
+        className={`process-stack-entry-row ${canToggle ? 'is-interactive' : 'is-static'} ${
+          entry.error ? 'is-error' : ''
+        }`}
+        onClick={canToggle ? onToggle : undefined}
+        onKeyDown={handleKeyDown}
+      >
+        {row}
+      </div>
       {open && (entry.detailText || entry.nestedBubble) ? (
         entry.detailKind === 'assistant' ? (
           <div className="process-stack-entry-assistant">
