@@ -393,6 +393,12 @@ import {
   PluginMarketplaceViewPreview,
   type PluginMarketplacePreviewMode,
 } from '../components/PluginMarketplaceView'
+import {
+  ConnectPhoneViewPreview,
+  ConnectPhoneSidebarPreview,
+  type ConnectPhoneViewPreviewMode,
+  type ConnectPhoneSidebarPreviewMode,
+} from '../components/ConnectPhoneView'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -1048,6 +1054,44 @@ function HomePage() {
       if (value === 'wireSuccess') return 'wireSuccess'
       if (value === 'wireWarning') return 'wireWarning'
       return value as InitialSetupDialogPreviewMode
+    }, [])
+
+  // Visual preview for the ported ConnectPhoneView
+  // (?connectPhoneViewPreview=1|lark|weixin|qrLoading|qrShowing|qrSuccess|qrError|connected|sidebarCollapsed).
+  const connectPhoneViewPreviewMode = useMemo((): ConnectPhoneViewPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('connectPhoneViewPreview')) return null
+    const value = params.get('connectPhoneViewPreview')
+    if (!value || value === '1' || value === 'default') return 'default'
+    if (value === 'lark') return 'lark'
+    if (value === 'weixin') return 'weixin'
+    if (value === 'qrLoading') return 'qrLoading'
+    if (value === 'qrShowing') return 'qrShowing'
+    if (value === 'qrSuccess') return 'qrSuccess'
+    if (value === 'qrError') return 'qrError'
+    if (value === 'connected') return 'connected'
+    if (value === 'sidebarCollapsed') return 'sidebarCollapsed'
+    return value as ConnectPhoneViewPreviewMode
+  }, [])
+
+  // Visual preview for the ported ConnectPhoneSidebarPanel
+  // (?connectPhoneSidebarPreview=1|empty|connected|qrShowing|qrSuccess|qrError|disconnecting|disabled).
+  const connectPhoneSidebarPreviewMode =
+    useMemo((): ConnectPhoneSidebarPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('connectPhoneSidebarPreview')) return null
+      const value = params.get('connectPhoneSidebarPreview')
+      if (!value || value === '1' || value === 'default') return 'default'
+      if (value === 'empty') return 'empty'
+      if (value === 'connected') return 'connected'
+      if (value === 'qrShowing') return 'qrShowing'
+      if (value === 'qrSuccess') return 'qrSuccess'
+      if (value === 'qrError') return 'qrError'
+      if (value === 'disconnecting') return 'disconnecting'
+      if (value === 'disabled') return 'disabled'
+      return value as ConnectPhoneSidebarPreviewMode
     }, [])
 
   // Visual preview for the ported PluginMarketplaceView
@@ -2050,6 +2094,14 @@ function HomePage() {
 
   if (initialSetupDialogPreviewMode) {
     return <InitialSetupDialogPreview mode={initialSetupDialogPreviewMode} />
+  }
+
+  if (connectPhoneViewPreviewMode) {
+    return <ConnectPhoneViewPreview mode={connectPhoneViewPreviewMode} />
+  }
+
+  if (connectPhoneSidebarPreviewMode) {
+    return <ConnectPhoneSidebarPreview mode={connectPhoneSidebarPreviewMode} />
   }
 
   if (pluginMarketplaceViewPreviewMode) {
