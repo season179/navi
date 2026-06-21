@@ -107,6 +107,7 @@ export const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceV
   'unsupported',
   'largeFile',
   'truncated',
+  'liveDisabled',
   'inlineAgent',
   'inlineAgentBlockMenu',
   'inlineAgentEmptyAgents',

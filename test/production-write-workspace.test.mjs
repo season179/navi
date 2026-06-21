@@ -39,6 +39,7 @@ test('maps document-pane and toolbar snapshot modes', () => {
     'unsupported',
     'largeFile',
     'truncated',
+    'liveDisabled',
     'inlineAgent',
     'error',
     'exportSuccess',
