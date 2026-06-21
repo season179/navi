@@ -479,6 +479,10 @@ import {
   ProviderModelImportDialogPreview,
   type ProviderModelImportDialogPreviewMode,
 } from '../components/providers/ProviderModelImportDialog'
+import {
+  ProviderModelsManagerPreview,
+  type ProviderModelsManagerPreviewMode,
+} from '../components/providers/ProviderModelsManager'
 import { SkillsSettings } from '../components/skills/SkillsSettings'
 import { hasUsableProvider, type SkillSummary } from '../../shared/flue'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
@@ -1360,6 +1364,23 @@ function HomePage() {
       if (value === 'empty') return 'empty'
       if (value === 'allExisting') return 'allExisting'
       if (value === 'chatOnly') return 'chatOnly'
+      return 'default'
+    }, [])
+
+  // Visual preview for the ported ProviderModelsManager
+  // (?providerModelsManagerPreview=1|empty|many|add|edit|search|selected).
+  const providerModelsManagerPreviewMode =
+    useMemo((): ProviderModelsManagerPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('providerModelsManagerPreview')) return null
+      const value = params.get('providerModelsManagerPreview')
+      if (value === 'empty') return 'empty'
+      if (value === 'many') return 'many'
+      if (value === 'add') return 'add'
+      if (value === 'edit') return 'edit'
+      if (value === 'search') return 'search'
+      if (value === 'selected') return 'selected'
       return 'default'
     }, [])
 
@@ -2622,6 +2643,10 @@ function HomePage() {
 
   if (providerModelImportDialogPreviewMode) {
     return <ProviderModelImportDialogPreview mode={providerModelImportDialogPreviewMode} />
+  }
+
+  if (providerModelsManagerPreviewMode) {
+    return <ProviderModelsManagerPreview mode={providerModelsManagerPreviewMode} />
   }
 
   if (scheduleDefaultsDialogPreviewMode) {

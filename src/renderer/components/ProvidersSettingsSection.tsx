@@ -14,7 +14,6 @@ import {
   Lock,
   Mic,
   Music2,
-  Pencil,
   PlugZap,
   Plus,
   Trash2,
@@ -28,6 +27,10 @@ import {
   Toggle,
   type InlineNotice,
 } from './SettingsControls'
+import {
+  ProviderModelsManager,
+  providerModelEntriesFromIds,
+} from './providers/ProviderModelsManager'
 
 export type ModelEndpointFormat =
   | 'chat_completions'
@@ -334,31 +337,6 @@ function DetailSection({
       </div>
       {children}
     </section>
-  )
-}
-
-function ProviderModelsListPreview({
-  models,
-}: {
-  models: string[]
-}): ReactElement {
-  if (models.length === 0) {
-    return <p className="providers-settings-model-empty">{COPY.providerModelEmpty}</p>
-  }
-  return (
-    <ul className="providers-settings-model-list">
-      {models.map((modelId) => (
-        <li key={modelId} className="providers-settings-model-row">
-          <div className="providers-settings-model-row-main">
-            <span className="providers-settings-model-id">{modelId}</span>
-            <span className="providers-settings-model-kind">Chat</span>
-          </div>
-          <button type="button" className="providers-settings-model-edit" aria-label="Edit model">
-            <Pencil className="providers-settings-model-edit-icon" strokeWidth={1.8} />
-          </button>
-        </li>
-      ))}
-    </ul>
   )
 }
 
@@ -725,8 +703,16 @@ export function ProvidersSettingsSection({
                     </button>
                   }
                 >
-                  <p className="providers-settings-muted-copy">{COPY.providerModelListDesc}</p>
-                  <ProviderModelsListPreview models={activeProvider.models} />
+                  <ProviderModelsManager
+                    snapshot={{
+                      models: providerModelEntriesFromIds(
+                        activeProvider.models,
+                        activeProvider.modelProfiles,
+                      ),
+                      providerEndpointFormat:
+                        ENDPOINT_FORMAT_LABELS[activeProvider.endpointFormat],
+                    }}
+                  />
                 </DetailSection>
 
                 {(
