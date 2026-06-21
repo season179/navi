@@ -20,6 +20,7 @@ import {
   resolveComposerFooterHintPreview,
   type ComposerFooterHintPreviewMode,
 } from '../lib/composerFooterHint'
+import { COMPOSER_DICTATION_ERROR_PREVIEW } from '../lib/composerVoiceDictation'
 import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
@@ -776,6 +777,21 @@ function HomePage() {
     return resolveComposerFooterHintPreview(mode)
   }, [])
 
+  // Visual preview for dictation error row (?composerDictationErrorPreview=1).
+  const composerDictationErrorPreview = useMemo(() => {
+    if (typeof window === 'undefined') return undefined
+    if (!new URLSearchParams(window.location.search).has('composerDictationErrorPreview')) {
+      return undefined
+    }
+    return COMPOSER_DICTATION_ERROR_PREVIEW
+  }, [])
+
+  // Visual preview for mic transcribing spinner (?composerVoiceTranscribingPreview=1).
+  const composerVoiceTranscribingPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return new URLSearchParams(window.location.search).has('composerVoiceTranscribingPreview')
+  }, [])
+
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
   const queuedMessagesPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
@@ -1254,7 +1270,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint).
+  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1276,6 +1292,8 @@ function HomePage() {
     if (value === 'modelPickerSubmenu') return 'modelPickerSubmenu'
     if (value === 'modelPickerNoProviders') return 'modelPickerNoProviders'
     if (value === 'worktreeHint') return 'worktreeHint'
+    if (value === 'dictationError') return 'dictationError'
+    if (value === 'voiceTranscribing') return 'voiceTranscribing'
     return 'default'
   }, [])
 
@@ -3833,6 +3851,8 @@ function HomePage() {
       defaultPlusMenuOpen={composerPlusMenuPreview?.open}
       plusMenuToggles={composerPlusMenuPreview?.toggles}
       footerHint={composerFooterHintPreview}
+      dictationError={composerDictationErrorPreview}
+      voiceTranscribing={composerVoiceTranscribingPreview}
       modelChip={
         <FloatingModelPicker
           providers={providerProfiles}

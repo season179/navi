@@ -83,6 +83,11 @@ import {
   COMPOSER_FOOTER_HINT_SLASH,
   COMPOSER_FOOTER_HINT_WORKTREE,
 } from '../lib/composerFooterHint'
+import {
+  COMPOSER_DICTATION_ERROR_PREVIEW,
+  COMPOSER_VOICE_START_LABEL,
+  COMPOSER_VOICE_TRANSCRIBING_LABEL,
+} from '../lib/composerVoiceDictation'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
@@ -111,6 +116,8 @@ export type FloatingComposerPreviewMode =
   | 'modelPickerSubmenu'
   | 'modelPickerNoProviders'
   | 'worktreeHint'
+  | 'dictationError'
+  | 'voiceTranscribing'
 
 export type ComposerSlashCommandItem = {
   id: string
@@ -171,6 +178,8 @@ export type FloatingComposerSnapshot = {
   modelPickerNoProviders: boolean
   threadUsage: ComposerThreadUsage | null
   footerHint: string | null
+  dictationError: string | null
+  voiceTranscribing: boolean
 }
 
 const SLASH_COMMANDS_PREVIEW: SlashCommandPreview[] = [
@@ -640,6 +649,8 @@ export function resolveFloatingComposerSnapshot(
     modelPickerNoProviders: false,
     threadUsage: COMPOSER_THREAD_USAGE_PREVIEW,
     footerHint: COMPOSER_FOOTER_HINT_SLASH,
+    dictationError: null,
+    voiceTranscribing: false,
   }
 
   switch (mode) {
@@ -693,6 +704,10 @@ export function resolveFloatingComposerSnapshot(
       }
     case 'worktreeHint':
       return { ...base, footerHint: COMPOSER_FOOTER_HINT_WORKTREE }
+    case 'dictationError':
+      return { ...base, dictationError: COMPOSER_DICTATION_ERROR_PREVIEW }
+    case 'voiceTranscribing':
+      return { ...base, voiceTranscribing: true }
     default:
       return base
   }
@@ -769,6 +784,12 @@ export function FloatingComposer({
               {snapshot.attachments.map((attachment) => (
                 <ComposerImageAttachmentPreview key={attachment.id} attachment={attachment} />
               ))}
+            </div>
+          ) : null}
+
+          {!snapshot.recording && snapshot.dictationError ? (
+            <div className="floating-composer-dictation-error">
+              <span>{snapshot.dictationError}</span>
             </div>
           ) : null}
 
@@ -863,8 +884,26 @@ export function FloatingComposer({
                     onChange={(patch) => setExecution((current) => ({ ...current, ...patch }))}
                   />
 
-                  <button type="button" className="floating-composer-mic-btn" aria-label="Start voice input">
-                    <Mic strokeWidth={2} />
+                  <button
+                    type="button"
+                    className="floating-composer-mic-btn"
+                    aria-label={
+                      snapshot.voiceTranscribing
+                        ? COMPOSER_VOICE_TRANSCRIBING_LABEL
+                        : COMPOSER_VOICE_START_LABEL
+                    }
+                    title={
+                      snapshot.voiceTranscribing
+                        ? COMPOSER_VOICE_TRANSCRIBING_LABEL
+                        : COMPOSER_VOICE_START_LABEL
+                    }
+                    disabled={snapshot.voiceTranscribing}
+                  >
+                    {snapshot.voiceTranscribing ? (
+                      <Loader2 strokeWidth={2.2} className="floating-composer-mic-spinner" />
+                    ) : (
+                      <Mic strokeWidth={2} />
+                    )}
                   </button>
 
                   {snapshot.busy ? (

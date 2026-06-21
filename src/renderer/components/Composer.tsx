@@ -9,7 +9,7 @@
 // front-end shortcut only, never a backend trigger.
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
-import { ListTodo, Mic, Plus, Send, Sparkles, Square, Target } from 'lucide-react'
+import { ListTodo, Loader2, Mic, Plus, Send, Sparkles, Square, Target } from 'lucide-react'
 import { filterSkillSlashCommands } from '../lib/composerSlashCommands'
 import {
   filterWorkspaceFileMentionSuggestions,
@@ -23,6 +23,10 @@ import type { ComposerImageAttachment } from '../lib/composerAttachments'
 import type { ComposerGoal } from '../lib/composerGoal'
 import type { ComposerThreadUsage } from '../lib/composerThreadUsage'
 import type { ComposerPlusMenuToggles } from '../lib/composerPlusMenu'
+import {
+  COMPOSER_VOICE_START_LABEL,
+  COMPOSER_VOICE_TRANSCRIBING_LABEL,
+} from '../lib/composerVoiceDictation'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import {
   FloatingComposerQueuedMessages,
@@ -77,6 +81,10 @@ interface ComposerProps {
     onStop?: () => void
     onSend?: () => void
   }
+  /** Dictation error shown above the toolbar, matching Kun's composer dictation.error row. */
+  dictationError?: string | null
+  /** When true, mic button shows transcribing spinner and is disabled. */
+  voiceTranscribing?: boolean
   /** Queued messages shown above the composer shell while a reply is streaming. */
   queuedMessages?: QueuedComposerMessage[]
   onRemoveQueuedMessage?: (id: string) => void
@@ -140,6 +148,8 @@ export function Composer({
   skills,
   fileMentionCandidates,
   voiceRecording,
+  dictationError,
+  voiceTranscribing = false,
   queuedMessages,
   onRemoveQueuedMessage,
   executionPicker,
@@ -561,6 +571,11 @@ export function Composer({
               ))}
             </div>
           ) : null}
+          {!compact && dictationError ? (
+            <div className="floating-composer-dictation-error">
+              <span>{dictationError}</span>
+            </div>
+          ) : null}
           <div className={toolbarClass}>
             {!compact ? (
               <div className="floating-composer-toolbar-start">
@@ -654,10 +669,23 @@ export function Composer({
                     <button
                       type="button"
                       className="floating-composer-mic-btn"
-                      aria-label="Start voice input"
-                      disabled={disabled}
+                      aria-label={
+                        voiceTranscribing
+                          ? COMPOSER_VOICE_TRANSCRIBING_LABEL
+                          : COMPOSER_VOICE_START_LABEL
+                      }
+                      title={
+                        voiceTranscribing
+                          ? COMPOSER_VOICE_TRANSCRIBING_LABEL
+                          : COMPOSER_VOICE_START_LABEL
+                      }
+                      disabled={disabled || voiceTranscribing}
                     >
-                      <Mic strokeWidth={2} />
+                      {voiceTranscribing ? (
+                        <Loader2 strokeWidth={2.2} className="floating-composer-mic-spinner" />
+                      ) : (
+                        <Mic strokeWidth={2} />
+                      )}
                     </button>
                   ) : null}
                   {busy ? (
