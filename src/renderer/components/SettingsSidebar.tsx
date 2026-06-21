@@ -17,6 +17,7 @@ import { MediaGenerationSettingsSectionPreview } from './MediaGenerationSettings
 import { WorktreeSettingsSectionPreview } from './WorktreeSettingsSection'
 import { ClawSettingsSectionPreview } from './ClawSettingsSection'
 import { WriteSettingsSectionPreview } from './WriteSettingsSection'
+import { ProvidersSettingsSectionPreview } from './ProvidersSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -181,6 +182,10 @@ export function SettingsSidebarPreviewContent({
       {category === 'general' ? (
         <div className="general-settings-preview-stack">
           <GeneralSettingsSectionPreview />
+        </div>
+      ) : category === 'providers' ? (
+        <div className="providers-settings-preview-stack">
+          <ProvidersSettingsSectionPreview />
         </div>
       ) : category === 'write' ? (
         <div className="write-settings-preview-stack">

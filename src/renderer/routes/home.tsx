@@ -288,6 +288,10 @@ import {
   type WritePreviewMode,
 } from '../components/WriteSettingsSection'
 import {
+  ProvidersSettingsSectionPreview,
+  type ProvidersPreviewMode,
+} from '../components/ProvidersSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1389,6 +1393,16 @@ function HomePage() {
     return mode as WritePreviewMode
   }, [])
 
+  // Visual preview for the ported ProvidersSettingsSection (?providersPreview=1|missingKey|draft|…).
+  const providersPreviewMode = useMemo((): ProvidersPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('providersPreview')) return null
+    const mode = params.get('providersPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as ProvidersPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1703,6 +1717,22 @@ function HomePage() {
           </p>
           <div className="write-preview-stack">
             <WriteSettingsSectionPreview mode={writePreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (providersPreviewMode) {
+    return (
+      <div className="providers-preview">
+        <div className="providers-preview-inner">
+          <h1 className="providers-preview-title">Providers</h1>
+          <p className="providers-preview-subtitle">
+            Providers category from Kun settings-section-providers.tsx.
+          </p>
+          <div className="providers-preview-stack">
+            <ProvidersSettingsSectionPreview mode={providersPreviewMode} />
           </div>
         </div>
       </div>
