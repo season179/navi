@@ -165,6 +165,12 @@ import {
   type TodoPanelPreviewMode,
 } from '../components/TodoPanel'
 import {
+  ChangeInspector,
+  CHANGE_INSPECTOR_PREVIEW_ITEMS,
+  type ChangeInspectorItem,
+  type ChangeInspectorPreviewMode,
+} from '../components/ChangeInspector'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -676,6 +682,40 @@ function HomePage() {
     }
   }, [todoPanelPreviewMode])
 
+  // Visual preview for the ported ChangeInspector (?changeInspectorPreview=1|empty|single).
+  const changeInspectorPreviewMode = useMemo((): ChangeInspectorPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('changeInspectorPreview')) return null
+    const mode = params.get('changeInspectorPreview')
+    if (mode === 'empty') return 'empty'
+    if (mode === 'single') return 'single'
+    return 'default'
+  }, [])
+  const [changeInspectorPreviewItems, setChangeInspectorPreviewItems] = useState<
+    ChangeInspectorItem[]
+  >(() => CHANGE_INSPECTOR_PREVIEW_ITEMS)
+  const [changeInspectorPreviewSelectedId, setChangeInspectorPreviewSelectedId] = useState<
+    string | null
+  >(() => CHANGE_INSPECTOR_PREVIEW_ITEMS[0]?.id ?? null)
+  useEffect(() => {
+    if (changeInspectorPreviewMode === 'empty') {
+      setChangeInspectorPreviewItems([])
+      setChangeInspectorPreviewSelectedId(null)
+      return
+    }
+    if (changeInspectorPreviewMode === 'single') {
+      const single = CHANGE_INSPECTOR_PREVIEW_ITEMS.slice(0, 1)
+      setChangeInspectorPreviewItems(single)
+      setChangeInspectorPreviewSelectedId(single[0]?.id ?? null)
+      return
+    }
+    if (changeInspectorPreviewMode) {
+      setChangeInspectorPreviewItems(CHANGE_INSPECTOR_PREVIEW_ITEMS)
+      setChangeInspectorPreviewSelectedId(CHANGE_INSPECTOR_PREVIEW_ITEMS[0]?.id ?? null)
+    }
+  }, [changeInspectorPreviewMode])
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -868,6 +908,18 @@ function HomePage() {
               )
             }
             onClear={() => setTodoPanelPreviewItems([])}
+          />
+        </div>
+      ) : null}
+
+      {changeInspectorPreviewMode ? (
+        <div className="change-inspector-preview-wrap">
+          <ChangeInspector
+            items={changeInspectorPreviewItems}
+            workspaceRoot="/Users/season/Personal/navi"
+            selectedId={changeInspectorPreviewSelectedId}
+            onSelect={setChangeInspectorPreviewSelectedId}
+            onCollapse={() => setChangeInspectorPreviewItems([])}
           />
         </div>
       ) : null}

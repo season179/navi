@@ -53,6 +53,7 @@
 
   /* Cards / chips / code surfaces */
   --ds-card-soft: rgba(255, 255, 255, 0.8);
+  --ds-card-ghost: rgba(255, 255, 255, 0.58);
   --ds-card-strong: rgba(255, 255, 255, 0.96);
   --ds-card-muted: rgba(245, 248, 253, 0.86);
   --ds-chip-bg: rgba(255, 255, 255, 0.9);
@@ -187,6 +188,7 @@
   /* Cards / chips */
   --ds-card-soft:
     linear-gradient(180deg, rgba(27, 35, 56, 0.94), rgba(21, 28, 45, 0.9));
+  --ds-card-ghost: rgba(15, 20, 34, 0.72);
   --ds-card-strong:
     linear-gradient(180deg, rgba(33, 43, 68, 0.98), rgba(24, 32, 51, 0.96));
   --ds-card-muted: rgba(27, 35, 56, 0.86);
