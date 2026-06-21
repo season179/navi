@@ -505,15 +505,22 @@ import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
 import { useSettings } from '../settings'
 
-// Which settings sub-panel is shown while the settings stage is open. Open/close
-// itself is owned by useSettings(); this only selects the tab.
-type SettingsTab = 'providers' | 'skills'
+// Which settings category is shown while the settings stage is open. Open/close
+// itself is owned by useSettings(); this selects the sidebar category.
+const PRODUCTION_SETTINGS_COPY = {
+  title: 'Settings',
+  subtitle: 'Manage API access, interface preferences, default folders, and assistant behavior.',
+  autoApplyHint: 'Changes apply automatically',
+  apiKeyRequiredTitle: 'API key required',
+  apiKeyRequiredBody:
+    'Add an API key in Providers first. Once entered, the app can start the local AI assistant service for you.',
+}
 
 function HomePage() {
   const { collapsed, toggle } = useSidebar()
   const { settingsOpen, openSettings, closeSettings } = useSettings()
   const [draft, setDraft] = useState('')
-  const [settingsTab, setSettingsTab] = useState<SettingsTab>('providers')
+  const [settingsCategory, setSettingsCategory] = useState<SettingsCategory>('providers')
   const { messages, status, busy, send, cancel, activeSelection, pickModel, pickReasoning } =
     useNaviThread()
   const {
@@ -2531,10 +2538,10 @@ function HomePage() {
     refreshSkills()
   }, [refreshSkills, settingsOpen])
 
-  // Open the settings stage on a specific tab. The provider entry points always
-  // want the Providers tab, regardless of the last-selected one.
-  const openSettingsTab = (tab: SettingsTab) => {
-    setSettingsTab(tab)
+  // Open the settings stage on a specific category. Provider entry points always
+  // want the Providers category, regardless of the last-selected one.
+  const openSettingsTab = (tab: 'providers' | 'skills') => {
+    setSettingsCategory(tab === 'skills' ? 'agents' : 'providers')
     openSettings()
   }
 
@@ -3345,37 +3352,54 @@ function HomePage() {
       ) : null}
 
       {settingsOpen ? (
-        <div className="stage-scroll">
-          <div className="providers-wrap">
-            <div className="settings-tabs">
-              <button
-                className={settingsTab === 'providers' ? 'settings-tab is-active' : 'settings-tab'}
-                onClick={() => setSettingsTab('providers')}
-              >
-                Providers
-              </button>
-              <button
-                className={settingsTab === 'skills' ? 'settings-tab is-active' : 'settings-tab'}
-                onClick={() => setSettingsTab('skills')}
-              >
-                Skills
-              </button>
+        <div className="settings-view ds-drag production-settings-view">
+          <SettingsSidebar
+            category={settingsCategory}
+            setCategory={setSettingsCategory}
+            goBack={closeSettings}
+          />
+          <div className="settings-view-main ds-no-drag">
+            <div className="settings-view-inner">
+              {!hasProvider ? (
+                <div className="settings-view-api-key-banner" role="status">
+                  <div className="settings-view-api-key-banner-title">
+                    {PRODUCTION_SETTINGS_COPY.apiKeyRequiredTitle}
+                  </div>
+                  <p className="settings-view-api-key-banner-body">
+                    {PRODUCTION_SETTINGS_COPY.apiKeyRequiredBody}
+                  </p>
+                </div>
+              ) : null}
+
+              <div className="settings-view-header">
+                <div>
+                  <h1 className="settings-view-title">{PRODUCTION_SETTINGS_COPY.title}</h1>
+                  <p className="settings-view-subtitle">{PRODUCTION_SETTINGS_COPY.subtitle}</p>
+                </div>
+                <span className="settings-view-save-status is-idle">
+                  {PRODUCTION_SETTINGS_COPY.autoApplyHint}
+                </span>
+              </div>
+
+              {settingsCategory === 'providers' ? (
+                <ProvidersSettings
+                  embedded
+                  providers={providerProfiles}
+                  statuses={status.providers}
+                  ready={status.ready}
+                  defaultSelection={defaultSelection}
+                  onUpsert={upsertProvider}
+                  onDelete={removeProvider}
+                  onSetDefault={setDefaultSelection}
+                  onProbe={probeProvider}
+                  onClose={closeSettings}
+                />
+              ) : settingsCategory === 'agents' ? (
+                <SkillsSettings projectPath={projectPath} onClose={closeSettings} />
+              ) : (
+                <SettingsSidebarPreviewContent category={settingsCategory} showHeader={false} />
+              )}
             </div>
-            {settingsTab === 'providers' ? (
-              <ProvidersSettings
-                providers={providerProfiles}
-                statuses={status.providers}
-                ready={status.ready}
-                defaultSelection={defaultSelection}
-                onUpsert={upsertProvider}
-                onDelete={removeProvider}
-                onSetDefault={setDefaultSelection}
-                onProbe={probeProvider}
-                onClose={closeSettings}
-              />
-            ) : (
-              <SkillsSettings projectPath={projectPath} onClose={closeSettings} />
-            )}
           </div>
         </div>
       ) : empty ? (

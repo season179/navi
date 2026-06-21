@@ -60,6 +60,8 @@ interface ProvidersSettingsProps {
   onSetDefault: (sel: DefaultSelection) => Promise<void>
   onProbe: (req: ProbeReq) => Promise<ProbeResult>
   onClose: () => void
+  /** When true, omit the panel header — for embedding inside SettingsView. */
+  embedded?: boolean
 }
 
 const DRAFT = '__draft__'
@@ -171,6 +173,7 @@ export function ProvidersSettings({
   onSetDefault,
   onProbe,
   onClose,
+  embedded = false,
 }: ProvidersSettingsProps) {
   const addMenuRef = useRef<HTMLDivElement>(null)
   const [selected, setSelected] = useState<string | null>(null)
@@ -392,18 +395,28 @@ export function ProvidersSettings({
   }
 
   return (
-    <div className="providers-panel">
-      <header className="providers-head">
-        <div className="providers-title">
-          Providers
-          {!ready ? <span className="providers-reconnecting">reconnecting…</span> : null}
-        </div>
-        <button className="apikey-close" onClick={onClose} aria-label="Close" title="Close">
-          <X />
-        </button>
-      </header>
+    <div className={embedded ? 'providers-settings-embedded' : 'providers-panel'}>
+      {!embedded ? (
+        <header className="providers-head">
+          <div className="providers-title">
+            Providers
+            {!ready ? <span className="providers-reconnecting">reconnecting…</span> : null}
+          </div>
+          <button className="apikey-close" onClick={onClose} aria-label="Close" title="Close">
+            <X />
+          </button>
+        </header>
+      ) : !ready ? (
+        <p className="providers-settings-reconnecting-hint">reconnecting…</p>
+      ) : null}
 
-      <div className="providers-settings-layout providers-panel-settings-body">
+      <div
+        className={
+          embedded
+            ? 'providers-settings-layout'
+            : 'providers-settings-layout providers-panel-settings-body'
+        }
+      >
         <div className="providers-settings-sidebar">
           {providers.length === 0 && !isDraft ? (
             <p className="providers-settings-model-empty">No providers yet. Add one to start.</p>

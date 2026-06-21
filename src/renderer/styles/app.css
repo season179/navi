@@ -23692,6 +23692,21 @@ button.usage-heatmap-cell:focus {
   min-height: 320px;
 }
 
+.providers-settings-embedded {
+  width: 100%;
+}
+
+.providers-settings-embedded .providers-settings-layout {
+  min-height: 320px;
+}
+
+.providers-settings-reconnecting-hint {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+}
+
 .providers-settings-detail-placeholder {
   align-self: start;
 }
