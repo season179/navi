@@ -147,12 +147,18 @@ import {
   type RuntimeBannerPreviewMode,
 } from '../components/RuntimeBanner'
 import {
+  SessionHeader,
+  SESSION_HEADER_PREVIEW,
+  SESSION_HEADER_PREVIEW_EMPTY,
+  type SessionHeaderPreviewMode,
+} from '../components/SessionHeader'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
 import { WorkspaceSelectEmptyHero } from '../components/WorkspaceSelectEmptyHero'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
-import { PencilLine } from 'lucide-react'
+import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -571,6 +577,21 @@ function HomePage() {
     return 'default'
   }, [])
 
+  // Visual preview for the ported SessionHeader
+  // (?sessionHeaderPreview=1|compact|fork|busy|empty|editing).
+  const sessionHeaderPreviewMode = useMemo((): SessionHeaderPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('sessionHeaderPreview')) return null
+    const mode = params.get('sessionHeaderPreview')
+    if (mode === 'compact') return 'compact'
+    if (mode === 'fork') return 'fork'
+    if (mode === 'busy') return 'busy'
+    if (mode === 'empty') return 'empty'
+    if (mode === 'editing') return 'editing'
+    return 'default'
+  }, [])
+
   // Visual preview for the ported ToolEntry (?toolEntry=1|running|error|command).
   const toolEntryPreview = useMemo((): {
     block: ToolBlockSnapshot
@@ -626,16 +647,67 @@ function HomePage() {
     void send(text)
   }
 
+  const sessionHeaderPreviewSnapshot = useMemo(() => {
+    if (!sessionHeaderPreviewMode) return null
+    if (sessionHeaderPreviewMode === 'empty') return null
+    if (sessionHeaderPreviewMode === 'fork') return SESSION_HEADER_PREVIEW.fork
+    return SESSION_HEADER_PREVIEW.default
+  }, [sessionHeaderPreviewMode])
+
   return (
     <>
-      <TopBar
-        title={empty ? 'New conversation' : 'Conversation'}
-        subtitle={statusLabel(status.ready, hasProvider, status.error)}
-        sidebarCollapsed={collapsed}
-        onToggleSidebar={toggle}
-        onOpenSettings={toggleSettings}
-        settingsActive={settingsOpen}
-      />
+      {sessionHeaderPreviewMode === 'compact' ||
+      sessionHeaderPreviewMode === 'fork' ||
+      sessionHeaderPreviewMode === 'busy' ? (
+        <header className="topbar">
+          <div className="topbar-session">
+            {collapsed ? (
+              <button
+                className="sidebar-titlebar-toggle"
+                onClick={toggle}
+                aria-label="Expand sidebar"
+                title="Expand sidebar"
+              >
+                <PanelLeft />
+              </button>
+            ) : null}
+            <SessionHeader
+              snapshot={
+                sessionHeaderPreviewMode === 'fork'
+                  ? SESSION_HEADER_PREVIEW.fork
+                  : SESSION_HEADER_PREVIEW.default
+              }
+              compact
+              busy={sessionHeaderPreviewMode === 'busy'}
+            />
+          </div>
+          <div className="topbar-actions" aria-hidden="true" />
+        </header>
+      ) : (
+        <TopBar
+          title={empty ? 'New conversation' : 'Conversation'}
+          subtitle={statusLabel(status.ready, hasProvider, status.error)}
+          sidebarCollapsed={collapsed}
+          onToggleSidebar={toggle}
+          onOpenSettings={toggleSettings}
+          settingsActive={settingsOpen}
+        />
+      )}
+
+      {sessionHeaderPreviewMode &&
+      sessionHeaderPreviewMode !== 'compact' &&
+      sessionHeaderPreviewMode !== 'fork' &&
+      sessionHeaderPreviewMode !== 'busy' ? (
+        <div className="session-header-preview-panel">
+          <SessionHeader
+            snapshot={sessionHeaderPreviewSnapshot}
+            workspaceLabel={SESSION_HEADER_PREVIEW_EMPTY.workspaceLabel}
+            compact={false}
+            busy={false}
+            forceEditing={sessionHeaderPreviewMode === 'editing'}
+          />
+        </div>
+      ) : null}
 
       {runtimeStatusBannerPreviewMode ? (
         <RuntimeStatusBanner status={RUNTIME_STATUS_BANNER_PREVIEW[runtimeStatusBannerPreviewMode]} />
