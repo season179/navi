@@ -25,7 +25,6 @@ import { ProviderModelImportDialog } from './ProviderModelImportDialog'
 
 interface ProbeReq {
   baseUrl?: string
-  api: string
   apiKey: string
   id?: string
 }
@@ -193,7 +192,6 @@ export function ProvidersSettings({
     const fp = fingerprint(form, !!keyInput.trim())
     const result = await onProbe({
       baseUrl: effectiveBaseUrl(form),
-      api: form.api,
       apiKey: keyInput.trim(),
       id: isDraft ? undefined : form.id,
     })
@@ -208,7 +206,6 @@ export function ProvidersSettings({
     setProbe(null)
     const result = await onProbe({
       baseUrl: effectiveBaseUrl(form),
-      api: form.api,
       apiKey: keyInput.trim(),
       id: isDraft ? undefined : form.id,
     })

@@ -24,7 +24,6 @@ import type {
 
 interface ProbeReq {
   baseUrl?: string
-  api: string
   apiKey: string
   id?: string
 }
@@ -169,6 +168,17 @@ export function useNaviChat(): NaviChat {
 
   const refreshStatus = useCallback(async () => {
     setStatus(await window.navi.flue.status())
+  }, [])
+
+  // Re-read the default selection from main and sync both state + ref. Main's
+  // deleteProvider resets defaultSelection when it pointed at the removed
+  // provider, so the renderer must re-read after a delete — otherwise it stays
+  // pinned to a deleted provider (ghost chip, broken new-conversation pointer,
+  // and the "first provider becomes default" gate in handleSave never fires).
+  const refreshDefaultSelection = useCallback(async () => {
+    const d = await window.navi.flue.getDefaultSelection()
+    setDefaultSelectionState(d)
+    defaultSelectionRef.current = d
   }, [])
 
   const persistCurrent = useCallback(async () => {
@@ -480,10 +490,14 @@ export function useNaviChat(): NaviChat {
   const removeProvider = useCallback(
     async (id: string) => {
       const res = await window.navi.flue.deleteProvider(id)
-      if (res.ok) await Promise.all([refreshProviders(), refreshStatus()])
+      if (res.ok) {
+        // deleteProvider (main) may have reset the default selection, so re-read
+        // it along with the profiles/status it already refreshes.
+        await Promise.all([refreshProviders(), refreshStatus(), refreshDefaultSelection()])
+      }
       return res
     },
-    [refreshProviders, refreshStatus],
+    [refreshProviders, refreshStatus, refreshDefaultSelection],
   )
 
   const probeProvider = useCallback((req: ProbeReq) => window.navi.flue.probeProvider(req), [])

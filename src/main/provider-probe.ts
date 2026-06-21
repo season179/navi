@@ -12,7 +12,6 @@ const PROBE_TIMEOUT_MS = 10_000
 export interface ProbeRequest {
   /** Effective base URL to probe (renderer resolves profile.baseUrl ?? preset default). */
   baseUrl?: string
-  api: string
   apiKey: string
   id?: string
 }

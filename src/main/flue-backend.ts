@@ -13,7 +13,7 @@ import { spawn, type ChildProcessByStdio } from 'child_process'
 import type { Readable } from 'stream'
 import { randomBytes, randomUUID } from 'crypto'
 import { EventEmitter } from 'events'
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs'
 import path from 'path'
 import { createFlueClient, type FlueClient } from '@flue/sdk'
 import {
@@ -62,6 +62,11 @@ class FlueBackend extends EventEmitter {
   private activeDefault: FlueStatus['active']
   private starting: Promise<void> | null = null
   private readonly active = new Map<string, ActivePrompt>()
+  // Paths of the transient handoff files written for the child (decrypted keys
+  // live here). Tracked so stop() can delete them — they must never outlive the
+  // backend, since they contain plaintext secrets (the encrypted store is the
+  // durable home; these are a per-launch handoff only).
+  private handoffFiles: string[] = []
 
   /** Subscribe to streamed prompt events. */
   onStream(listener: (msg: FlueStreamMessage) => void): () => void {
@@ -162,6 +167,7 @@ class FlueBackend extends EventEmitter {
     })
     writeFileSync(providersFile, JSON.stringify(naviProviders), { mode: 0o600 })
     writeFileSync(keysFile, JSON.stringify(keys), { mode: 0o600 })
+    this.handoffFiles = [providersFile, keysFile]
 
     const token = randomBytes(32).toString('hex')
     const port = '0'
@@ -267,20 +273,38 @@ class FlueBackend extends EventEmitter {
     this.child = null
     this.client = null
     this.ready = false
-    if (!child || child.exitCode !== null) return
 
-    await new Promise<void>((resolve) => {
-      const done = () => resolve()
-      const killTimer = setTimeout(() => {
-        if (child.exitCode === null) child.kill('SIGKILL')
-        resolve()
-      }, 4000)
-      child.once('exit', () => {
-        clearTimeout(killTimer)
-        done()
+    if (child && child.exitCode === null) {
+      await new Promise<void>((resolve) => {
+        const done = () => resolve()
+        const killTimer = setTimeout(() => {
+          if (child.exitCode === null) child.kill('SIGKILL')
+          resolve()
+        }, 4000)
+        child.once('exit', () => {
+          clearTimeout(killTimer)
+          done()
+        })
+        child.kill('SIGTERM')
       })
-      child.kill('SIGTERM')
-    })
+    }
+
+    // Always sweep the handoff files — they hold decrypted keys and must never
+    // outlive the backend. doStart rewrites them on the next start, so removing
+    // them here (even after a failed start that left this.child null) keeps no
+    // plaintext secrets on disk between launches.
+    this.clearHandoffFiles()
+  }
+
+  private clearHandoffFiles() {
+    for (const f of this.handoffFiles) {
+      try {
+        unlinkSync(f)
+      } catch {
+        // already gone, or write never completed — nothing to do
+      }
+    }
+    this.handoffFiles = []
   }
 
   /** Restart after a settings change (e.g. a new API key). */

@@ -202,7 +202,6 @@ export interface FlueBridge {
   /** Probe a provider's models endpoint from MAIN (test connection / fetch models). */
   probeProvider(req: {
     baseUrl?: string
-    api: string
     apiKey: string
     id?: string
   }): Promise<ProbeResult>
