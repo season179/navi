@@ -220,6 +220,11 @@ import {
   type AppErrorBoundaryPreviewMode,
 } from '../components/AppErrorBoundary'
 import {
+  GuiUpdateControl,
+  GUI_UPDATE_CONTROL_PREVIEW,
+  type GuiUpdateControlPreviewMode,
+} from '../components/GuiUpdateControl'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1177,6 +1182,18 @@ function HomePage() {
     return params.get('appErrorBoundaryPreview') === 'message' ? 'message' : 'default'
   }, [])
 
+  // Visual preview for the ported GuiUpdateControl (?guiUpdateControlPreview=1|current|downloading|…).
+  const guiUpdateControlPreviewMode = useMemo((): GuiUpdateControlPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('guiUpdateControlPreview')) return null
+    const mode = params.get('guiUpdateControlPreview')
+    if (mode && mode in GUI_UPDATE_CONTROL_PREVIEW) {
+      return mode as GuiUpdateControlPreviewMode
+    }
+    return 'available'
+  }, [])
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -2064,6 +2081,19 @@ function HomePage() {
               }
             />
           ) : null}
+        </div>
+      ) : null}
+
+      {guiUpdateControlPreviewMode ? (
+        <div className="gui-update-control-preview">
+          <div className="gui-update-control-preview-card">
+            <GuiUpdateControl
+              {...GUI_UPDATE_CONTROL_PREVIEW[guiUpdateControlPreviewMode]}
+              onCheck={async () => undefined}
+              onDownload={async () => undefined}
+              onInstall={async () => undefined}
+            />
+          </div>
         </div>
       ) : null}
     </>
