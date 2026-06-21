@@ -75,6 +75,10 @@ import {
 } from '../lib/composerAttachments'
 import { COMPOSER_GOAL_PREVIEW, type ComposerGoal } from '../lib/composerGoal'
 import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
+import {
+  COMPOSER_THREAD_USAGE_PREVIEW,
+  type ComposerThreadUsage,
+} from '../lib/composerThreadUsage'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
@@ -160,13 +164,7 @@ export type FloatingComposerSnapshot = {
   showModelPickerMenu: boolean
   modelPickerActiveProviderId: string | null
   modelPickerNoProviders: boolean
-  threadUsage: {
-    tokens: string
-    cost: string
-    savings: string
-    cache: string
-    turns: number
-  } | null
+  threadUsage: ComposerThreadUsage | null
 }
 
 const SLASH_COMMANDS_PREVIEW: SlashCommandPreview[] = [
@@ -550,6 +548,27 @@ export function ComposerChangeSummary({
   )
 }
 
+export function ComposerThreadUsageFooter({
+  usage,
+}: {
+  usage: ComposerThreadUsage
+}): ReactElement {
+  return (
+    <div className="ds-composer-usage floating-composer-usage" title="Session usage">
+      <BarChart3 strokeWidth={1.9} />
+      <span className="ds-composer-usage-tokens">{usage.tokens} tokens</span>
+      <span className="floating-composer-usage-sep">·</span>
+      <span>{usage.cost}</span>
+      <span className="floating-composer-usage-sep">·</span>
+      <span className="floating-composer-usage-savings">{usage.savings}</span>
+      <span className="floating-composer-usage-sep">·</span>
+      <span>{usage.cache} cache</span>
+      <span className="floating-composer-usage-sep">·</span>
+      <span>{usage.turns} turns</span>
+    </div>
+  )
+}
+
 export function resolveFloatingComposerSnapshot(
   mode: FloatingComposerPreviewMode = 'default',
 ): FloatingComposerSnapshot {
@@ -584,13 +603,7 @@ export function resolveFloatingComposerSnapshot(
     showModelPickerMenu: false,
     modelPickerActiveProviderId: null,
     modelPickerNoProviders: false,
-    threadUsage: {
-      tokens: '145k',
-      cost: '$0.42',
-      savings: '12k saved',
-      cache: '68%',
-      turns: 8,
-    },
+    threadUsage: COMPOSER_THREAD_USAGE_PREVIEW,
   }
 
   switch (mode) {
@@ -836,20 +849,7 @@ export function FloatingComposer({
         <div className="ds-composer-footer-left">
           <WorkspaceProjectPicker snapshot={WORKSPACE_PROJECT_PICKER_PREVIEW} />
           <GitBranchPicker snapshot={GIT_BRANCH_PICKER_PREVIEW} />
-          {snapshot.threadUsage ? (
-            <div className="ds-composer-usage floating-composer-usage" title="Session usage">
-              <BarChart3 strokeWidth={1.9} />
-              <span className="ds-composer-usage-tokens">{snapshot.threadUsage.tokens} tokens</span>
-              <span className="floating-composer-usage-sep">·</span>
-              <span>{snapshot.threadUsage.cost}</span>
-              <span className="floating-composer-usage-sep">·</span>
-              <span className="floating-composer-usage-savings">{snapshot.threadUsage.savings}</span>
-              <span className="floating-composer-usage-sep">·</span>
-              <span>{snapshot.threadUsage.cache} cache</span>
-              <span className="floating-composer-usage-sep">·</span>
-              <span>{snapshot.threadUsage.turns} turns</span>
-            </div>
-          ) : null}
+          {snapshot.threadUsage ? <ComposerThreadUsageFooter usage={snapshot.threadUsage} /> : null}
         </div>
       </div>
     </div>

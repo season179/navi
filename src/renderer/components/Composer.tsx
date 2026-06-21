@@ -21,6 +21,7 @@ import {
 import type { ComposerChangedFile } from '../lib/composerChangeSummary'
 import type { ComposerImageAttachment } from '../lib/composerAttachments'
 import type { ComposerGoal } from '../lib/composerGoal'
+import type { ComposerThreadUsage } from '../lib/composerThreadUsage'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import {
   FloatingComposerQueuedMessages,
@@ -35,6 +36,7 @@ import {
   ComposerImageAttachmentPreview,
   ComposerGoalFloater,
   ComposerGoalPanel,
+  ComposerThreadUsageFooter,
   type ComposerSlashCommandItem,
   type ComposerFileMentionItem,
 } from './FloatingComposer'
@@ -101,6 +103,8 @@ interface ComposerProps {
   goalBadge?: boolean
   /** When true, shows the Plan mode badge beside the plus button in the toolbar. */
   planBadge?: boolean
+  /** Session usage chip shown in the composer footer beside project/branch pickers. */
+  threadUsage?: ComposerThreadUsage | null
 }
 
 /**
@@ -144,6 +148,7 @@ export function Composer({
   showGoalPanel = false,
   goalBadge = false,
   planBadge = false,
+  threadUsage,
 }: ComposerProps) {
   const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -669,9 +674,12 @@ export function Composer({
           </div>
         </div>
       </div>
-      {!compact && footerLeft ? (
+      {!compact && (footerLeft || threadUsage) ? (
         <div className="ds-composer-footer floating-composer-footer">
-          <div className="ds-composer-footer-left">{footerLeft}</div>
+          <div className="ds-composer-footer-left">
+            {footerLeft}
+            {threadUsage ? <ComposerThreadUsageFooter usage={threadUsage} /> : null}
+          </div>
         </div>
       ) : null}
     </div>
