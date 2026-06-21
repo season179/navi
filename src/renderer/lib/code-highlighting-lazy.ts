@@ -1,38 +1,23 @@
-// The heavy half of code highlighting, isolated into its own esbuild chunk.
-// `build:renderer` runs with `--splitting --format=esm`, so everything reachable
-// only from here — shiki/core, the JavaScript regex engine, the github-light
-// theme, and the 21 statically imported grammars (~1.8 MB) — is emitted as a
-// separate chunk instead of being inlined into the initial renderer bundle.
-// `code-highlighting.ts` pulls this in via `import('./code-highlighting-lazy')`
-// the first time a real code block is highlighted; until then it never loads,
-// and the synchronous escaped-HTML fallback covers the UI.
+// The heavy half of code highlighting, split out of the initial renderer bundle.
+// `build:renderer` runs with `--splitting --format=esm`, so this module — and,
+// crucially, each grammar it import()s on demand — is emitted as its own chunk.
+// `code-highlighting.ts` pulls this module in via `import('./code-highlighting-lazy')`
+// the first time a real code block is highlighted. The highlighter is built from
+// shiki/core + the JavaScript regex engine + the two themes, but with NO grammars
+// up front; each grammar then loads lazily through `loadGrammar` the first time a
+// block of that language appears. So a Markdown-only conversation never downloads
+// the Rust grammar, and no single output chunk is large enough to matter. Until a
+// grammar resolves, the synchronous escaped-HTML fallback covers the UI.
 
-import { createHighlighterCore, type HighlighterCore, type ThemeRegistration } from 'shiki/core'
+import {
+  createHighlighterCore,
+  type HighlighterCore,
+  type LanguageInput,
+  type ThemeRegistration,
+} from 'shiki/core'
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript'
 
 import githubLight from 'shiki/themes/github-light.mjs'
-
-import langBash from 'shiki/langs/bash.mjs'
-import langC from 'shiki/langs/c.mjs'
-import langCpp from 'shiki/langs/cpp.mjs'
-import langCss from 'shiki/langs/css.mjs'
-import langDiff from 'shiki/langs/diff.mjs'
-import langGo from 'shiki/langs/go.mjs'
-import langHtml from 'shiki/langs/html.mjs'
-import langJava from 'shiki/langs/java.mjs'
-import langJs from 'shiki/langs/javascript.mjs'
-import langJsx from 'shiki/langs/jsx.mjs'
-import langJson from 'shiki/langs/json.mjs'
-import langJsonc from 'shiki/langs/jsonc.mjs'
-import langMarkdown from 'shiki/langs/markdown.mjs'
-import langPython from 'shiki/langs/python.mjs'
-import langRust from 'shiki/langs/rust.mjs'
-import langScss from 'shiki/langs/scss.mjs'
-import langSql from 'shiki/langs/sql.mjs'
-import langToml from 'shiki/langs/toml.mjs'
-import langTs from 'shiki/langs/typescript.mjs'
-import langTsx from 'shiki/langs/tsx.mjs'
-import langYaml from 'shiki/langs/yaml.mjs'
 
 // Custom dark theme — Kun's "Codex" palette, kept verbatim so navi's code
 // blocks read identically in dark mode.
@@ -101,36 +86,76 @@ const CODEX_CODE_THEME = {
   ],
 } satisfies ThemeRegistration
 
-// Build the fine-grained highlighter from shiki/core with the curated grammar
-// set and the JS regex engine (no oniguruma WASM asset for esbuild to resolve).
-// The JS engine's `forgiving` mode keeps partial/streamed code from throwing on
-// half-formed grammar constructs.
+// One dynamic import() per grammar. esbuild `--splitting` turns each into its own
+// chunk (shared grammar deps — e.g. tsx → typescript, html → css/js — are factored
+// out into shared chunks automatically), so we only ever download the grammars a
+// conversation actually uses. Short aliases ('js', 'ts', …) point at the same
+// import() as their canonical id; the duplicate thunks resolve to one shared chunk.
+// Keys are the normalized language ids produced by `normalizeCodeLanguage`.
+const GRAMMAR_LOADERS: Record<string, () => LanguageInput> = {
+  bash: () => import('shiki/langs/bash.mjs'),
+  css: () => import('shiki/langs/css.mjs'),
+  diff: () => import('shiki/langs/diff.mjs'),
+  go: () => import('shiki/langs/go.mjs'),
+  html: () => import('shiki/langs/html.mjs'),
+  java: () => import('shiki/langs/java.mjs'),
+  javascript: () => import('shiki/langs/javascript.mjs'),
+  js: () => import('shiki/langs/javascript.mjs'),
+  json: () => import('shiki/langs/json.mjs'),
+  jsonc: () => import('shiki/langs/jsonc.mjs'),
+  jsx: () => import('shiki/langs/jsx.mjs'),
+  markdown: () => import('shiki/langs/markdown.mjs'),
+  md: () => import('shiki/langs/markdown.mjs'),
+  py: () => import('shiki/langs/python.mjs'),
+  python: () => import('shiki/langs/python.mjs'),
+  rs: () => import('shiki/langs/rust.mjs'),
+  rust: () => import('shiki/langs/rust.mjs'),
+  scss: () => import('shiki/langs/scss.mjs'),
+  sql: () => import('shiki/langs/sql.mjs'),
+  toml: () => import('shiki/langs/toml.mjs'),
+  ts: () => import('shiki/langs/typescript.mjs'),
+  typescript: () => import('shiki/langs/typescript.mjs'),
+  tsx: () => import('shiki/langs/tsx.mjs'),
+  yaml: () => import('shiki/langs/yaml.mjs'),
+  yml: () => import('shiki/langs/yaml.mjs'),
+}
+
+// Build the fine-grained highlighter from shiki/core with both themes and the JS
+// regex engine (no oniguruma WASM asset for esbuild to resolve), but zero grammars
+// — those load on demand via `loadGrammar`. The JS engine's `forgiving` mode keeps
+// partial/streamed code from throwing on half-formed grammar constructs.
 export function createNaviHighlighter(): Promise<HighlighterCore> {
   return createHighlighterCore({
     themes: [githubLight, CODEX_CODE_THEME],
-    langs: [
-      langBash,
-      langC,
-      langCpp,
-      langCss,
-      langDiff,
-      langGo,
-      langHtml,
-      langJava,
-      langJs,
-      langJsx,
-      langJson,
-      langJsonc,
-      langMarkdown,
-      langPython,
-      langRust,
-      langScss,
-      langSql,
-      langToml,
-      langTs,
-      langTsx,
-      langYaml,
-    ],
+    langs: [],
     engine: createJavaScriptRegexEngine({ forgiving: true }),
   })
+}
+
+// In-flight grammar loads, keyed by normalized language id, so concurrent code
+// blocks of the same new language share a single import()/loadLanguage call.
+const grammarLoads = new Map<string, Promise<boolean>>()
+
+// Ensure the grammar for `lang` is loaded into `highlighter`. Resolves true once
+// it's ready, false for a language we don't ship a grammar for (the caller then
+// renders the escaped fallback). A failed load clears the cached promise so a
+// later block of the same language can retry, and rejects so the caller falls back.
+export function loadGrammar(highlighter: HighlighterCore, lang: string): Promise<boolean> {
+  if (highlighter.getLoadedLanguages().includes(lang)) return Promise.resolve(true)
+
+  const loader = GRAMMAR_LOADERS[lang]
+  if (!loader) return Promise.resolve(false)
+
+  let load = grammarLoads.get(lang)
+  if (!load) {
+    load = highlighter
+      .loadLanguage(loader())
+      .then(() => true)
+      .catch((err) => {
+        grammarLoads.delete(lang)
+        throw err
+      })
+    grammarLoads.set(lang, load)
+  }
+  return load
 }

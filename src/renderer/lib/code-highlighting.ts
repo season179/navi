@@ -1,10 +1,12 @@
 // Syntax highlighting for assistant code blocks. The heavy shiki machinery —
-// shiki/core, the JavaScript regex engine, the theme, and the 21 grammars
-// (~1.8 MB) — lives in ./code-highlighting-lazy and is pulled in via a dynamic
-// import() the first time a real block is highlighted (see loadHighlighter).
-// This module keeps only the lightweight plumbing — language aliases, the LRU
-// cache, and the synchronous escaped-HTML fallback — so it stays in the initial
-// renderer bundle and code renders instantly while the highlighter chunk loads.
+// shiki/core, the JavaScript regex engine, and the themes — lives in
+// ./code-highlighting-lazy and is pulled in via a dynamic import() the first time
+// a real block is highlighted (see loadHighlighter). Each grammar then loads
+// lazily and individually (see loadGrammar over there), so we only download the
+// languages a conversation actually uses. This module keeps only the lightweight
+// plumbing — language aliases, the LRU cache, and the synchronous escaped-HTML
+// fallback — so it stays in the initial renderer bundle and code renders instantly
+// while the highlighter chunk and the relevant grammar chunk load.
 // Adapted from Kun's code-highlighting
 // (../kun/src/renderer/src/lib/code-highlighting.ts). Dual-theme output (light
 // default + dark in --shiki-dark vars) is toggled via [data-theme] CSS.
@@ -59,16 +61,24 @@ const DOWNLOAD_EXTENSIONS: Record<string, string> = {
 const MAX_HIGHLIGHT_CHARS = 250_000
 export const MAX_HIGHLIGHT_CACHE_ENTRIES = 120
 
-let highlighterPromise: Promise<HighlighterCore> | null = null
+type CodeHighlightingLazy = typeof import('./code-highlighting-lazy')
+
+let highlighterPromise: Promise<{ mod: CodeHighlightingLazy; highlighter: HighlighterCore }> | null =
+  null
 const highlightCache = new Map<string, string>()
 const inflightHighlights = new Map<string, Promise<string>>()
 
-function loadHighlighter(): Promise<HighlighterCore> {
-  // Fetch the shiki chunk (grammars + engine + theme) lazily on first use; the
+function loadHighlighter(): Promise<{ mod: CodeHighlightingLazy; highlighter: HighlighterCore }> {
+  // Fetch the shiki chunk (engine + themes, no grammars) lazily on first use; the
   // cached promise ensures the chunk loads and the highlighter is built at most
-  // once. A failed chunk load or build rejects here and is caught by
-  // highlightCodeHtml, which renders the escaped-HTML fallback instead.
-  highlighterPromise ??= import('./code-highlighting-lazy').then((m) => m.createNaviHighlighter())
+  // once. We hold onto the module too so highlightCodeHtml can call loadGrammar to
+  // pull in per-language grammar chunks on demand. A failed chunk load or build
+  // rejects here and is caught by highlightCodeHtml, which renders the
+  // escaped-HTML fallback instead.
+  highlighterPromise ??= import('./code-highlighting-lazy').then(async (mod) => ({
+    mod,
+    highlighter: await mod.createNaviHighlighter(),
+  }))
   return highlighterPromise
 }
 
@@ -143,8 +153,9 @@ export async function highlightCodeHtml(code: string, language: string): Promise
     }
 
     try {
-      const highlighter = await loadHighlighter()
-      if (!highlighter.getLoadedLanguages().includes(normalized)) {
+      const { mod, highlighter } = await loadHighlighter()
+      const loaded = await mod.loadGrammar(highlighter, normalized)
+      if (!loaded) {
         const fallback = renderFallbackCodeHtml(code)
         writeHighlightCache(cacheKey, fallback)
         return fallback
