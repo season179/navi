@@ -10,6 +10,7 @@ import { Composer } from '../components/Composer'
 import { COMPOSER_FILE_MENTION_PREVIEW, COMPOSER_FILE_REFERENCES_PREVIEW } from '../lib/composerFileReferences'
 import { COMPOSER_ATTACHMENTS_PREVIEW } from '../lib/composerAttachments'
 import { COMPOSER_GOAL_PREVIEW } from '../lib/composerGoal'
+import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
@@ -630,8 +631,12 @@ function HomePage() {
   const { focusModeEnabled } = useFocusMode()
   const [draft, setDraft] = useState(() => {
     if (typeof window === 'undefined') return ''
-    if (new URLSearchParams(window.location.search).has('composerFileMentionPreview')) {
+    const params = new URLSearchParams(window.location.search)
+    if (params.has('composerFileMentionPreview')) {
       return 'Please review @src/ren'
+    }
+    if (params.has('composerPlanModePreview')) {
+      return COMPOSER_PLAN_MODE_PLACEHOLDER
     }
     return ''
   })
@@ -725,6 +730,12 @@ function HomePage() {
 
   const composerGoalPreview =
     composerGoalFloaterPreview || composerGoalPanelPreview ? COMPOSER_GOAL_PREVIEW : undefined
+
+  // Visual preview for the ported plan-mode badge (?composerPlanModePreview=1).
+  const composerPlanModePreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return new URLSearchParams(window.location.search).has('composerPlanModePreview')
+  }, [])
 
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
   const queuedMessagesPreview = useMemo(() => {
@@ -3759,11 +3770,13 @@ function HomePage() {
       busy={busy}
       disabled={composerDisabled}
       placeholder={
-        !hasProvider
-          ? 'Add a provider to start chatting…'
-          : !status.ready
-            ? 'Connecting to Navi…'
-            : 'Send a message to Navi…'
+        composerPlanModePreview
+          ? COMPOSER_PLAN_MODE_PLACEHOLDER
+          : !hasProvider
+            ? 'Add a provider to start chatting…'
+            : !status.ready
+              ? 'Connecting to Navi…'
+              : 'Send a message to Navi…'
       }
       skills={skills}
       fileMentionCandidates={composerFileMentionPreview}
@@ -3775,6 +3788,7 @@ function HomePage() {
       showGoalFloater={composerGoalFloaterPreview}
       showGoalPanel={composerGoalPanelPreview}
       goalBadge={composerGoalFloaterPreview || composerGoalPanelPreview}
+      planBadge={composerPlanModePreview}
       modelChip={
         <FloatingModelPicker
           providers={providerProfiles}

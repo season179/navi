@@ -9,7 +9,7 @@
 // front-end shortcut only, never a backend trigger.
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
-import { Mic, Plus, Send, Sparkles, Square, Target } from 'lucide-react'
+import { ListTodo, Mic, Plus, Send, Sparkles, Square, Target } from 'lucide-react'
 import { filterSkillSlashCommands } from '../lib/composerSlashCommands'
 import {
   filterWorkspaceFileMentionSuggestions,
@@ -99,6 +99,8 @@ interface ComposerProps {
   showGoalPanel?: boolean
   /** When true, shows the Goal badge beside the plus button in the toolbar. */
   goalBadge?: boolean
+  /** When true, shows the Plan mode badge beside the plus button in the toolbar. */
+  planBadge?: boolean
 }
 
 /**
@@ -141,6 +143,7 @@ export function Composer({
   showGoalFloater = false,
   showGoalPanel = false,
   goalBadge = false,
+  planBadge = false,
 }: ComposerProps) {
   const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -552,6 +555,12 @@ export function Composer({
                 >
                   <Plus strokeWidth={1.8} />
                 </button>
+                {planBadge ? (
+                  <span className="floating-composer-mode-badge">
+                    <ListTodo strokeWidth={1.9} />
+                    <span>Plan mode</span>
+                  </span>
+                ) : null}
                 {goalBadge ? (
                   <span className="floating-composer-mode-badge">
                     <Target strokeWidth={1.9} />

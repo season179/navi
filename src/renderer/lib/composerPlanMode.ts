@@ -1,0 +1,6 @@
+// Kun plan-mode composer chrome (../Kun/src/renderer/src/components/chat/FloatingComposer.tsx).
+// Visual only — used for plan-mode badge and placeholder in production Composer previews.
+
+/** Placeholder text for ?composerPlanModePreview visual verification. */
+export const COMPOSER_PLAN_MODE_PLACEHOLDER =
+  'Draft a plan for the remaining composer overlays.'

@@ -74,6 +74,7 @@ import {
   type ComposerImageAttachment,
 } from '../lib/composerAttachments'
 import { COMPOSER_GOAL_PREVIEW, type ComposerGoal } from '../lib/composerGoal'
+import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
@@ -620,7 +621,12 @@ export function resolveFloatingComposerSnapshot(
     case 'contextCapacity':
       return { ...base, showContextCapacity: true, contextCapacityOpen: true }
     case 'planMode':
-      return { ...base, mode: 'plan', planBadge: true, input: 'Draft a plan for the remaining composer overlays.' }
+      return {
+        ...base,
+        mode: 'plan',
+        planBadge: true,
+        input: COMPOSER_PLAN_MODE_PLACEHOLDER,
+      }
     case 'modelPicker':
       return { ...base, showModelPickerMenu: true }
     case 'modelPickerSubmenu':
