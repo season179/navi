@@ -22,6 +22,10 @@ import {
   type Panel,
 } from '@codemirror/view'
 import { unifiedMergeView } from '@codemirror/merge'
+import {
+  writeMarkdownInlineCompletionPreviewExtensions,
+  type WriteMarkdownInlineCompletionPreviewMode,
+} from '../lib/writeMarkdownInlineCompletionPreview'
 import { writeMarkdownLivePreviewExtensions } from '../lib/writeMarkdownLivePreview'
 import { WRITE_MARKDOWN_PREVIEW_SAMPLE } from './WriteMarkdownPreview'
 
@@ -36,6 +40,8 @@ export type WriteMarkdownEditorPreviewMode =
   | 'source'
   | 'readonly'
   | 'diffReview'
+  | 'inlineCompletion'
+  | 'inlineEdit'
 
 /** Sample document for ?writeMarkdownEditor preview hooks. */
 export const WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE = WRITE_MARKDOWN_PREVIEW_SAMPLE
@@ -71,6 +77,8 @@ type Props = {
   readOnly?: boolean
   /** Static preview: show the inline diff review panel and merge colors. */
   showDiffReview?: boolean
+  /** Static preview: render Kun-matching inline AI completion or edit decorations. */
+  inlineCompletionPreview?: WriteMarkdownInlineCompletionPreviewMode
   onChange?: (value: string) => void
 }
 
@@ -156,6 +164,7 @@ export function WriteMarkdownEditor({
   appearance = 'live',
   readOnly = false,
   showDiffReview = false,
+  inlineCompletionPreview,
   onChange,
 }: Props): ReactElement {
   const hostRef = useRef<HTMLDivElement | null>(null)
@@ -163,6 +172,7 @@ export function WriteMarkdownEditor({
   const themeCompartmentRef = useRef<Compartment | null>(null)
   const editableCompartmentRef = useRef<Compartment | null>(null)
   const livePreviewCompartmentRef = useRef<Compartment | null>(null)
+  const inlineCompletionCompartmentRef = useRef<Compartment | null>(null)
   const mergeCompartmentRef = useRef<Compartment | null>(null)
   const onChangeRef = useRef(onChange)
   const lastEmittedValueRef = useRef<string | null>(null)
@@ -175,10 +185,12 @@ export function WriteMarkdownEditor({
     const themeCompartment = new Compartment()
     const editableCompartment = new Compartment()
     const livePreviewCompartment = new Compartment()
+    const inlineCompletionCompartment = new Compartment()
     const mergeCompartment = new Compartment()
     themeCompartmentRef.current = themeCompartment
     editableCompartmentRef.current = editableCompartment
     livePreviewCompartmentRef.current = livePreviewCompartment
+    inlineCompletionCompartmentRef.current = inlineCompletionCompartment
     mergeCompartmentRef.current = mergeCompartment
 
     const initialDoc = showDiffReview ? DIFF_REVIEW_NEXT : value
@@ -200,6 +212,11 @@ export function WriteMarkdownEditor({
         editableCompartment.of(buildInteractionExtensions(readOnly, appearance)),
         livePreviewCompartment.of(
           appearance === 'live' ? writeMarkdownLivePreviewExtensions() : [],
+        ),
+        inlineCompletionCompartment.of(
+          inlineCompletionPreview
+            ? writeMarkdownInlineCompletionPreviewExtensions(inlineCompletionPreview)
+            : [],
         ),
         mergeCompartment.of(mergeExtensions),
         markdown({ base: markdownLanguage, codeLanguages: languages }),
@@ -234,6 +251,7 @@ export function WriteMarkdownEditor({
       themeCompartmentRef.current = null
       editableCompartmentRef.current = null
       livePreviewCompartmentRef.current = null
+      inlineCompletionCompartmentRef.current = null
       mergeCompartmentRef.current = null
     }
     // Mount-once editor shell for preview verification.
@@ -245,7 +263,10 @@ export function WriteMarkdownEditor({
     const themeCompartment = themeCompartmentRef.current
     const editableCompartment = editableCompartmentRef.current
     const livePreviewCompartment = livePreviewCompartmentRef.current
-    if (!view || !themeCompartment || !editableCompartment || !livePreviewCompartment) return
+    const inlineCompletionCompartment = inlineCompletionCompartmentRef.current
+    if (!view || !themeCompartment || !editableCompartment || !livePreviewCompartment || !inlineCompletionCompartment) {
+      return
+    }
     view.dispatch({
       effects: [
         themeCompartment.reconfigure(buildEditorTheme(appearance)),
@@ -253,9 +274,14 @@ export function WriteMarkdownEditor({
         livePreviewCompartment.reconfigure(
           appearance === 'live' ? writeMarkdownLivePreviewExtensions() : [],
         ),
+        inlineCompletionCompartment.reconfigure(
+          inlineCompletionPreview
+            ? writeMarkdownInlineCompletionPreviewExtensions(inlineCompletionPreview)
+            : [],
+        ),
       ],
     })
-  }, [appearance, readOnly])
+  }, [appearance, inlineCompletionPreview, readOnly])
 
   useEffect(() => {
     if (showDiffReview) return
@@ -298,15 +324,23 @@ type PreviewProps = {
 /** Full-page preview shell for ?writeMarkdownEditor URL hooks. */
 export function WriteMarkdownEditorPreview({ mode }: PreviewProps): ReactElement {
   const [value, setValue] = useState(WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE)
+  const inlineCompletionPreview =
+    mode === 'inlineCompletion' ? 'completion' : mode === 'inlineEdit' ? 'edit' : undefined
+  const readOnly =
+    mode === 'readonly' ||
+    mode === 'diffReview' ||
+    mode === 'inlineCompletion' ||
+    mode === 'inlineEdit'
 
   return (
     <div className="write-markdown-editor-preview">
       <WriteMarkdownEditor
         value={value}
         appearance={previewAppearance(mode)}
-        readOnly={mode === 'readonly' || mode === 'diffReview'}
+        readOnly={readOnly}
         showDiffReview={mode === 'diffReview'}
-        onChange={mode === 'readonly' || mode === 'diffReview' ? undefined : setValue}
+        inlineCompletionPreview={inlineCompletionPreview}
+        onChange={readOnly ? undefined : setValue}
       />
     </div>
   )

@@ -25150,6 +25150,41 @@ button.usage-heatmap-cell:focus {
   background: var(--ds-hover);
 }
 
+.cm-inline-completion {
+  color: color-mix(in srgb, var(--ds-text-faint) 82%, transparent);
+  pointer-events: none;
+  white-space: pre-wrap;
+}
+
+.cm-inline-edit-original {
+  color: color-mix(in srgb, var(--ds-text-muted) 78%, transparent);
+  text-decoration-line: line-through;
+  text-decoration-color: color-mix(in srgb, #dc2626 62%, var(--ds-text-faint));
+  text-decoration-thickness: 1.5px;
+}
+
+.cm-inline-edit-replacement {
+  display: inline;
+  margin-left: 0.42em;
+  color: color-mix(in srgb, var(--ds-accent) 78%, var(--ds-text-muted));
+}
+
+.cm-inline-edit-replacement-leading {
+  margin-left: 0;
+  margin-right: 0.42em;
+}
+
+.cm-inline-edit-arrow {
+  margin-right: 0.36em;
+  color: color-mix(in srgb, var(--ds-text-faint) 72%, transparent);
+  font-size: 0.86em;
+}
+
+.cm-inline-edit-text {
+  border-bottom: 1px solid color-mix(in srgb, var(--ds-accent) 48%, transparent);
+  color: color-mix(in srgb, var(--ds-accent) 82%, var(--ds-text));
+}
+
 .write-codemirror-host .cm-deletedChunk,
 .write-codemirror-host .cm-deletedLine,
 .write-codemirror-host .cm-deletedText {
@@ -25830,6 +25865,26 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
 
 [data-theme='dark'] .write-rich-editor .sdd-req-pill-verified {
   color: #5eead4;
+}
+
+.write-rich-ghost-text {
+  color: var(--ds-text-faint);
+  opacity: 0.72;
+  pointer-events: none;
+  white-space: pre-wrap;
+}
+
+.write-rich-inline-edit-original {
+  background-color: color-mix(in srgb, #ef4444 16%, transparent);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, #ef4444 60%, transparent);
+  border-radius: 3px;
+}
+
+.write-rich-inline-edit-replacement {
+  background-color: color-mix(in srgb, #22c55e 16%, transparent);
+  border-radius: 3px;
+  white-space: pre-wrap;
 }
 
 .write-rich-fallback-shell {

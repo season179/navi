@@ -15,7 +15,13 @@ const COPY = {
     'This document uses Markdown features that are not fully supported in rich mode. Showing the source editor instead.',
 }
 
-export type WriteRichEditorPreviewMode = 'default' | 'readonly' | 'fallback' | 'requirementBadges'
+export type WriteRichEditorPreviewMode =
+  | 'default'
+  | 'readonly'
+  | 'fallback'
+  | 'requirementBadges'
+  | 'inlineCompletion'
+  | 'inlineEdit'
 
 /** Sample markdown backing the rich editor preview surface. */
 export const WRITE_RICH_EDITOR_PREVIEW_SAMPLE = WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE
@@ -30,7 +36,51 @@ type Props = {
   sampleContent?: ReactNode
   /** Static preview: render SDD requirement status pills on h3 headings. */
   requirementBadges?: boolean
+  /** Static preview: render Kun-matching inline AI ghost text or edit diff spans. */
+  inlineCompletionPreview?: 'completion' | 'edit'
   onChange?: (value: string) => void
+}
+
+function WriteRichEditorInlineCompletionSampleContent(): ReactElement {
+  return (
+    <>
+      <h1>Launch plan draft</h1>
+      <p>
+        Inline AI completion suggests the next phrase as faint ghost text at the cursor.
+      </p>
+      <p>
+        Inline <code>clamp()</code> helpers keep zoom ranges stable across preview modes
+        <span className="write-rich-ghost-text"> and dark-theme contrast checks.</span>
+      </p>
+    </>
+  )
+}
+
+function WriteRichEditorInlineEditSampleContent(): ReactElement {
+  return (
+    <>
+      <h1>Launch plan draft</h1>
+      <p>
+        Inline AI edit mode shows the original selection struck through with a green
+        replacement preview beside it.
+      </p>
+      <ul>
+        <li>
+          <p>
+            <span className="write-rich-inline-edit-original">
+              Match Kun&apos;s write preview typography and spacing
+            </span>
+            <span className="write-rich-ghost-text write-rich-inline-edit-replacement">
+              Match Kun write typography, spacing, and live-preview widgets
+            </span>
+          </p>
+        </li>
+        <li>
+          <p>Keep code blocks, tables, and task lists readable</p>
+        </li>
+      </ul>
+    </>
+  )
 }
 
 function WriteRichEditorSampleContent(): ReactElement {
@@ -150,6 +200,7 @@ export function WriteRichEditor({
   fallback,
   sampleContent,
   requirementBadges = false,
+  inlineCompletionPreview,
 }: Props): ReactElement {
   const fallbackSurface =
     fallback ?? (
@@ -182,7 +233,11 @@ export function WriteRichEditor({
         data-write-editor-mode="rich"
       >
         {sampleContent ??
-          (requirementBadges ? (
+          (inlineCompletionPreview === 'completion' ? (
+            <WriteRichEditorInlineCompletionSampleContent />
+          ) : inlineCompletionPreview === 'edit' ? (
+            <WriteRichEditorInlineEditSampleContent />
+          ) : requirementBadges ? (
             <SddRequirementRichSampleContent />
           ) : (
             <WriteRichEditorSampleContent />
@@ -198,13 +253,17 @@ type PreviewProps = {
 
 /** Full-page preview shell for ?writeRichEditor URL hooks. */
 export function WriteRichEditorPreview({ mode }: PreviewProps): ReactElement {
+  const inlineCompletionPreview =
+    mode === 'inlineCompletion' ? 'completion' : mode === 'inlineEdit' ? 'edit' : undefined
+
   return (
     <div className="write-rich-editor-preview">
       <div className="write-rich-editor-preview-card">
         <WriteRichEditor
-          readOnly={mode === 'readonly'}
+          readOnly={mode === 'readonly' || mode === 'inlineCompletion' || mode === 'inlineEdit'}
           showFallback={mode === 'fallback'}
           requirementBadges={mode === 'requirementBadges'}
+          inlineCompletionPreview={inlineCompletionPreview}
         />
       </div>
     </div>

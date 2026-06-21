@@ -1460,7 +1460,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported WriteMarkdownEditor
-  // (?writeMarkdownEditor=1|source|readonly|diffReview).
+  // (?writeMarkdownEditor=1|source|readonly|diffReview|inlineCompletion|inlineEdit).
   const writeMarkdownEditorPreviewMode = useMemo((): WriteMarkdownEditorPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1469,6 +1469,8 @@ function HomePage() {
     if (value === 'source') return 'source'
     if (value === 'readonly') return 'readonly'
     if (value === 'diffReview') return 'diffReview'
+    if (value === 'inlineCompletion') return 'inlineCompletion'
+    if (value === 'inlineEdit') return 'inlineEdit'
     return 'default'
   }, [])
 
@@ -1486,7 +1488,7 @@ function HomePage() {
     return 'default'
   }, [])
 
-  // (?writeRichEditor=1|readonly|fallback|requirementBadges).
+  // (?writeRichEditor=1|readonly|fallback|requirementBadges|inlineCompletion|inlineEdit).
   const writeRichEditorPreviewMode = useMemo((): WriteRichEditorPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1495,6 +1497,8 @@ function HomePage() {
     if (value === 'readonly') return 'readonly'
     if (value === 'fallback') return 'fallback'
     if (value === 'requirementBadges') return 'requirementBadges'
+    if (value === 'inlineCompletion') return 'inlineCompletion'
+    if (value === 'inlineEdit') return 'inlineEdit'
     return 'default'
   }, [])
 
