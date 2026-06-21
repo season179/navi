@@ -137,6 +137,16 @@ import {
   RUNTIME_WAKE_HERO_PREVIEW_ERROR,
 } from '../components/RuntimeWakeHero'
 import {
+  RuntimeStatusBanner,
+  RUNTIME_STATUS_BANNER_PREVIEW,
+  type RuntimeStatusBannerPreviewMode,
+} from '../components/RuntimeStatusBanner'
+import {
+  RuntimeBanner,
+  RUNTIME_BANNER_PREVIEW,
+  type RuntimeBannerPreviewMode,
+} from '../components/RuntimeBanner'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -535,6 +545,32 @@ function HomePage() {
     return 'populated'
   }, [])
 
+  // Visual preview for the ported RuntimeStatusBanner
+  // (?runtimeStatusBanner=restarting|restartingAttempt|crashed|rolledBack).
+  const runtimeStatusBannerPreviewMode = useMemo((): RuntimeStatusBannerPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('runtimeStatusBanner')) return null
+    const mode = params.get('runtimeStatusBanner')
+    if (mode === 'restartingAttempt') return 'restartingAttempt'
+    if (mode === 'crashed') return 'crashed'
+    if (mode === 'rolledBack') return 'rolledBack'
+    return 'restarting'
+  }, [])
+
+  // Visual preview for the ported RuntimeBanner
+  // (?runtimeBanner=1|expanded|offline|logPath).
+  const runtimeBannerPreviewMode = useMemo((): RuntimeBannerPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('runtimeBanner')) return null
+    const mode = params.get('runtimeBanner')
+    if (mode === 'expanded') return 'expanded'
+    if (mode === 'offline') return 'offline'
+    if (mode === 'logPath') return 'logPath'
+    return 'default'
+  }, [])
+
   // Visual preview for the ported ToolEntry (?toolEntry=1|running|error|command).
   const toolEntryPreview = useMemo((): {
     block: ToolBlockSnapshot
@@ -600,6 +636,17 @@ function HomePage() {
         onOpenSettings={toggleSettings}
         settingsActive={settingsOpen}
       />
+
+      {runtimeStatusBannerPreviewMode ? (
+        <RuntimeStatusBanner status={RUNTIME_STATUS_BANNER_PREVIEW[runtimeStatusBannerPreviewMode]} />
+      ) : null}
+
+      {runtimeBannerPreviewMode ? (
+        <RuntimeBanner
+          snapshot={RUNTIME_BANNER_PREVIEW[runtimeBannerPreviewMode]}
+          forceDetailsOpen={runtimeBannerPreviewMode === 'expanded'}
+        />
+      ) : null}
 
       {settingsOpen ? (
         <div className="stage-scroll">

@@ -8818,4 +8818,370 @@ button.usage-heatmap-cell:focus {
   text-align: center;
 }
 
+/* --------------------------------------------------------------------------
+   Runtime status banner (Kun RuntimeStatusBanner)
+   -------------------------------------------------------------------------- */
+
+.runtime-status-banner {
+  flex: none;
+  border-bottom: 1px solid rgba(253, 230, 138, 0.7);
+  background: rgba(255, 248, 235, 0.82);
+  backdrop-filter: blur(16px);
+}
+
+:root[data-theme='dark'] .runtime-status-banner {
+  border-bottom-color: rgba(146, 64, 14, 0.5);
+  background: rgba(69, 26, 3, 0.35);
+}
+
+.runtime-status-banner-inner {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+}
+
+.runtime-status-banner-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: #b45309;
+}
+
+:root[data-theme='dark'] .runtime-status-banner-icon {
+  color: #fcd34d;
+}
+
+.runtime-status-banner-icon-spin {
+  animation: spin 1s linear infinite;
+}
+
+.runtime-status-banner-label {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  line-height: 1.25;
+  color: #451a03;
+}
+
+:root[data-theme='dark'] .runtime-status-banner-label {
+  color: #fef3c7;
+}
+
+.runtime-status-banner-dismiss {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(69, 26, 3, 0.7);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.runtime-status-banner-dismiss:hover {
+  background: rgba(254, 243, 199, 0.7);
+}
+
+:root[data-theme='dark'] .runtime-status-banner-dismiss {
+  color: rgba(254, 243, 199, 0.8);
+}
+
+:root[data-theme='dark'] .runtime-status-banner-dismiss:hover {
+  background: rgba(120, 53, 15, 0.4);
+}
+
+.runtime-status-banner-dismiss-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Runtime error banner (Kun RuntimeBanner)
+   -------------------------------------------------------------------------- */
+
+.runtime-banner {
+  flex: none;
+  border-bottom: 1px solid rgba(253, 230, 138, 0.7);
+  background: rgba(255, 248, 235, 0.82);
+  backdrop-filter: blur(16px);
+}
+
+:root[data-theme='dark'] .runtime-banner {
+  border-bottom-color: rgba(146, 64, 14, 0.5);
+  background: rgba(69, 26, 3, 0.35);
+}
+
+.runtime-banner-body {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.runtime-banner-inset {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.runtime-banner-header {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.runtime-banner-message {
+  min-width: 0;
+  flex: 1;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #451a03;
+}
+
+:root[data-theme='dark'] .runtime-banner-message {
+  color: #fef3c7;
+}
+
+.runtime-banner-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.runtime-banner-details-toggle,
+.runtime-banner-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(69, 26, 3, 0.8);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.runtime-banner-details-toggle:hover,
+.runtime-banner-settings-btn:hover {
+  background: rgba(254, 243, 199, 0.7);
+}
+
+:root[data-theme='dark'] .runtime-banner-details-toggle,
+:root[data-theme='dark'] .runtime-banner-settings-btn {
+  color: #fef3c7;
+}
+
+:root[data-theme='dark'] .runtime-banner-details-toggle:hover,
+:root[data-theme='dark'] .runtime-banner-settings-btn:hover {
+  background: rgba(120, 53, 15, 0.3);
+}
+
+.runtime-banner-details-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.runtime-banner-retry-btn {
+  padding: 4px 12px;
+  border: 1px solid rgba(252, 211, 77, 0.7);
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #451a03;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.runtime-banner-retry-btn:hover {
+  background: rgba(254, 243, 199, 0.8);
+}
+
+:root[data-theme='dark'] .runtime-banner-retry-btn {
+  border-color: rgba(180, 83, 9, 0.6);
+  background: rgba(120, 53, 15, 0.2);
+  color: #fef3c7;
+}
+
+:root[data-theme='dark'] .runtime-banner-retry-btn:hover {
+  background: rgba(120, 53, 15, 0.4);
+}
+
+.runtime-banner-log-row {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.25;
+  color: rgba(69, 26, 3, 0.8);
+}
+
+:root[data-theme='dark'] .runtime-banner-log-row {
+  color: rgba(254, 243, 199, 0.85);
+}
+
+.runtime-banner-log-label {
+  font-weight: 500;
+}
+
+.runtime-banner-log-path {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.7);
+  font-family: var(--ds-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+  color: #451a03;
+}
+
+:root[data-theme='dark'] .runtime-banner-log-path {
+  background: rgba(69, 26, 3, 0.3);
+  color: #fef3c7;
+}
+
+.runtime-banner-log-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(69, 26, 3, 0.85);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.runtime-banner-log-open-btn:hover {
+  background: rgba(254, 243, 199, 0.7);
+}
+
+:root[data-theme='dark'] .runtime-banner-log-open-btn {
+  color: #fef3c7;
+}
+
+:root[data-theme='dark'] .runtime-banner-log-open-btn:hover {
+  background: rgba(120, 53, 15, 0.3);
+}
+
+.runtime-banner-log-open-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.runtime-banner-log-error {
+  color: #b91c1c;
+}
+
+:root[data-theme='dark'] .runtime-banner-log-error {
+  color: #fca5a5;
+}
+
+.runtime-banner-details-panel {
+  padding: 12px;
+  border: 1px solid rgba(252, 211, 77, 0.6);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+:root[data-theme='dark'] .runtime-banner-details-panel {
+  border-color: rgba(146, 64, 14, 0.5);
+  background: rgba(69, 26, 3, 0.25);
+}
+
+.runtime-banner-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.runtime-banner-details-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #451a03;
+}
+
+:root[data-theme='dark'] .runtime-banner-details-title {
+  color: #fef3c7;
+}
+
+.runtime-banner-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(69, 26, 3, 0.8);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.runtime-banner-copy-btn:hover {
+  background: rgba(254, 243, 199, 0.7);
+}
+
+:root[data-theme='dark'] .runtime-banner-copy-btn {
+  color: #fef3c7;
+}
+
+:root[data-theme='dark'] .runtime-banner-copy-btn:hover {
+  background: rgba(120, 53, 15, 0.4);
+}
+
+.runtime-banner-copy-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.runtime-banner-details-pre {
+  max-height: 208px;
+  margin: 0;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--ds-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12px;
+  line-height: 1.25;
+  color: #451a03;
+}
+
+:root[data-theme='dark'] .runtime-banner-details-pre {
+  color: #fef3c7;
+}
+
+.runtime-banner-preview-stack {
+  display: flex;
+  flex-direction: column;
+}
+
 
