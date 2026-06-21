@@ -99,13 +99,14 @@ import {
   COMPOSER_GOAL_MODE_BADGE_LABEL,
   formatComposerGoalBannerLabel,
   formatComposerGoalStatusShort,
+  getGoalPanelDraftObjective,
   type ComposerGoal,
 } from '../lib/composerGoal'
 import {
-  COMPOSER_QUEUE_MESSAGE_LABEL,
   COMPOSER_QUEUE_PLACEHOLDER,
   COMPOSER_STOP_LABEL,
 } from '../lib/composerBusyState'
+import { resolveComposerPrimaryActionState } from '../lib/composerPrimaryAction'
 import { COMPOSER_PLAN_MODE_BADGE_LABEL } from '../lib/composerPlanMode'
 import { resolveComposerPlaceholder } from '../lib/composerPlaceholder'
 import {
@@ -1076,6 +1077,24 @@ export function FloatingComposer({
 
   const showToolbarStart = true
 
+  const highlightedSlashCommand =
+    snapshot.showSlashMenu && snapshot.slashCommands.length > 0
+      ? snapshot.slashCommands.find((command) => command.active) ??
+        snapshot.slashCommands[0]
+      : null
+  const goalPanelDraftObjective = getGoalPanelDraftObjective(
+    snapshot.input,
+    snapshot.showGoalPanel,
+  )
+  const primaryAction = resolveComposerPrimaryActionState({
+    busy: snapshot.busy,
+    canSend: snapshot.input.trim().length > 0,
+    slashMenuOpen: Boolean(highlightedSlashCommand),
+    highlightedSlashCommandDisabled: highlightedSlashCommand?.disabled === true,
+    goalPanelOpen: snapshot.showGoalPanel,
+    goalPanelDraftObjective,
+  })
+
   return (
     <div className="ds-floating-composer ds-no-drag ds-chat-column-inset floating-composer-root">
       <FloatingComposerQueuedMessages messages={snapshot.queuedMessages} />
@@ -1296,10 +1315,9 @@ export function FloatingComposer({
                   <button
                     type="button"
                     className="floating-composer-send-btn"
-                    aria-label={
-                      snapshot.busy ? COMPOSER_QUEUE_MESSAGE_LABEL : 'Send'
-                    }
-                    title={snapshot.busy ? COMPOSER_QUEUE_MESSAGE_LABEL : 'Send'}
+                    aria-label={primaryAction.label}
+                    title={primaryAction.label}
+                    disabled={primaryAction.disabled}
                   >
                     <Send strokeWidth={2.2} />
                   </button>

@@ -24,6 +24,7 @@ const {
   COMPOSER_GOAL_STATUS_PAUSED,
   formatComposerGoalBannerLabel,
   formatComposerGoalStatusShort,
+  getGoalPanelDraftObjective,
   resolveComposerGoalPreview,
 } = await import(out)
 
@@ -47,4 +48,12 @@ test('resolveComposerGoalPreview routes paused preview mode', () => {
   assert.equal(resolveComposerGoalPreview(null), COMPOSER_GOAL_PREVIEW)
   assert.equal(resolveComposerGoalPreview('paused'), COMPOSER_GOAL_PAUSED_PREVIEW)
   assert.equal(resolveComposerGoalPreview('paused').status, 'paused')
+})
+
+test('getGoalPanelDraftObjective matches Kun goal panel draft rules', () => {
+  assert.equal(getGoalPanelDraftObjective('ship the goal UX', true), 'ship the goal UX')
+  assert.equal(getGoalPanelDraftObjective('  ship the goal UX  ', true), 'ship the goal UX')
+  assert.equal(getGoalPanelDraftObjective('ship the goal UX', false), '')
+  assert.equal(getGoalPanelDraftObjective('/goal pause', true), '')
+  assert.equal(getGoalPanelDraftObjective('/compact after this', true), '')
 })

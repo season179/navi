@@ -61,3 +61,10 @@ export function resolveComposerGoalPreview(mode: string | null): ComposerGoal {
   if (mode === 'paused') return COMPOSER_GOAL_PAUSED_PREVIEW
   return COMPOSER_GOAL_PREVIEW
 }
+
+/** Kun getGoalPanelDraftObjective — non-empty draft when goal panel is open and input is not a slash command. */
+export function getGoalPanelDraftObjective(input: string, goalPanelOpen: boolean): string {
+  const objective = input.trim()
+  if (!goalPanelOpen || objective.length === 0 || objective.startsWith('/')) return ''
+  return objective
+}

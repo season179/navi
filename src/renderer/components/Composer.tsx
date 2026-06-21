@@ -20,16 +20,16 @@ import {
 } from '../lib/composerFileReferences'
 import type { ComposerChangedFile } from '../lib/composerChangeSummary'
 import type { ComposerImageAttachment } from '../lib/composerAttachments'
-import { COMPOSER_GOAL_MODE_BADGE_LABEL, type ComposerGoal } from '../lib/composerGoal'
+import { COMPOSER_GOAL_MODE_BADGE_LABEL, getGoalPanelDraftObjective, type ComposerGoal } from '../lib/composerGoal'
 import type { ComposerThreadUsage } from '../lib/composerThreadUsage'
 import type { ComposerPlusMenuToggles } from '../lib/composerPlusMenu'
 import { COMPOSER_PLUS_MENU_TITLE } from '../lib/composerPlusMenu'
 import { COMPOSER_PLAN_MODE_BADGE_LABEL } from '../lib/composerPlanMode'
 import { COMPOSER_DEFAULT_PLACEHOLDER } from '../lib/composerPlaceholder'
 import {
-  COMPOSER_QUEUE_MESSAGE_LABEL,
   COMPOSER_STOP_LABEL,
 } from '../lib/composerBusyState'
+import { resolveComposerPrimaryActionState } from '../lib/composerPrimaryAction'
 import {
   COMPOSER_VOICE_SEND_LABEL,
   COMPOSER_VOICE_START_LABEL,
@@ -351,6 +351,20 @@ export function Composer({
       active: index === slashActiveIndex,
     }))
   }, [slashCommandsOverride, query, skills, slashActiveIndex])
+
+  const highlightedSlashCommand =
+    pickerOpen && slashCommands.length > 0
+      ? slashCommands[Math.min(slashActiveIndex, slashCommands.length - 1)]
+      : null
+  const goalPanelDraftObjective = getGoalPanelDraftObjective(value, showGoalPanel)
+  const primaryAction = resolveComposerPrimaryActionState({
+    busy,
+    canSend,
+    slashMenuOpen: Boolean(highlightedSlashCommand),
+    highlightedSlashCommandDisabled: highlightedSlashCommand?.disabled === true,
+    goalPanelOpen: showGoalPanel,
+    goalPanelDraftObjective,
+  })
 
   useEffect(() => {
     if (slashCommandsOverride) {
@@ -771,10 +785,10 @@ export function Composer({
                   <button
                     type="button"
                     className="floating-composer-send-btn"
-                    disabled={!canSend}
+                    disabled={primaryAction.disabled}
                     onClick={onSend}
-                    aria-label={busy ? COMPOSER_QUEUE_MESSAGE_LABEL : 'Send'}
-                    title={busy ? COMPOSER_QUEUE_MESSAGE_LABEL : 'Send'}
+                    aria-label={primaryAction.label}
+                    title={primaryAction.label}
                   >
                     <Send strokeWidth={2.2} />
                   </button>
