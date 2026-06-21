@@ -149,6 +149,10 @@ import {
   type TimelinePaginationControlsPreviewMode,
 } from '../components/TimelinePaginationControls'
 import {
+  MessageBubblePreview,
+  type MessageBubblePreviewMode,
+} from '../components/MessageBubble'
+import {
   RuntimeWakeHero,
   RUNTIME_WAKE_HERO_PREVIEW_ERROR,
 } from '../components/RuntimeWakeHero'
@@ -849,6 +853,33 @@ function HomePage() {
       if (mode === 'both') return 'both'
       return 'showEarlier'
     }, [])
+
+  // Visual preview for the ported MessageBubble / UserMessageBubble
+  // (?messageBubblePreview=user|userEditing|userWriteMeta|userClawInbound|userRich|assistant|assistantStreaming|reasoning|tool|userInput|approvalPending|approvalDone|approvalError|system|systemWarning|systemError|compaction|review).
+  const messageBubblePreviewMode = useMemo((): MessageBubblePreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('messageBubblePreview')) return null
+    const mode = params.get('messageBubblePreview')
+    if (mode === 'userEditing') return 'userEditing'
+    if (mode === 'userWriteMeta') return 'userWriteMeta'
+    if (mode === 'userClawInbound') return 'userClawInbound'
+    if (mode === 'userRich') return 'userRich'
+    if (mode === 'assistant') return 'assistant'
+    if (mode === 'assistantStreaming') return 'assistantStreaming'
+    if (mode === 'reasoning') return 'reasoning'
+    if (mode === 'tool') return 'tool'
+    if (mode === 'userInput') return 'userInput'
+    if (mode === 'approvalPending') return 'approvalPending'
+    if (mode === 'approvalDone') return 'approvalDone'
+    if (mode === 'approvalError') return 'approvalError'
+    if (mode === 'system') return 'system'
+    if (mode === 'systemWarning') return 'systemWarning'
+    if (mode === 'systemError') return 'systemError'
+    if (mode === 'compaction') return 'compaction'
+    if (mode === 'review') return 'review'
+    return 'user'
+  }, [])
 
   // Visual preview for the ported RuntimeWakeHero
   // (?runtimeWakeHero=1|waking|error|quiet).
@@ -2339,6 +2370,10 @@ function HomePage() {
 
   if (timelinePaginationControlsPreviewMode) {
     return <TimelinePaginationControlsPreview mode={timelinePaginationControlsPreviewMode} />
+  }
+
+  if (messageBubblePreviewMode) {
+    return <MessageBubblePreview mode={messageBubblePreviewMode} />
   }
 
   if (writeMarkdownPreviewPreviewMode) {
