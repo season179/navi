@@ -117,6 +117,11 @@ import {
   TOOL_ENTRY_PREVIEW_RUNNING,
   type ToolBlockSnapshot,
 } from '../components/ToolEntry'
+import {
+  ThreadForkBanner,
+  ThreadForkPoint,
+  THREAD_FORK_BANNER_PREVIEW_TITLE,
+} from '../components/ThreadForkBanner'
 import { PencilLine } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -415,6 +420,22 @@ function HomePage() {
     if (mode === 'single') return GENERATED_FILES_PANEL_PREVIEW_SINGLE
     if (mode === 'mixed') return GENERATED_FILES_PANEL_PREVIEW_MIXED
     return GENERATED_FILES_PANEL_PREVIEW
+  }, [])
+
+  // Visual preview for the ported ThreadForkBanner / ThreadForkPoint
+  // (?threadForkBanner=1|unknown, ?threadForkPoint=1|unknown).
+  const threadForkBannerPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('threadForkBanner')) return null
+    return params.get('threadForkBanner') === 'unknown' ? 'unknown' : 'title'
+  }, [])
+
+  const threadForkPointPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('threadForkPoint')) return null
+    return params.get('threadForkPoint') === 'unknown' ? 'unknown' : 'title'
   }, [])
 
   // Visual preview for the ported ToolEntry (?toolEntry=1|running|error|command).
@@ -916,6 +937,29 @@ function HomePage() {
             block={toolEntryPreview.block}
             defaultExpanded={toolEntryPreview.defaultExpanded}
           />
+        </div>
+      ) : null}
+
+      {threadForkBannerPreviewMode || threadForkPointPreviewMode ? (
+        <div className="thread-fork-preview">
+          {threadForkBannerPreviewMode ? (
+            <ThreadForkBanner
+              parentTitle={
+                threadForkBannerPreviewMode === 'unknown'
+                  ? undefined
+                  : THREAD_FORK_BANNER_PREVIEW_TITLE
+              }
+            />
+          ) : null}
+          {threadForkPointPreviewMode ? (
+            <ThreadForkPoint
+              parentTitle={
+                threadForkPointPreviewMode === 'unknown'
+                  ? undefined
+                  : THREAD_FORK_BANNER_PREVIEW_TITLE
+              }
+            />
+          ) : null}
         </div>
       ) : null}
     </>
