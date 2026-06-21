@@ -584,6 +584,8 @@ function HomePage() {
           : EXECUTION_PICKER_PREVIEW.sandboxMode,
     }),
   )
+  const [productionExecutionSettings, setProductionExecutionSettings] =
+    useState<ComposerExecutionSettings>(() => EXECUTION_PICKER_PREVIEW)
 
   // Visual preview for the ported GitBranchPicker (?gitBranchPickerPreview=1).
   const gitBranchPickerPreviewMode = useMemo(() => {
@@ -3504,10 +3506,19 @@ function HomePage() {
         voiceRecording={voiceRecording}
         queuedMessages={queuedMessagesPreview}
         executionPicker={
-          executionPickerPreviewMode ? (
+          hasProvider ? (
             <FloatingComposerExecutionPicker
-              value={executionPickerPreview}
-              onChange={(patch) => setExecutionPickerPreview((current) => ({ ...current, ...patch }))}
+              value={
+                executionPickerPreviewMode ? executionPickerPreview : productionExecutionSettings
+              }
+              disabled={composerDisabled}
+              onChange={(patch) => {
+                if (executionPickerPreviewMode) {
+                  setExecutionPickerPreview((current) => ({ ...current, ...patch }))
+                  return
+                }
+                setProductionExecutionSettings((current) => ({ ...current, ...patch }))
+              }}
             />
           ) : undefined
         }
