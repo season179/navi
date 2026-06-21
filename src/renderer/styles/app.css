@@ -1784,6 +1784,10 @@ html[data-theme='dark'] .process-section-row-error-dot {
   padding-left: 11px;
 }
 
+.process-stack-entry {
+  min-width: 0;
+}
+
 .process-stack-entry-row {
   display: flex;
   width: 100%;

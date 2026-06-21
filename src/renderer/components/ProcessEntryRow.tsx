@@ -161,7 +161,12 @@ function ProcessSummaryLine({
   return (
     <>
       {summary.slice(0, index)}
-      <button type="button" className="ds-process-file-reference" title="Preview file">
+      <button
+        type="button"
+        className="ds-process-file-reference"
+        title="Preview file"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         {filePath}
       </button>
       {summary.slice(index + filePath.length)}
@@ -218,7 +223,13 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
     entry.collapsible !== false &&
     (Boolean(entry.detailText) || Boolean(entry.nestedBubble))
   const defaultOpen = entry.error === true
-  const forceOpen = entry.forceOpen === true || entry.detailKind === 'assistant'
+  const autoOpenPending =
+    entry.active === true &&
+    (entry.detailKind === 'approval' || entry.detailKind === 'user_input')
+  const forceOpen =
+    entry.forceOpen === true ||
+    entry.detailKind === 'assistant' ||
+    autoOpenPending
   const isOpen = canExpand && (forceOpen || (expanded ?? (userOpen ?? defaultOpen)))
   const canToggle = canExpand && !forceOpen
   const rowActive = entry.active === true

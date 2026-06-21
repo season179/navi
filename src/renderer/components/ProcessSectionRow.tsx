@@ -45,12 +45,41 @@ export type ProcessSectionSnapshot = {
   active?: boolean
   hasError?: boolean
   showActiveError?: boolean
+  hasPendingApproval?: boolean
+  hasRequestUserInput?: boolean
   expanded?: boolean
   collapsible?: boolean
   forceExpanded?: boolean
   reasoningText?: string
   stackEntries?: ProcessStackEntrySnapshot[]
   outputEntries?: ProcessOutputEntrySnapshot[]
+}
+
+function entryAutoForceOpen(entry: ProcessStackEntrySnapshot): boolean {
+  return (
+    entry.active === true &&
+    (entry.detailKind === 'approval' || entry.detailKind === 'user_input')
+  )
+}
+
+function sectionHasPendingApproval(section: ProcessSectionSnapshot): boolean {
+  if (section.hasPendingApproval === true) return true
+  return (
+    section.stackEntries?.some(
+      (entry) => entry.detailKind === 'approval' && entry.active === true,
+    ) ?? false
+  )
+}
+
+function sectionHasRequestUserInput(section: ProcessSectionSnapshot): boolean {
+  if (section.hasRequestUserInput === true) return true
+  return (
+    section.processing === true &&
+    (section.stackEntries?.some(
+      (entry) => entry.detailKind === 'user_input' && entry.active === true,
+    ) ??
+      false)
+  )
 }
 
 const PREVIEW_PATCH = `--- a/src/auth/middleware.ts
@@ -366,7 +395,12 @@ function ProcessSummaryLine({
   return (
     <>
       {summary.slice(0, index)}
-      <button type="button" className="ds-process-file-reference" title="Preview file">
+      <button
+        type="button"
+        className="ds-process-file-reference"
+        title="Preview file"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         {filePath}
       </button>
       {summary.slice(index + filePath.length)}
@@ -531,7 +565,7 @@ function ProcessStackRows({
         const hasDetail = Boolean(entry.detailText) || Boolean(entry.nestedBubble)
         const staticOpen = hasDetail && entry.collapsible === false
         const defaultOpen = entry.error === true
-        const forceOpen = entry.forceOpen === true
+        const forceOpen = entry.forceOpen === true || entryAutoForceOpen(entry)
         const userClosed = closedBlockIds.has(entry.id)
         const userOpened = openBlockId === entry.id
         const open =
@@ -562,13 +596,14 @@ function ProcessStackRows({
         }
 
         return (
-          <ProcessStackEntryRow
-            key={entry.id}
-            entry={entry}
-            open={open}
-            canToggle={canToggle}
-            onToggle={handleToggle}
-          />
+          <div key={entry.id} className="process-stack-entry">
+            <ProcessStackEntryRow
+              entry={entry}
+              open={open}
+              canToggle={canToggle}
+              onToggle={handleToggle}
+            />
+          </div>
         )
       })}
     </div>
@@ -606,12 +641,17 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
     section.kind === 'reasoning'
       ? Boolean(section.reasoningText?.trim())
       : (section.stackEntries?.length ?? 0) > 0
+  const pendingApproval = sectionHasPendingApproval(section)
+  const requestUserInput = sectionHasRequestUserInput(section)
   const defaultExpanded =
     section.hasError === true ||
+    pendingApproval ||
     (section.active === true && section.kind === 'reasoning') ||
-    (section.processing === true && section.active === true && section.kind === 'execution') ||
+    (section.processing === true &&
+      section.kind === 'execution' &&
+      requestUserInput) ||
     section.expanded === true
-  const forceExpanded = section.forceExpanded === true
+  const forceExpanded = section.forceExpanded === true || pendingApproval
   const isControlled = expanded !== undefined
   const isExpanded =
     hasDetails &&
