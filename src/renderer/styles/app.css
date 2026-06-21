@@ -9848,4 +9848,368 @@ button.usage-heatmap-cell:focus {
   }
 }
 
+/* =====================================================
+   ds-sidebar-toggle-button (Kun surfaces-write port)
+   ===================================================== */
+.ds-sidebar-toggle-button {
+  display: inline-flex;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--ds-border-muted) 82%, white 18%);
+  background: rgba(255, 255, 255, 0.46);
+  color: var(--ds-text-faint);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    0 8px 18px rgba(20, 47, 95, 0.05);
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+  cursor: pointer;
+}
+
+.ds-sidebar-toggle-button:hover {
+  transform: translateY(-1px);
+  border-color: var(--ds-border-strong);
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--ds-text);
+}
+
+:root[data-theme='dark'] .ds-sidebar-toggle-button {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 20px rgba(2, 6, 16, 0.16);
+}
+
+:root[data-theme='dark'] .ds-sidebar-toggle-button:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* =====================================================
+   TodoPanel (Kun todo/TodoPanel port)
+   ===================================================== */
+.todo-panel {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  border-left: 1px solid var(--ds-border-muted);
+  background: #fff;
+}
+
+:root[data-theme='dark'] .todo-panel {
+  background: var(--ds-bg-canvas);
+}
+
+.todo-panel-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, #fff 92%, transparent);
+}
+
+:root[data-theme='dark'] .todo-panel-header {
+  background: var(--ds-card);
+}
+
+.todo-panel-header-row {
+  display: flex;
+  height: 3rem;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.todo-panel-collapse-btn {
+  flex-shrink: 0;
+}
+
+.todo-panel-collapse-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.todo-panel-title-wrap {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+}
+
+.todo-panel-title-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--ds-accent);
+}
+
+.todo-panel-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.todo-panel-clear-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 6px;
+  background: transparent;
+  color: var(--ds-text-faint);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  cursor: pointer;
+}
+
+.todo-panel-clear-btn:hover {
+  background: var(--ds-hover);
+  color: #dc2626;
+}
+
+.todo-panel-clear-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.todo-panel-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.todo-panel-stat {
+  border-radius: 8px;
+  background: var(--ds-surface-subtle);
+  padding: 8px 10px;
+}
+
+:root[data-theme='dark'] .todo-panel-stat {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.todo-panel-stat-value {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ds-text);
+}
+
+.todo-panel-stat-label {
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-text-faint);
+}
+
+.todo-panel-body {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.todo-panel-empty {
+  display: flex;
+  height: 100%;
+  min-height: 220px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.todo-panel-empty-icon-wrap {
+  border-radius: 999px;
+  background: var(--ds-surface-subtle);
+  padding: 12px;
+  color: var(--ds-text-faint);
+}
+
+:root[data-theme='dark'] .todo-panel-empty-icon-wrap {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.todo-panel-empty-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.todo-panel-empty-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.todo-panel-empty-description {
+  margin-top: 4px;
+  max-width: 16rem;
+  font-size: 12px;
+  line-height: 1.25rem;
+  color: var(--ds-text-muted);
+}
+
+.todo-panel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-panel-row {
+  border-radius: 8px;
+  border: 1px solid var(--ds-border-muted);
+  background: #fff;
+  padding: 10px 12px;
+  box-shadow: 0 1px 2px rgba(20, 47, 95, 0.04);
+}
+
+:root[data-theme='dark'] .todo-panel-row {
+  background: var(--ds-card);
+}
+
+.todo-panel-row-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.todo-panel-row-toggle {
+  margin-top: 2px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ds-text-muted);
+  transition: color 0.15s ease;
+  cursor: pointer;
+}
+
+.todo-panel-row-toggle:hover {
+  color: var(--ds-accent);
+}
+
+.todo-panel-row-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.todo-panel-row-icon-completed {
+  color: #059669;
+}
+
+.todo-panel-row-icon-active {
+  color: #d97706;
+}
+
+.todo-panel-row-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.todo-panel-row-text {
+  overflow-wrap: break-word;
+  font-size: 13px;
+  line-height: 1.25rem;
+  color: var(--ds-text);
+}
+
+.todo-panel-row-text-completed {
+  color: var(--ds-text-faint);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--ds-text-faint) 60%, transparent);
+}
+
+.todo-panel-row-plan-link {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  border: none;
+  border-radius: 6px;
+  padding: 2px 6px;
+  background: transparent;
+  font-size: 11px;
+  color: var(--ds-text-faint);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  cursor: pointer;
+}
+
+.todo-panel-row-plan-link:hover {
+  background: var(--ds-hover);
+  color: var(--ds-accent);
+}
+
+.todo-panel-row-plan-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.todo-panel-row-plan-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-panel-row-statuses {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-left: 24px;
+}
+
+.todo-panel-row-status {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ds-text-faint);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  cursor: pointer;
+}
+
+.todo-panel-row-status:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.todo-panel-row-status.is-active {
+  background: color-mix(in srgb, var(--ds-accent) 12%, transparent);
+  color: var(--ds-accent);
+}
+
+.todo-panel-preview-wrap {
+  position: fixed;
+  top: 52px;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+  width: min(360px, calc(100vw - 24px));
+  box-shadow: -8px 0 24px rgba(20, 47, 95, 0.08);
+}
+
 

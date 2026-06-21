@@ -159,6 +159,12 @@ import {
   type WorkbenchTopBarPreviewMode,
 } from '../components/WorkbenchTopBar'
 import {
+  TodoPanel,
+  TODO_PANEL_PREVIEW_ITEMS,
+  type ThreadTodoItem,
+  type TodoPanelPreviewMode,
+} from '../components/TodoPanel'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -650,6 +656,26 @@ function HomePage() {
     return { guiUpdate, sideChatCount, sideChatRunningCount }
   }, [workbenchTopBarPreviewMode])
 
+  // Visual preview for the ported TodoPanel (?todoPanelPreview=1|empty).
+  const todoPanelPreviewMode = useMemo((): TodoPanelPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('todoPanelPreview')) return null
+    return params.get('todoPanelPreview') === 'empty' ? 'empty' : 'default'
+  }, [])
+  const [todoPanelPreviewItems, setTodoPanelPreviewItems] = useState<ThreadTodoItem[]>(
+    () => TODO_PANEL_PREVIEW_ITEMS,
+  )
+  useEffect(() => {
+    if (todoPanelPreviewMode === 'empty') {
+      setTodoPanelPreviewItems([])
+      return
+    }
+    if (todoPanelPreviewMode) {
+      setTodoPanelPreviewItems(TODO_PANEL_PREVIEW_ITEMS)
+    }
+  }, [todoPanelPreviewMode])
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -824,6 +850,26 @@ function HomePage() {
           snapshot={RUNTIME_BANNER_PREVIEW[runtimeBannerPreviewMode]}
           forceDetailsOpen={runtimeBannerPreviewMode === 'expanded'}
         />
+      ) : null}
+
+      {todoPanelPreviewMode ? (
+        <div className="todo-panel-preview-wrap">
+          <TodoPanel
+            items={todoPanelPreviewItems}
+            onCollapse={() => setTodoPanelPreviewItems([])}
+            onOpenPlan={() => undefined}
+            onStatusChange={(id, status) =>
+              setTodoPanelPreviewItems((current) =>
+                current.map((item) =>
+                  item.id === id
+                    ? { ...item, status, updatedAt: new Date().toISOString() }
+                    : item,
+                ),
+              )
+            }
+            onClear={() => setTodoPanelPreviewItems([])}
+          />
+        </div>
       ) : null}
 
       {settingsOpen ? (
