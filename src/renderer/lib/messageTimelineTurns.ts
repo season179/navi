@@ -6,6 +6,13 @@ export type TimelineChatBlock = {
   kind: string
   text?: string
   status?: string
+  summary?: string
+  detail?: string
+  filePath?: string
+  toolKind?: string
+  meta?: Record<string, unknown>
+  severity?: string
+  auto?: boolean
 }
 
 export type Turn = {

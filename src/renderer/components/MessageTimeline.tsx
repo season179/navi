@@ -62,13 +62,22 @@ import {
 } from './TurnChangeSummary'
 import { WorkMetaRow, WORK_META_ROW_PREVIEW } from './WorkMetaRow'
 import type { MediaReference } from './MediaPreviewTile'
+import {
+  buildDerivedIntermediateTurnPreview,
+  buildMessageTurnSnapshotFromSource,
+  type MessageTurnSource,
+} from '../lib/buildMessageTurnSnapshot'
 
 const TURN_PAGE_SIZE = 18
 const AUTO_COLLAPSE_THRESHOLD = 24
 
+export type { MessageTurnSource } from '../lib/buildMessageTurnSnapshot'
+
 export type MessageTurnSnapshot = {
   key: string
   user?: UserMessageSnapshot
+  /** When set, turn layout is derived from blocks via deriveTurnSections like Kun. */
+  source?: MessageTurnSource
   processing?: boolean
   workExpanded?: boolean
   workMeta?: {
@@ -126,23 +135,36 @@ function MessageTurnImpl({
   turn: MessageTurnSnapshot
   viewportRef?: RefObject<HTMLDivElement | null>
 }): ReactElement {
+  const derivedTurn = useMemo(
+    () =>
+      turn.source
+        ? buildMessageTurnSnapshotFromSource({
+            key: turn.key,
+            user: turn.user,
+            source: turn.source,
+          })
+        : null,
+    [turn.key, turn.source, turn.user],
+  )
+  const resolved = derivedTurn ?? turn
+
   const [workExpandedOverride, setWorkExpandedOverride] = useState<boolean | null>(null)
-  const processing = turn.processing === true
-  const workMeta = turn.workMeta
-  const processSections = turn.processSections ?? []
+  const processing = resolved.processing === true
+  const workMeta = resolved.workMeta
+  const processSections = resolved.processSections ?? []
   const hasProcess = Boolean(workMeta && (processing || processSections.length > 0))
   const hasProcessError = processSections.some((section) => section.hasError)
   const reasoningSectionCount = processSections.filter(
     (section) => section.kind === 'reasoning',
   ).length
   const workExpanded =
-    hasProcessError || (workExpandedOverride ?? turn.workExpanded ?? processing)
-  const showLiveAssistant = Boolean(turn.liveAssistant?.text.trim())
-  const showLiveProgress = turn.showLiveProgress === true
+    hasProcessError || (workExpandedOverride ?? resolved.workExpanded ?? processing)
+  const showLiveAssistant = Boolean(resolved.liveAssistant?.text.trim())
+  const showLiveProgress = resolved.showLiveProgress === true
 
   return (
     <div className="message-timeline-turn">
-      {turn.user ? <MessageBubble block={turn.user} /> : null}
+      {resolved.user ? <MessageBubble block={resolved.user} /> : null}
 
       {hasProcess && workMeta ? (
         <div className="message-timeline-turn-process">
@@ -176,19 +198,19 @@ function MessageTurnImpl({
         </div>
       ) : null}
 
-      {(turn.assistantBlocks ?? []).map((block) => (
+      {(resolved.assistantBlocks ?? []).map((block) => (
         <MessageBubble key={block.id} block={block} />
       ))}
 
-      {showLiveAssistant && turn.liveAssistant ? (
-        <MessageBubble block={turn.liveAssistant} />
+      {showLiveAssistant && resolved.liveAssistant ? (
+        <MessageBubble block={resolved.liveAssistant} />
       ) : null}
 
-      {turn.generatedFiles?.length ? (
-        <GeneratedFilesPanel media={turn.generatedFiles} />
+      {resolved.generatedFiles?.length ? (
+        <GeneratedFilesPanel media={resolved.generatedFiles} />
       ) : null}
 
-      {(turn.reviews ?? []).map((review) => (
+      {(resolved.reviews ?? []).map((review) => (
         <ReviewSummaryCard key={review.title} review={review} />
       ))}
 
@@ -196,28 +218,28 @@ function MessageTurnImpl({
         <LiveTurnProgressRow hasActiveGoal={false} />
       ) : null}
 
-      {!processing && turn.devPreviewCard ? (
+      {!processing && resolved.devPreviewCard ? (
         <DevPreviewLaunchCard url={DEV_PREVIEW_LAUNCH_CARD_PREVIEW.url} />
       ) : null}
 
-      {!processing && turn.plan ? (
+      {!processing && resolved.plan ? (
         <ReviewPlanCard
-          title={turn.plan.title}
-          relativePath={turn.plan.relativePath}
+          title={resolved.plan.title}
+          relativePath={resolved.plan.relativePath}
           onOpen={() => undefined}
           onBuild={() => undefined}
         />
       ) : null}
 
-      {!processing && turn.changes?.length ? (
+      {!processing && resolved.changes?.length ? (
         <TurnChangeSummary
-          changes={turn.changes}
-          compact={turn.compactCards}
+          changes={resolved.changes}
+          compact={resolved.compactCards}
           viewportRef={viewportRef}
         />
       ) : null}
 
-      {turn.compaction ? <CompactionDivider block={turn.compaction} /> : null}
+      {resolved.compaction ? <CompactionDivider block={resolved.compaction} /> : null}
     </div>
   )
 }
@@ -449,6 +471,7 @@ export type MessageTimelinePreviewMode =
   | 'forked'
   | 'rich'
   | 'withGoal'
+  | 'derivedIntermediate'
 
 export function resolveMessageTimelinePreviewSnapshot(
   mode: MessageTimelinePreviewMode,
@@ -507,6 +530,8 @@ function resolvePreviewSnapshot(mode: MessageTimelinePreviewMode): MessageTimeli
         busy: true,
         hasActiveGoal: true,
       }
+    case 'derivedIntermediate':
+      return { turns: [buildDerivedIntermediateTurnPreview()] }
   }
 }
 
@@ -544,6 +569,10 @@ export {
   stableTurnKey,
 } from '../lib/messageTimelineTurns'
 export type { TimelineChatBlock, Turn } from '../lib/messageTimelineTurns'
+export {
+  buildMessageTurnSnapshotFromSource,
+  buildDerivedIntermediateTurnPreview,
+} from '../lib/buildMessageTurnSnapshot'
 export { deriveTurnSections } from '../lib/deriveTurnSections'
 export type {
   TurnAssistantBlock,
