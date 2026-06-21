@@ -23687,6 +23687,19 @@ button.usage-heatmap-cell:focus {
   margin-top: 32px;
 }
 
+.providers-panel-settings-body {
+  padding: 16px;
+  min-height: 320px;
+}
+
+.providers-settings-detail-placeholder {
+  align-self: start;
+}
+
+.providers-settings-draft-confirm-icon.is-spinning {
+  animation: spin 1s linear infinite;
+}
+
 /* Agents settings section (Kun settings-section-agents.tsx) */
 .agents-preview {
   min-height: 100vh;

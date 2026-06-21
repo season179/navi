@@ -18,8 +18,19 @@
 // the backend (registerProvider is boot-only), so a brief "reconnecting" state
 // is expected (§F7).
 
-import { useState } from 'react'
-import { Plus, X, Check, Loader2, Trash2, Wifi, Download } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react'
+import {
+  ChevronDown,
+  Check,
+  Download,
+  KeyRound,
+  Loader2,
+  Lock,
+  PlugZap,
+  Plus,
+  Trash2,
+  X,
+} from 'lucide-react'
 import type {
   DefaultSelection,
   ProbeResult,
@@ -76,18 +87,77 @@ function fingerprint(form: ProviderProfile, hasKeyInput: boolean): ProviderFinge
   return [form.id, form.baseUrl ?? '', form.api, modelsHash, hasKeyInput ? '1' : '0'].join('\0')
 }
 
-type Badge = { label: string; tone: 'success' | 'warning' }
+function ProviderBadge({
+  tone,
+  children,
+}: {
+  tone: 'accent' | 'warning'
+  children: ReactNode
+}): ReactElement {
+  return (
+    <span
+      className={
+        tone === 'accent'
+          ? 'providers-settings-badge providers-settings-badge-accent'
+          : 'providers-settings-badge providers-settings-badge-warning'
+      }
+    >
+      {children}
+    </span>
+  )
+}
+
+function DetailSection({
+  title,
+  action,
+  children,
+}: {
+  title: string
+  action?: ReactNode
+  children?: ReactNode
+}): ReactElement {
+  return (
+    <section className="providers-settings-detail-section">
+      <div className="providers-settings-detail-section-header">
+        <h3 className="providers-settings-detail-section-title">{title}</h3>
+        {action}
+      </div>
+      {children}
+    </section>
+  )
+}
 
 /**
  * Status pills for a saved provider, mirroring Kun's independent-conditional
  * badges. "In use" = it's the app's default provider; the key-state warnings
  * flag missing/unreadable keys. A keyed, non-default provider yields none.
  */
-function providerBadges(keyState: ProviderStatus['keyState'], inUse: boolean): Badge[] {
-  const badges: Badge[] = []
-  if (inUse) badges.push({ label: 'In use', tone: 'success' })
-  if (keyState === 'absent') badges.push({ label: 'No API key', tone: 'warning' })
-  if (keyState === 'unreadable') badges.push({ label: 'Key unreadable', tone: 'warning' })
+function renderProviderBadges(
+  keyState: ProviderStatus['keyState'],
+  inUse: boolean,
+): ReactNode {
+  const badges: ReactNode[] = []
+  if (inUse) {
+    badges.push(
+      <ProviderBadge key="in-use" tone="accent">
+        In use
+      </ProviderBadge>,
+    )
+  }
+  if (keyState === 'absent') {
+    badges.push(
+      <ProviderBadge key="missing-key" tone="warning">
+        No API key
+      </ProviderBadge>,
+    )
+  }
+  if (keyState === 'unreadable') {
+    badges.push(
+      <ProviderBadge key="unreadable-key" tone="warning">
+        Key unreadable
+      </ProviderBadge>,
+    )
+  }
   return badges
 }
 
@@ -102,6 +172,7 @@ export function ProvidersSettings({
   onProbe,
   onClose,
 }: ProvidersSettingsProps) {
+  const addMenuRef = useRef<HTMLDivElement>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [form, setForm] = useState<ProviderProfile | null>(null)
   const [isDraft, setIsDraft] = useState(false)
@@ -116,6 +187,24 @@ export function ProvidersSettings({
   const [addOpen, setAddOpen] = useState(false)
 
   const statusFor = (id: string) => statuses.find((s) => s.id === id)
+
+  useEffect(() => {
+    if (!addOpen) return
+    const onPointerDown = (event: PointerEvent): void => {
+      const target = event.target
+      if (target instanceof Node && addMenuRef.current?.contains(target)) return
+      setAddOpen(false)
+    }
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') setAddOpen(false)
+    }
+    window.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [addOpen])
 
   const editExisting = (p: ProviderProfile) => {
     setSelected(p.id)
@@ -255,6 +344,52 @@ export function ProvidersSettings({
   // Probe result is shown only while the form fingerprint matches the one it was
   // probed against — any edit since then makes it stale (§F2).
   const probeFresh = !!form && probe !== null && probedFp === fingerprint(form, !!keyInput.trim())
+  const canEditProviderId = Boolean(isDraft && form && !findPreset(form.id))
+  const keyState = form && !isDraft ? statusFor(form.id)?.keyState : undefined
+
+  const renderProviderButton = (p: ProviderProfile, draft = false): ReactElement => {
+    const activeId = isDraft && draft ? DRAFT : p.id
+    const selectedState = selected === activeId
+    const providerKeyState = draft ? 'absent' : (statusFor(p.id)?.keyState ?? 'absent')
+    const inUse = !draft && defaultSelection?.providerId === p.id
+    const hasStoredKey = providerKeyState === 'ok'
+    const preset = findPreset(p.id)
+
+    return (
+      <button
+        key={draft ? DRAFT : p.id}
+        type="button"
+        aria-pressed={selectedState}
+        onClick={() => {
+          if (!draft) editExisting(p)
+        }}
+        className={
+          selectedState
+            ? 'providers-settings-provider-btn is-selected'
+            : 'providers-settings-provider-btn'
+        }
+      >
+        <div className="providers-settings-provider-btn-title-row">
+          <span className="providers-settings-provider-btn-name">
+            {p.name.trim() || p.id || 'New provider'}
+          </span>
+          {draft ? <ProviderBadge tone="warning">Unsaved</ProviderBadge> : renderProviderBadges(providerKeyState, inUse)}
+        </div>
+        <div className="providers-settings-provider-btn-meta">
+          <span>{p.models.length} models</span>
+          {preset ? (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>{preset.catalog ? 'Preset' : 'Custom'}</span>
+            </>
+          ) : null}
+          {hasStoredKey ? (
+            <KeyRound className="providers-settings-provider-btn-icon" strokeWidth={1.9} />
+          ) : null}
+        </div>
+      </button>
+    )
+  }
 
   return (
     <div className="providers-panel">
@@ -263,125 +398,155 @@ export function ProvidersSettings({
           Providers
           {!ready ? <span className="providers-reconnecting">reconnecting…</span> : null}
         </div>
-        <div className="providers-head-actions">
-          <div className="add-provider">
-            <button className="btn btn-secondary" onClick={() => setAddOpen((v) => !v)}>
-              <Plus />
+        <button className="apikey-close" onClick={onClose} aria-label="Close" title="Close">
+          <X />
+        </button>
+      </header>
+
+      <div className="providers-settings-layout providers-panel-settings-body">
+        <div className="providers-settings-sidebar">
+          {providers.length === 0 && !isDraft ? (
+            <p className="providers-settings-model-empty">No providers yet. Add one to start.</p>
+          ) : (
+            <div className="providers-settings-provider-list">
+              {providers.map((p) => renderProviderButton(p))}
+              {isDraft && form ? renderProviderButton(form, true) : null}
+            </div>
+          )}
+
+          <div ref={addMenuRef} className="providers-settings-add-menu-wrap">
+            <button
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={addOpen}
+              onClick={() => setAddOpen((value) => !value)}
+              className="providers-settings-add-btn"
+            >
+              <Plus className="providers-settings-add-btn-icon" strokeWidth={1.9} />
               Add provider
+              <ChevronDown className="providers-settings-add-btn-icon" strokeWidth={1.9} />
             </button>
             {addOpen ? (
-              <div className="add-provider-menu" role="menu">
+              <div role="menu" className="providers-settings-add-menu">
+                <div className="providers-settings-add-menu-heading">API providers</div>
                 {PROVIDER_PRESETS.map((p) => (
-                  <button key={p.id} role="menuitem" onClick={() => startPreset(p.id)}>
-                    {p.name}
+                  <button
+                    key={p.id}
+                    type="button"
+                    role="menuitem"
+                    onClick={() => startPreset(p.id)}
+                    className="providers-settings-add-menu-item"
+                  >
+                    <span>{p.name}</span>
+                    <span className="providers-settings-add-menu-tag">Preset</span>
                   </button>
                 ))}
-                <button role="menuitem" onClick={startCustom}>
-                  Custom…
+                <div className="providers-settings-add-menu-divider" />
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={startCustom}
+                  className="providers-settings-add-menu-item"
+                >
+                  Custom provider…
                 </button>
               </div>
             ) : null}
           </div>
-          <button className="apikey-close" onClick={onClose} aria-label="Close" title="Close">
-            <X />
-          </button>
         </div>
-      </header>
 
-      <div className="providers-body">
-        <aside className="providers-list">
-          {providers.length === 0 && !isDraft ? (
-            <div className="providers-list-empty">No providers yet. Add one to start.</div>
-          ) : null}
-          {providers.map((p) => {
-            const keyState = statusFor(p.id)?.keyState ?? 'absent'
-            const badges = providerBadges(keyState, defaultSelection?.providerId === p.id)
-            return (
-              <button
-                key={p.id}
-                className={selected === p.id ? 'provider-card is-active' : 'provider-card'}
-                onClick={() => editExisting(p)}
-              >
-                <div className="provider-card-head">
-                  <span className="provider-card-name">{p.name}</span>
-                  <span className="provider-card-count">{p.models.length}</span>
-                </div>
-                {badges.length > 0 ? (
-                  <div className="provider-card-badges">
-                    {badges.map((b) => (
-                      <span key={b.label} className={`provider-badge badge-${b.tone}`}>
-                        {b.label}
-                      </span>
-                    ))}
-                  </div>
+        {!form ? (
+          <p className="providers-settings-model-empty providers-settings-detail-placeholder">
+            Select a provider, or add one to configure its key and models.
+          </p>
+        ) : (
+          <div className="providers-settings-detail">
+            <div className="providers-settings-detail-header">
+              <div className="providers-settings-detail-title-row">
+                <span className="providers-settings-detail-name">
+                  {form.name.trim() || form.id || 'New provider'}
+                </span>
+                {form.id ? <span className="providers-settings-detail-id">{form.id}</span> : null}
+                {!canEditProviderId && form.id ? (
+                  <span title="Provider ID locked" className="providers-settings-detail-lock">
+                    <Lock className="providers-settings-detail-lock-icon" strokeWidth={1.9} />
+                  </span>
                 ) : null}
+              </div>
+              <button
+                type="button"
+                onClick={handleTest}
+                disabled={probing || importing || busy}
+                className="providers-settings-test-btn"
+              >
+                {probing ? (
+                  <Loader2 className="providers-settings-test-btn-icon is-spinning" strokeWidth={1.9} />
+                ) : (
+                  <PlugZap className="providers-settings-test-btn-icon" strokeWidth={1.9} />
+                )}
+                Test connection
               </button>
-            )
-          })}
-          {isDraft && form ? (
-            <div className="provider-card is-active is-draft">
-              <div className="provider-card-head">
-                <span className="provider-card-name">{form.name || 'New provider'}</span>
-              </div>
-              <div className="provider-card-badges">
-                <span className="provider-badge badge-warning">Unsaved</span>
-              </div>
             </div>
-          ) : null}
-        </aside>
 
-        <section className="provider-detail">
-          {!form ? (
-            <div className="provider-detail-empty">
-              Select a provider, or add one to configure its key and models.
-            </div>
-          ) : (
-            <>
-              <label className="field">
-                <span className="field-label">Name</span>
-                <input
-                  className="apikey-input"
-                  value={form.name}
-                  onChange={(e) => patch({ name: e.target.value })}
-                  placeholder="Display name"
-                />
-              </label>
+            {probeFresh && probe ? (
+              probe.ok ? (
+                <p className="providers-settings-muted-copy probe-result probe-ok">
+                  <Check strokeWidth={2} />
+                  OK · {probe.latencyMs}ms · {probe.modelIds.length} models
+                </p>
+              ) : (
+                <p className="providers-settings-url-warning probe-result probe-err">{probe.message}</p>
+              )
+            ) : null}
 
-              <label className="field">
-                <span className="field-label">Provider id</span>
-                <input
-                  className="apikey-input"
-                  value={form.id}
-                  disabled={!isDraft || !!findPreset(form.id)}
-                  onChange={(e) => patch({ id: e.target.value.toLowerCase() })}
-                  placeholder="lowercase-id"
-                  spellCheck={false}
-                />
-              </label>
+            <DetailSection title="Provider basics">
+              <div className="providers-settings-field-grid">
+                <label className="providers-settings-field">
+                  Provider name
+                  <input
+                    className="settings-text-input"
+                    value={form.name}
+                    onChange={(e) => patch({ name: e.target.value })}
+                    placeholder="Display name"
+                  />
+                </label>
+                <label className="providers-settings-field">
+                  Provider ID
+                  <span className="providers-settings-id-wrap">
+                    <input
+                      className={
+                        canEditProviderId
+                          ? 'settings-text-input providers-settings-id-input'
+                          : 'settings-text-input providers-settings-id-input is-readonly'
+                      }
+                      value={form.id}
+                      readOnly={!canEditProviderId}
+                      onChange={(e) => patch({ id: e.target.value.toLowerCase() })}
+                      placeholder="lowercase-id"
+                      spellCheck={false}
+                    />
+                    {!canEditProviderId && form.id ? (
+                      <span title="Provider ID locked" className="providers-settings-id-lock">
+                        <Lock className="providers-settings-detail-lock-icon" strokeWidth={1.9} />
+                      </span>
+                    ) : null}
+                  </span>
+                </label>
+              </div>
+            </DetailSection>
 
-              <label className="field">
-                <span className="field-label">
-                  Base URL {isCatalog(form.id) ? <span className="field-hint">(blank = default)</span> : null}
-                </span>
-                <input
-                  className="apikey-input"
-                  value={form.baseUrl ?? ''}
-                  onChange={(e) => patch({ baseUrl: e.target.value })}
-                  placeholder={findPreset(form.id)?.defaultBaseUrl ?? 'https://…'}
-                  spellCheck={false}
-                />
-              </label>
-
-              <label className="field">
-                <span className="field-label">
-                  API key
-                  {!isDraft && statusFor(form.id)?.keyState === 'ok' ? (
-                    <span className="field-hint">(saved — leave blank to keep)</span>
-                  ) : null}
-                  {!isDraft && statusFor(form.id)?.keyState === 'unreadable' ? (
-                    <span className="field-hint field-warn">(stored key unreadable — re-enter)</span>
-                  ) : null}
-                </span>
+            <DetailSection title="Provider connection">
+              <label className="providers-settings-field">
+                Provider API key
+                {keyState === 'ok' ? (
+                  <span className="providers-settings-muted-copy"> (saved — leave blank to keep)</span>
+                ) : null}
+                {keyState === 'unreadable' ? (
+                  <span className="providers-settings-url-warning">
+                    {' '}
+                    (stored key unreadable — re-enter)
+                  </span>
+                ) : null}
                 <SecretInput
                   value={keyInput}
                   onChange={setKeyInput}
@@ -389,57 +554,95 @@ export function ProvidersSettings({
                   onEnter={handleSave}
                 />
               </label>
+              <label className="providers-settings-field">
+                Provider base URL
+                {isCatalog(form.id) ? (
+                  <span className="providers-settings-muted-copy"> (blank = default)</span>
+                ) : null}
+                <input
+                  className="settings-text-input"
+                  value={form.baseUrl ?? ''}
+                  onChange={(e) => patch({ baseUrl: e.target.value })}
+                  placeholder={findPreset(form.id)?.defaultBaseUrl ?? 'https://…'}
+                  spellCheck={false}
+                />
+              </label>
+            </DetailSection>
 
-              <div className="provider-actions">
+            <DetailSection
+              title={`Models · ${form.models.length}`}
+              action={
                 <button
-                  className="btn btn-secondary"
-                  onClick={handleTest}
-                  disabled={probing || importing || busy}
-                >
-                  {probing ? <Loader2 className="spin" /> : <Wifi />}
-                  Test connection
-                </button>
-                <button
-                  className="btn btn-secondary"
+                  type="button"
                   onClick={handleFetch}
                   disabled={probing || importing || busy}
+                  className="providers-settings-fetch-btn"
                 >
-                  {importing ? <Loader2 className="spin" /> : <Download />}
-                  Fetch models
-                </button>
-                {probeFresh && probe ? (
-                  probe.ok ? (
-                    <span className="probe-result probe-ok">
-                      <Check /> OK · {probe.latencyMs}ms · {probe.modelIds.length} models
-                    </span>
+                  {importing ? (
+                    <Loader2 className="providers-settings-fetch-btn-icon is-spinning" strokeWidth={1.9} />
                   ) : (
-                    <span className="probe-result probe-err">{probe.message}</span>
-                  )
-                ) : null}
-              </div>
-
-              <div className="field">
-                <span className="field-label">Models</span>
-                <ProviderModels models={form.models} catalog={isCatalog(form.id)} onChange={setModels} />
-              </div>
-
-              {error ? <div className="apikey-error">{error}</div> : null}
-
-              <div className="provider-footer">
-                <button className="btn btn-primary" onClick={handleSave} disabled={busy}>
-                  {busy ? <Loader2 className="spin" /> : null}
-                  {isDraft ? 'Add provider' : 'Save changes'}
+                    <Download className="providers-settings-fetch-btn-icon" strokeWidth={1.9} />
+                  )}
+                  Fetch from API
                 </button>
-                {!isDraft ? (
-                  <button className="btn btn-secondary danger" onClick={handleDelete} disabled={busy}>
-                    <Trash2 />
-                    Delete
+              }
+            >
+              <ProviderModels models={form.models} catalog={isCatalog(form.id)} onChange={setModels} />
+            </DetailSection>
+
+            {error ? <p className="providers-settings-url-warning">{error}</p> : null}
+
+            {isDraft ? (
+              <DetailSection title="Draft provider">
+                <div className="providers-settings-draft-actions">
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={busy}
+                    className="providers-settings-draft-confirm"
+                  >
+                    {busy ? (
+                      <Loader2 className="providers-settings-draft-confirm-icon is-spinning" strokeWidth={2} />
+                    ) : (
+                      <Plus className="providers-settings-draft-confirm-icon" strokeWidth={2} />
+                    )}
+                    Add provider
                   </button>
-                ) : null}
-              </div>
-            </>
-          )}
-        </section>
+                  <span className="providers-settings-draft-hint">
+                    {keyInput.trim() || keyState === 'ok'
+                      ? 'Ready to save once details look correct.'
+                      : 'Add an API key before saving this provider.'}
+                  </span>
+                </div>
+              </DetailSection>
+            ) : (
+              <DetailSection title="Danger zone">
+                <div className="providers-settings-danger-actions">
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={busy}
+                    className="providers-settings-draft-confirm"
+                  >
+                    {busy ? (
+                      <Loader2 className="providers-settings-draft-confirm-icon is-spinning" strokeWidth={2} />
+                    ) : null}
+                    Save changes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={busy}
+                    className="providers-settings-remove-btn"
+                  >
+                    <Trash2 className="providers-settings-remove-btn-icon" strokeWidth={1.9} />
+                    Delete provider
+                  </button>
+                </div>
+              </DetailSection>
+            )}
+          </div>
+        )}
       </div>
 
       {importIds !== null && form ? (
