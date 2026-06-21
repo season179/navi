@@ -71,6 +71,9 @@ export type MessageTimelineSnapshot = {
   busy?: boolean
   showCollapseEarlier?: boolean
   jumpAnchors?: TimelineJumpAnchor[]
+  /** Kun renders a live turn when blocks are empty but SSE has started. */
+  liveReasoning?: string
+  liveContent?: string
   turns: MessageTurnSnapshot[]
 }
 
@@ -99,6 +102,8 @@ export function MessageTimeline({
   busy = false,
   showCollapseEarlier = false,
   jumpAnchors,
+  liveReasoning = '',
+  liveContent = '',
   turns,
 }: MessageTimelineProps): ReactElement {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -177,6 +182,24 @@ export function MessageTimeline({
             </div>
           )
         })}
+
+        {turns.length === 0 && (liveReasoning.trim() || liveContent.trim()) ? (
+          <div className="message-timeline-turn-anchor scroll-mt-6">
+            <MessageTurn
+              turn={{
+                key: 'live-empty-turn',
+                source: {
+                  blocks: [],
+                  isProcessing: busy,
+                  liveReasoning,
+                  liveContent,
+                },
+              }}
+              viewportRef={containerRef}
+              hasActiveGoal={hasActiveGoal}
+            />
+          </div>
+        ) : null}
 
         {showCollapseEarlier ? (
           <TimelineCollapseEarlierButton
@@ -313,6 +336,9 @@ export type MessageTimelinePreviewMode =
   | 'rich'
   | 'withGoal'
   | 'derivedIntermediate'
+  | 'emptyLiveStream'
+  | 'emptyLiveReasoning'
+  | 'emptyLiveContent'
 
 export function resolveMessageTimelinePreviewSnapshot(
   mode: MessageTimelinePreviewMode,
@@ -373,6 +399,31 @@ function resolvePreviewSnapshot(mode: MessageTimelinePreviewMode): MessageTimeli
       }
     case 'derivedIntermediate':
       return { turns: [buildDerivedIntermediateTurnPreview()] }
+    case 'emptyLiveStream':
+      return {
+        hasContent: true,
+        activeThreadId: 'preview-thread',
+        busy: true,
+        turns: [],
+        liveReasoning: 'Scanning the auth middleware for token validation paths…',
+        liveContent: 'I found the likely issue in the Bearer token extraction step.',
+      }
+    case 'emptyLiveReasoning':
+      return {
+        hasContent: true,
+        activeThreadId: 'preview-thread',
+        busy: true,
+        turns: [],
+        liveReasoning: 'Checking imports and tracing how verifyToken is called…',
+      }
+    case 'emptyLiveContent':
+      return {
+        hasContent: true,
+        activeThreadId: 'preview-thread',
+        busy: true,
+        turns: [],
+        liveContent: 'Updating the middleware now — normalizing the Authorization header…',
+      }
   }
 }
 

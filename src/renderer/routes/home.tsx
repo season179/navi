@@ -1178,7 +1178,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported MessageTimeline orchestrator
-  // (?messageTimelinePreview=empty|emptyWaking|emptyNoWorkspace|emptyClaw|single|processing|multi|paginated|forked|rich|withGoal|derivedIntermediate).
+  // (?messageTimelinePreview=empty|emptyWaking|emptyNoWorkspace|emptyClaw|single|processing|multi|paginated|forked|rich|withGoal|derivedIntermediate|emptyLiveStream|emptyLiveReasoning|emptyLiveContent).
   const messageTimelinePreviewMode = useMemo((): MessageTimelinePreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1195,6 +1195,9 @@ function HomePage() {
     if (value === 'rich') return 'rich'
     if (value === 'withGoal') return 'withGoal'
     if (value === 'derivedIntermediate') return 'derivedIntermediate'
+    if (value === 'emptyLiveStream') return 'emptyLiveStream'
+    if (value === 'emptyLiveReasoning') return 'emptyLiveReasoning'
+    if (value === 'emptyLiveContent') return 'emptyLiveContent'
     return 'empty'
   }, [])
 
