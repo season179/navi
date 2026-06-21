@@ -630,6 +630,30 @@ type PreviewProps = {
   mode: WriteWorkspaceViewPreviewMode
 }
 
+function resolveProductionWriteAssistantPreviewOpen(): boolean {
+  if (typeof window === 'undefined') return false
+  const value = new URLSearchParams(window.location.search).get('productionWriteWorkspace')
+  return value === 'assistant' || value === 'assistantTimeline' || value === 'assistantQuoted'
+}
+
+function resolveProductionWriteAssistantSnapshot(): Partial<WriteAssistantPanelSnapshot> {
+  const activeFileLabel = WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel
+  if (typeof window === 'undefined') {
+    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_DEFAULT, activeFileLabel }
+  }
+  const value = new URLSearchParams(window.location.search).get('productionWriteWorkspace')
+  if (value === 'assistantTimeline') {
+    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_TIMELINE, activeFileLabel }
+  }
+  if (value === 'assistantQuoted') {
+    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_QUOTED, activeFileLabel }
+  }
+  if (value === 'assistant') {
+    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_DEFAULT, activeFileLabel }
+  }
+  return {}
+}
+
 /** Production shell for Write workspace tab — mock snapshots for visual parity. */
 export function WriteWorkspaceProductionView({
   leftSidebarCollapsed,
@@ -639,6 +663,8 @@ export function WriteWorkspaceProductionView({
   onToggleLeftSidebar: () => void
 }): ReactElement {
   const snapshot = useMemo(() => previewSnapshot('split'), [])
+  const [assistantOpen, setAssistantOpen] = useState(() => resolveProductionWriteAssistantPreviewOpen())
+  const assistantPanelSnapshot = useMemo(() => resolveProductionWriteAssistantSnapshot(), [])
 
   return (
     <div className="production-write-stage">
@@ -670,6 +696,9 @@ export function WriteWorkspaceProductionView({
         leftSidebarCollapsed={leftSidebarCollapsed}
         onToggleLeftSidebar={onToggleLeftSidebar}
         onPickWorkspace={() => undefined}
+        assistantOpen={assistantOpen}
+        onAssistantOpenChange={setAssistantOpen}
+        assistantPanelSnapshot={assistantPanelSnapshot}
       />
     </div>
   )

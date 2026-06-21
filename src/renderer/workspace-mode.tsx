@@ -36,6 +36,11 @@ function resolveWorkspaceModeTabsPreviewMode(): WorkspaceModeView | null {
   return params.get('workspaceModeTabsPreview') === 'write' ? 'write' : 'chat'
 }
 
+function resolveProductionWriteWorkspacePreview(): boolean {
+  if (typeof window === 'undefined') return false
+  return new URLSearchParams(window.location.search).has('productionWriteWorkspace')
+}
+
 export function WorkspaceModeProvider({
   children,
   scheduleActive,
@@ -49,7 +54,9 @@ export function WorkspaceModeProvider({
   const [workspaceModeTabsPreviewView, setWorkspaceModeTabsPreviewView] = useState<
     'chat' | 'write'
   >(() => (workspaceModeTabsPreviewMode === 'write' ? 'write' : 'chat'))
-  const [productionWorkspaceMode, setProductionWorkspaceMode] = useState<'chat' | 'write'>('chat')
+  const [productionWorkspaceMode, setProductionWorkspaceMode] = useState<'chat' | 'write'>(() =>
+    resolveProductionWriteWorkspacePreview() ? 'write' : 'chat',
+  )
 
   const workspaceMode = useMemo((): WorkspaceModeView => {
     if (workspaceModeTabsPreviewMode !== null) return workspaceModeTabsPreviewView
