@@ -4,6 +4,7 @@
 
 import { type ReactElement, type ReactNode } from 'react'
 import { TriangleAlert } from 'lucide-react'
+import { SddRequirementRichSampleContent } from './SddRequirementBadges'
 import {
   WriteMarkdownEditor,
   WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE,
@@ -14,7 +15,7 @@ const COPY = {
     'This document uses Markdown features that are not fully supported in rich mode. Showing the source editor instead.',
 }
 
-export type WriteRichEditorPreviewMode = 'default' | 'readonly' | 'fallback'
+export type WriteRichEditorPreviewMode = 'default' | 'readonly' | 'fallback' | 'requirementBadges'
 
 /** Sample markdown backing the rich editor preview surface. */
 export const WRITE_RICH_EDITOR_PREVIEW_SAMPLE = WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE
@@ -27,6 +28,8 @@ type Props = {
   fallback?: ReactNode
   /** Override the default TipTap-shaped sample document body. */
   sampleContent?: ReactNode
+  /** Static preview: render SDD requirement status pills on h3 headings. */
+  requirementBadges?: boolean
   onChange?: (value: string) => void
 }
 
@@ -146,6 +149,7 @@ export function WriteRichEditor({
   showFallback = false,
   fallback,
   sampleContent,
+  requirementBadges = false,
 }: Props): ReactElement {
   const fallbackSurface =
     fallback ?? (
@@ -177,7 +181,12 @@ export function WriteRichEditor({
         spellCheck={!readOnly}
         data-write-editor-mode="rich"
       >
-        {sampleContent ?? <WriteRichEditorSampleContent />}
+        {sampleContent ??
+          (requirementBadges ? (
+            <SddRequirementRichSampleContent />
+          ) : (
+            <WriteRichEditorSampleContent />
+          ))}
       </div>
     </div>
   )
@@ -195,6 +204,7 @@ export function WriteRichEditorPreview({ mode }: PreviewProps): ReactElement {
         <WriteRichEditor
           readOnly={mode === 'readonly'}
           showFallback={mode === 'fallback'}
+          requirementBadges={mode === 'requirementBadges'}
         />
       </div>
     </div>

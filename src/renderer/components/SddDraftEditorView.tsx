@@ -654,6 +654,7 @@ export function SddDraftEditorView({
           <WriteRichEditor
             readOnly={readOnly}
             showFallback={showRichFallback}
+            requirementBadges={!showRichFallback}
             fallback={
               <WriteMarkdownEditor
                 value={draft.content}

@@ -1455,7 +1455,7 @@ function HomePage() {
     return 'default'
   }, [])
 
-  // (?writeRichEditor=1|readonly|fallback).
+  // (?writeRichEditor=1|readonly|fallback|requirementBadges).
   const writeRichEditorPreviewMode = useMemo((): WriteRichEditorPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1463,6 +1463,7 @@ function HomePage() {
     const value = params.get('writeRichEditor')
     if (value === 'readonly') return 'readonly'
     if (value === 'fallback') return 'fallback'
+    if (value === 'requirementBadges') return 'requirementBadges'
     return 'default'
   }, [])
 
