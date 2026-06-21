@@ -169,6 +169,22 @@ export function resolveWriteWorkspaceInlineAgentPreviewMode(
   return null
 }
 
+/** Assistant panel modes exposed via ?productionWriteWorkspace (handled separately from snapshot modes). */
+export const PRODUCTION_WRITE_WORKSPACE_ASSISTANT_MODES = new Set<WriteWorkspaceViewPreviewMode>([
+  'assistant',
+  'assistantTimeline',
+  'assistantQuoted',
+  'assistantPdf',
+  'assistantNoFile',
+  'assistantStreaming',
+])
+
+export function isProductionWriteWorkspaceAssistantMode(
+  mode: WriteWorkspaceViewPreviewMode,
+): boolean {
+  return PRODUCTION_WRITE_WORKSPACE_ASSISTANT_MODES.has(mode)
+}
+
 export function resolveProductionWriteWorkspaceSnapshotMode(
   searchParams?: URLSearchParams | null,
 ): WriteWorkspaceViewPreviewMode {
@@ -176,5 +192,17 @@ export function resolveProductionWriteWorkspaceSnapshotMode(
   if (value && PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES.has(value as WriteWorkspaceViewPreviewMode)) {
     return value as WriteWorkspaceViewPreviewMode
   }
+  return 'split'
+}
+
+/** Full production mode including assistant variants that need document-pane snapshots. */
+export function resolveProductionWriteWorkspaceMode(
+  searchParams?: URLSearchParams | null,
+): WriteWorkspaceViewPreviewMode {
+  const value = resolveProductionWriteWorkspaceParam(searchParams)
+  if (!value) return 'split'
+  const mode = value as WriteWorkspaceViewPreviewMode
+  if (PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES.has(mode)) return mode
+  if (PRODUCTION_WRITE_WORKSPACE_ASSISTANT_MODES.has(mode)) return mode
   return 'split'
 }

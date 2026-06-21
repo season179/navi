@@ -44,7 +44,8 @@ import { RuntimeBanner, RUNTIME_BANNER_PREVIEW, type RuntimeBannerSnapshot } fro
 import { useWriteSplitScrollSync } from './useWriteSplitScrollSync'
 import {
   resolveProductionWriteWorkspaceParam,
-  resolveProductionWriteWorkspaceSnapshotMode,
+  resolveProductionWriteWorkspaceMode,
+  PRODUCTION_WRITE_WORKSPACE_ASSISTANT_MODES,
   isWriteWorkspaceInlineAgentPreviewMode,
   resolveWriteWorkspaceInlineAgentPreviewMode,
   type WriteWorkspaceViewPreviewMode,
@@ -897,14 +898,7 @@ type PreviewProps = {
   mode: WriteWorkspaceViewPreviewMode
 }
 
-const ASSISTANT_PANEL_PREVIEW_MODES = new Set<WriteWorkspaceViewPreviewMode>([
-  'assistant',
-  'assistantTimeline',
-  'assistantQuoted',
-  'assistantPdf',
-  'assistantNoFile',
-  'assistantStreaming',
-])
+const ASSISTANT_PANEL_PREVIEW_MODES = PRODUCTION_WRITE_WORKSPACE_ASSISTANT_MODES
 
 function resolveProductionWriteAssistantPreviewOpen(): boolean {
   const value = resolveProductionWriteWorkspaceParam()
@@ -946,7 +940,7 @@ export function WriteWorkspaceProductionView({
   leftSidebarCollapsed: boolean
   onToggleLeftSidebar: () => void
 }): ReactElement {
-  const snapshotMode = useMemo(() => resolveProductionWriteWorkspaceSnapshotMode(), [])
+  const snapshotMode = useMemo(() => resolveProductionWriteWorkspaceMode(), [])
   const snapshot = useMemo(() => previewSnapshot(snapshotMode), [snapshotMode])
   const chrome = useMemo(
     () => writeWorkspaceViewChromeFromMode(snapshotMode, snapshot.previewMode),

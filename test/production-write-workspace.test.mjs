@@ -1,7 +1,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
+  PRODUCTION_WRITE_WORKSPACE_ASSISTANT_MODES,
   PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES,
+  resolveProductionWriteWorkspaceMode,
   resolveProductionWriteWorkspaceSnapshotMode,
 } from '../src/renderer/lib/writeWorkspacePreviewModes.ts'
 
@@ -19,6 +21,22 @@ test('defaults to split for unknown param values', () => {
 test('assistant modes are not snapshot modes (handled separately)', () => {
   assert.equal(
     resolveProductionWriteWorkspaceSnapshotMode(new URLSearchParams('productionWriteWorkspace=assistant')),
+    'split',
+  )
+})
+
+test('assistant modes resolve through production mode helper', () => {
+  for (const mode of PRODUCTION_WRITE_WORKSPACE_ASSISTANT_MODES) {
+    assert.equal(
+      resolveProductionWriteWorkspaceMode(new URLSearchParams(`productionWriteWorkspace=${mode}`)),
+      mode,
+    )
+  }
+})
+
+test('production mode defaults to split for unknown params', () => {
+  assert.equal(
+    resolveProductionWriteWorkspaceMode(new URLSearchParams('productionWriteWorkspace=unknown')),
     'split',
   )
 })
