@@ -16,6 +16,7 @@ import {
   FloatingComposerQueuedMessages,
   type QueuedComposerMessage,
 } from './FloatingComposerQueuedMessages'
+import { ComposerPlusMenu } from './FloatingComposer'
 import {
   ContextCapacityPopover,
   type ContextCapacity,
@@ -93,7 +94,9 @@ export function Composer({
   const contextCapacityRef = useRef<HTMLDivElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [focused, setFocused] = useState(false)
+  const [plusMenuOpen, setPlusMenuOpen] = useState(false)
   const [contextCapacityOpen, setContextCapacityOpen] = useState(false)
+  const plusMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!contextCapacityOpen) return
@@ -105,6 +108,21 @@ export function Composer({
     window.addEventListener('pointerdown', onPointerDown)
     return () => window.removeEventListener('pointerdown', onPointerDown)
   }, [contextCapacityOpen])
+
+  useEffect(() => {
+    if (!plusMenuOpen) return
+    const onPointerDown = (event: PointerEvent): void => {
+      const target = event.target
+      if (target instanceof Node && plusMenuRef.current?.contains(target)) return
+      setPlusMenuOpen(false)
+    }
+    window.addEventListener('pointerdown', onPointerDown)
+    return () => window.removeEventListener('pointerdown', onPointerDown)
+  }, [plusMenuOpen])
+
+  useEffect(() => {
+    if (pickerOpen) setPlusMenuOpen(false)
+  }, [pickerOpen])
 
   // Auto-grow the textarea up to its CSS max-height.
   useEffect(() => {
@@ -209,6 +227,11 @@ export function Composer({
         />
       ) : null}
       <div className="floating-composer-relative">
+        {!compact && plusMenuOpen && query === null ? (
+          <div ref={plusMenuRef}>
+            <ComposerPlusMenu />
+          </div>
+        ) : null}
         {!compact && pickerOpen && query !== null ? (
           <SkillPicker
             skills={skills ?? []}
@@ -242,9 +265,11 @@ export function Composer({
               <div className="floating-composer-toolbar-start">
                 <button
                   type="button"
-                  className="floating-composer-plus-btn"
+                  className={`floating-composer-plus-btn${plusMenuOpen ? ' is-open' : ''}`}
                   aria-label="Composer menu"
+                  aria-expanded={plusMenuOpen}
                   disabled={disabled}
+                  onClick={() => setPlusMenuOpen((open) => !open)}
                 >
                   <Plus strokeWidth={1.8} />
                 </button>

@@ -276,7 +276,7 @@ function ComposerImageAttachmentPreview({
   )
 }
 
-function ComposerPlusMenu(): ReactElement {
+export function ComposerPlusMenu(): ReactElement {
   return (
     <div className="floating-composer-plus-menu" role="menu" aria-label="Composer menu">
       <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
