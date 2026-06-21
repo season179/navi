@@ -131,6 +131,7 @@ import {
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
 import { WorkspaceSelectEmptyHero } from '../components/WorkspaceSelectEmptyHero'
+import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -476,6 +477,21 @@ function HomePage() {
     return params.has('workspaceSelectEmptyHero')
   }, [])
 
+  // Visual preview for the ported InitialSessionUsageHeatmap
+  // (?initialSessionUsageHeatmap=populated|loading|empty|error|collapsed|models).
+  const initialSessionUsageHeatmapPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('initialSessionUsageHeatmap')) return null
+    const mode = params.get('initialSessionUsageHeatmap')
+    if (mode === 'loading') return 'loading'
+    if (mode === 'empty') return 'empty'
+    if (mode === 'error') return 'error'
+    if (mode === 'collapsed') return 'collapsed'
+    if (mode === 'models') return 'models'
+    return 'populated'
+  }, [])
+
   // Visual preview for the ported ToolEntry (?toolEntry=1|running|error|command).
   const toolEntryPreview = useMemo((): {
     block: ToolBlockSnapshot
@@ -596,6 +612,8 @@ function HomePage() {
             />
           ) : workspaceSelectEmptyHeroPreview ? (
             <WorkspaceSelectEmptyHero />
+          ) : initialSessionUsageHeatmapPreviewMode ? (
+            <InitialSessionUsageHeatmap previewMode={initialSessionUsageHeatmapPreviewMode} />
           ) : (
             <div className="hero">
               <HeroStage />
