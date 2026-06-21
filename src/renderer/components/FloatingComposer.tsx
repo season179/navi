@@ -73,6 +73,7 @@ import {
   COMPOSER_ATTACHMENTS_PREVIEW,
   type ComposerImageAttachment,
 } from '../lib/composerAttachments'
+import { COMPOSER_GOAL_PREVIEW, type ComposerGoal } from '../lib/composerGoal'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
@@ -80,6 +81,8 @@ export type { ComposerFileReferenceChip } from '../lib/composerFileReferences'
 export { COMPOSER_FILE_REFERENCES_PREVIEW } from '../lib/composerFileReferences'
 export type { ComposerImageAttachment } from '../lib/composerAttachments'
 export { COMPOSER_ATTACHMENTS_PREVIEW } from '../lib/composerAttachments'
+export type { ComposerGoal } from '../lib/composerGoal'
+export { COMPOSER_GOAL_PREVIEW } from '../lib/composerGoal'
 
 export type FloatingComposerPreviewMode =
   | 'default'
@@ -125,12 +128,6 @@ type FileReferencePreview = ComposerFileReferenceChip
 
 type ChangedFilePreview = ComposerChangedFile
 
-type GoalPreview = {
-  objective: string
-  status: 'active' | 'paused'
-  elapsedLabel: string
-}
-
 export type FloatingComposerSnapshot = {
   input: string
   mode: 'plan' | 'agent'
@@ -149,7 +146,7 @@ export type FloatingComposerSnapshot = {
   recording: boolean
   planBadge: boolean
   goalBadge: boolean
-  goal: GoalPreview | null
+  goal: ComposerGoal | null
   slashCommands: SlashCommandPreview[]
   fileMentions: FileMentionPreview[]
   fileReferences: FileReferencePreview[]
@@ -222,12 +219,6 @@ const ATTACHMENTS_PREVIEW: ComposerImageAttachment[] = COMPOSER_ATTACHMENTS_PREV
 
 
 const CHANGED_FILES_PREVIEW: ChangedFilePreview[] = COMPOSER_CHANGE_SUMMARY_PREVIEW.files
-
-const GOAL_PREVIEW: GoalPreview = {
-  objective: 'Port Kun FloatingComposer visuals into navi',
-  status: 'active',
-  elapsedLabel: '12m',
-}
 
 function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`
@@ -402,7 +393,7 @@ export function ComposerFileMentionMenu({
   )
 }
 
-function ComposerGoalFloater({ goal }: { goal: GoalPreview }): ReactElement {
+export function ComposerGoalFloater({ goal }: { goal: ComposerGoal }): ReactElement {
   return (
     <div className="floating-composer-goal-floater">
       <div className="floating-composer-goal-floater-card">
@@ -432,7 +423,7 @@ function ComposerGoalFloater({ goal }: { goal: GoalPreview }): ReactElement {
   )
 }
 
-function ComposerGoalPanel({ goal }: { goal: GoalPreview | null }): ReactElement {
+export function ComposerGoalPanel({ goal }: { goal: ComposerGoal | null }): ReactElement {
   return (
     <div className="floating-composer-goal-panel">
       <div className="floating-composer-goal-panel-header">
@@ -611,9 +602,9 @@ export function resolveFloatingComposerSnapshot(
     case 'fileMention':
       return { ...base, input: 'Check @src/rend', showFileMentionMenu: true }
     case 'goalFloater':
-      return { ...base, showGoalFloater: true, goal: GOAL_PREVIEW, goalBadge: true }
+      return { ...base, showGoalFloater: true, goal: COMPOSER_GOAL_PREVIEW, goalBadge: true }
     case 'goalPanel':
-      return { ...base, showGoalPanel: true, goal: GOAL_PREVIEW, goalBadge: true }
+      return { ...base, showGoalPanel: true, goal: COMPOSER_GOAL_PREVIEW, goalBadge: true }
     case 'attachments':
       return {
         ...base,

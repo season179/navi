@@ -9,6 +9,7 @@ import {
 import { Composer } from '../components/Composer'
 import { COMPOSER_FILE_MENTION_PREVIEW, COMPOSER_FILE_REFERENCES_PREVIEW } from '../lib/composerFileReferences'
 import { COMPOSER_ATTACHMENTS_PREVIEW } from '../lib/composerAttachments'
+import { COMPOSER_GOAL_PREVIEW } from '../lib/composerGoal'
 import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
@@ -709,6 +710,21 @@ function HomePage() {
     }
     return COMPOSER_ATTACHMENTS_PREVIEW
   }, [])
+
+  // Visual preview for the ported ComposerGoalFloater (?composerGoalFloaterPreview=1).
+  const composerGoalFloaterPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return new URLSearchParams(window.location.search).has('composerGoalFloaterPreview')
+  }, [])
+
+  // Visual preview for the ported ComposerGoalPanel (?composerGoalPanelPreview=1).
+  const composerGoalPanelPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return new URLSearchParams(window.location.search).has('composerGoalPanelPreview')
+  }, [])
+
+  const composerGoalPreview =
+    composerGoalFloaterPreview || composerGoalPanelPreview ? COMPOSER_GOAL_PREVIEW : undefined
 
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
   const queuedMessagesPreview = useMemo(() => {
@@ -3755,6 +3771,10 @@ function HomePage() {
       changedStats={composerChangeSummaryPreview?.stats}
       fileReferences={composerFileReferencesPreview}
       attachments={composerAttachmentsPreview}
+      goal={composerGoalPreview}
+      showGoalFloater={composerGoalFloaterPreview}
+      showGoalPanel={composerGoalPanelPreview}
+      goalBadge={composerGoalFloaterPreview || composerGoalPanelPreview}
       modelChip={
         <FloatingModelPicker
           providers={providerProfiles}

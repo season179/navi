@@ -9,7 +9,7 @@
 // front-end shortcut only, never a backend trigger.
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
-import { Mic, Plus, Send, Sparkles, Square } from 'lucide-react'
+import { Mic, Plus, Send, Sparkles, Square, Target } from 'lucide-react'
 import { filterSkillSlashCommands } from '../lib/composerSlashCommands'
 import {
   filterWorkspaceFileMentionSuggestions,
@@ -20,6 +20,7 @@ import {
 } from '../lib/composerFileReferences'
 import type { ComposerChangedFile } from '../lib/composerChangeSummary'
 import type { ComposerImageAttachment } from '../lib/composerAttachments'
+import type { ComposerGoal } from '../lib/composerGoal'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import {
   FloatingComposerQueuedMessages,
@@ -32,6 +33,8 @@ import {
   ComposerChangeSummary,
   ComposerFileReferenceChips,
   ComposerImageAttachmentPreview,
+  ComposerGoalFloater,
+  ComposerGoalPanel,
   type ComposerSlashCommandItem,
   type ComposerFileMentionItem,
 } from './FloatingComposer'
@@ -88,6 +91,14 @@ interface ComposerProps {
   /** Image attachment previews shown below file-reference chips in Kun's composer shell. */
   attachments?: ComposerImageAttachment[]
   onRemoveAttachment?: (id: string) => void
+  /** Active thread goal shown in Kun's goal floater and panel overlays. */
+  goal?: ComposerGoal | null
+  /** When true, shows the goal floater banner above the composer shell. */
+  showGoalFloater?: boolean
+  /** When true, shows the goal panel overlay above the composer shell. */
+  showGoalPanel?: boolean
+  /** When true, shows the Goal badge beside the plus button in the toolbar. */
+  goalBadge?: boolean
 }
 
 /**
@@ -126,6 +137,10 @@ export function Composer({
   onRemoveFileReference,
   attachments,
   onRemoveAttachment,
+  goal,
+  showGoalFloater = false,
+  showGoalPanel = false,
+  goalBadge = false,
 }: ComposerProps) {
   const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -444,7 +459,10 @@ export function Composer({
         />
       ) : null}
       <div className="floating-composer-relative">
-        {!compact && plusMenuOpen && query === null ? (
+        {!compact && showGoalFloater && goal ? (
+          <ComposerGoalFloater goal={goal} />
+        ) : null}
+        {!compact && plusMenuOpen && query === null && !showGoalPanel ? (
           <div ref={plusMenuRef}>
             <ComposerPlusMenu />
           </div>
@@ -474,6 +492,9 @@ export function Composer({
               }
             />
           </div>
+        ) : null}
+        {!compact && showGoalPanel ? (
+          <ComposerGoalPanel goal={goal ?? null} />
         ) : null}
         <div className={shellClass}>
           {!compact && changedFiles && changedFiles.length > 0 ? (
@@ -531,6 +552,12 @@ export function Composer({
                 >
                   <Plus strokeWidth={1.8} />
                 </button>
+                {goalBadge ? (
+                  <span className="floating-composer-mode-badge">
+                    <Target strokeWidth={1.9} />
+                    <span>Goal</span>
+                  </span>
+                ) : null}
               </div>
             ) : null}
             <div className={toolbarEndClass}>
