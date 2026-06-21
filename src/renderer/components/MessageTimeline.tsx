@@ -523,3 +523,6 @@ export function MessageTimelinePreview({
     </div>
   )
 }
+
+export { summarizeToolBlock, toolFilePath } from '../lib/summarizeToolBlock'
+export type { SummarizeToolBlockInput, ToolSummaryLabelFn } from '../lib/summarizeToolBlock'

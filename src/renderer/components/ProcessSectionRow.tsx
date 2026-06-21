@@ -20,6 +20,11 @@ import {
 
 export type { ProcessOutputEntrySnapshot } from './ProcessOutputSection'
 import {
+  summarizeToolBlock,
+  toolFilePath,
+  type SummarizeToolBlockInput,
+} from '../lib/summarizeToolBlock'
+import {
   resolveProcessSectionTitle,
   splitSummaryVerb,
 } from './processSectionTitles'
@@ -117,6 +122,62 @@ const PREVIEW_PATCH = `--- a/src/auth/middleware.ts
 +  req.user = verifyToken(token)
    next()
  }`
+
+function toolSummaryPreviewEntry(
+  id: string,
+  block: SummarizeToolBlockInput,
+): ProcessStackEntrySnapshot {
+  const summary = summarizeToolBlock(block)
+  return {
+    id,
+    summary,
+    filePath: toolFilePath(block),
+    toolBlock: true,
+    collapsible: true,
+    expanded: false,
+  }
+}
+
+/** Kun MessageTimeline.tool-summary.test.ts cases as visual preview entries. */
+function buildToolSummaryPreviewEntries(): ProcessStackEntrySnapshot[] {
+  return [
+    toolSummaryPreviewEntry('read', {
+      summary: 'read: file',
+      meta: { toolName: 'read' },
+      filePath: '/tmp/readme.md',
+    }),
+    toolSummaryPreviewEntry('write', {
+      summary: 'write: file',
+      meta: { toolName: 'write' },
+      filePath: '/tmp/out.ts',
+    }),
+    toolSummaryPreviewEntry('edit', {
+      summary: 'edit: file',
+      meta: { toolName: 'edit' },
+      filePath: '/tmp/app.ts',
+    }),
+    toolSummaryPreviewEntry('grep', {
+      summary: 'grep: search',
+      meta: { toolName: 'grep', pattern: 'needle' },
+      filePath: '/tmp/src',
+    }),
+    toolSummaryPreviewEntry('find', {
+      summary: 'find: files',
+      meta: { toolName: 'find', pattern: '*.ts' },
+      filePath: '/tmp/src',
+    }),
+    toolSummaryPreviewEntry('ls', {
+      summary: 'ls: list',
+      meta: { toolName: 'ls' },
+      filePath: '/tmp/project',
+    }),
+    toolSummaryPreviewEntry('bash', {
+      summary: 'bash: exec',
+      toolKind: 'command_execution',
+      meta: { toolName: 'bash', command: 'npm test' },
+    }),
+  ]
+}
 
 /** Sample snapshots for ?processSectionRow preview hooks. */
 export const PROCESS_SECTION_ROW_PREVIEW = {
@@ -472,6 +533,13 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         filePath: 'package.json',
       },
     ],
+  },
+  executionToolSummaries: {
+    kind: 'execution',
+    title: 'Used 7 tools',
+    collapsible: true,
+    expanded: true,
+    stackEntries: buildToolSummaryPreviewEntries(),
   },
   output: {
     kind: 'output',

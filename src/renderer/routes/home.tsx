@@ -767,6 +767,7 @@ function HomePage() {
     if (mode === 'executionPendingShimmer') return 'executionPendingShimmer'
     if (mode === 'executionRedundantDetail') return 'executionRedundantDetail'
     if (mode === 'executionSystemMessages') return 'executionSystemMessages'
+    if (mode === 'executionToolSummaries') return 'executionToolSummaries'
     if (mode === 'error') return 'error'
     if (mode === 'output') return 'output'
     if (mode === 'outputStreaming') return 'outputStreaming'
@@ -4277,6 +4278,7 @@ function HomePage() {
               processSectionRowPreviewMode === 'executionUserInput' ||
               processSectionRowPreviewMode === 'executionRequestInput' ||
               processSectionRowPreviewMode === 'executionPendingShimmer' ||
+              processSectionRowPreviewMode === 'executionToolSummaries' ||
               processSectionRowPreviewMode === 'error'
                 ? true
                 : processSectionRowExpanded
