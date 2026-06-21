@@ -349,6 +349,10 @@ import {
   WriteMarkdownEditorPreview,
   type WriteMarkdownEditorPreviewMode,
 } from '../components/WriteMarkdownEditor'
+import {
+  WriteWorkspaceDocumentPanePreview,
+  type WriteWorkspaceDocumentPanePreviewMode,
+} from '../components/WriteWorkspaceDocumentPane'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -889,6 +893,28 @@ function HomePage() {
     if (value === 'selection') return 'selection'
     return 'default'
   }, [])
+
+  // Visual preview for the ported WriteWorkspaceDocumentPane
+  // (?writeWorkspaceDocumentPane=start|loading|image|pdf|unsupported|source|live|split|preview|largeFile|truncated).
+  const writeWorkspaceDocumentPanePreviewMode =
+    useMemo((): WriteWorkspaceDocumentPanePreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('writeWorkspaceDocumentPane')) return null
+      const value = params.get('writeWorkspaceDocumentPane')
+      if (value === 'start') return 'start'
+      if (value === 'loading') return 'loading'
+      if (value === 'image') return 'image'
+      if (value === 'pdf') return 'pdf'
+      if (value === 'unsupported') return 'unsupported'
+      if (value === 'source') return 'source'
+      if (value === 'live') return 'live'
+      if (value === 'split') return 'split'
+      if (value === 'preview') return 'preview'
+      if (value === 'largeFile') return 'largeFile'
+      if (value === 'truncated') return 'truncated'
+      return 'split'
+    }, [])
 
   // Visual preview for the ported InitialSessionUsageHeatmap
   // (?initialSessionUsageHeatmap=populated|loading|empty|error|collapsed|models).
@@ -1795,6 +1821,10 @@ function HomePage() {
 
   if (writePdfViewerPreviewMode) {
     return <WritePdfViewerPreview mode={writePdfViewerPreviewMode} />
+  }
+
+  if (writeWorkspaceDocumentPanePreviewMode) {
+    return <WriteWorkspaceDocumentPanePreview mode={writeWorkspaceDocumentPanePreviewMode} />
   }
 
   if (writeInlineAgentPreviewMode) {
