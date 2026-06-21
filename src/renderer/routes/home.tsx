@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
-import { TopBar } from '../components/TopBar'
+import { SidebarTitlebarToggleButton } from '../components/SidebarPrimitives'
 import {
   ContextCapacityPopover,
   CONTEXT_CAPACITY_PREVIEW,
@@ -169,6 +169,7 @@ import {
   SESSION_HEADER_PREVIEW,
   SESSION_HEADER_PREVIEW_EMPTY,
   type SessionHeaderPreviewMode,
+  type SessionHeaderSnapshot,
 } from '../components/SessionHeader'
 import {
   WorkbenchTopBar,
@@ -504,20 +505,13 @@ import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
 import { useSettings } from '../settings'
 
-function statusLabel(ready: boolean, hasProvider: boolean, error?: string): string {
-  if (!hasProvider) return 'needs provider'
-  if (error) return 'backend error'
-  if (!ready) return 'connecting…'
-  return 'ready'
-}
-
 // Which settings sub-panel is shown while the settings stage is open. Open/close
 // itself is owned by useSettings(); this only selects the tab.
 type SettingsTab = 'providers' | 'skills'
 
 function HomePage() {
   const { collapsed, toggle } = useSidebar()
-  const { settingsOpen, openSettings, closeSettings, toggleSettings } = useSettings()
+  const { settingsOpen, openSettings, closeSettings } = useSettings()
   const [draft, setDraft] = useState('')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('providers')
   const { messages, status, busy, send, cancel, activeSelection, pickModel, pickReasoning } =
@@ -531,6 +525,8 @@ function HomePage() {
     setDefaultSelection,
     projects,
     currentProjectId,
+    conversations,
+    currentId,
   } = useNaviList()
 
   const empty = messages.length === 0
@@ -2500,6 +2496,30 @@ function HomePage() {
     return proj?.path || undefined
   }, [projects, currentProjectId])
 
+  const productionSessionHeaderSnapshot = useMemo((): SessionHeaderSnapshot | null => {
+    const conversation = conversations.find((entry) => entry.id === currentId)
+    const project = projects.find((entry) => entry.id === currentProjectId)
+    const workspaceLabel = project?.label ?? project?.name ?? 'navi'
+
+    if (empty) {
+      return {
+        title: 'New conversation',
+        workspaceLabel,
+        workspacePath: projectPath,
+        mode: 'chat',
+        updatedAt: conversation?.updatedAt ?? Date.now(),
+      }
+    }
+
+    return {
+      title: conversation?.title?.trim() || 'Conversation',
+      workspaceLabel,
+      workspacePath: projectPath,
+      mode: 'chat',
+      updatedAt: conversation?.updatedAt ?? Date.now(),
+    }
+  }, [conversations, currentId, empty, projects, currentProjectId, projectPath])
+
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
   // toggles (a create/enable/disable in the Skills tab may have changed the set).
@@ -3079,14 +3099,30 @@ function HomePage() {
           <div className="topbar-actions">{renderWorkbenchTopBarPreview()}</div>
         </header>
       ) : (
-        <TopBar
-          title={empty ? 'New conversation' : 'Conversation'}
-          subtitle={statusLabel(status.ready, hasProvider, status.error)}
-          sidebarCollapsed={collapsed}
-          onToggleSidebar={toggle}
-          onOpenSettings={toggleSettings}
-          settingsActive={settingsOpen}
-        />
+        <header className="chat-topbar ds-topbar-surface">
+          <div className="chat-topbar-grid">
+            <div
+              className={`chat-topbar-session${
+                collapsed ? ' ds-window-controls-safe-inset' : ''
+              }`}
+            >
+              <SidebarTitlebarToggleButton
+                onClick={toggle}
+                title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              />
+              <SessionHeader
+                snapshot={productionSessionHeaderSnapshot}
+                compact
+                busy={busy}
+                className="workbench-session-header"
+              />
+            </div>
+            <div className="chat-topbar-actions">
+              {busy ? <span className="workbench-running-pill">Running</span> : null}
+              <WorkbenchTopBar planPanelEnabled />
+            </div>
+          </div>
+        </header>
       )}
 
       {sessionHeaderPreviewMode &&
