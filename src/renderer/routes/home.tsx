@@ -1443,7 +1443,7 @@ function HomePage() {
     }, [])
 
   // Visual preview for the ported WriteWorkspaceView
-  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|preview|pdf|image|inlineAgent|assistant|assistantTimeline|assistantQuoted|error|exportSuccess|exportError|dirty|saving).
+  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|preview|pdf|image|inlineAgent|assistant|assistantTimeline|assistantQuoted|runtimeBanner|error|exportSuccess|exportError|dirty|saving).
   const writeWorkspaceViewPreviewMode = useMemo((): WriteWorkspaceViewPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1461,6 +1461,7 @@ function HomePage() {
     if (value === 'assistant') return 'assistant'
     if (value === 'assistantTimeline') return 'assistantTimeline'
     if (value === 'assistantQuoted') return 'assistantQuoted'
+    if (value === 'runtimeBanner') return 'runtimeBanner'
     if (value === 'error') return 'error'
     if (value === 'exportSuccess') return 'exportSuccess'
     if (value === 'exportError') return 'exportError'

@@ -35,6 +35,7 @@ import {
   type WriteInlineAgentPosition,
 } from './WriteInlineAgent'
 import { WRITE_SETTINGS_PREVIEW_DEFAULT } from './WriteSettingsSection'
+import { RuntimeBanner, RUNTIME_BANNER_PREVIEW, type RuntimeBannerSnapshot } from './RuntimeBanner'
 
 export type WriteWorkspaceViewPreviewMode =
   | 'empty'
@@ -50,6 +51,7 @@ export type WriteWorkspaceViewPreviewMode =
   | 'assistant'
   | 'assistantTimeline'
   | 'assistantQuoted'
+  | 'runtimeBanner'
   | 'error'
   | 'exportSuccess'
   | 'exportError'
@@ -86,6 +88,7 @@ type WorkspaceSnapshot = {
   showInlineAgent: boolean
   fileError: string | null
   exportNotice: WriteNotice | null
+  runtimeBanner: RuntimeBannerSnapshot | null
 }
 
 const SAMPLE_PATH = '/Users/season/writing/docs/launch-plan.md'
@@ -115,6 +118,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     | 'showInlineAgent'
     | 'fileError'
     | 'exportNotice'
+    | 'runtimeBanner'
   > = {
     fileContent: WRITE_MARKDOWN_PREVIEW_SAMPLE,
     fileSize: 12_480,
@@ -149,6 +153,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
+      runtimeBanner: null,
       ...baseText,
     }
   }
@@ -189,6 +194,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
+      runtimeBanner: null,
       ...baseText,
     }
   }
@@ -222,6 +228,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
+      runtimeBanner: null,
       ...baseText,
     }
   }
@@ -255,6 +262,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
+      runtimeBanner: null,
       ...baseText,
     }
   }
@@ -301,6 +309,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
         : mode === 'exportError'
           ? { tone: 'error', message: 'Export failed. The file may be open elsewhere.' }
           : null,
+    runtimeBanner: mode === 'runtimeBanner' ? RUNTIME_BANNER_PREVIEW.default : null,
     ...baseText,
   }
 }
@@ -345,6 +354,7 @@ type ViewProps = {
   showInlineAgent?: boolean
   fileError?: string | null
   exportNotice?: WriteNotice | null
+  runtimeBanner?: RuntimeBannerSnapshot | null
   leftSidebarCollapsed?: boolean
   onToggleLeftSidebar?: () => void
   onPickWorkspace?: () => void
@@ -384,6 +394,7 @@ export function WriteWorkspaceView({
   showInlineAgent = false,
   fileError = null,
   exportNotice = null,
+  runtimeBanner = null,
   leftSidebarCollapsed = false,
   onToggleLeftSidebar,
   onPickWorkspace,
@@ -442,7 +453,13 @@ export function WriteWorkspaceView({
   }
 
   return (
-    <div className="write-workspace-view">
+    <div className="write-workspace-view ds-no-drag">
+      {runtimeBanner ? (
+        <RuntimeBanner
+          snapshot={runtimeBanner}
+          stageInsetClass="write-workspace-runtime-banner-inset"
+        />
+      ) : null}
       <WriteWorkspaceToolbar
         activeFileIsPdf={activeFileIsPdf}
         activeFileIsImage={activeFileIsImage}
@@ -598,6 +615,7 @@ export function WriteWorkspaceProductionView({
         showInlineAgent={snapshot.showInlineAgent}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}
+        runtimeBanner={snapshot.runtimeBanner}
         leftSidebarCollapsed={leftSidebarCollapsed}
         onToggleLeftSidebar={onToggleLeftSidebar}
         onPickWorkspace={() => undefined}
@@ -667,6 +685,7 @@ export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement 
         showInlineAgent={snapshot.showInlineAgent}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}
+        runtimeBanner={snapshot.runtimeBanner}
         leftSidebarCollapsed={leftSidebarCollapsed}
         onToggleLeftSidebar={() => setLeftSidebarCollapsed((open) => !open)}
         onPickWorkspace={() => undefined}
