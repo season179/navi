@@ -170,15 +170,21 @@ export function SettingsSidebar({
 
 export function SettingsSidebarPreviewContent({
   category,
+  showHeader = true,
 }: {
   category: SettingsCategory
+  showHeader?: boolean
 }): ReactElement {
   const label = COPY[SETTINGS_CATEGORIES.find((item) => item.id === category)?.labelKey ?? ''] ?? category
 
   return (
     <div className="settings-sidebar-preview-content">
-      <h1 className="settings-sidebar-preview-title">Settings</h1>
-      <p className="settings-sidebar-preview-subtitle">Configure {label.toLowerCase()} preferences.</p>
+      {showHeader ? (
+        <>
+          <h1 className="settings-sidebar-preview-title">Settings</h1>
+          <p className="settings-sidebar-preview-subtitle">Configure {label.toLowerCase()} preferences.</p>
+        </>
+      ) : null}
       {category === 'general' ? (
         <div className="general-settings-preview-stack">
           <GeneralSettingsSectionPreview />

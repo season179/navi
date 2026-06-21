@@ -17476,6 +17476,215 @@ button.usage-heatmap-cell:focus {
 }
 
 /* =====================================================
+   Settings view (Kun SettingsView.tsx)
+   ===================================================== */
+.settings-view {
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  display: flex;
+  min-height: 0;
+  width: 100%;
+  background: var(--ds-bg-main);
+}
+
+.settings-view-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 40px;
+}
+
+.settings-view-inner {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.settings-view-api-key-banner {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border: 1px solid rgba(252, 211, 77, 0.8);
+  border-radius: 16px;
+  background: rgba(255, 251, 235, 0.95);
+  color: #78350f;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme='dark'] .settings-view-api-key-banner {
+  border-color: rgba(180, 83, 9, 0.6);
+  background: rgba(69, 26, 3, 0.35);
+  color: #fef3c7;
+}
+
+.settings-view-api-key-banner-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.settings-view-api-key-banner-body {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(120, 53, 15, 0.9);
+}
+
+[data-theme='dark'] .settings-view-api-key-banner-body {
+  color: rgba(254, 243, 199, 0.9);
+}
+
+.settings-view-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.settings-view-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+}
+
+.settings-view-subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ds-text-muted);
+}
+
+.settings-view-save-status {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.settings-view-save-status.is-idle {
+  background: var(--ds-surface-subtle);
+  color: var(--ds-text-muted);
+}
+
+.settings-view-save-status.is-success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #047857;
+}
+
+[data-theme='dark'] .settings-view-save-status.is-success {
+  color: #6ee7b7;
+}
+
+.settings-view-save-status.is-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+[data-theme='dark'] .settings-view-save-status.is-warning {
+  color: #fcd34d;
+}
+
+.settings-view-save-status.is-error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #b91c1c;
+}
+
+[data-theme='dark'] .settings-view-save-status.is-error {
+  color: #fca5a5;
+}
+
+.settings-view-inline-error {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  border: 1px solid rgba(254, 202, 202, 1);
+  border-radius: 12px;
+  background: #fef2f2;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #991b1b;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme='dark'] .settings-view-inline-error {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.1);
+  color: #fecaca;
+}
+
+.settings-view-error-toast {
+  position: fixed;
+  right: 32px;
+  bottom: 24px;
+  z-index: 30;
+  display: flex;
+  max-width: min(560px, calc(100vw - 3rem));
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid rgba(252, 165, 165, 0.7);
+  border-radius: 16px;
+  background: rgba(254, 242, 242, 0.95);
+  color: #7f1d1d;
+  box-shadow:
+    0 25px 50px -12px rgba(127, 29, 29, 0.1),
+    0 0 0 1px rgba(127, 29, 29, 0.03);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme='dark'] .settings-view-error-toast {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(69, 10, 10, 0.9);
+  color: #fee2e2;
+}
+
+.settings-view-error-toast-copy {
+  min-width: 0;
+}
+
+.settings-view-error-toast-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-view-error-toast-message {
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: rgba(127, 29, 29, 0.85);
+}
+
+[data-theme='dark'] .settings-view-error-toast-message {
+  color: rgba(254, 226, 226, 0.8);
+}
+
+.settings-view-error-toast-retry {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  background: #dc2626;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  transition: background 0.14s ease;
+}
+
+.settings-view-error-toast-retry:hover:not(:disabled) {
+  background: #ef4444;
+}
+
+.settings-view-error-toast-retry:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* =====================================================
    Settings controls (Kun settings-controls.tsx)
    ===================================================== */
 .settings-control-select,

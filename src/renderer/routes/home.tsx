@@ -381,6 +381,10 @@ import {
   ScheduleTasksViewPreview,
   type ScheduleTasksPreviewMode,
 } from '../components/ScheduleTasksView'
+import {
+  SettingsViewPreview,
+  type SettingsViewPreviewMode,
+} from '../components/SettingsView'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -1016,6 +1020,23 @@ function HomePage() {
       if (value === 'singleProvider') return 'singleProvider'
       return 'default'
     }, [])
+
+  // Visual preview for the ported SettingsView
+  // (?settingsViewPreview=1|general|providers|noApiKey|saving|saved|error|portError|writeDebugModal).
+  const settingsViewPreviewMode = useMemo((): SettingsViewPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('settingsViewPreview')) return null
+    const value = params.get('settingsViewPreview')
+    if (!value || value === '1' || value === 'default') return 'default'
+    if (value === 'noApiKey') return 'noApiKey'
+    if (value === 'saving') return 'saving'
+    if (value === 'saved') return 'saved'
+    if (value === 'error') return 'error'
+    if (value === 'portError') return 'portError'
+    if (value === 'writeDebugModal') return 'writeDebugModal'
+    return value as SettingsViewPreviewMode
+  }, [])
 
   // Visual preview for the ported ScheduleTasksView
   // (?scheduleTasksViewPreview=1|empty|filterEmpty|loading|error|running|expandedResult|createDialog|editDialog|settingsDialog).
@@ -1976,6 +1997,10 @@ function HomePage() {
 
   if (clawAddImDialogPreviewMode) {
     return <ClawAddImDialogPreview mode={clawAddImDialogPreviewMode} />
+  }
+
+  if (settingsViewPreviewMode) {
+    return <SettingsViewPreview mode={settingsViewPreviewMode} />
   }
 
   if (scheduleTasksViewPreviewMode) {
