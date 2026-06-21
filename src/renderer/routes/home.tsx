@@ -3000,6 +3000,46 @@ function HomePage() {
     }
   }, [])
 
+  // Production ChatThread live SSE via ?productionLiveStream=latestTurnLiveStream|…
+  const productionChatLiveStream = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {
+        liveReasoning: undefined as string | undefined,
+        liveContent: undefined as string | undefined,
+      }
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionLiveStream')) {
+      return {
+        liveReasoning: undefined as string | undefined,
+        liveContent: undefined as string | undefined,
+      }
+    }
+    const mode = params.get('productionLiveStream')
+    if (mode === 'latestTurnLiveStream') {
+      return {
+        liveReasoning: 'Tracing token validation through the middleware stack…',
+        liveContent: 'The Bearer prefix check is failing before verifyToken runs.',
+      }
+    }
+    if (mode === 'latestTurnLiveReasoning') {
+      return {
+        liveReasoning: 'Reading auth.ts and following the verifyToken call chain…',
+        liveContent: undefined as string | undefined,
+      }
+    }
+    if (mode === 'latestTurnLiveContent') {
+      return {
+        liveReasoning: undefined as string | undefined,
+        liveContent: 'Normalizing the Authorization header before the JWT check…',
+      }
+    }
+    return {
+      liveReasoning: undefined as string | undefined,
+      liveContent: undefined as string | undefined,
+    }
+  }, [])
+
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
   // toggles (a create/enable/disable in the Skills tab may have changed the set).
@@ -3652,6 +3692,8 @@ function HomePage() {
         workProcessAtTurnIndex={productionChatWorkProcess.workProcessAtTurnIndex}
         workProcess={productionChatWorkProcess.workProcess}
         derivedTurnAtIndex={productionChatDerivedTurn.derivedTurnAtIndex}
+        liveReasoning={productionChatLiveStream.liveReasoning}
+        liveContent={productionChatLiveStream.liveContent}
       />
     </>
   )

@@ -10,6 +10,7 @@ import {
   type ReactElement,
 } from 'react'
 import type { ChatMessage } from '../flue/useNaviChat'
+import { applyChatTurnLiveStream } from '../lib/chatTurnLiveStream'
 import { buildDerivedIntermediateTurnPreview } from '../lib/buildMessageTurnSnapshot'
 import { goalTimelinePaddingClass } from './LiveTurnProgressRow'
 import {
@@ -279,6 +280,10 @@ type ChatThreadProps = TurnOverlayProps & {
   forkedFromTitle?: string
   /** Absolute turn index (0-based) at which the fork boundary marker is inserted. */
   forkBoundaryTurnIndex?: number
+  /** Timeline-level live stream override for the latest turn (preview hooks). */
+  liveReasoning?: string
+  liveContent?: string
+  hasActiveGoal?: boolean
 }
 
 export function ChatThread({
@@ -306,6 +311,9 @@ export function ChatThread({
   workProcessAtTurnIndex,
   workProcess,
   derivedTurnAtIndex,
+  liveReasoning,
+  liveContent,
+  hasActiveGoal = false,
 }: ChatThreadProps): ReactElement {
   const bottomRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -414,10 +422,20 @@ export function ChatThread({
           const showForkPoint =
             typeof forkBoundaryTurnIndex === 'number' &&
             forkBoundaryTurnIndex === absoluteTurnIndex
-          const turnSnapshot = applyTurnOverlays(
-            chatTurnToSnapshot(turn),
-            absoluteTurnIndex,
-            overlayProps,
+          const isLatestVisibleTurn = index === visibleTurns.length - 1
+          const turnSnapshot = applyChatTurnLiveStream(
+            applyTurnOverlays(
+              chatTurnToSnapshot(turn),
+              absoluteTurnIndex,
+              overlayProps,
+            ),
+            turn,
+            {
+              isLatestTurn: isLatestVisibleTurn,
+              busy,
+              liveReasoning: isLatestVisibleTurn ? liveReasoning : undefined,
+              liveContent: isLatestVisibleTurn ? liveContent : undefined,
+            },
           )
 
           return (
@@ -433,7 +451,11 @@ export function ChatThread({
               className="message-timeline-turn-anchor scroll-mt-6"
             >
               {showForkPoint ? <ThreadForkPoint parentTitle={forkedFromTitle} /> : null}
-              <MessageTurn turn={turnSnapshot} viewportRef={containerRef} />
+              <MessageTurn
+                turn={turnSnapshot}
+                viewportRef={containerRef}
+                hasActiveGoal={hasActiveGoal}
+              />
             </div>
           )
         })}
@@ -442,6 +464,25 @@ export function ChatThread({
         forkBoundaryTurnIndex === totalTurns &&
         totalTurns > 0 ? (
           <ThreadForkPoint parentTitle={forkedFromTitle} />
+        ) : null}
+
+        {totalTurns === 0 &&
+        (liveReasoning?.trim() || liveContent?.trim()) ? (
+          <div className="message-timeline-turn-anchor scroll-mt-6">
+            <MessageTurn
+              turn={{
+                key: 'live-empty-turn',
+                source: {
+                  blocks: [],
+                  isProcessing: busy,
+                  liveReasoning: liveReasoning ?? '',
+                  liveContent: liveContent ?? '',
+                },
+              }}
+              viewportRef={containerRef}
+              hasActiveGoal={hasActiveGoal}
+            />
+          </div>
         ) : null}
 
         {hiddenTurnCount === 0 ? (
