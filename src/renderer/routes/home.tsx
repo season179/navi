@@ -1461,7 +1461,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported WriteMarkdownEditor
-  // (?writeMarkdownEditor=1|source|readonly|diffReview|inlineCompletion|inlineEdit|infographic|infographicStale|infographicDesign|infographicPrototype|htmlEmbed|imageError|loadedImage).
+  // (?writeMarkdownEditor=1|source|readonly|diffReview|inlineCompletion|inlineEdit|infographic|infographicStale|infographicDesign|infographicPrototype|htmlEmbed|htmlEmbedLoaded|htmlEmbedError|htmlEmbedMissing|imageError|loadedImage).
   const writeMarkdownEditorPreviewMode = useMemo((): WriteMarkdownEditorPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)

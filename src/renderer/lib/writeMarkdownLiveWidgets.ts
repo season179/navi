@@ -7,7 +7,10 @@ import {
   highlightCodeHtml,
   renderFallbackCodeHtml,
 } from './code-highlighting'
-import { createHtmlEmbedElement } from './writeHtmlEmbedDom'
+import {
+  createHtmlEmbedElement,
+  type HtmlEmbedVisualState,
+} from './writeHtmlEmbedDom'
 import {
   createInfographicPendingElement,
   type InfographicPendingKind,
@@ -224,18 +227,24 @@ export class HtmlEmbedWidget extends WidgetType {
   constructor(
     private rawSrc: string,
     private alt: string,
+    private visualState?: HtmlEmbedVisualState,
   ) {
     super()
   }
 
   eq(other: HtmlEmbedWidget): boolean {
-    return other.rawSrc === this.rawSrc
+    return other.rawSrc === this.rawSrc && other.visualState === this.visualState
   }
 
   toDOM(): HTMLElement {
     const wrapper = document.createElement('span')
     wrapper.className = 'cm-write-md-image-wrap'
-    wrapper.appendChild(createHtmlEmbedElement({ rawSrc: this.rawSrc, alt: this.alt }))
+    wrapper.appendChild(
+      createHtmlEmbedElement(
+        { rawSrc: this.rawSrc, alt: this.alt },
+        this.visualState ? { visualState: this.visualState } : undefined,
+      ),
+    )
     return wrapper
   }
 }

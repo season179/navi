@@ -53,6 +53,9 @@ export type WriteMarkdownEditorPreviewMode =
   | 'infographicDesign'
   | 'infographicPrototype'
   | 'htmlEmbed'
+  | 'htmlEmbedLoaded'
+  | 'htmlEmbedError'
+  | 'htmlEmbedMissing'
   | 'imageError'
   | 'loadedImage'
 

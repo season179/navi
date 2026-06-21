@@ -621,11 +621,16 @@ function buildMarkdownDecorations(view: EditorView): DecorationSet {
             // happily build an ImageWidget for any extension and fail to load.
             const inlineImage = parseMarkdownImageSource(source)
             if (inlineImage && isHtmlEmbedSrc(inlineImage.rawSrc)) {
+              const htmlEmbedOverride = view.state.facet(livePreviewWidgetOverridesFacet)?.htmlEmbed
               ranges.push({
                 from: node.from,
                 to: node.to,
                 deco: Decoration.replace({
-                  widget: new HtmlEmbedWidget(inlineImage.rawSrc, inlineImage.alt),
+                  widget: new HtmlEmbedWidget(
+                    inlineImage.rawSrc,
+                    inlineImage.alt,
+                    htmlEmbedOverride?.visualState,
+                  ),
                 }),
               })
               return false

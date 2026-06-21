@@ -268,6 +268,9 @@ export type WriteMarkdownEditorImageWidgetPreviewMode =
   | 'infographicDesign'
   | 'infographicPrototype'
   | 'htmlEmbed'
+  | 'htmlEmbedLoaded'
+  | 'htmlEmbedError'
+  | 'htmlEmbedMissing'
   | 'imageError'
   | 'loadedImage'
 
@@ -291,6 +294,9 @@ export function isWriteMarkdownEditorImageWidgetMode(
     value === 'infographicDesign' ||
     value === 'infographicPrototype' ||
     value === 'htmlEmbed' ||
+    value === 'htmlEmbedLoaded' ||
+    value === 'htmlEmbedError' ||
+    value === 'htmlEmbedMissing' ||
     value === 'imageError' ||
     value === 'loadedImage'
   )
@@ -308,6 +314,14 @@ export function editorWidgetOverridesForImageWidgetMode(
   ) {
     return widgetOverridesForPreviewMode(mode)
   }
+  if (
+    mode === 'htmlEmbed' ||
+    mode === 'htmlEmbedLoaded' ||
+    mode === 'htmlEmbedError' ||
+    mode === 'htmlEmbedMissing'
+  ) {
+    return widgetOverridesForPreviewMode(mode)
+  }
   return undefined
 }
 
@@ -316,7 +330,14 @@ export function editorPreviewContentForImageWidgetMode(
   mode: WriteMarkdownEditorImageWidgetPreviewMode,
 ): string {
   if (mode === 'infographic') return WRITE_MARKDOWN_PREVIEW_INFOGRAPHIC_SAMPLE
-  if (mode === 'htmlEmbed') return WRITE_MARKDOWN_PREVIEW_HTML_EMBED_SAMPLE
+  if (
+    mode === 'htmlEmbed' ||
+    mode === 'htmlEmbedLoaded' ||
+    mode === 'htmlEmbedError' ||
+    mode === 'htmlEmbedMissing'
+  ) {
+    return WRITE_MARKDOWN_PREVIEW_HTML_EMBED_SAMPLE
+  }
   if (mode === 'imageError') return WRITE_MARKDOWN_PREVIEW_IMAGE_ERROR_SAMPLE
   return WRITE_MARKDOWN_EDITOR_LOADED_IMAGE_SAMPLE
 }
