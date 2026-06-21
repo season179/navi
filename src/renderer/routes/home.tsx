@@ -385,6 +385,10 @@ import {
   SettingsViewPreview,
   type SettingsViewPreviewMode,
 } from '../components/SettingsView'
+import {
+  InitialSetupDialogPreview,
+  type InitialSetupDialogPreviewMode,
+} from '../components/InitialSetupDialog'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -1019,6 +1023,27 @@ function HomePage() {
       if (value === 'empty') return 'empty'
       if (value === 'singleProvider') return 'singleProvider'
       return 'default'
+    }, [])
+
+  // Visual preview for the ported InitialSetupDialog
+  // (?initialSetupDialogPreview=1|preview|minimax|xiaomi|filled|saving|error|loading|wireSuccess|wireWarning).
+  const initialSetupDialogPreviewMode =
+    useMemo((): InitialSetupDialogPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('initialSetupDialogPreview')) return null
+      const value = params.get('initialSetupDialogPreview')
+      if (!value || value === '1' || value === 'default') return 'default'
+      if (value === 'preview') return 'preview'
+      if (value === 'minimax') return 'minimax'
+      if (value === 'xiaomi') return 'xiaomi'
+      if (value === 'filled') return 'filled'
+      if (value === 'saving') return 'saving'
+      if (value === 'error') return 'error'
+      if (value === 'loading') return 'loading'
+      if (value === 'wireSuccess') return 'wireSuccess'
+      if (value === 'wireWarning') return 'wireWarning'
+      return value as InitialSetupDialogPreviewMode
     }, [])
 
   // Visual preview for the ported SettingsView
@@ -1997,6 +2022,10 @@ function HomePage() {
 
   if (clawAddImDialogPreviewMode) {
     return <ClawAddImDialogPreview mode={clawAddImDialogPreviewMode} />
+  }
+
+  if (initialSetupDialogPreviewMode) {
+    return <InitialSetupDialogPreview mode={initialSetupDialogPreviewMode} />
   }
 
   if (settingsViewPreviewMode) {
