@@ -8469,6 +8469,15 @@ a.runtime-meta-chip:hover {
   color: var(--ds-text-faint);
 }
 
+.write-assistant-body .message-timeline {
+  min-height: 100%;
+}
+
+.write-assistant-body .message-timeline-content.ds-chat-column-inset {
+  max-width: none;
+  padding: 1.25rem clamp(1.45rem, 4.2vw, 2.35rem) 1.35rem;
+}
+
 .write-assistant-timeline.ds-chat-column-inset {
   max-width: none;
   padding: 1.25rem clamp(1.45rem, 4.2vw, 2.35rem) 1.35rem;

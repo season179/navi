@@ -22,7 +22,8 @@ import {
   Square,
   X,
 } from 'lucide-react'
-import { Markdown } from './Markdown'
+import { MessageTimeline } from './MessageTimeline'
+import { type MessageTurnSnapshot } from './MessageTurn'
 
 export type WriteAssistantQuotedSelection = {
   id: string
@@ -255,32 +256,90 @@ function WriteAssistantCompactComposer({
   )
 }
 
+function writeAssistantBlocksToTurns(
+  blocks: WriteAssistantTimelineBlock[],
+  options?: { busy?: boolean; liveAssistant?: string },
+): MessageTurnSnapshot[] {
+  const turns: MessageTurnSnapshot[] = []
+
+  for (const block of blocks) {
+    if (block.kind === 'user') {
+      turns.push({
+        key: block.id,
+        user: {
+          kind: 'user',
+          id: block.id,
+          text: block.text,
+          canEdit: false,
+          route: 'write',
+        },
+        assistantBlocks: [],
+      })
+      continue
+    }
+
+    if (turns.length === 0) {
+      turns.push({
+        key: block.id,
+        assistantBlocks: [{ kind: 'assistant', id: block.id, text: block.text }],
+      })
+      continue
+    }
+
+    const last = turns[turns.length - 1]
+    turns[turns.length - 1] = {
+      ...last,
+      assistantBlocks: [
+        ...(last.assistantBlocks ?? []),
+        { kind: 'assistant', id: block.id, text: block.text },
+      ],
+    }
+  }
+
+  const busy = options?.busy === true
+  const liveText = options?.liveAssistant?.trim() ?? ''
+  if (turns.length === 0) return turns
+
+  const lastIndex = turns.length - 1
+  const last = turns[lastIndex]
+  turns[lastIndex] = {
+    ...last,
+    processing: busy,
+    liveAssistant: liveText
+      ? {
+          kind: 'assistant',
+          id: 'live-assistant',
+          text: liveText,
+          streaming: true,
+        }
+      : undefined,
+    showLiveProgress: busy && !liveText,
+  }
+
+  return turns
+}
+
 function WriteAssistantTimeline({
   blocks,
   liveAssistant,
+  busy = false,
 }: {
   blocks: WriteAssistantTimelineBlock[]
   liveAssistant?: string
+  busy?: boolean
 }): ReactElement {
+  const turns = useMemo(
+    () => writeAssistantBlocksToTurns(blocks, { busy, liveAssistant }),
+    [blocks, busy, liveAssistant],
+  )
+
   return (
-    <div className="write-assistant-timeline ds-chat-column-inset">
-      {blocks.map((block) =>
-        block.kind === 'user' ? (
-          <div key={block.id} className="ds-user-message">
-            <div className="ds-user-message-bubble">{block.text}</div>
-          </div>
-        ) : (
-          <div key={block.id} className="ds-chat-answer">
-            <Markdown text={block.text} streaming={false} />
-          </div>
-        ),
-      )}
-      {liveAssistant?.trim() ? (
-        <div className="ds-chat-answer">
-          <span>{liveAssistant}</span>
-        </div>
-      ) : null}
-    </div>
+    <MessageTimeline
+      hasContent
+      activeThreadId="write-assistant"
+      turns={turns}
+      compactCards
+    />
   )
 }
 
@@ -443,7 +502,11 @@ export function WriteAssistantPanel({
 
       <div className="write-assistant-body">
         {hasTimeline ? (
-          <WriteAssistantTimeline blocks={blocks} liveAssistant={liveAssistant} />
+          <WriteAssistantTimeline
+            blocks={blocks}
+            liveAssistant={liveAssistant}
+            busy={busy}
+          />
         ) : (
           <WriteAssistantEmptyBody
             activeFileLabel={activeFileLabel}

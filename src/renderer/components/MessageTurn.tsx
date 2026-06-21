@@ -62,11 +62,14 @@ function MessageTurnImpl({
   turn,
   viewportRef,
   hasActiveGoal = false,
+  compactCards = false,
 }: {
   turn: MessageTurnSnapshot
   viewportRef?: RefObject<HTMLDivElement | null>
   /** Matches Kun activeThreadGoal for LiveTurnProgressRow spacing. */
   hasActiveGoal?: boolean
+  /** Kun WriteAssistantPanel passes compactCards for narrower TurnChangeSummary. */
+  compactCards?: boolean
 }): ReactElement {
   const resolved: MessageTurnSnapshot = useMemo(() => {
     if (!turn.source) return turn
@@ -176,7 +179,7 @@ function MessageTurnImpl({
       {!processing && resolved.changes?.length ? (
         <TurnChangeSummary
           changes={resolved.changes}
-          compact={resolved.changesCompact ?? resolved.compactCards}
+          compact={resolved.changesCompact ?? resolved.compactCards ?? compactCards}
           defaultExpanded={resolved.changesDefaultExpanded}
           viewportRef={viewportRef}
         />

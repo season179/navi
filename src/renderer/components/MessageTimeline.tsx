@@ -75,6 +75,8 @@ export type MessageTimelineSnapshot = {
   /** Kun renders a live turn when blocks are empty but SSE has started. */
   liveReasoning?: string
   liveContent?: string
+  /** Kun WriteAssistantPanel sets this for narrower turn cards in the 360px sidebar. */
+  compactCards?: boolean
   turns: MessageTurnSnapshot[]
 }
 
@@ -107,6 +109,7 @@ export function MessageTimeline({
   jumpAnchors,
   liveReasoning = '',
   liveContent = '',
+  compactCards = false,
   turns,
 }: MessageTimelineProps): ReactElement {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -188,6 +191,7 @@ export function MessageTimeline({
                 turn={resolvedTurn}
                 viewportRef={containerRef}
                 hasActiveGoal={hasActiveGoal}
+                compactCards={compactCards}
               />
             </div>
           )
