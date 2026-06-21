@@ -2633,6 +2633,547 @@ a.runtime-meta-chip:hover {
 }
 
 /* =====================================================
+   User input bubble (Kun UserInputBubble)
+   ===================================================== */
+.user-input-bubble {
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--ds-accent) 24%, transparent);
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  background: color-mix(in srgb, var(--ds-card) 95%, transparent);
+  color: var(--ds-text);
+  box-shadow: 0 14px 36px rgba(20, 47, 95, 0.055);
+}
+
+.user-input-bubble.is-nested {
+  border-radius: 14px;
+  padding: 12px 14px;
+  line-height: 1.25;
+  box-shadow: 0 8px 22px rgba(20, 47, 95, 0.035);
+}
+
+.user-input-bubble.tone-error {
+  border-color: rgba(252, 165, 165, 0.7);
+  background: color-mix(in srgb, var(--ds-card) 90%, transparent);
+}
+
+[data-theme='dark'] .user-input-bubble.tone-error {
+  border-color: rgba(153, 27, 27, 0.6);
+  background: rgba(69, 10, 10, 0.2);
+}
+
+.user-input-bubble.is-nested.tone-error {
+  border-color: rgba(252, 165, 165, 0.65);
+  background: color-mix(in srgb, var(--ds-card) 88%, transparent);
+}
+
+[data-theme='dark'] .user-input-bubble.is-nested.tone-error {
+  border-color: rgba(153, 27, 27, 0.55);
+  background: rgba(69, 10, 10, 0.2);
+}
+
+.user-input-bubble.tone-success {
+  border-color: rgba(16, 185, 129, 0.24);
+  background: color-mix(in srgb, var(--ds-card) 90%, transparent);
+}
+
+[data-theme='dark'] .user-input-bubble.tone-success {
+  border-color: rgba(5, 150, 105, 0.32);
+  background: color-mix(in srgb, var(--ds-card) 84%, transparent);
+}
+
+.user-input-bubble.is-nested.tone-success {
+  border-color: rgba(16, 185, 129, 0.22);
+  background: color-mix(in srgb, var(--ds-card) 88%, transparent);
+}
+
+[data-theme='dark'] .user-input-bubble.is-nested.tone-success {
+  border-color: rgba(5, 150, 105, 0.3);
+  background: color-mix(in srgb, var(--ds-card) 82%, transparent);
+}
+
+.user-input-bubble.tone-muted {
+  border-color: var(--ds-border);
+  background: color-mix(in srgb, var(--ds-card) 82%, transparent);
+}
+
+.user-input-bubble.is-nested.tone-muted {
+  border-color: var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-card) 78%, transparent);
+}
+
+.user-input-bubble-header {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.user-input-bubble-header-main {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.user-input-bubble-icon-frame {
+  display: flex;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ds-accent) 20%, transparent);
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+  color: var(--ds-accent);
+}
+
+.user-input-bubble.tone-error .user-input-bubble-icon-frame {
+  border-color: rgba(252, 165, 165, 0.6);
+  background: rgba(239, 68, 68, 0.1);
+  color: #b91c1c;
+}
+
+[data-theme='dark'] .user-input-bubble.tone-error .user-input-bubble-icon-frame {
+  border-color: rgba(153, 27, 27, 0.45);
+  color: #fca5a5;
+}
+
+.user-input-bubble.tone-success .user-input-bubble-icon-frame {
+  border-color: rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+}
+
+[data-theme='dark'] .user-input-bubble.tone-success .user-input-bubble-icon-frame {
+  color: #6ee7b7;
+}
+
+.user-input-bubble.tone-muted .user-input-bubble-icon-frame {
+  border-color: var(--ds-border-muted);
+  background: var(--ds-subtle);
+  color: var(--ds-text-muted);
+}
+
+.user-input-bubble-status-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.user-input-bubble-status-icon.is-spin {
+  animation: navi-spin 1s linear infinite;
+}
+
+.user-input-bubble-status-icon.is-error {
+  display: flex;
+  width: 14px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid currentColor;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.user-input-bubble-status-icon.is-muted-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+.user-input-bubble-title-wrap {
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.user-input-bubble-title {
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.user-input-bubble-status {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.user-input-bubble-status.tone-active {
+  color: var(--ds-accent);
+}
+
+.user-input-bubble-status.tone-success {
+  color: #047857;
+}
+
+[data-theme='dark'] .user-input-bubble-status.tone-success {
+  color: #6ee7b7;
+}
+
+.user-input-bubble-status.tone-error {
+  color: #b91c1c;
+}
+
+[data-theme='dark'] .user-input-bubble-status.tone-error {
+  color: #fca5a5;
+}
+
+.user-input-bubble-status.tone-muted {
+  color: var(--ds-text-muted);
+}
+
+.user-input-bubble-count {
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid var(--ds-border-muted);
+  background: var(--ds-subtle);
+  padding: 2px 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+}
+
+.user-input-bubble-questions {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-input-bubble-questions.is-nested {
+  margin-top: 12px;
+  gap: 10px;
+}
+
+.user-input-bubble-question {
+  min-width: 0;
+  border-radius: 12px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-bg-main) 45%, transparent);
+  padding: 12px;
+}
+
+.user-input-bubble-question.has-answer {
+  background: color-mix(in srgb, var(--ds-bg-main) 35%, transparent);
+}
+
+.user-input-bubble-question-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.user-input-bubble-question-meta-left {
+  min-width: 0;
+}
+
+.user-input-bubble-question-header {
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-text-muted);
+}
+
+.user-input-bubble-question-progress {
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--ds-card) 70%, transparent);
+  padding: 2px 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ds-text-faint);
+}
+
+.user-input-bubble-question-text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ds-text);
+}
+
+.user-input-bubble-question-text.has-meta {
+  margin-top: 8px;
+}
+
+.user-input-bubble-submitted-answer {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(16, 185, 129, 0.14);
+  background: color-mix(in srgb, var(--ds-card) 78%, transparent);
+  padding: 10px 12px;
+}
+
+.user-input-bubble-submitted-icon {
+  display: flex;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+
+[data-theme='dark'] .user-input-bubble-submitted-icon {
+  color: #6ee7b7;
+}
+
+.user-input-bubble-submitted-check {
+  width: 14px;
+  height: 14px;
+}
+
+.user-input-bubble-submitted-text {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ds-text);
+}
+
+.user-input-bubble-done-placeholder {
+  margin-top: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-card) 70%, transparent);
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+}
+
+.user-input-bubble-options {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.user-input-bubble-option {
+  display: flex;
+  min-width: 0;
+  gap: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-card) 78%, transparent);
+  padding: 10px 12px;
+  text-align: left;
+  color: var(--ds-text-muted);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.user-input-bubble-option:hover:not(:disabled) {
+  border-color: var(--ds-border);
+  background: var(--ds-card);
+  color: var(--ds-text);
+}
+
+.user-input-bubble-option.is-selected {
+  border-color: color-mix(in srgb, var(--ds-accent) 35%, transparent);
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+  color: var(--ds-text);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ds-accent) 10%, transparent);
+}
+
+.user-input-bubble-option:disabled {
+  cursor: default;
+}
+
+.user-input-bubble-option-radio {
+  display: flex;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  border-radius: 9999px;
+  border: 1px solid var(--ds-border);
+  background: transparent;
+  transition: border-color 0.15s ease;
+}
+
+.user-input-bubble-option:hover:not(:disabled) .user-input-bubble-option-radio:not(.is-selected) {
+  border-color: var(--ds-text-muted);
+}
+
+.user-input-bubble-option-radio.is-selected {
+  border-color: var(--ds-accent);
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+}
+
+.user-input-bubble-option-radio-dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--ds-accent);
+}
+
+.user-input-bubble-option-content {
+  min-width: 0;
+}
+
+.user-input-bubble-option-label {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.user-input-bubble-option-description {
+  display: block;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.25;
+  color: var(--ds-text-faint);
+}
+
+.user-input-bubble-freeform {
+  margin-top: 12px;
+}
+
+.user-input-bubble-textarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  border-radius: 10px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-card) 90%, transparent);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.25;
+  color: var(--ds-text);
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.user-input-bubble-textarea.is-compact {
+  min-height: 80px;
+}
+
+.user-input-bubble-textarea::placeholder {
+  color: var(--ds-text-faint);
+}
+
+.user-input-bubble-textarea:focus {
+  border-color: color-mix(in srgb, var(--ds-accent) 45%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ds-accent) 10%, transparent);
+}
+
+.user-input-bubble-textarea:disabled {
+  cursor: default;
+  opacity: 0.8;
+}
+
+.user-input-bubble-error-message {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+[data-theme='dark'] .user-input-bubble-error-message {
+  color: #fca5a5;
+}
+
+.user-input-bubble-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  border-top: 1px solid var(--ds-border-muted);
+  padding-top: 12px;
+}
+
+.user-input-bubble-submit {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 9px;
+  background: var(--ds-text);
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: opacity 0.15s ease;
+}
+
+[data-theme='dark'] .user-input-bubble-submit {
+  color: #000;
+}
+
+.user-input-bubble-submit:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.user-input-bubble-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.user-input-bubble-submit-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.user-input-bubble-cancel {
+  min-height: 32px;
+  border-radius: 9px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-card) 80%, transparent);
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.user-input-bubble-cancel:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.user-input-bubble-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  bottom: calc(var(--composer-offset, 120px) + 24px);
+  width: min(560px, calc(100vw - 48px));
+  transform: translateX(-50%);
+}
+
+/* =====================================================
    Media preview tile (Kun MediaPreviewTile)
    ===================================================== */
 .media-preview-tile {

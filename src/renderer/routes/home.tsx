@@ -94,6 +94,15 @@ import {
   CopyFeedbackButton,
   COPY_FEEDBACK_BUTTON_PREVIEW_TEXT,
 } from '../components/CopyFeedbackButton'
+import {
+  UserInputBubble,
+  USER_INPUT_BUBBLE_PREVIEW,
+  USER_INPUT_BUBBLE_PREVIEW_CANCELLED,
+  USER_INPUT_BUBBLE_PREVIEW_ERROR,
+  USER_INPUT_BUBBLE_PREVIEW_FREEFORM,
+  USER_INPUT_BUBBLE_PREVIEW_MULTI,
+  USER_INPUT_BUBBLE_PREVIEW_SUBMITTED,
+} from '../components/UserInputBubble'
 import { PencilLine } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -367,6 +376,20 @@ function HomePage() {
     if (mode === 'success') return 'success'
     if (mode === 'error') return 'error'
     return 'icon'
+  }, [])
+
+  // Visual preview for the ported UserInputBubble (?userInputBubble=1|freeform|submitted|cancelled|error|multi).
+  const userInputBubblePreviewSnapshot = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('userInputBubble')) return null
+    const mode = params.get('userInputBubble')
+    if (mode === 'freeform') return USER_INPUT_BUBBLE_PREVIEW_FREEFORM
+    if (mode === 'submitted') return USER_INPUT_BUBBLE_PREVIEW_SUBMITTED
+    if (mode === 'cancelled') return USER_INPUT_BUBBLE_PREVIEW_CANCELLED
+    if (mode === 'error') return USER_INPUT_BUBBLE_PREVIEW_ERROR
+    if (mode === 'multi') return USER_INPUT_BUBBLE_PREVIEW_MULTI
+    return USER_INPUT_BUBBLE_PREVIEW
   }, [])
 
   const composerFooterPreview =
@@ -834,6 +857,12 @@ function HomePage() {
               </div>
             </div>
           </div>
+        </div>
+      ) : null}
+
+      {userInputBubblePreviewSnapshot ? (
+        <div className="user-input-bubble-preview">
+          <UserInputBubble block={userInputBubblePreviewSnapshot} />
         </div>
       ) : null}
     </>
