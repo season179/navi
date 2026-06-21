@@ -27,6 +27,7 @@
   --accent: #3b82d8;
   --accent-soft: rgba(59, 130, 216, 0.15);
   --success: #128a4a;
+  --warning: #b06a16;
   --danger: #d6493f;
 
   /* Stage + topbar + sidebar layered surfaces */
@@ -119,6 +120,7 @@
   --ds-success-soft: rgba(17, 185, 129, 0.14);
   --ds-danger: var(--danger);
   --ds-danger-soft: rgba(244, 116, 100, 0.14);
+  --ds-warning: var(--warning);
   --ds-warning-soft: rgba(240, 162, 63, 0.16);
   --ds-selection: var(--selection);
   --ds-shadow-card-soft: var(--shadow-card-soft);
@@ -151,6 +153,7 @@
   --accent: #6fb0e8;
   --accent-soft: rgba(111, 176, 232, 0.18);
   --success: #40c977;
+  --warning: #f2b455;
   --danger: #f8736a;
 
   /* Stage + topbar + sidebar layered surfaces */
@@ -247,6 +250,7 @@
   --ds-success-soft: rgba(64, 201, 119, 0.18);
   --ds-danger: var(--danger);
   --ds-danger-soft: rgba(248, 115, 106, 0.18);
+  --ds-warning: var(--warning);
   --ds-warning-soft: rgba(242, 162, 63, 0.18);
   --ds-selection: var(--selection);
   --ds-shadow-card-soft: var(--shadow-card-soft);

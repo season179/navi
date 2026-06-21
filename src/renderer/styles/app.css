@@ -1338,8 +1338,9 @@ textarea {
 
 .provider-card {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   padding: 9px 10px;
   border: 1px solid transparent;
   border-radius: 10px;
@@ -1348,6 +1349,12 @@ textarea {
   cursor: pointer;
   text-align: left;
   transition: background 0.14s ease;
+}
+
+.provider-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .provider-card:hover {
@@ -1382,20 +1389,35 @@ textarea {
   border-radius: 999px;
 }
 
-.key-dot {
-  width: 8px;
-  height: 8px;
+/* Provider status pills (Kun's ProviderBadge). Text labels, not a colored dot,
+   so each state reads unambiguously: green "In use" = active provider; amber
+   warnings = a key problem. */
+.provider-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.provider-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 1px 8px;
   border-radius: 999px;
-  flex-shrink: 0;
+  border: 1px solid transparent;
+  white-space: nowrap;
 }
-.key-dot.key-ok {
-  background: var(--ds-success);
+.provider-badge.badge-success {
+  color: var(--ds-success);
+  background: var(--ds-success-soft);
+  border-color: var(--ds-success-soft);
 }
-.key-dot.key-absent {
-  background: var(--ds-text-placeholder);
-}
-.key-dot.key-unreadable {
-  background: var(--ds-danger);
+.provider-badge.badge-warning {
+  color: var(--ds-warning);
+  background: var(--ds-warning-soft);
+  border-color: var(--ds-warning-soft);
 }
 
 .provider-detail {

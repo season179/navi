@@ -11,6 +11,7 @@ import { SkillsSettings } from '../components/skills/SkillsSettings'
 import { hasUsableProvider, type SkillSummary } from '../../shared/flue'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
+import { useSettings } from '../settings'
 
 function statusLabel(ready: boolean, hasProvider: boolean, error?: string): string {
   if (!hasProvider) return 'needs provider'
@@ -19,14 +20,15 @@ function statusLabel(ready: boolean, hasProvider: boolean, error?: string): stri
   return 'ready'
 }
 
-// Which settings sub-panel is open. Null = no settings panel; the chat/hero
-// stage renders instead.
+// Which settings sub-panel is shown while the settings stage is open. Open/close
+// itself is owned by useSettings(); this only selects the tab.
 type SettingsTab = 'providers' | 'skills'
 
 function HomePage() {
   const { collapsed, toggle } = useSidebar()
+  const { settingsOpen, openSettings, closeSettings, toggleSettings } = useSettings()
   const [draft, setDraft] = useState('')
-  const [settingsTab, setSettingsTab] = useState<SettingsTab | null>(null)
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>('providers')
   const { messages, status, busy, send, cancel, activeSelection, pickModel, pickReasoning } =
     useNaviThread()
   const {
@@ -52,15 +54,22 @@ function HomePage() {
   }, [projects, currentProjectId])
 
   // Available skills for the composer `/skill` picker, scoped to the active
-  // project. Reloaded when the project changes or after the Skills panel closes
-  // (a create/enable/disable may have changed the set).
+  // project. Reloaded when the project changes or when the settings stage
+  // toggles (a create/enable/disable in the Skills tab may have changed the set).
   const [skills, setSkills] = useState<SkillSummary[]>([])
   const refreshSkills = useCallback(() => {
     void window.navi.flue.listSkills(projectPath).then(setSkills)
   }, [projectPath])
   useEffect(() => {
     refreshSkills()
-  }, [refreshSkills, settingsTab])
+  }, [refreshSkills, settingsOpen])
+
+  // Open the settings stage on a specific tab. The provider entry points always
+  // want the Providers tab, regardless of the last-selected one.
+  const openSettingsTab = (tab: SettingsTab) => {
+    setSettingsTab(tab)
+    openSettings()
+  }
 
   const handleSend = () => {
     const text = draft
@@ -75,13 +84,11 @@ function HomePage() {
         subtitle={statusLabel(status.ready, hasProvider, status.error)}
         sidebarCollapsed={collapsed}
         onToggleSidebar={toggle}
-        onOpenSettings={() =>
-          setSettingsTab((v) => (v === null ? 'providers' : null))
-        }
-        settingsActive={settingsTab !== null}
+        onOpenSettings={toggleSettings}
+        settingsActive={settingsOpen}
       />
 
-      {settingsTab !== null ? (
+      {settingsOpen ? (
         <div className="stage-scroll">
           <div className="providers-wrap">
             <div className="settings-tabs">
@@ -108,13 +115,10 @@ function HomePage() {
                 onDelete={removeProvider}
                 onSetDefault={setDefaultSelection}
                 onProbe={probeProvider}
-                onClose={() => setSettingsTab(null)}
+                onClose={closeSettings}
               />
             ) : (
-              <SkillsSettings
-                projectPath={projectPath}
-                onClose={() => setSettingsTab(null)}
-              />
+              <SkillsSettings projectPath={projectPath} onClose={closeSettings} />
             )}
           </div>
         </div>
@@ -127,7 +131,10 @@ function HomePage() {
               Navi is your local-first companion. Start a conversation below.
             </p>
             {!hasProvider ? (
-              <button className="btn btn-primary connect-provider" onClick={() => setSettingsTab('providers')}>
+              <button
+                className="btn btn-primary connect-provider"
+                onClick={() => openSettingsTab('providers')}
+              >
                 Connect a provider
               </button>
             ) : null}
@@ -159,7 +166,7 @@ function HomePage() {
             active={activeSelection}
             onPickModel={pickModel}
             onPickReasoning={pickReasoning}
-            onConfigure={() => setSettingsTab('providers')}
+            onConfigure={() => openSettingsTab('providers')}
           />
         }
       />
