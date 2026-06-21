@@ -34,3 +34,10 @@ test('routes save-status and dropdown preview modes', () => {
     'review',
   )
 })
+
+test('routes rich toolbar mode preview without opening mode menu', () => {
+  assert.equal(
+    resolveWriteWorkspaceToolbarPreviewMode(new URLSearchParams('writeWorkspaceToolbar=rich')),
+    'rich',
+  )
+})

@@ -502,7 +502,11 @@ function previewState(mode: WriteWorkspaceToolbarPreviewMode): {
   }
 
   const previewMode: WritePreviewMode =
-    mode === 'modeMenu' ? 'rich' : mode === 'exportMenu' ? 'live' : 'live'
+    mode === 'rich' || mode === 'modeMenu'
+      ? 'rich'
+      : mode === 'exportMenu'
+        ? 'live'
+        : 'live'
 
   return {
     activeFileIsPdf: false,
