@@ -194,6 +194,14 @@ import {
   type TerminalPreviewMode,
 } from '../components/TerminalPanel'
 import {
+  SideConversationPanel,
+  SIDE_CONVERSATION_PANEL_PREVIEW_ERROR,
+  SIDE_CONVERSATION_PANEL_PREVIEW_RUNNING,
+  SIDE_CONVERSATION_PANEL_PREVIEW_SIDES,
+  type SideConversationPanelPreviewMode,
+  type SideConversationSnapshot,
+} from '../components/SideConversationPanel'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -956,6 +964,75 @@ function HomePage() {
   }, [terminalPanelPreviewMode])
   const [terminalPanelPreviewOpen, setTerminalPanelPreviewOpen] = useState(true)
 
+  // Visual preview for the ported SideConversationPanel (?sideConversationPanelPreview=1|draft|minimized|running|error).
+  const sideConversationPanelPreviewMode = useMemo((): SideConversationPanelPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('sideConversationPanelPreview')) return null
+    const mode = params.get('sideConversationPanelPreview')
+    if (
+      mode === 'draft' ||
+      mode === 'minimized' ||
+      mode === 'running' ||
+      mode === 'error'
+    ) {
+      return mode
+    }
+    return 'default'
+  }, [])
+  const sideConversationPanelPreviewProps = useMemo(() => {
+    if (!sideConversationPanelPreviewMode) return null
+    if (sideConversationPanelPreviewMode === 'draft') {
+      return {
+        sides: [] as SideConversationSnapshot[],
+        activeSideId: null as string | null,
+        showDraft: true,
+        minimized: false,
+      }
+    }
+    if (sideConversationPanelPreviewMode === 'minimized') {
+      return {
+        sides: SIDE_CONVERSATION_PANEL_PREVIEW_SIDES,
+        activeSideId: SIDE_CONVERSATION_PANEL_PREVIEW_SIDES[0]?.threadId ?? null,
+        showDraft: false,
+        minimized: true,
+      }
+    }
+    if (sideConversationPanelPreviewMode === 'running') {
+      return {
+        sides: [SIDE_CONVERSATION_PANEL_PREVIEW_RUNNING],
+        activeSideId: SIDE_CONVERSATION_PANEL_PREVIEW_RUNNING.threadId,
+        showDraft: false,
+        minimized: false,
+      }
+    }
+    if (sideConversationPanelPreviewMode === 'error') {
+      return {
+        sides: [SIDE_CONVERSATION_PANEL_PREVIEW_ERROR],
+        activeSideId: SIDE_CONVERSATION_PANEL_PREVIEW_ERROR.threadId,
+        showDraft: false,
+        minimized: false,
+      }
+    }
+    return {
+      sides: SIDE_CONVERSATION_PANEL_PREVIEW_SIDES,
+      activeSideId: SIDE_CONVERSATION_PANEL_PREVIEW_SIDES[0]?.threadId ?? null,
+      showDraft: false,
+      minimized: false,
+    }
+  }, [sideConversationPanelPreviewMode])
+  const [sideConversationPanelPreviewActiveId, setSideConversationPanelPreviewActiveId] =
+    useState<string | null>(() => SIDE_CONVERSATION_PANEL_PREVIEW_SIDES[0]?.threadId ?? null)
+  const [sideConversationPanelPreviewMinimized, setSideConversationPanelPreviewMinimized] =
+    useState(false)
+  const [sideConversationPanelPreviewOpen, setSideConversationPanelPreviewOpen] = useState(true)
+  useEffect(() => {
+    if (!sideConversationPanelPreviewProps) return
+    setSideConversationPanelPreviewActiveId(sideConversationPanelPreviewProps.activeSideId)
+    setSideConversationPanelPreviewMinimized(sideConversationPanelPreviewProps.minimized)
+    setSideConversationPanelPreviewOpen(true)
+  }, [sideConversationPanelPreviewProps])
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -1262,6 +1339,26 @@ function HomePage() {
             error={terminalPanelPreviewProps.error}
             exited={terminalPanelPreviewProps.exited}
             onCollapse={() => setTerminalPanelPreviewOpen(false)}
+          />
+        </div>
+      ) : null}
+
+      {sideConversationPanelPreviewMode &&
+      sideConversationPanelPreviewProps &&
+      sideConversationPanelPreviewOpen ? (
+        <div className="side-conversation-panel-preview-wrap">
+          <SideConversationPanel
+            sides={sideConversationPanelPreviewProps.sides}
+            activeSideId={sideConversationPanelPreviewActiveId}
+            showDraft={sideConversationPanelPreviewProps.showDraft}
+            minimized={sideConversationPanelPreviewMinimized}
+            onSelectSide={setSideConversationPanelPreviewActiveId}
+            onMinimize={() => setSideConversationPanelPreviewMinimized(true)}
+            onExpand={() => setSideConversationPanelPreviewMinimized(false)}
+            onClose={() => setSideConversationPanelPreviewOpen(false)}
+            onNewDraft={() => {
+              setSideConversationPanelPreviewActiveId(null)
+            }}
           />
         </div>
       ) : null}
