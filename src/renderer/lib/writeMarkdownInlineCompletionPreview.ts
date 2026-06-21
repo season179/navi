@@ -129,11 +129,25 @@ export function resolveWriteMarkdownEditorPreviewMode(
 
 export function resolveWriteRichEditorPreviewMode(
   value: string | null,
-): 'default' | 'readonly' | 'fallback' | 'requirementBadges' | 'inlineCompletion' | 'inlineEdit' {
+):
+  | 'default'
+  | 'readonly'
+  | 'fallback'
+  | 'requirementBadges'
+  | 'inlineCompletion'
+  | 'inlineEdit'
+  | 'imageError'
+  | 'infographic'
+  | 'infographicStale'
+  | 'htmlEmbed' {
   if (value === 'readonly') return 'readonly'
   if (value === 'fallback') return 'fallback'
   if (value === 'requirementBadges') return 'requirementBadges'
   if (value === 'inlineCompletion') return 'inlineCompletion'
   if (value === 'inlineEdit') return 'inlineEdit'
+  if (value === 'imageError') return 'imageError'
+  if (value === 'infographic') return 'infographic'
+  if (value === 'infographicStale') return 'infographicStale'
+  if (value === 'htmlEmbed') return 'htmlEmbed'
   return 'default'
 }

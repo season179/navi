@@ -422,6 +422,7 @@ import {
   WriteRichEditorPreview,
   type WriteRichEditorPreviewMode,
 } from '../components/WriteRichEditor'
+import { resolveWriteRichEditorPreviewMode } from '../lib/writeMarkdownInlineCompletionPreview'
 import {
   WriteWorkspaceDocumentPanePreview,
   type WriteWorkspaceDocumentPanePreviewMode,
@@ -1488,18 +1489,12 @@ function HomePage() {
     return 'default'
   }, [])
 
-  // (?writeRichEditor=1|readonly|fallback|requirementBadges|inlineCompletion|inlineEdit).
+  // (?writeRichEditor=1|readonly|fallback|requirementBadges|inlineCompletion|inlineEdit|imageError|infographic|infographicStale|htmlEmbed).
   const writeRichEditorPreviewMode = useMemo((): WriteRichEditorPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
     if (!params.has('writeRichEditor')) return null
-    const value = params.get('writeRichEditor')
-    if (value === 'readonly') return 'readonly'
-    if (value === 'fallback') return 'fallback'
-    if (value === 'requirementBadges') return 'requirementBadges'
-    if (value === 'inlineCompletion') return 'inlineCompletion'
-    if (value === 'inlineEdit') return 'inlineEdit'
-    return 'default'
+    return resolveWriteRichEditorPreviewMode(params.get('writeRichEditor'))
   }, [])
 
   // Visual preview for the ported WriteWorkspaceDocumentPane

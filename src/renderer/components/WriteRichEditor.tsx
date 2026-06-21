@@ -5,6 +5,13 @@
 import { type ReactElement, type ReactNode } from 'react'
 import { TriangleAlert } from 'lucide-react'
 import { SddRequirementRichSampleContent } from './SddRequirementBadges'
+import { WriteHtmlEmbed } from './WriteHtmlEmbed'
+import { WriteInfographicPending } from './WriteInfographicPending'
+import {
+  imageWidgetSnapshotForMode,
+  type WriteRichEditorImageWidgetPreviewMode,
+  type WriteRichEditorImageWidgetSnapshot,
+} from '../lib/writeRichEditorImageWidgets'
 import {
   WriteMarkdownEditor,
   WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE,
@@ -22,6 +29,7 @@ export type WriteRichEditorPreviewMode =
   | 'requirementBadges'
   | 'inlineCompletion'
   | 'inlineEdit'
+  | WriteRichEditorImageWidgetPreviewMode
 
 /** Sample markdown backing the rich editor preview surface. */
 export const WRITE_RICH_EDITOR_PREVIEW_SAMPLE = WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE
@@ -38,6 +46,8 @@ type Props = {
   requirementBadges?: boolean
   /** Static preview: render Kun-matching inline AI ghost text or edit diff spans. */
   inlineCompletionPreview?: 'completion' | 'edit'
+  /** Static preview: render rich-editor image widget chrome. */
+  imageWidgetSnapshot?: WriteRichEditorImageWidgetSnapshot
   onChange?: (value: string) => void
 }
 
@@ -79,6 +89,62 @@ function WriteRichEditorInlineEditSampleContent(): ReactElement {
           <p>Keep code blocks, tables, and task lists readable</p>
         </li>
       </ul>
+    </>
+  )
+}
+
+function WriteRichEditorImageWidgetsSampleContent({
+  snapshot,
+}: {
+  snapshot: WriteRichEditorImageWidgetSnapshot
+}): ReactElement {
+  return (
+    <>
+      <h1>Launch plan draft</h1>
+      <p>
+        Kun&apos;s rich editor mounts infographic placeholders, HTML prototype cards, and
+        workspace images through WriteLocalImage node views.
+      </p>
+      {snapshot.infographic ? (
+        <>
+          <h2>Infographic placeholder</h2>
+          <WriteInfographicPending
+            pendingId={snapshot.infographic.pendingId}
+            kind={snapshot.infographic.kind}
+            state={snapshot.infographic.state}
+          />
+        </>
+      ) : null}
+      {snapshot.htmlEmbed ? (
+        <>
+          <h2>HTML prototype embed</h2>
+          <WriteHtmlEmbed
+            rawSrc={snapshot.htmlEmbed.rawSrc}
+            alt={snapshot.htmlEmbed.alt}
+            visualState={snapshot.htmlEmbed.visualState}
+          />
+        </>
+      ) : null}
+      {snapshot.imageError ? (
+        <>
+          <h2>Broken workspace image</h2>
+          <img
+            className="write-rich-image write-rich-image-error"
+            alt={snapshot.imageError.alt}
+            title={snapshot.imageError.title}
+          />
+        </>
+      ) : null}
+      {snapshot.loadedImage ? (
+        <>
+          <h2>Loaded workspace image</h2>
+          <img
+            className="write-rich-image"
+            src={snapshot.loadedImage.src}
+            alt={snapshot.loadedImage.alt}
+          />
+        </>
+      ) : null}
     </>
   )
 }
@@ -201,6 +267,7 @@ export function WriteRichEditor({
   sampleContent,
   requirementBadges = false,
   inlineCompletionPreview,
+  imageWidgetSnapshot,
 }: Props): ReactElement {
   const fallbackSurface =
     fallback ?? (
@@ -233,7 +300,9 @@ export function WriteRichEditor({
         data-write-editor-mode="rich"
       >
         {sampleContent ??
-          (inlineCompletionPreview === 'completion' ? (
+          (imageWidgetSnapshot ? (
+            <WriteRichEditorImageWidgetsSampleContent snapshot={imageWidgetSnapshot} />
+          ) : inlineCompletionPreview === 'completion' ? (
             <WriteRichEditorInlineCompletionSampleContent />
           ) : inlineCompletionPreview === 'edit' ? (
             <WriteRichEditorInlineEditSampleContent />
@@ -255,15 +324,28 @@ type PreviewProps = {
 export function WriteRichEditorPreview({ mode }: PreviewProps): ReactElement {
   const inlineCompletionPreview =
     mode === 'inlineCompletion' ? 'completion' : mode === 'inlineEdit' ? 'edit' : undefined
+  const imageWidgetSnapshot =
+    mode === 'imageError' ||
+    mode === 'infographic' ||
+    mode === 'infographicStale' ||
+    mode === 'htmlEmbed'
+      ? imageWidgetSnapshotForMode(mode)
+      : undefined
 
   return (
     <div className="write-rich-editor-preview">
       <div className="write-rich-editor-preview-card">
         <WriteRichEditor
-          readOnly={mode === 'readonly' || mode === 'inlineCompletion' || mode === 'inlineEdit'}
+          readOnly={
+            mode === 'readonly' ||
+            mode === 'inlineCompletion' ||
+            mode === 'inlineEdit' ||
+            Boolean(imageWidgetSnapshot)
+          }
           showFallback={mode === 'fallback'}
           requirementBadges={mode === 'requirementBadges'}
           inlineCompletionPreview={inlineCompletionPreview}
+          imageWidgetSnapshot={imageWidgetSnapshot}
         />
       </div>
     </div>
