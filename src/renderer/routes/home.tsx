@@ -342,6 +342,10 @@ import {
   type SddAssistantPanelPreviewMode,
 } from '../components/SddAssistantPanel'
 import {
+  SddDraftEditorViewPreview,
+  type SddDraftEditorViewPreviewMode,
+} from '../components/SddDraftEditorView'
+import {
   WriteMarkdownPreviewPreview,
   type WriteMarkdownPreviewPreviewMode,
 } from '../components/WriteMarkdownPreview'
@@ -931,6 +935,25 @@ function HomePage() {
     if (value === 'timeline') return 'timeline'
     if (value === 'busy') return 'busy'
     if (value === 'disabled') return 'disabled'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported SddDraftEditorView
+  // (?sddDraftEditorViewPreview=1|dirty|saving|error|upgrading|designContext|noDraft|assistantOpen|leftCollapsed|withNotice).
+  const sddDraftEditorViewPreviewMode = useMemo((): SddDraftEditorViewPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('sddDraftEditorViewPreview')) return null
+    const value = params.get('sddDraftEditorViewPreview')
+    if (value === 'dirty') return 'dirty'
+    if (value === 'saving') return 'saving'
+    if (value === 'error') return 'error'
+    if (value === 'upgrading') return 'upgrading'
+    if (value === 'designContext') return 'designContext'
+    if (value === 'noDraft') return 'noDraft'
+    if (value === 'assistantOpen') return 'assistantOpen'
+    if (value === 'leftCollapsed') return 'leftCollapsed'
+    if (value === 'withNotice') return 'withNotice'
     return 'default'
   }, [])
 
@@ -2193,6 +2216,10 @@ function HomePage() {
 
   if (sddAssistantPanelPreviewMode) {
     return <SddAssistantPanelPreview mode={sddAssistantPanelPreviewMode} />
+  }
+
+  if (sddDraftEditorViewPreviewMode) {
+    return <SddDraftEditorViewPreview mode={sddDraftEditorViewPreviewMode} />
   }
 
   if (writeMarkdownPreviewPreviewMode) {
