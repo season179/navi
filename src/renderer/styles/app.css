@@ -151,6 +151,13 @@ textarea {
   box-shadow: var(--ds-sidebar-shadow);
 }
 
+.app-shell-body > .workbench.production-workbench {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  width: 100%;
+}
+
 .production-sidebar-host {
   position: relative;
   width: var(--sidebar-width, 264px);

@@ -3434,7 +3434,21 @@ function HomePage() {
           )}
         </div>
       ) : (
-        <ChatThread messages={messages} />
+        <>
+          {status.error && (status.ready || !empty) && !runtimeBannerPreviewMode ? (
+            <RuntimeBanner
+              snapshot={{
+                message: status.error,
+                runtimeReady: status.ready,
+              }}
+              onOpenSettings={() => openSettingsTab('providers')}
+              onRetryConnection={() => {
+                void window.navi.flue.status()
+              }}
+            />
+          ) : null}
+          <ChatThread messages={messages} />
+        </>
       )}
 
       <Composer

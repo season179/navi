@@ -11,6 +11,15 @@ import {
   type WorkspaceModeView,
 } from '../components/WorkspaceModeTabs'
 import { SidebarCommandRow, SidebarFrame } from '../components/SidebarPrimitives'
+import {
+  WindowsTitleBar,
+  supportsDesktopTitleBar,
+} from '../components/WindowsTitleBar'
+
+function resolveProductionPlatform(): string {
+  if (typeof window === 'undefined') return 'darwin'
+  return window.navigator.platform.toLowerCase()
+}
 
 function RootLayout() {
   const { theme, toggleTheme } = useTheme()
@@ -22,10 +31,10 @@ function RootLayout() {
   const toggleSettings = useCallback(() => setSettingsOpen((v) => !v), [])
   const { newConversation } = useNaviList()
 
-  const handleNew = () => {
+  const handleNew = useCallback(() => {
     closeSettings()
     newConversation()
-  }
+  }, [closeSettings, newConversation])
 
   const workspaceModeTabsPreviewMode = useMemo((): WorkspaceModeView | null => {
     if (typeof window === 'undefined') return null
@@ -36,15 +45,34 @@ function RootLayout() {
   const [workspaceModeTabsPreviewView, setWorkspaceModeTabsPreviewView] =
     useState<WorkspaceModeView>(() => workspaceModeTabsPreviewMode ?? 'chat')
 
+  const platform = useMemo(() => resolveProductionPlatform(), [])
+  const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
+  const appShellFrameClass = hasDesktopTitleBar
+    ? 'app-shell-frame app-shell-frame--desktop'
+    : 'app-shell-frame'
+
+  const titleBarActions = useMemo(
+    () => ({
+      createThread: handleNew,
+      openSettings: toggleSettings,
+    }),
+    [handleNew, toggleSettings],
+  )
+
   return (
     <SidebarContext.Provider value={{ collapsed, toggle }}>
       <SettingsContext.Provider
         value={{ settingsOpen, openSettings, closeSettings, toggleSettings }}
       >
-        <div
-          className="workbench"
-          style={{ ['--sidebar-width' as string]: collapsed ? '0px' : '264px' }}
-        >
+        <div className={appShellFrameClass}>
+          {hasDesktopTitleBar ? (
+            <WindowsTitleBar platform={platform} actions={titleBarActions} />
+          ) : null}
+          <div className="app-shell-body">
+            <div
+              className="workbench production-workbench"
+              style={{ ['--sidebar-width' as string]: collapsed ? '0px' : '264px' }}
+            >
           {!collapsed ? (
             <div className="production-sidebar-host">
               <SidebarFrame
@@ -98,9 +126,11 @@ function RootLayout() {
             </div>
           ) : null}
 
-          <main className="stage">
+          <main className="stage ds-stage-surface ds-chat-stage">
             <Outlet />
           </main>
+            </div>
+          </div>
         </div>
       </SettingsContext.Provider>
     </SidebarContext.Provider>
