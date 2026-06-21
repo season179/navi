@@ -20,6 +20,9 @@ import {
 } from './ProcessEntryRow'
 import { type RuntimeMetaChipsSnapshot, RUNTIME_META_CHIPS_PREVIEW } from './RuntimeMetaChips'
 
+/** Kun getProcessDetail skips expand affordance for short system messages. */
+const SYSTEM_MESSAGE_DETAIL_THRESHOLD = 140
+
 export type ProcessStackEntrySnapshot = {
   id: string
   summary: string
@@ -34,6 +37,10 @@ export type ProcessStackEntrySnapshot = {
   detailFilePath?: string
   nestedBubble?: MessageBubbleSnapshot
   meta?: RuntimeMetaChipsSnapshot
+  /** Process block kind — drives system-message expand rules like Kun. */
+  blockKind?: 'system'
+  /** When set, detailText is block.detail rather than duplicated summary text. */
+  explicitDetail?: boolean
   showCompactionIcon?: boolean
   /** Running request_user_input tool — auto force-opens during processing like Kun. */
   requestUserInput?: boolean
@@ -534,6 +541,32 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
       },
     ],
   },
+  executionSystemMessages: {
+    kind: 'execution',
+    title: 'Used 2 tools',
+    collapsible: true,
+    expanded: true,
+    stackEntries: [
+      {
+        id: 'system-short',
+        summary: 'Workspace index refreshed successfully.',
+        blockKind: 'system',
+        detailText: 'Workspace index refreshed successfully.',
+        detailKind: 'text',
+      },
+      {
+        id: 'system-long',
+        summary:
+          'A background sync job refreshed the workspace index and validated that every referenced package still resolves. Two optional dependencies were skipped because they are only used in CI.',
+        blockKind: 'system',
+        collapsible: true,
+        expanded: false,
+        detailText:
+          'A background sync job refreshed the workspace index and validated that every referenced package still resolves. Two optional dependencies were skipped because they are only used in CI.',
+        detailKind: 'text',
+      },
+    ],
+  },
   executionRequestInput: {
     kind: 'execution',
     title: 'Waiting for input',
@@ -599,6 +632,28 @@ function normalizeProcessText(text: string): string {
   return text.replace(/\s+/g, ' ').trim().toLowerCase()
 }
 
+function hasExplicitSystemDetail(
+  summary: string,
+  detailText?: string,
+  explicitDetail?: boolean,
+): boolean {
+  if (explicitDetail === true) return true
+  const detail = detailText?.trim()
+  if (!detail) return false
+  return normalizeProcessText(detail) !== normalizeProcessText(summary)
+}
+
+function systemEntryHasExpandableDetail(
+  summary: string,
+  detailText?: string,
+  explicitDetail?: boolean,
+): boolean {
+  const detail = detailText?.trim()
+  if (!detail) return false
+  if (hasExplicitSystemDetail(summary, detailText, explicitDetail)) return true
+  return summary.trim().length > SYSTEM_MESSAGE_DETAIL_THRESHOLD
+}
+
 function splitSummaryVerb(summary: string): { verb: string; rest: string } {
   const trimmed = summary.trim()
   if (!trimmed) return { verb: '', rest: '' }
@@ -620,6 +675,13 @@ function stackEntryHasExpandableDetail(entry: ProcessStackEntrySnapshot): boolea
     entry.detailKind === 'user_input'
   ) {
     return true
+  }
+  if (entry.blockKind === 'system') {
+    return systemEntryHasExpandableDetail(
+      entry.summary,
+      entry.detailText,
+      entry.explicitDetail,
+    )
   }
   return normalizeProcessText(detailText) !== normalizeProcessText(entry.summary)
 }
@@ -654,9 +716,17 @@ function stackEntryToProcessEntry(
     showCompactionIcon: entry.showCompactionIcon,
     pendingApproval: entry.pendingApproval,
     pendingUserInput: entry.pendingUserInput,
+    blockKind: entry.blockKind,
+    explicitDetail: entry.explicitDetail,
     wrapSummary:
       entry.wrapSummary === true ||
       entry.detailKind === 'assistant' ||
+      (entry.blockKind === 'system' &&
+        !systemEntryHasExpandableDetail(
+          entry.summary,
+          entry.detailText,
+          entry.explicitDetail,
+        )) ||
       (entry.collapsible === false && !entry.detailText && !entry.nestedBubble),
   }
 }

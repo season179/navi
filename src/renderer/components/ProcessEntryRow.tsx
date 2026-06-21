@@ -35,11 +35,18 @@ export type ProcessEntrySnapshot = {
   detailFilePath?: string
   nestedBubble?: MessageBubbleSnapshot
   meta?: RuntimeMetaChipsSnapshot
+  /** Process block kind — drives system-message expand rules like Kun. */
+  blockKind?: 'system'
+  /** When set, detailText is block.detail rather than duplicated summary text. */
+  explicitDetail?: boolean
   /** Pending approval — force-opens like Kun isPendingApproval. */
   pendingApproval?: boolean
   /** Pending user_input — auto force-opens during active processing like Kun. */
   pendingUserInput?: boolean
 }
+
+/** Kun getProcessDetail skips expand affordance for short system messages. */
+const SYSTEM_MESSAGE_DETAIL_THRESHOLD = 140
 
 function normalizeProcessText(text: string): string {
   return text.replace(/\s+/g, ' ').trim().toLowerCase()
@@ -47,6 +54,28 @@ function normalizeProcessText(text: string): string {
 
 function entryFullSummary(entry: ProcessEntrySnapshot): string {
   return [entry.verb, entry.rest].filter(Boolean).join(' ').trim()
+}
+
+function hasExplicitSystemDetail(
+  summary: string,
+  detailText?: string,
+  explicitDetail?: boolean,
+): boolean {
+  if (explicitDetail === true) return true
+  const detail = detailText?.trim()
+  if (!detail) return false
+  return normalizeProcessText(detail) !== normalizeProcessText(summary)
+}
+
+function systemEntryHasExpandableDetail(
+  summary: string,
+  detailText?: string,
+  explicitDetail?: boolean,
+): boolean {
+  const detail = detailText?.trim()
+  if (!detail) return false
+  if (hasExplicitSystemDetail(summary, detailText, explicitDetail)) return true
+  return summary.trim().length > SYSTEM_MESSAGE_DETAIL_THRESHOLD
 }
 
 /** Kun getProcessDetail — hide expand chevron when detail duplicates the summary line. */
@@ -63,7 +92,15 @@ function processEntryHasExpandableDetail(entry: ProcessEntrySnapshot): boolean {
   ) {
     return true
   }
-  return normalizeProcessText(detailText) !== normalizeProcessText(entryFullSummary(entry))
+  const summary = entryFullSummary(entry)
+  if (entry.blockKind === 'system') {
+    return systemEntryHasExpandableDetail(
+      summary,
+      entry.detailText,
+      entry.explicitDetail,
+    )
+  }
+  return normalizeProcessText(detailText) !== normalizeProcessText(summary)
 }
 
 const PREVIEW_PATCH = `--- a/src/auth/middleware.ts
@@ -196,6 +233,34 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
     detailKind: 'user_input',
     nestedBubble: MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
   },
+  systemShort: {
+    verb: 'Workspace',
+    rest: 'index refreshed successfully.',
+    blockKind: 'system',
+    detailText: 'Workspace index refreshed successfully.',
+    detailKind: 'text',
+  },
+  systemLong: {
+    verb: 'A',
+    rest: 'background sync job refreshed the workspace index and validated that every referenced package still resolves. Two optional dependencies were skipped because they are only used in CI.',
+    blockKind: 'system',
+    collapsible: true,
+    expanded: false,
+    detailText:
+      'A background sync job refreshed the workspace index and validated that every referenced package still resolves. Two optional dependencies were skipped because they are only used in CI.',
+    detailKind: 'text',
+  },
+  systemExplicitDetail: {
+    verb: 'Sync',
+    rest: 'completed',
+    blockKind: 'system',
+    explicitDetail: true,
+    collapsible: true,
+    expanded: false,
+    detailText:
+      'Indexed 1,248 files across 42 packages. Skipped 2 optional dev-only dependencies used exclusively in CI workflows.',
+    detailKind: 'text',
+  },
 } as const satisfies Record<string, ProcessEntrySnapshot>
 
 export type ProcessEntryRowPreviewMode = keyof typeof PROCESS_ENTRY_ROW_PREVIEW
@@ -292,6 +357,16 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
   const canToggle = canExpand && !forceOpen
   const rowActive = entry.active === true
   const showCompactionIcon = entry.showCompactionIcon === true && !rowActive
+  const summaryText = entryFullSummary(entry)
+  const wrapSummary =
+    entry.wrapSummary ??
+    (entry.detailKind === 'assistant' ||
+      (entry.blockKind === 'system' &&
+        !systemEntryHasExpandableDetail(
+          summaryText,
+          entry.detailText,
+          entry.explicitDetail,
+        )))
 
   const handleToggle = (): void => {
     if (!canToggle) return
@@ -316,7 +391,7 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
       ) : null}
       <span
         className={`process-entry-row-summary ${
-          entry.wrapSummary ? 'is-wrap' : 'is-truncate'
+          wrapSummary ? 'is-wrap' : 'is-truncate'
         } ${rowActive && !entry.error ? 'ds-shiny-text' : ''}`}
       >
         <span
