@@ -37,6 +37,10 @@ import {
   DevPreviewLaunchCard,
   DEV_PREVIEW_LAUNCH_CARD_PREVIEW,
 } from '../components/DevPreviewLaunchCard'
+import {
+  ReviewPlanCard,
+  REVIEW_PLAN_CARD_PREVIEW,
+} from '../components/ReviewPlanCard'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -176,6 +180,15 @@ function HomePage() {
     return params.get('devPreviewLaunchCard') === 'opened' ? 'opened' : 'default'
   }, [])
   const [devPreviewLaunchCardOpened, setDevPreviewLaunchCardOpened] = useState(false)
+
+  // Visual preview for the ported ReviewPlanCard (?reviewPlanCard=1).
+  const reviewPlanCardPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('reviewPlanCard')) return null
+    return params.get('reviewPlanCard') === 'busy' ? 'busy' : 'default'
+  }, [])
+  const [reviewPlanCardBuildBusy, setReviewPlanCardBuildBusy] = useState(false)
 
   const composerFooterPreview =
     gitBranchPickerPreviewMode != null || workspaceProjectPickerPreviewMode != null
@@ -380,6 +393,18 @@ function HomePage() {
               devPreviewLaunchCardPreviewMode === 'opened' || devPreviewLaunchCardOpened
             }
             onOpen={() => setDevPreviewLaunchCardOpened(true)}
+          />
+        </div>
+      ) : null}
+
+      {reviewPlanCardPreviewMode ? (
+        <div className="review-plan-card-preview">
+          <ReviewPlanCard
+            title={REVIEW_PLAN_CARD_PREVIEW.title}
+            relativePath={REVIEW_PLAN_CARD_PREVIEW.relativePath}
+            busy={reviewPlanCardPreviewMode === 'busy' || reviewPlanCardBuildBusy}
+            onOpen={() => undefined}
+            onBuild={() => setReviewPlanCardBuildBusy(true)}
           />
         </div>
       ) : null}
