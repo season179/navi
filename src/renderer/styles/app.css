@@ -24614,3 +24614,226 @@ button.usage-heatmap-cell:focus {
   line-height: 1.6;
   text-align: center;
 }
+
+/* --------------------------------------------------------------------------
+   schedule-defaults-dialog (Kun ScheduleDefaultsDialog.tsx port)
+   -------------------------------------------------------------------------- */
+.schedule-defaults-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.58);
+}
+
+.schedule-defaults-dialog {
+  width: 100%;
+  max-width: 620px;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  border-radius: 24px;
+  background: var(--ds-card);
+  padding: 24px;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.28);
+}
+
+.schedule-defaults-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.schedule-defaults-dialog-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.schedule-defaults-dialog-close {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ds-text-muted);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.schedule-defaults-dialog-close:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.schedule-defaults-dialog-close-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.schedule-defaults-dialog-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  border-radius: 12px;
+  background: var(--ds-surface-subtle);
+  padding: 8px 12px;
+}
+
+.schedule-defaults-dialog-toggle-label {
+  font-size: 13px;
+  color: var(--ds-text-muted);
+}
+
+.schedule-defaults-dialog-toggle {
+  display: inline-flex;
+  align-items: center;
+}
+
+.schedule-defaults-dialog-toggle-track {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--ds-border-strong);
+  transition: background-color 0.15s ease;
+}
+
+.schedule-defaults-dialog-toggle-track.is-on {
+  background: var(--ds-text);
+}
+
+.schedule-defaults-dialog-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition: left 0.15s ease;
+}
+
+.schedule-defaults-dialog-toggle-track.is-on .schedule-defaults-dialog-toggle-thumb {
+  left: 18px;
+}
+
+.schedule-defaults-dialog-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.schedule-defaults-dialog-grid--two {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .schedule-defaults-dialog-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.schedule-defaults-dialog-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text);
+}
+
+.schedule-defaults-dialog-field--full {
+  margin-top: 16px;
+}
+
+.schedule-defaults-dialog-input,
+.schedule-defaults-dialog-textarea {
+  width: 100%;
+  border: 1px solid var(--ds-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ds-bg-main) 60%, transparent);
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ds-text);
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.schedule-defaults-dialog-input:focus,
+.schedule-defaults-dialog-textarea:focus {
+  border-color: color-mix(in srgb, var(--ds-accent) 40%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ds-accent) 25%, transparent);
+}
+
+.schedule-defaults-dialog-textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.5rem;
+}
+
+.schedule-defaults-dialog-textarea--tall {
+  min-height: 110px;
+}
+
+.schedule-defaults-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.schedule-defaults-dialog-btn {
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.schedule-defaults-dialog-btn--secondary {
+  border: 1px solid var(--ds-border);
+  background: var(--ds-card);
+  color: var(--ds-text-muted);
+}
+
+.schedule-defaults-dialog-btn--secondary:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.schedule-defaults-dialog-btn--primary {
+  border: none;
+  background: rgba(133, 193, 241, 0.2);
+  color: #233659;
+  font-weight: 600;
+}
+
+.schedule-defaults-dialog-btn--primary:hover {
+  opacity: 0.9;
+}
+
+:root[data-theme='dark'] .schedule-defaults-dialog-btn--primary {
+  background: rgba(133, 193, 241, 0.13);
+  color: #f0f5fc;
+}

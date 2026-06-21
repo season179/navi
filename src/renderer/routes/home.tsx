@@ -373,6 +373,10 @@ import {
   WindowsTitleBarPreview,
   type WindowsTitleBarPreviewMode,
 } from '../components/WindowsTitleBar'
+import {
+  ScheduleDefaultsDialogPreview,
+  type ScheduleDefaultsDialogPreviewMode,
+} from '../components/ScheduleDefaultsDialog'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -994,6 +998,20 @@ function HomePage() {
     if (value === 'error') return 'error'
     return 'add'
   }, [])
+
+  // Visual preview for the ported ScheduleDefaultsDialog
+  // (?scheduleDefaultsDialogPreview=1|disabled|empty|singleProvider).
+  const scheduleDefaultsDialogPreviewMode =
+    useMemo((): ScheduleDefaultsDialogPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('scheduleDefaultsDialogPreview')) return null
+      const value = params.get('scheduleDefaultsDialogPreview')
+      if (value === 'disabled') return 'disabled'
+      if (value === 'empty') return 'empty'
+      if (value === 'singleProvider') return 'singleProvider'
+      return 'default'
+    }, [])
 
   // Visual preview for the ported WindowsTitleBar
   // (?windowsTitleBarPreview=1|menuOpen|maximized|linux).
@@ -1935,6 +1953,10 @@ function HomePage() {
 
   if (clawAddImDialogPreviewMode) {
     return <ClawAddImDialogPreview mode={clawAddImDialogPreviewMode} />
+  }
+
+  if (scheduleDefaultsDialogPreviewMode) {
+    return <ScheduleDefaultsDialogPreview mode={scheduleDefaultsDialogPreviewMode} />
   }
 
   if (windowsTitleBarPreviewMode) {
