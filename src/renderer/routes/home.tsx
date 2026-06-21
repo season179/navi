@@ -141,6 +141,14 @@ import {
   type LiveTurnProgressRowPreviewMode,
 } from '../components/LiveTurnProgressRow'
 import {
+  TimelineJumpRailPreview,
+  type TimelineJumpRailPreviewMode,
+} from '../components/TimelineJumpRail'
+import {
+  TimelinePaginationControlsPreview,
+  type TimelinePaginationControlsPreviewMode,
+} from '../components/TimelinePaginationControls'
+import {
   RuntimeWakeHero,
   RUNTIME_WAKE_HERO_PREVIEW_ERROR,
 } from '../components/RuntimeWakeHero'
@@ -815,6 +823,32 @@ function HomePage() {
     if (mode === 'ikunMode') return 'ikunMode'
     return 'default'
   }, [])
+
+  // Visual preview for the ported TimelineJumpRail
+  // (?timelineJumpRailPreview=default|few|many).
+  const timelineJumpRailPreviewMode = useMemo((): TimelineJumpRailPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('timelineJumpRailPreview')) return null
+    const mode = params.get('timelineJumpRailPreview')
+    if (mode === 'few') return 'few'
+    if (mode === 'many') return 'many'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported TimelinePaginationControls
+  // (?timelinePaginationControlsPreview=showEarlier|showEarlierSingle|collapseEarlier|both).
+  const timelinePaginationControlsPreviewMode =
+    useMemo((): TimelinePaginationControlsPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('timelinePaginationControlsPreview')) return null
+      const mode = params.get('timelinePaginationControlsPreview')
+      if (mode === 'showEarlierSingle') return 'showEarlierSingle'
+      if (mode === 'collapseEarlier') return 'collapseEarlier'
+      if (mode === 'both') return 'both'
+      return 'showEarlier'
+    }, [])
 
   // Visual preview for the ported RuntimeWakeHero
   // (?runtimeWakeHero=1|waking|error|quiet).
@@ -2297,6 +2331,14 @@ function HomePage() {
 
   if (liveTurnProgressRowPreviewMode) {
     return <LiveTurnProgressRowPreview mode={liveTurnProgressRowPreviewMode} />
+  }
+
+  if (timelineJumpRailPreviewMode) {
+    return <TimelineJumpRailPreview mode={timelineJumpRailPreviewMode} />
+  }
+
+  if (timelinePaginationControlsPreviewMode) {
+    return <TimelinePaginationControlsPreview mode={timelinePaginationControlsPreviewMode} />
   }
 
   if (writeMarkdownPreviewPreviewMode) {

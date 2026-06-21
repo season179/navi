@@ -3973,6 +3973,96 @@ a.runtime-meta-chip:hover {
   }
 }
 
+/* =====================================================
+   Timeline pagination controls (Kun MessageTimeline buttons)
+   ===================================================== */
+.timeline-pagination-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timeline-show-earlier-button {
+  border: 1px solid var(--ds-chip-border);
+  border-radius: 999px;
+  background: var(--ds-chip-bg);
+  padding: 8px 16px;
+  color: var(--ds-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 140ms ease;
+}
+
+.timeline-show-earlier-button:hover {
+  color: var(--ds-text);
+}
+
+.timeline-collapse-earlier-button {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 6px 12px;
+  color: var(--ds-text-faint);
+  font-size: 12.5px;
+  font-weight: 500;
+  transition:
+    background 140ms ease,
+    color 140ms ease;
+}
+
+.timeline-collapse-earlier-button:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.timeline-jump-rail-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: auto;
+  background: var(--ds-bg-main);
+}
+
+.timeline-jump-rail-preview-stage {
+  position: relative;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  padding: 32px 24px 120px;
+}
+
+.timeline-jump-rail-preview-content {
+  display: flex;
+  width: 100%;
+  max-width: 56rem;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 32px;
+  margin: 0 auto;
+  padding-top: 32px;
+}
+
+.timeline-jump-rail-preview-hint {
+  margin: 0;
+  color: var(--ds-text-faint);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.timeline-pagination-controls-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  background: var(--ds-bg-main);
+}
+
 
 /* =====================================================
    Claw empty hero (Kun ClawEmptyHero)
