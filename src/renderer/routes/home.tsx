@@ -365,6 +365,10 @@ import {
   ClawSidebarPreview,
   type ClawSidebarPreviewMode,
 } from '../components/ClawSidebar'
+import {
+  ClawAddImDialogPreview,
+  type ClawAddImDialogPreviewMode,
+} from '../components/ClawAddImDialog'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -963,6 +967,28 @@ function HomePage() {
     if (value === 'disabled') return 'disabled'
     if (value === 'running') return 'running'
     return 'default'
+  }, [])
+
+  // Visual preview for the ported ClawAddImDialog
+  // (?clawAddImDialogPreview=1|prompt|connection|qrLoading|qrShowing|qrSuccess|qrError|manage|edit|empty|manageEmpty|busy|error).
+  const clawAddImDialogPreviewMode = useMemo((): ClawAddImDialogPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('clawAddImDialogPreview')) return null
+    const value = params.get('clawAddImDialogPreview')
+    if (value === 'prompt') return 'prompt'
+    if (value === 'connection') return 'connection'
+    if (value === 'qrLoading') return 'qrLoading'
+    if (value === 'qrShowing') return 'qrShowing'
+    if (value === 'qrSuccess') return 'qrSuccess'
+    if (value === 'qrError') return 'qrError'
+    if (value === 'manage') return 'manage'
+    if (value === 'edit') return 'edit'
+    if (value === 'empty') return 'empty'
+    if (value === 'manageEmpty') return 'manageEmpty'
+    if (value === 'busy') return 'busy'
+    if (value === 'error') return 'error'
+    return 'add'
   }, [])
 
   // Visual preview for the ported WriteDebugLogModal
@@ -1888,6 +1914,10 @@ function HomePage() {
 
   if (clawSidebarPreviewMode) {
     return <ClawSidebarPreview mode={clawSidebarPreviewMode} />
+  }
+
+  if (clawAddImDialogPreviewMode) {
+    return <ClawAddImDialogPreview mode={clawAddImDialogPreviewMode} />
   }
 
   if (writeDebugLogPreviewMode) {
