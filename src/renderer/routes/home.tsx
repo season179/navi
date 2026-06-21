@@ -33,6 +33,10 @@ import {
   ImagePreviewLightbox,
   IMAGE_PREVIEW_LIGHTBOX_SAMPLE,
 } from '../components/ImagePreviewLightbox'
+import {
+  DevPreviewLaunchCard,
+  DEV_PREVIEW_LAUNCH_CARD_PREVIEW,
+} from '../components/DevPreviewLaunchCard'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -163,6 +167,15 @@ function HomePage() {
     return new URLSearchParams(window.location.search).has('imagePreviewLightbox')
   }, [])
   const [imagePreviewLightboxDismissed, setImagePreviewLightboxDismissed] = useState(false)
+
+  // Visual preview for the ported DevPreviewLaunchCard (?devPreviewLaunchCard=1).
+  const devPreviewLaunchCardPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('devPreviewLaunchCard')) return null
+    return params.get('devPreviewLaunchCard') === 'opened' ? 'opened' : 'default'
+  }, [])
+  const [devPreviewLaunchCardOpened, setDevPreviewLaunchCardOpened] = useState(false)
 
   const composerFooterPreview =
     gitBranchPickerPreviewMode != null || workspaceProjectPickerPreviewMode != null
@@ -358,6 +371,18 @@ function HomePage() {
         downloadName="preview.svg"
         onClose={() => setImagePreviewLightboxDismissed(true)}
       />
+
+      {devPreviewLaunchCardPreviewMode ? (
+        <div className="dev-preview-launch-card-preview">
+          <DevPreviewLaunchCard
+            url={DEV_PREVIEW_LAUNCH_CARD_PREVIEW.url}
+            opened={
+              devPreviewLaunchCardPreviewMode === 'opened' || devPreviewLaunchCardOpened
+            }
+            onOpen={() => setDevPreviewLaunchCardOpened(true)}
+          />
+        </div>
+      ) : null}
     </>
   )
 }
