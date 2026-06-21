@@ -13066,3 +13066,79 @@ button.usage-heatmap-cell:focus {
   text-decoration: var(--shiki-dark-text-decoration, inherit) !important;
 }
 
+/* AppErrorBoundary — Kun's uncaught render error fallback card */
+.app-error-boundary {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  background: var(--ds-bg-main);
+}
+
+.app-error-boundary-card {
+  width: 100%;
+  max-width: 28rem;
+  padding: 24px;
+  border: 1px solid rgba(253, 230, 138, 0.8);
+  border-radius: 16px;
+  background: rgba(255, 251, 235, 0.9);
+  text-align: center;
+  box-shadow: 0 14px 32px rgba(20, 47, 95, 0.08);
+}
+
+:root[data-theme='dark'] .app-error-boundary-card {
+  border-color: rgba(146, 64, 14, 0.6);
+  background: rgba(69, 26, 3, 0.35);
+}
+
+.app-error-boundary-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #78350f;
+}
+
+:root[data-theme='dark'] .app-error-boundary-title {
+  color: #fef3c7;
+}
+
+.app-error-boundary-message {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.25rem;
+  color: rgba(120, 53, 15, 0.8);
+}
+
+:root[data-theme='dark'] .app-error-boundary-message {
+  color: rgba(254, 243, 199, 0.8);
+}
+
+.app-error-boundary-reload {
+  margin-top: 16px;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 9999px;
+  background: rgba(120, 53, 15, 0.1);
+  font-size: 13px;
+  font-weight: 500;
+  color: #78350f;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.app-error-boundary-reload:hover {
+  background: rgba(120, 53, 15, 0.2);
+}
+
+:root[data-theme='dark'] .app-error-boundary-reload {
+  background: rgba(254, 243, 199, 0.1);
+  color: #fef3c7;
+}
+
+:root[data-theme='dark'] .app-error-boundary-reload:hover {
+  background: rgba(254, 243, 199, 0.2);
+}
+

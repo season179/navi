@@ -215,6 +215,11 @@ import {
   type WorkspaceFileTarget,
 } from '../components/WorkspaceFilePreviewPanel'
 import {
+  AppErrorFallback,
+  APP_ERROR_BOUNDARY_PREVIEW,
+  type AppErrorBoundaryPreviewMode,
+} from '../components/AppErrorBoundary'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1164,6 +1169,14 @@ function HomePage() {
     })
   }, [workspaceFilePreviewPanelTarget])
 
+  // Visual preview for the ported AppErrorBoundary (?appErrorBoundaryPreview=1|message).
+  const appErrorBoundaryPreviewMode = useMemo((): AppErrorBoundaryPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('appErrorBoundaryPreview')) return null
+    return params.get('appErrorBoundaryPreview') === 'message' ? 'message' : 'default'
+  }, [])
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -1247,6 +1260,12 @@ function HomePage() {
     if (sessionHeaderPreviewMode === 'fork') return SESSION_HEADER_PREVIEW.fork
     return SESSION_HEADER_PREVIEW.default
   }, [sessionHeaderPreviewMode])
+
+  if (appErrorBoundaryPreviewMode) {
+    return (
+      <AppErrorFallback error={APP_ERROR_BOUNDARY_PREVIEW[appErrorBoundaryPreviewMode]} />
+    )
+  }
 
   return (
     <>
