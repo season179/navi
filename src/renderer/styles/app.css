@@ -36975,3 +36975,29 @@ button.usage-heatmap-cell:focus {
   color: var(--ds-text-muted);
 }
 
+.secret-input-preview-wrap {
+  display: flex;
+  min-height: 100vh;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 24px;
+  background: var(--ds-main);
+}
+
+.secret-input-preview-card {
+  width: min(480px, 100%);
+  border-radius: 16px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-card);
+  padding: 20px;
+  box-shadow: 0 12px 32px rgba(20, 47, 95, 0.08);
+}
+
+.secret-input-preview-label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-text-muted);
+}
+

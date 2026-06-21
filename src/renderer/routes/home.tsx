@@ -488,6 +488,10 @@ import {
   type ModelChipsInputPreviewMode,
 } from '../components/providers/ModelChipsInput'
 import {
+  SecretInputPreview,
+  type SecretInputPreviewMode,
+} from '../components/providers/SecretInput'
+import {
   ProviderModelImportDialogPreview,
   type ProviderModelImportDialogPreviewMode,
 } from '../components/providers/ProviderModelImportDialog'
@@ -1386,6 +1390,17 @@ function HomePage() {
     if (value === 'busy') return 'busy'
     if (value === 'error') return 'error'
     return 'add'
+  }, [])
+
+  // Visual preview for the ported SecretInput (?secretInputPreview=1|invalid|filled).
+  const secretInputPreviewMode = useMemo((): SecretInputPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('secretInputPreview')) return null
+    const value = params.get('secretInputPreview')
+    if (value === 'invalid') return 'invalid'
+    if (value === 'filled') return 'filled'
+    return 'default'
   }, [])
 
   // Visual preview for the ported ModelChipsInput
@@ -2694,6 +2709,10 @@ function HomePage() {
 
   if (scheduleTasksViewPreviewMode) {
     return <ScheduleTasksViewPreview mode={scheduleTasksViewPreviewMode} />
+  }
+
+  if (secretInputPreviewMode) {
+    return <SecretInputPreview mode={secretInputPreviewMode} />
   }
 
   if (modelChipsInputPreviewMode) {
