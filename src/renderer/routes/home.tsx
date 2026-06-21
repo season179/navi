@@ -10,6 +10,7 @@ import { ProvidersSettings } from '../components/providers/ProvidersSettings'
 import { hasUsableProvider } from '../../shared/flue'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
+import { useSettings } from '../settings'
 
 function statusLabel(ready: boolean, hasProvider: boolean, error?: string): string {
   if (!hasProvider) return 'needs provider'
@@ -20,8 +21,8 @@ function statusLabel(ready: boolean, hasProvider: boolean, error?: string): stri
 
 function HomePage() {
   const { collapsed, toggle } = useSidebar()
+  const { settingsOpen, openSettings, closeSettings, toggleSettings } = useSettings()
   const [draft, setDraft] = useState('')
-  const [showSettings, setShowSettings] = useState(false)
   const { messages, status, busy, send, cancel, activeSelection, pickModel, pickReasoning } =
     useNaviThread()
   const {
@@ -50,11 +51,11 @@ function HomePage() {
         subtitle={statusLabel(status.ready, hasProvider, status.error)}
         sidebarCollapsed={collapsed}
         onToggleSidebar={toggle}
-        onOpenSettings={() => setShowSettings((v) => !v)}
-        settingsActive={showSettings}
+        onOpenSettings={toggleSettings}
+        settingsActive={settingsOpen}
       />
 
-      {showSettings ? (
+      {settingsOpen ? (
         <div className="stage-scroll">
           <div className="providers-wrap">
             <ProvidersSettings
@@ -66,7 +67,7 @@ function HomePage() {
               onDelete={removeProvider}
               onSetDefault={setDefaultSelection}
               onProbe={probeProvider}
-              onClose={() => setShowSettings(false)}
+              onClose={closeSettings}
             />
           </div>
         </div>
@@ -79,7 +80,7 @@ function HomePage() {
               Navi is your local-first companion. Start a conversation below.
             </p>
             {!hasProvider ? (
-              <button className="btn btn-primary connect-provider" onClick={() => setShowSettings(true)}>
+              <button className="btn btn-primary connect-provider" onClick={openSettings}>
                 Connect a provider
               </button>
             ) : null}
@@ -110,7 +111,7 @@ function HomePage() {
             active={activeSelection}
             onPickModel={pickModel}
             onPickReasoning={pickReasoning}
-            onConfigure={() => setShowSettings(true)}
+            onConfigure={openSettings}
           />
         }
       />
