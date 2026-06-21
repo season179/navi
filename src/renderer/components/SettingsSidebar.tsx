@@ -14,6 +14,7 @@ import { MemorySettingsSectionPreview } from './MemorySettingsSection'
 import { SpeechToTextSettingsSectionPreview } from './SpeechToTextSettingsSection'
 import { ImageGenerationSettingsSectionPreview } from './ImageGenerationSettingsSection'
 import { MediaGenerationSettingsSectionPreview } from './MediaGenerationSettingsSection'
+import { WorktreeSettingsSectionPreview } from './WorktreeSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -218,6 +219,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'mediaGeneration' ? (
         <div className="media-generation-preview-stack">
           <MediaGenerationSettingsSectionPreview />
+        </div>
+      ) : category === 'worktree' ? (
+        <div className="worktree-settings-preview-stack">
+          <WorktreeSettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">

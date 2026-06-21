@@ -276,6 +276,10 @@ import {
   type MediaGenerationPreviewMode,
 } from '../components/MediaGenerationSettingsSection'
 import {
+  WorktreeSettingsSectionPreview,
+  type WorktreePreviewMode,
+} from '../components/WorktreeSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1347,6 +1351,16 @@ function HomePage() {
     return mode as MediaGenerationPreviewMode
   }, [])
 
+  // Visual preview for the ported WorktreeSettingsSection (?worktreePreview=1|empty|loading|error|…).
+  const worktreePreviewMode = useMemo((): WorktreePreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('worktreePreview')) return null
+    const mode = params.get('worktreePreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as WorktreePreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1613,6 +1627,22 @@ function HomePage() {
           </p>
           <div className="media-generation-preview-stack">
             <MediaGenerationSettingsSectionPreview mode={mediaGenerationPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (worktreePreviewMode) {
+    return (
+      <div className="worktree-preview">
+        <div className="worktree-preview-inner">
+          <h1 className="worktree-preview-title">Worktree pool</h1>
+          <p className="worktree-preview-subtitle">
+            Worktree category from Kun settings-section-worktree.tsx.
+          </p>
+          <div className="worktree-preview-stack">
+            <WorktreeSettingsSectionPreview mode={worktreePreviewMode} />
           </div>
         </div>
       </div>

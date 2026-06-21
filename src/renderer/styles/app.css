@@ -15903,3 +15903,412 @@ button.usage-heatmap-cell:focus {
   margin-top: 32px;
 }
 
+/* Worktree settings section (Kun settings-section-worktree.tsx) */
+.worktree-control {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.worktree-overview-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  font-size: 12px;
+}
+
+.worktree-stat-card {
+  border-radius: 12px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-bg-main) 40%, transparent);
+  padding: 8px 12px;
+}
+
+.worktree-stat-label {
+  color: var(--ds-text-faint);
+}
+
+.worktree-stat-value {
+  margin-top: 2px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.worktree-stat-value-mono {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 13px;
+}
+
+.worktree-stat-value-count {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 15px;
+}
+
+.worktree-stat-value-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--ds-text-muted);
+}
+
+.worktree-stat-refresh {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.worktree-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--ds-border-muted);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  background: transparent;
+  transition: background 0.15s, color 0.15s;
+}
+
+.worktree-refresh-btn:hover:not(:disabled) {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.worktree-refresh-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.worktree-refresh-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.worktree-refresh-icon-spin {
+  animation: spin 1s linear infinite;
+}
+
+.worktree-warning {
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #fcd34d 80%, transparent);
+  background: color-mix(in srgb, #fffbeb 80%, transparent);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #b45309;
+}
+
+[data-theme='dark'] .worktree-warning {
+  border-color: color-mix(in srgb, #92400e 40%, transparent);
+  background: color-mix(in srgb, #f59e0b 10%, transparent);
+  color: #fcd34d;
+}
+
+.worktree-error {
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, #fecaca 80%, transparent);
+  background: color-mix(in srgb, #fef2f2 80%, transparent);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+[data-theme='dark'] .worktree-error {
+  border-color: color-mix(in srgb, #991b1b 40%, transparent);
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+  color: #fca5a5;
+}
+
+.worktree-pool-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.worktree-pool-card {
+  border-radius: 12px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-bg-main) 40%, transparent);
+  padding: 10px 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.worktree-pool-card-busy {
+  border-color: color-mix(in srgb, var(--ds-text) 30%, transparent);
+  background: color-mix(in srgb, var(--ds-surface-subtle) 50%, transparent);
+}
+
+.worktree-pool-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.worktree-pool-main {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.worktree-pool-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--ds-text-muted);
+}
+
+.worktree-pool-copy {
+  min-width: 0;
+}
+
+.worktree-pool-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.worktree-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.worktree-status-badge-busy {
+  background: color-mix(in srgb, #10b981 15%, transparent);
+  color: #047857;
+}
+
+[data-theme='dark'] .worktree-status-badge-busy {
+  color: #6ee7b7;
+}
+
+.worktree-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #10b981;
+}
+
+.worktree-status-badge-idle {
+  background: color-mix(in srgb, var(--ds-hover) 60%, transparent);
+  color: var(--ds-text-muted);
+}
+
+.worktree-status-badge-empty {
+  background: color-mix(in srgb, var(--ds-hover) 30%, transparent);
+  color: var(--ds-text-faint);
+}
+
+.worktree-pool-path {
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--ds-text-faint);
+}
+
+.worktree-pool-changes {
+  margin-left: 8px;
+  color: #d97706;
+}
+
+[data-theme='dark'] .worktree-pool-changes {
+  color: #fbbf24;
+}
+
+.worktree-pool-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.worktree-pool-spinner {
+  width: 14px;
+  height: 14px;
+  color: var(--ds-text-muted);
+  animation: spin 1s linear infinite;
+}
+
+.worktree-action-text {
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ds-text);
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.worktree-action-text:hover {
+  background: var(--ds-hover);
+}
+
+.worktree-action-icon {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 8px;
+  padding: 4px;
+  color: var(--ds-text-muted);
+  background: transparent;
+  transition: background 0.15s, color 0.15s;
+}
+
+.worktree-action-icon:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.worktree-action-icon-danger:hover {
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+  color: #dc2626;
+}
+
+.worktree-action-icon-svg {
+  width: 14px;
+  height: 14px;
+}
+
+.worktree-result {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border-radius: 12px;
+  border: 1px solid;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.worktree-result-success {
+  border-color: color-mix(in srgb, #a7f3d0 80%, transparent);
+  background: color-mix(in srgb, #ecfdf5 80%, transparent);
+  color: #047857;
+}
+
+[data-theme='dark'] .worktree-result-success {
+  border-color: color-mix(in srgb, #065f46 40%, transparent);
+  background: color-mix(in srgb, #10b981 10%, transparent);
+  color: #6ee7b7;
+}
+
+.worktree-result-warning {
+  border-color: color-mix(in srgb, #fcd34d 80%, transparent);
+  background: color-mix(in srgb, #fffbeb 80%, transparent);
+  color: #b45309;
+}
+
+[data-theme='dark'] .worktree-result-warning {
+  border-color: color-mix(in srgb, #92400e 40%, transparent);
+  background: color-mix(in srgb, #f59e0b 10%, transparent);
+  color: #fcd34d;
+}
+
+.worktree-result-icon {
+  margin-top: 2px;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.worktree-result-body {
+  min-width: 0;
+}
+
+.worktree-result-message {
+  font-weight: 500;
+}
+
+.worktree-result-conflicts {
+  margin-top: 4px;
+  padding-left: 16px;
+  list-style: disc;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.worktree-result-conflict-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.worktree-cleanup-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.worktree-cleanup-btn {
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #dc2626;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.worktree-cleanup-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+}
+
+.worktree-cleanup-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.worktree-preview {
+  min-height: 100vh;
+  padding: 48px 24px;
+  background: var(--ds-bg-main);
+}
+
+.worktree-preview-inner {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.worktree-preview-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+}
+
+.worktree-preview-subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ds-text-muted);
+}
+
+.worktree-preview-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 32px;
+}
+
+.worktree-settings-preview-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
