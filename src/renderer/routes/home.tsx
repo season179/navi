@@ -404,6 +404,14 @@ import {
   type SidebarPreviewMode,
 } from '../components/Sidebar'
 import {
+  AnimatedWorkLogoPreview,
+  IkunCameoPreview,
+  KunCelebrationPreview,
+  type AnimatedWorkLogoPreviewMode,
+  type IkunCameoPreviewMode,
+  type KunCelebrationPreviewMode,
+} from '../components/AnimatedWorkLogo'
+import {
   SidebarProjectsSectionPreview,
   type SidebarProjectsPreviewMode,
 } from '../components/SidebarProjectsSection'
@@ -1140,6 +1148,52 @@ function HomePage() {
     if (value === 'renameDialog') return 'renameDialog'
     if (value === 'contextMenu') return 'contextMenu'
     return value as SidebarProjectsPreviewMode
+  }, [])
+
+  // Visual preview for the ported AnimatedWorkLogo
+  // (?animatedWorkLogoPreview=1|active|md|surf|sprint|dive|ikun|ikunMode).
+  const animatedWorkLogoPreviewMode = useMemo((): AnimatedWorkLogoPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('animatedWorkLogoPreview')) return null
+    const value = params.get('animatedWorkLogoPreview')
+    if (!value || value === '1' || value === 'default') return 'default'
+    if (value === 'active') return 'active'
+    if (value === 'md') return 'md'
+    if (value === 'surf') return 'surf'
+    if (value === 'sprint') return 'sprint'
+    if (value === 'dive') return 'dive'
+    if (value === 'ikun') return 'ikun'
+    if (value === 'ikunMode') return 'ikunMode'
+    return value as AnimatedWorkLogoPreviewMode
+  }, [])
+
+  // Visual preview for IkunCameoLayer (?ikunCameoPreview=1|dash|chase|peek|boba|nap).
+  const ikunCameoPreviewMode = useMemo((): IkunCameoPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('ikunCameoPreview')) return null
+    const value = params.get('ikunCameoPreview')
+    if (!value || value === '1' || value === 'default') return 'default'
+    if (value === 'dash') return 'dash'
+    if (value === 'chase') return 'chase'
+    if (value === 'peek') return 'peek'
+    if (value === 'boba') return 'boba'
+    if (value === 'nap') return 'nap'
+    return value as IkunCameoPreviewMode
+  }, [])
+
+  // Visual preview for KunCelebrationLayer (?kunCelebrationPreview=1|cheer|lap|toast|ikunMode).
+  const kunCelebrationPreviewMode = useMemo((): KunCelebrationPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('kunCelebrationPreview')) return null
+    const value = params.get('kunCelebrationPreview')
+    if (!value || value === '1' || value === 'cheer') return 'cheer'
+    if (value === 'lap') return 'lap'
+    if (value === 'toast') return 'toast'
+    if (value === 'ikunMode') return 'ikunMode'
+    return value as KunCelebrationPreviewMode
   }, [])
 
   // Visual preview for the ported PluginMarketplaceView
@@ -2150,6 +2204,18 @@ function HomePage() {
 
   if (connectPhoneSidebarPreviewMode) {
     return <ConnectPhoneSidebarPreview mode={connectPhoneSidebarPreviewMode} />
+  }
+
+  if (animatedWorkLogoPreviewMode) {
+    return <AnimatedWorkLogoPreview mode={animatedWorkLogoPreviewMode} />
+  }
+
+  if (ikunCameoPreviewMode) {
+    return <IkunCameoPreview mode={ikunCameoPreviewMode} />
+  }
+
+  if (kunCelebrationPreviewMode) {
+    return <KunCelebrationPreview mode={kunCelebrationPreviewMode} />
   }
 
   if (sidebarPreviewMode) {
