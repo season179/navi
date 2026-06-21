@@ -61,9 +61,12 @@ export type MessageTurnSnapshot = {
 function MessageTurnImpl({
   turn,
   viewportRef,
+  hasActiveGoal = false,
 }: {
   turn: MessageTurnSnapshot
   viewportRef?: RefObject<HTMLDivElement | null>
+  /** Matches Kun activeThreadGoal for LiveTurnProgressRow spacing. */
+  hasActiveGoal?: boolean
 }): ReactElement {
   const resolved: MessageTurnSnapshot = useMemo(() => {
     if (!turn.source) return turn
@@ -139,8 +142,6 @@ function MessageTurnImpl({
         <MessageBubble block={resolved.liveAssistant} />
       ) : null}
 
-      {showLiveProgress ? <LiveTurnProgressRow hasActiveGoal={false} /> : null}
-
       {resolved.generatedFiles?.length ? (
         <GeneratedFilesPanel media={resolved.generatedFiles} />
       ) : null}
@@ -148,6 +149,8 @@ function MessageTurnImpl({
       {(resolved.reviews ?? []).map((review) => (
         <ReviewSummaryCard key={review.title} review={review} />
       ))}
+
+      {showLiveProgress ? <LiveTurnProgressRow hasActiveGoal={hasActiveGoal} /> : null}
 
       {!processing && resolved.devPreviewCard ? (
         <DevPreviewLaunchCard url={DEV_PREVIEW_LAUNCH_CARD_PREVIEW.url} />

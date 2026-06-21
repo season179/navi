@@ -169,7 +169,11 @@ export function MessageTimeline({
               className="message-timeline-turn-anchor scroll-mt-6"
             >
               {showForkPoint ? <ThreadForkPoint parentTitle={forkTitle} /> : null}
-              <MessageTurn turn={turn} viewportRef={containerRef} />
+              <MessageTurn
+                turn={turn}
+                viewportRef={containerRef}
+                hasActiveGoal={hasActiveGoal}
+              />
             </div>
           )
         })}
