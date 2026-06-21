@@ -272,6 +272,10 @@ import {
   type ImageGenerationPreviewMode,
 } from '../components/ImageGenerationSettingsSection'
 import {
+  MediaGenerationSettingsSectionPreview,
+  type MediaGenerationPreviewMode,
+} from '../components/MediaGenerationSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1333,6 +1337,16 @@ function HomePage() {
     return mode as ImageGenerationPreviewMode
   }, [])
 
+  // Visual preview for the ported MediaGenerationSettingsSection (?mediaGenerationPreview=1|disabled|ttsCustom|…).
+  const mediaGenerationPreviewMode = useMemo((): MediaGenerationPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('mediaGenerationPreview')) return null
+    const mode = params.get('mediaGenerationPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as MediaGenerationPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1583,6 +1597,22 @@ function HomePage() {
           </p>
           <div className="image-generation-preview-stack">
             <ImageGenerationSettingsSectionPreview mode={imageGenerationPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (mediaGenerationPreviewMode) {
+    return (
+      <div className="media-generation-preview">
+        <div className="media-generation-preview-inner">
+          <h1 className="media-generation-preview-title">Media generation</h1>
+          <p className="media-generation-preview-subtitle">
+            Media generation category from Kun settings-section-media-generation.tsx.
+          </p>
+          <div className="media-generation-preview-stack">
+            <MediaGenerationSettingsSectionPreview mode={mediaGenerationPreviewMode} />
           </div>
         </div>
       </div>

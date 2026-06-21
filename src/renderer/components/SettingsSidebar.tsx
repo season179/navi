@@ -13,6 +13,7 @@ import { LlmDebugSettingsSectionPreview } from './LlmDebugSettingsSection'
 import { MemorySettingsSectionPreview } from './MemorySettingsSection'
 import { SpeechToTextSettingsSectionPreview } from './SpeechToTextSettingsSection'
 import { ImageGenerationSettingsSectionPreview } from './ImageGenerationSettingsSection'
+import { MediaGenerationSettingsSectionPreview } from './MediaGenerationSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -213,6 +214,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'imageGeneration' ? (
         <div className="image-generation-preview-stack">
           <ImageGenerationSettingsSectionPreview />
+        </div>
+      ) : category === 'mediaGeneration' ? (
+        <div className="media-generation-preview-stack">
+          <MediaGenerationSettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">
