@@ -747,7 +747,7 @@ function HomePage() {
   const [workMetaRowExpanded, setWorkMetaRowExpanded] = useState(false)
 
   // Visual preview for the ported ProcessSectionRow
-  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|executionAutoOpen|executionForceOpen|executionApproval|executionUserInput|error|output|outputStreaming).
+  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|executionAutoOpen|executionForceOpen|executionApproval|executionUserInput|executionRequestInput|error|output|outputStreaming).
   const processSectionRowPreviewMode = useMemo((): ProcessSectionRowPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -761,6 +761,7 @@ function HomePage() {
     if (mode === 'executionForceOpen') return 'executionForceOpen'
     if (mode === 'executionApproval') return 'executionApproval'
     if (mode === 'executionUserInput') return 'executionUserInput'
+    if (mode === 'executionRequestInput') return 'executionRequestInput'
     if (mode === 'error') return 'error'
     if (mode === 'output') return 'output'
     if (mode === 'outputStreaming') return 'outputStreaming'
@@ -4248,6 +4249,7 @@ function HomePage() {
               processSectionRowPreviewMode === 'executionForceOpen' ||
               processSectionRowPreviewMode === 'executionApproval' ||
               processSectionRowPreviewMode === 'executionUserInput' ||
+              processSectionRowPreviewMode === 'executionRequestInput' ||
               processSectionRowPreviewMode === 'error'
                 ? true
                 : processSectionRowExpanded

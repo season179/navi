@@ -33,6 +33,8 @@ export type ProcessStackEntrySnapshot = {
   nestedBubble?: MessageBubbleSnapshot
   meta?: RuntimeMetaChipsSnapshot
   showCompactionIcon?: boolean
+  /** Running request_user_input tool — auto force-opens during processing like Kun. */
+  requestUserInput?: boolean
 }
 
 export type ProcessOutputEntrySnapshot = {
@@ -62,19 +64,17 @@ function entryAutoForceOpen(
   entry: ProcessStackEntrySnapshot,
   processing?: boolean,
 ): boolean {
+  if (entry.detailKind === 'approval') return true
+  if (processing === true && entry.requestUserInput === true) return true
   if (entry.active !== true) return false
-  if (entry.detailKind === 'approval' || entry.detailKind === 'user_input') {
-    return true
-  }
+  if (entry.detailKind === 'user_input') return true
   return processing === true && entry.showCompactionIcon === true
 }
 
 function sectionHasPendingApproval(section: ProcessSectionSnapshot): boolean {
   if (section.hasPendingApproval === true) return true
   return (
-    section.stackEntries?.some(
-      (entry) => entry.detailKind === 'approval' && entry.active === true,
-    ) ?? false
+    section.stackEntries?.some((entry) => entry.detailKind === 'approval') ?? false
   )
 }
 
@@ -83,7 +83,9 @@ function sectionHasRequestUserInput(section: ProcessSectionSnapshot): boolean {
   return (
     section.processing === true &&
     (section.stackEntries?.some(
-      (entry) => entry.detailKind === 'user_input' && entry.active === true,
+      (entry) =>
+        entry.requestUserInput === true ||
+        (entry.detailKind === 'user_input' && entry.active === true),
     ) ??
       false)
   )
@@ -319,6 +321,32 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         forceOpen: true,
         detailKind: 'user_input',
         nestedBubble: MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
+      },
+      {
+        id: 'read',
+        summary: 'Read package.json',
+        filePath: 'package.json',
+      },
+    ],
+  },
+  executionRequestInput: {
+    kind: 'execution',
+    title: 'Waiting for input',
+    processing: true,
+    active: true,
+    hasRequestUserInput: true,
+    collapsible: true,
+    expanded: true,
+    stackEntries: [
+      {
+        id: 'request-input-tool',
+        summary: 'Request user input: Which database should I use?',
+        active: true,
+        requestUserInput: true,
+        collapsible: true,
+        detailText:
+          'The project supports SQLite and Postgres. Which database should I configure for local development?',
+        detailKind: 'text',
       },
       {
         id: 'read',
