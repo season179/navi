@@ -33825,6 +33825,17 @@ button.usage-heatmap-cell:focus {
 }
 /* ---------- iKun 出没:主会话两侧不定时冒出的坤鸡彩蛋(指针穿透) ---------- */
 
+/* Focus mode removes decorative Kun / iKun mascots without hiding essential loading indicators. */
+[data-focus-mode='on'] .ds-ikun-cameo-layer,
+[data-focus-mode='on'] .ds-kun-celebration-layer,
+[data-focus-mode='on'] .ds-kun-state,
+[data-focus-mode='on'] .ds-runtime-wake-zzz,
+[data-focus-mode='on'] .ds-work-logo,
+[data-focus-mode='on'] .ds-work-logo-slot:has(.ds-work-logo),
+[data-focus-mode='on'] .ds-ikun-toggle-figure {
+  display: none !important;
+}
+
 .ds-ikun-cameo-layer {
   position: absolute;
   inset: 0;

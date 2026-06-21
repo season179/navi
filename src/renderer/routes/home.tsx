@@ -506,6 +506,7 @@ import { hasUsableProvider, type SkillSummary } from '../../shared/flue'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
 import { useSettings } from '../settings'
+import { useFocusMode } from '../focus-mode'
 
 // Which settings category is shown while the settings stage is open. Open/close
 // itself is owned by useSettings(); this selects the sidebar category.
@@ -577,6 +578,7 @@ function renderProductionRightPanel(
 function HomePage() {
   const { collapsed, toggle } = useSidebar()
   const { settingsOpen, openSettings, closeSettings } = useSettings()
+  const { focusModeEnabled } = useFocusMode()
   const [draft, setDraft] = useState('')
   const [settingsCategory, setSettingsCategory] = useState<SettingsCategory>('providers')
   const { messages, status, busy, send, cancel, activeSelection, pickModel, pickReasoning } =
@@ -3223,6 +3225,7 @@ function HomePage() {
           ready={status.ready}
           hasWorkspace={Boolean(projectPath)}
           runtimeError={status.error}
+          focusModeEnabled={focusModeEnabled}
           onOpenSettings={() => openSettingsTab('providers')}
         />
       )}

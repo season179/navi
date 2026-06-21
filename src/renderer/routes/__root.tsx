@@ -5,6 +5,7 @@ import { FocusModeToggle, SidebarMascot } from '../components/Sidebar'
 import { useTheme } from '../theme'
 import { SidebarContext } from '../sidebar'
 import { SettingsContext } from '../settings'
+import { FocusModeProvider, useFocusMode } from '../focus-mode'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import {
   RuntimeStatusBanner,
@@ -28,8 +29,9 @@ function resolveProductionPlatform(): string {
   return window.navigator.platform.toLowerCase()
 }
 
-function RootLayout() {
+function RootLayoutInner() {
   const { theme, toggleTheme } = useTheme()
+  const { focusModeEnabled, toggleFocusMode } = useFocusMode()
   const [collapsed, setCollapsed] = useState(false)
   const toggle = useCallback(() => setCollapsed((v) => !v), [])
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -54,7 +56,6 @@ function RootLayout() {
     useState<WorkspaceModeView>(() => workspaceModeTabsPreviewMode ?? 'chat')
   const [productionWorkspaceMode, setProductionWorkspaceMode] =
     useState<WorkspaceModeView>('chat')
-  const [productionFocusModeEnabled, setProductionFocusModeEnabled] = useState(false)
 
   const platform = useMemo(() => resolveProductionPlatform(), [])
   const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
@@ -119,14 +120,14 @@ function RootLayout() {
                 footer={
                   <div className="space-y-1">
                     <div className="flex min-h-[42px] items-center justify-center gap-2.5 pb-1">
-                      {!productionFocusModeEnabled ? (
+                      {!focusModeEnabled ? (
                         <span className="flex h-[46px] w-[56px] shrink-0 items-center justify-center">
                           <SidebarMascot />
                         </span>
                       ) : null}
                       <FocusModeToggle
-                        enabled={productionFocusModeEnabled}
-                        onToggle={() => setProductionFocusModeEnabled((enabled) => !enabled)}
+                        enabled={focusModeEnabled}
+                        onToggle={toggleFocusMode}
                       />
                     </div>
                     <SidebarCommandRow
@@ -197,6 +198,14 @@ function RootLayout() {
         </div>
       </SettingsContext.Provider>
     </SidebarContext.Provider>
+  )
+}
+
+function RootLayout() {
+  return (
+    <FocusModeProvider>
+      <RootLayoutInner />
+    </FocusModeProvider>
   )
 }
 
