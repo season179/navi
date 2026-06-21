@@ -64,8 +64,74 @@ export type ProcessSectionSnapshot = {
   collapsible?: boolean
   forceExpanded?: boolean
   reasoningText?: string
+  /** When >1, reasoning title becomes "Thought (N steps)" like Kun. */
+  reasoningStepCount?: number
   stackEntries?: ProcessStackEntrySnapshot[]
   outputEntries?: ProcessOutputEntrySnapshot[]
+}
+
+function formatDuration(ms: number): string {
+  if (ms < 1000) return `${Math.max(1, Math.round(ms))}ms`
+  if (ms < 60_000) return `${(ms / 1000).toFixed(ms < 10_000 ? 1 : 0)}s`
+  if (ms < 3_600_000) {
+    const totalSeconds = Math.round(ms / 1000)
+    const m = Math.floor(totalSeconds / 60)
+    const s = totalSeconds % 60
+    return `${m}m ${s}s`
+  }
+  if (ms < 86_400_000) {
+    const totalMinutes = Math.round(ms / 60_000)
+    const h = Math.floor(totalMinutes / 60)
+    const m = totalMinutes % 60
+    return `${h}h ${m}m`
+  }
+  const totalHours = Math.round(ms / 3_600_000)
+  const d = Math.floor(totalHours / 24)
+  const h = totalHours % 24
+  return `${d}d ${h}h`
+}
+
+function describeReasoningSectionTitle(
+  section: ProcessSectionSnapshot,
+  opts: {
+    singleReasoningSection: boolean
+    reasoningDurationMs?: number
+  },
+): string {
+  if (section.processing === true && section.active === true) {
+    return 'Thinking…'
+  }
+  if (
+    opts.singleReasoningSection &&
+    typeof opts.reasoningDurationMs === 'number' &&
+    opts.reasoningDurationMs >= 1000
+  ) {
+    return `Thought for ${formatDuration(opts.reasoningDurationMs)}`
+  }
+  const stepCount = section.reasoningStepCount ?? 1
+  if (stepCount > 1) {
+    return `Thought (${stepCount} steps)`
+  }
+  return 'Thinking'
+}
+
+function resolveProcessSectionTitle(
+  section: ProcessSectionSnapshot,
+  opts?: {
+    singleReasoningSection?: boolean
+    reasoningDurationMs?: number
+  },
+): string {
+  if (
+    section.kind !== 'reasoning' ||
+    opts?.singleReasoningSection === undefined
+  ) {
+    return section.title
+  }
+  return describeReasoningSectionTitle(section, {
+    singleReasoningSection: opts.singleReasoningSection,
+    reasoningDurationMs: opts.reasoningDurationMs,
+  })
 }
 
 function entryAutoForceOpen(
@@ -138,6 +204,15 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
     expanded: true,
     reasoningText:
       'Checking file imports and existing token validation helpers in the auth package…',
+  },
+  reasoningSteps: {
+    kind: 'reasoning',
+    title: 'Thinking',
+    reasoningStepCount: 3,
+    collapsible: true,
+    expanded: false,
+    reasoningText:
+      'First I checked imports, then traced token validation, then planned the middleware edit.',
   },
   execution: {
     kind: 'execution',
@@ -414,6 +489,9 @@ type Props = {
   expanded?: boolean
   onToggle?: () => void
   viewportRef?: RefObject<HTMLDivElement | null>
+  /** When set with singleReasoningSection, reasoning titles match Kun's describeProcessSection. */
+  reasoningDurationMs?: number
+  singleReasoningSection?: boolean
 }
 
 function splitSummaryVerb(summary: string): { verb: string; rest: string } {
@@ -691,6 +769,8 @@ export function ProcessSectionRow({
   expanded,
   onToggle,
   viewportRef,
+  reasoningDurationMs,
+  singleReasoningSection,
 }: Props): ReactElement {
   const [userExpanded, setUserExpanded] = useState<boolean | null>(null)
   const singleExecutionEntry =
@@ -752,6 +832,10 @@ export function ProcessSectionRow({
   const showActiveError = section.showActiveError === true
   const titleClass = section.hasError ? 'is-error' : ''
   const titleShimmer = section.active && !section.hasError ? 'ds-shiny-text' : ''
+  const displayTitle = resolveProcessSectionTitle(section, {
+    singleReasoningSection,
+    reasoningDurationMs,
+  })
   const { ref: deferredDetailRef, shouldRender: shouldRenderDetail } =
     useDeferredRender<HTMLDivElement>({
       enabled: isExpanded && hasDetails,
@@ -766,7 +850,7 @@ export function ProcessSectionRow({
           <span className="process-section-row-error-dot" />
         </span>
       ) : null}
-      <span className={titleShimmer}>{section.title}</span>
+      <span className={titleShimmer}>{displayTitle}</span>
       {canToggleSection ? (
         isExpanded ? (
           <ChevronDown className="process-section-row-chevron is-expanded" strokeWidth={1.8} />

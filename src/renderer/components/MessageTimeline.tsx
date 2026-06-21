@@ -132,6 +132,9 @@ function MessageTurnImpl({
   const processSections = turn.processSections ?? []
   const hasProcess = Boolean(workMeta && (processing || processSections.length > 0))
   const hasProcessError = processSections.some((section) => section.hasError)
+  const reasoningSectionCount = processSections.filter(
+    (section) => section.kind === 'reasoning',
+  ).length
   const workExpanded =
     hasProcessError || (workExpandedOverride ?? turn.workExpanded ?? processing)
   const showLiveAssistant = Boolean(turn.liveAssistant?.text.trim())
@@ -163,6 +166,8 @@ function MessageTurnImpl({
                       : `${section.kind}-${index}`)
                   }
                   section={section}
+                  reasoningDurationMs={workMeta.reasoningDurationMs}
+                  singleReasoningSection={reasoningSectionCount === 1}
                   viewportRef={viewportRef}
                 />
               ))}

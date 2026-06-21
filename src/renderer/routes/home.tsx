@@ -747,7 +747,7 @@ function HomePage() {
   const [workMetaRowExpanded, setWorkMetaRowExpanded] = useState(false)
 
   // Visual preview for the ported ProcessSectionRow
-  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|executionAutoOpen|executionForceOpen|executionApproval|executionApprovalResolved|executionUserInput|executionRequestInput|error|output|outputStreaming).
+  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|reasoningSteps|execution|...).
   const processSectionRowPreviewMode = useMemo((): ProcessSectionRowPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -755,6 +755,7 @@ function HomePage() {
     const mode = params.get('processSectionRow')
     if (mode === 'reasoningExpanded') return 'reasoningExpanded'
     if (mode === 'reasoningActive') return 'reasoningActive'
+    if (mode === 'reasoningSteps') return 'reasoningSteps'
     if (mode === 'execution') return 'execution'
     if (mode === 'executionExpanded') return 'executionExpanded'
     if (mode === 'executionAutoOpen') return 'executionAutoOpen'
@@ -4243,6 +4244,18 @@ function HomePage() {
         <div className="process-section-row-preview">
           <ProcessSectionRow
             section={PROCESS_SECTION_ROW_PREVIEW[processSectionRowPreviewMode]}
+            reasoningDurationMs={
+              processSectionRowPreviewMode === 'reasoningExpanded' ? 4_200 : undefined
+            }
+            singleReasoningSection={
+              processSectionRowPreviewMode === 'reasoning' ||
+              processSectionRowPreviewMode === 'reasoningExpanded' ||
+              processSectionRowPreviewMode === 'reasoningActive'
+                ? true
+                : processSectionRowPreviewMode === 'reasoningSteps'
+                  ? false
+                  : undefined
+            }
             expanded={
               processSectionRowPreviewMode === 'reasoningExpanded' ||
               processSectionRowPreviewMode === 'reasoningActive' ||

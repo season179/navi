@@ -300,6 +300,9 @@ export function ChatThread({
             typeof workProcessAtTurnIndex === 'number' &&
             workProcessAtTurnIndex === absoluteTurnIndex
           const processSections = workProcess?.processSections ?? []
+          const reasoningSectionCount = processSections.filter(
+            (section) => section.kind === 'reasoning',
+          ).length
           const hasProcessError = processSections.some((section) => section.hasError)
           const workExpanded =
             hasProcessError ||
@@ -357,6 +360,10 @@ export function ChatThread({
                                 : `${section.kind}-${index}`)
                             }
                             section={section}
+                            reasoningDurationMs={
+                              workProcess.workMeta.reasoningDurationMs
+                            }
+                            singleReasoningSection={reasoningSectionCount === 1}
                             viewportRef={containerRef}
                           />
                         ))}
