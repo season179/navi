@@ -264,6 +264,78 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     }
   }
 
+  const UNSUPPORTED_FILE_PATH = '/Users/season/writing/archive/project.zip'
+
+  if (mode === 'loading') {
+    return {
+      workspaceReady: true,
+      workspaceError: null,
+      activeFilePath: SAMPLE_PATH,
+      activeFileIsImage: false,
+      activeFileIsPdf: false,
+      activeFileIsText: true,
+      fileLoading: true,
+      previewMode: 'split',
+      renderSafety: {
+        livePreviewEnabled: true,
+        markdownPreviewEnabled: true,
+        readOnly: false,
+        notice: 'none',
+      },
+      fileGuardMessage: '',
+      fileGuardDetail: '',
+      imageSrc: WRITE_IMAGE_PREVIEW_SAMPLE.src,
+      imageMimeType: WRITE_IMAGE_PREVIEW_SAMPLE.mimeType,
+      activeFileName: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileName,
+      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
+      activeFilePathLabel: SAMPLE_PATH,
+      documentStatsLabel: null,
+      saveStatus: 'saved',
+      readOnly: false,
+      showInlineAgent: false,
+      fileError: null,
+      exportNotice: null,
+      runtimeBanner: null,
+      fileContent: '',
+      fileSize: 0,
+    }
+  }
+
+  if (mode === 'unsupported') {
+    return {
+      workspaceReady: true,
+      workspaceError: null,
+      activeFilePath: UNSUPPORTED_FILE_PATH,
+      activeFileIsImage: false,
+      activeFileIsPdf: false,
+      activeFileIsText: false,
+      fileLoading: false,
+      previewMode: 'split',
+      renderSafety: {
+        livePreviewEnabled: true,
+        markdownPreviewEnabled: true,
+        readOnly: false,
+        notice: 'none',
+      },
+      fileGuardMessage: '',
+      fileGuardDetail: '',
+      imageSrc: WRITE_IMAGE_PREVIEW_SAMPLE.src,
+      imageMimeType: WRITE_IMAGE_PREVIEW_SAMPLE.mimeType,
+      activeFileName: 'project.zip',
+      activeFileLabel: 'project.zip',
+      activeFilePathLabel: UNSUPPORTED_FILE_PATH,
+      documentStatsLabel: null,
+      saveStatus: 'saved',
+      readOnly: false,
+      showInlineAgent: false,
+      fileError: null,
+      exportNotice: null,
+      runtimeBanner: null,
+      fileContent: '',
+      fileSize: 4_194_304,
+    }
+  }
+
   if (mode === 'largeFile') {
     return {
       workspaceReady: true,

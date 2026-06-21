@@ -11,6 +11,8 @@ export type WriteWorkspaceViewPreviewMode =
   | 'preview'
   | 'pdf'
   | 'image'
+  | 'loading'
+  | 'unsupported'
   | 'largeFile'
   | 'truncated'
   | 'inlineAgent'
@@ -38,6 +40,8 @@ export function resolveWriteWorkspaceViewPreviewMode(
   if (value === 'preview') return 'preview'
   if (value === 'pdf') return 'pdf'
   if (value === 'image') return 'image'
+  if (value === 'loading') return 'loading'
+  if (value === 'unsupported') return 'unsupported'
   if (value === 'largeFile') return 'largeFile'
   if (value === 'truncated') return 'truncated'
   if (value === 'inlineAgent') return 'inlineAgent'
@@ -65,6 +69,8 @@ export const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceV
   'preview',
   'pdf',
   'image',
+  'loading',
+  'unsupported',
   'largeFile',
   'truncated',
   'inlineAgent',

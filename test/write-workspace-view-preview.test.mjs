@@ -13,6 +13,17 @@ test('defaults to split for bare writeWorkspaceView param', () => {
   )
 })
 
+test('routes loading and unsupported document-pane preview modes', () => {
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=loading')),
+    'loading',
+  )
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=unsupported')),
+    'unsupported',
+  )
+})
+
 test('routes largeFile and truncated file-guard preview modes', () => {
   assert.equal(
     resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=largeFile')),
