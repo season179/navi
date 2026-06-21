@@ -3454,6 +3454,114 @@ a.runtime-meta-chip:hover {
 
 
 /* =====================================================
+   Claw empty hero (Kun ClawEmptyHero)
+   ===================================================== */
+.claw-empty-hero {
+  display: flex;
+  justify-content: center;
+  padding: 48px 16px 24px;
+}
+
+@media (min-width: 768px) {
+  .claw-empty-hero {
+    padding: 64px 32px 24px;
+  }
+}
+
+.claw-empty-hero-card {
+  width: 100%;
+  max-width: 980px;
+  padding: 40px 32px;
+  border-radius: 32px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-card) 78%, transparent);
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(20, 47, 95, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+[data-theme='dark'] .claw-empty-hero-card {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+
+@media (min-width: 768px) {
+  .claw-empty-hero-card {
+    padding: 56px 48px;
+  }
+}
+
+.claw-empty-hero-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.claw-empty-hero-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  border-radius: 24px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-bg-main) 55%, transparent);
+  color: var(--ds-accent);
+}
+
+.claw-empty-hero-mascot {
+  width: 56px;
+  height: 56px;
+  transform-origin: 50% 88%;
+  animation: claw-empty-hero-greet-wave 2.6s ease-in-out infinite;
+}
+
+@keyframes claw-empty-hero-greet-wave {
+  0%,
+  48%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  12% {
+    transform: rotate(-5deg) translateY(-1px);
+  }
+  24% {
+    transform: rotate(4deg) translateY(-1.6px);
+  }
+  36% {
+    transform: rotate(-3deg) translateY(-0.6px);
+  }
+}
+
+.claw-empty-hero-title {
+  margin: 24px 0 0;
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  color: var(--ds-text);
+}
+
+@media (min-width: 768px) {
+  .claw-empty-hero-title {
+    font-size: 48px;
+  }
+}
+
+.claw-empty-hero-sub {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ds-text-muted);
+}
+
+@media (min-width: 768px) {
+  .claw-empty-hero-sub {
+    font-size: 16px;
+  }
+}
+
+
+/* =====================================================
    Runtime wake hero (Kun RuntimeWakeHero / KunHeroStage)
    ===================================================== */
 .runtime-wake-hero {

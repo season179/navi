@@ -45,6 +45,31 @@ export function SleepingMascot({ className, style }: MascotProps) {
 }
 
 /**
+ * Greeting bird figure — raised wing pose with a gentle wave animation
+ * matching Kun's ds-kun-state-greet figure in ClawEmptyHero.
+ */
+export function GreetingMascot({ className, style }: MascotProps) {
+  return (
+    <svg viewBox="0 0 56 56" className={className} style={style} aria-hidden="true">
+      <ellipse cx="28" cy="48" rx="12" ry="2.5" fill="var(--mascot-water)" opacity="0.5" />
+      <path
+        d="M14 34 C14 26 18 22 26 22 C34 22 40 26 40 32 C40 36 37 38 33 38 L18 38 C15 38 14 36 14 34 Z"
+        fill="var(--mascot-body)"
+      />
+      <circle cx="30" cy="28" r="7" fill="var(--mascot-body)" />
+      <path d="M34 28 l7 -2 l-7 4 z" fill="var(--mascot-beak)" />
+      <circle cx="31" cy="27" r="1.4" fill="#14305f" />
+      <path
+        d="M18 32 C12 28 8 24 10 18 C14 20 17 24 19 30 Z"
+        fill="var(--mascot-body)"
+        className="greeting-mascot-wing"
+      />
+      <path d="M22 36 l-5 2 l5 -1 z" fill="var(--mascot-body)" opacity="0.85" />
+    </svg>
+  )
+}
+
+/**
  * A small bird figure (Kun's companion) perched near the whale.
  */
 export function CompanionBird({ className, style }: MascotProps) {

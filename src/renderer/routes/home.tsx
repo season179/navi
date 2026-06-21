@@ -126,6 +126,10 @@ import {
   RuntimeWakeHero,
   RUNTIME_WAKE_HERO_PREVIEW_ERROR,
 } from '../components/RuntimeWakeHero'
+import {
+  ClawEmptyHero,
+  CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
+} from '../components/ClawEmptyHero'
 import { PencilLine } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -454,6 +458,15 @@ function HomePage() {
     return 'waking'
   }, [])
 
+  // Visual preview for the ported ClawEmptyHero
+  // (?clawEmptyHero=1|needsInbound).
+  const clawEmptyHeroPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('clawEmptyHero')) return null
+    return params.get('clawEmptyHero') === 'needsInbound' ? 'needsInbound' : 'ready'
+  }, [])
+
   // Visual preview for the ported ToolEntry (?toolEntry=1|running|error|command).
   const toolEntryPreview = useMemo((): {
     block: ToolBlockSnapshot
@@ -567,6 +580,11 @@ function HomePage() {
                 waking={runtimeWakeHeroPreviewMode === 'waking' ? true : false}
               />
             </div>
+          ) : clawEmptyHeroPreviewMode ? (
+            <ClawEmptyHero
+              agentName={CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME}
+              hasInboundConversation={clawEmptyHeroPreviewMode !== 'needsInbound'}
+            />
           ) : (
             <div className="hero">
               <HeroStage />
