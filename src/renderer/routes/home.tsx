@@ -153,6 +153,12 @@ import {
   type SessionHeaderPreviewMode,
 } from '../components/SessionHeader'
 import {
+  WorkbenchTopBar,
+  WORKBENCH_TOP_BAR_PREVIEW_GUI_UPDATE,
+  type RightPanelMode,
+  type WorkbenchTopBarPreviewMode,
+} from '../components/WorkbenchTopBar'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -592,6 +598,80 @@ function HomePage() {
     return 'default'
   }, [])
 
+  // Visual preview for the ported WorkbenchTopBar
+  // (?workbenchTopBarPreview=1|update|downloading|downloaded|manual|sidechat|sidechatRunning|active).
+  const workbenchTopBarPreviewMode = useMemo((): WorkbenchTopBarPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('workbenchTopBarPreview')) return null
+    const mode = params.get('workbenchTopBarPreview')
+    if (mode === 'update') return 'update'
+    if (mode === 'downloading') return 'downloading'
+    if (mode === 'downloaded') return 'downloaded'
+    if (mode === 'manual') return 'manual'
+    if (mode === 'sidechat') return 'sidechat'
+    if (mode === 'sidechatRunning') return 'sidechatRunning'
+    if (mode === 'active') return 'active'
+    return 'default'
+  }, [])
+  const [workbenchTopBarPanelMode, setWorkbenchTopBarPanelMode] =
+    useState<RightPanelMode>(() =>
+      workbenchTopBarPreviewMode === 'active' ? 'changes' : null,
+    )
+  const [workbenchTopBarTerminalOpen, setWorkbenchTopBarTerminalOpen] = useState(
+    () => workbenchTopBarPreviewMode === 'active',
+  )
+  const [workbenchTopBarFileTreeOpen, setWorkbenchTopBarFileTreeOpen] = useState(false)
+  const [workbenchTopBarSideChatOpen, setWorkbenchTopBarSideChatOpen] = useState(
+    () =>
+      workbenchTopBarPreviewMode === 'sidechat' ||
+      workbenchTopBarPreviewMode === 'sidechatRunning',
+  )
+
+  const workbenchTopBarPreviewProps = useMemo(() => {
+    if (!workbenchTopBarPreviewMode) return null
+    const guiUpdate =
+      workbenchTopBarPreviewMode === 'update'
+        ? WORKBENCH_TOP_BAR_PREVIEW_GUI_UPDATE.available
+        : workbenchTopBarPreviewMode === 'downloading'
+          ? WORKBENCH_TOP_BAR_PREVIEW_GUI_UPDATE.downloading
+          : workbenchTopBarPreviewMode === 'downloaded'
+            ? WORKBENCH_TOP_BAR_PREVIEW_GUI_UPDATE.downloaded
+            : workbenchTopBarPreviewMode === 'manual'
+              ? WORKBENCH_TOP_BAR_PREVIEW_GUI_UPDATE.manual
+              : null
+    const sideChatCount =
+      workbenchTopBarPreviewMode === 'sidechat' ||
+      workbenchTopBarPreviewMode === 'sidechatRunning'
+        ? 3
+        : 0
+    const sideChatRunningCount =
+      workbenchTopBarPreviewMode === 'sidechatRunning' ? 1 : 0
+    return { guiUpdate, sideChatCount, sideChatRunningCount }
+  }, [workbenchTopBarPreviewMode])
+
+  const renderWorkbenchTopBarPreview = () => {
+    if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
+    return (
+      <WorkbenchTopBar
+        rightPanelMode={workbenchTopBarPanelMode}
+        onToggleRightPanelMode={(mode) =>
+          setWorkbenchTopBarPanelMode((current) => (current === mode ? null : mode))
+        }
+        planPanelEnabled
+        terminalOpen={workbenchTopBarTerminalOpen}
+        onToggleTerminal={() => setWorkbenchTopBarTerminalOpen((value) => !value)}
+        sideChatCount={workbenchTopBarPreviewProps.sideChatCount}
+        sideChatRunningCount={workbenchTopBarPreviewProps.sideChatRunningCount}
+        sideChatOpen={workbenchTopBarSideChatOpen}
+        onOpenSideChat={() => setWorkbenchTopBarSideChatOpen((value) => !value)}
+        fileTreeOpen={workbenchTopBarFileTreeOpen}
+        onToggleFileTree={() => setWorkbenchTopBarFileTreeOpen((value) => !value)}
+        guiUpdate={workbenchTopBarPreviewProps.guiUpdate}
+      />
+    )
+  }
+
   // Visual preview for the ported ToolEntry (?toolEntry=1|running|error|command).
   const toolEntryPreview = useMemo((): {
     block: ToolBlockSnapshot
@@ -681,7 +761,33 @@ function HomePage() {
               busy={sessionHeaderPreviewMode === 'busy'}
             />
           </div>
-          <div className="topbar-actions" aria-hidden="true" />
+          <div className="topbar-actions">
+            {renderWorkbenchTopBarPreview()}
+          </div>
+        </header>
+      ) : workbenchTopBarPreviewMode ? (
+        <header className="topbar">
+          <div className="topbar-session">
+            {collapsed ? (
+              <button
+                className="sidebar-titlebar-toggle"
+                onClick={toggle}
+                aria-label="Expand sidebar"
+                title="Expand sidebar"
+              >
+                <PanelLeft />
+              </button>
+            ) : null}
+            <div style={{ minWidth: 0 }}>
+              <div className="topbar-title">Refactor auth middleware</div>
+              <div className="topbar-subtitle">
+                <span>navi</span>
+                <span className="dot">·</span>
+                <span>chat</span>
+              </div>
+            </div>
+          </div>
+          <div className="topbar-actions">{renderWorkbenchTopBarPreview()}</div>
         </header>
       ) : (
         <TopBar
