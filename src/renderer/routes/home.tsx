@@ -236,6 +236,10 @@ import {
   type SettingsControlsPreviewMode,
 } from '../components/SettingsControls'
 import {
+  GeneralSettingsSectionPreview,
+  type GeneralSettingsPreviewMode,
+} from '../components/GeneralSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1207,6 +1211,16 @@ function HomePage() {
       resolveSettingsSidebarPreviewCategory(settingsSidebarPreviewMode),
     )
 
+  // Visual preview for the ported GeneralSettingsSection (?generalSettingsPreview=1|workspaceError|legacyScanning|…).
+  const generalSettingsPreviewMode = useMemo((): GeneralSettingsPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('generalSettingsPreview')) return null
+    const mode = params.get('generalSettingsPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as GeneralSettingsPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1316,6 +1330,22 @@ function HomePage() {
   if (appErrorBoundaryPreviewMode) {
     return (
       <AppErrorFallback error={APP_ERROR_BOUNDARY_PREVIEW[appErrorBoundaryPreviewMode]} />
+    )
+  }
+
+  if (generalSettingsPreviewMode) {
+    return (
+      <div className="general-settings-preview">
+        <div className="general-settings-preview-inner">
+          <h1 className="general-settings-preview-title">General settings</h1>
+          <p className="general-settings-preview-subtitle">
+            General category from Kun settings-section-general.tsx.
+          </p>
+          <div className="general-settings-preview-stack">
+            <GeneralSettingsSectionPreview mode={generalSettingsPreviewMode} />
+          </div>
+        </div>
+      </div>
     )
   }
 

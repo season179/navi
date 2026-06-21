@@ -13915,3 +13915,253 @@ button.usage-heatmap-cell:focus {
   gap: 8px;
 }
 
+/* =====================================================
+   General settings section (Kun settings-section-general.tsx)
+   ===================================================== */
+.settings-card-spaced {
+  margin-top: 24px;
+}
+
+.settings-text-input {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-card);
+  font-size: 14px;
+  color: var(--ds-text);
+  box-shadow: var(--ds-shadow-card-soft);
+  transition:
+    border-color 0.14s ease,
+    box-shadow 0.14s ease;
+}
+
+.settings-text-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--ds-accent) 40%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ds-accent) 30%, transparent);
+}
+
+.settings-action-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-card);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text);
+  box-shadow: var(--ds-shadow-card-soft);
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.settings-action-button:hover:not(:disabled) {
+  background: var(--ds-surface-hover);
+}
+
+.settings-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-action-button.is-inline {
+  font-size: 14px;
+}
+
+.settings-action-button.is-compact {
+  padding: 6px 12px;
+}
+
+.settings-action-button-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.general-settings-font-scale {
+  width: 100%;
+  min-width: 0;
+  max-width: 28rem;
+}
+
+.general-settings-font-scale-labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ds-text-faint);
+}
+
+.general-settings-font-scale-slider {
+  width: 100%;
+  margin-top: 8px;
+  accent-color: var(--ds-accent);
+}
+
+.general-settings-font-scale-current {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+}
+
+.general-settings-workspace {
+  width: 100%;
+  min-width: 200px;
+  max-width: 36rem;
+}
+
+.general-settings-workspace-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.general-settings-workspace-error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.25rem;
+  color: #b45309;
+}
+
+[data-theme='dark'] .general-settings-workspace-error {
+  color: #fcd34d;
+}
+
+.general-settings-legacy-control {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.general-settings-legacy-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ds-text-muted);
+}
+
+.general-settings-legacy-spinner {
+  width: 14px;
+  height: 14px;
+  animation: spin 1s linear infinite;
+}
+
+.general-settings-legacy-sources {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.general-settings-legacy-source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ds-text-faint);
+}
+
+.general-settings-legacy-source + .general-settings-legacy-source {
+  margin-top: 4px;
+}
+
+.general-settings-legacy-source-count {
+  font-weight: 500;
+  color: var(--ds-text-muted);
+}
+
+.general-settings-legacy-source-path {
+  word-break: break-all;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.general-settings-legacy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.general-settings-log-control {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.general-settings-log-path {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  word-break: break-all;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ds-bg-main) 70%, transparent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: var(--ds-text-muted);
+  box-shadow: var(--ds-shadow-card-soft);
+}
+
+.general-settings-log-empty {
+  font-size: 13px;
+  color: var(--ds-text-faint);
+}
+
+.general-settings-log-error {
+  margin: 0;
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+[data-theme='dark'] .general-settings-log-error {
+  color: #fca5a5;
+}
+
+.general-settings-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  overflow: auto;
+  padding: 40px;
+  background: var(--ds-bg-main);
+}
+
+.general-settings-preview-inner {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.general-settings-preview-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+}
+
+.general-settings-preview-subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ds-text-muted);
+}
+
+.general-settings-preview-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 32px;
+}
+

@@ -4,6 +4,7 @@
 
 import type { Dispatch, ReactElement, SetStateAction } from 'react'
 import { SettingsControlsPreview } from './SettingsControls'
+import { GeneralSettingsSectionPreview } from './GeneralSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -166,8 +167,8 @@ export function SettingsSidebarPreviewContent({
       <h1 className="settings-sidebar-preview-title">Settings</h1>
       <p className="settings-sidebar-preview-subtitle">Configure {label.toLowerCase()} preferences.</p>
       {category === 'general' ? (
-        <div className="settings-controls-preview-stack">
-          <SettingsControlsPreview />
+        <div className="general-settings-preview-stack">
+          <GeneralSettingsSectionPreview />
         </div>
       ) : category === 'agents' ? (
         <div className="settings-controls-preview-stack">
