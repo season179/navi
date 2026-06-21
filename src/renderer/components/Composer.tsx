@@ -42,6 +42,8 @@ interface ComposerProps {
   onRemoveQueuedMessage?: (id: string) => void
   /** Execution picker (approval + sandbox) rendered in the toolbar after the model chip. */
   executionPicker?: ReactNode
+  /** Footer row below the composer shell (e.g. git branch picker). */
+  footerLeft?: ReactNode
 }
 
 /**
@@ -70,6 +72,7 @@ export function Composer({
   queuedMessages,
   onRemoveQueuedMessage,
   executionPicker,
+  footerLeft,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -217,6 +220,11 @@ export function Composer({
           </div>
         </div>
         </div>
+        {footerLeft ? (
+          <div className="composer-footer">
+            <div className="composer-footer-left">{footerLeft}</div>
+          </div>
+        ) : null}
       </div>
     </div>
   )

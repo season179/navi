@@ -1222,6 +1222,302 @@ textarea {
   flex-shrink: 0;
 }
 
+/* =====================================================
+   Git branch picker (composer footer)
+   ===================================================== */
+.git-branch-picker {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.git-branch-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 320px;
+  height: 32px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.git-branch-picker-trigger:hover {
+  background: var(--ds-surface-hover);
+  color: var(--ds-text);
+}
+
+.git-branch-picker-trigger svg:first-child {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.git-branch-picker-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.git-branch-picker-spinner,
+.git-branch-picker-chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--ds-text-faint);
+}
+
+.git-branch-picker-spinner {
+  animation: navi-spin 0.9s linear infinite;
+}
+
+.git-branch-picker-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  width: min(420px, calc(100vw - 48px));
+  overflow: hidden;
+  border: 1px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-card-strong);
+  box-shadow: 0 24px 70px rgba(44, 55, 78, 0.18);
+  backdrop-filter: blur(24px);
+}
+
+[data-theme='dark'] .git-branch-picker-menu {
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+}
+
+.git-branch-picker-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ds-border-muted);
+}
+
+.git-branch-picker-search svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--ds-text-faint);
+}
+
+.git-branch-picker-search input {
+  min-width: 0;
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--ds-text);
+  outline: none;
+}
+
+.git-branch-picker-search input::placeholder {
+  color: var(--ds-text-faint);
+}
+
+.git-branch-picker-list {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.git-branch-picker-section-label {
+  margin-bottom: 8px;
+  padding: 0 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text-faint);
+}
+
+.git-branch-picker-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 4px;
+  font-size: 13px;
+  color: var(--ds-text-muted);
+}
+
+.git-branch-picker-loading svg {
+  width: 16px;
+  height: 16px;
+  animation: navi-spin 0.9s linear infinite;
+}
+
+.git-branch-picker-error {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, #fcd34d 70%, transparent);
+  border-radius: 8px;
+  background: #fffbeb;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #78350f;
+}
+
+.git-branch-picker-error svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+[data-theme='dark'] .git-branch-picker-error {
+  border-color: color-mix(in srgb, #b45309 50%, transparent);
+  background: color-mix(in srgb, #451a03 35%, transparent);
+  color: #fef3c7;
+}
+
+.git-branch-picker-row {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 4px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ds-text);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.14s ease;
+}
+
+.git-branch-picker-row:hover:not(:disabled) {
+  background: var(--ds-surface-hover);
+}
+
+.git-branch-picker-row:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.git-branch-picker-row > svg:first-child {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--ds-text-faint);
+}
+
+.git-branch-picker-row-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.git-branch-picker-row-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.git-branch-picker-row-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ds-text-faint);
+}
+
+.git-branch-picker-row-spinner,
+.git-branch-picker-row-check {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--ds-text-muted);
+}
+
+.git-branch-picker-row-spinner {
+  animation: navi-spin 0.9s linear infinite;
+}
+
+.git-branch-picker-empty {
+  padding: 12px 4px;
+  font-size: 13px;
+  color: var(--ds-text-faint);
+}
+
+.git-branch-picker-footer {
+  border-top: 1px solid var(--ds-border-muted);
+  padding: 12px;
+}
+
+.git-branch-picker-create {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ds-text);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.14s ease;
+}
+
+.git-branch-picker-create:hover:not(:disabled) {
+  background: var(--ds-surface-hover);
+}
+
+.git-branch-picker-create:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.git-branch-picker-create svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--ds-text-muted);
+}
+
+.git-branch-picker-create span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.composer-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 28px;
+  margin-top: 4px;
+  padding: 0 12px;
+}
+
+.composer-footer-left {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Round tool button (plus menu, etc.) */
 .tool-btn {
   display: inline-flex;

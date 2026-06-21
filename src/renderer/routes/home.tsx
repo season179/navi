@@ -17,6 +17,12 @@ import {
   EXECUTION_PICKER_PREVIEW,
   type ComposerExecutionSettings,
 } from '../components/FloatingComposerExecutionPicker'
+import {
+  GitBranchPicker,
+  GIT_BRANCH_PICKER_PREVIEW,
+  GIT_BRANCH_PICKER_PREVIEW_ERROR,
+  type GitBranchesSnapshot,
+} from '../components/GitBranchPicker'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -102,6 +108,26 @@ function HomePage() {
           : EXECUTION_PICKER_PREVIEW.sandboxMode,
     }),
   )
+
+  // Visual preview for the ported GitBranchPicker (?gitBranchPickerPreview=1).
+  const gitBranchPickerPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('gitBranchPickerPreview')) return null
+    const mode = params.get('gitBranchPickerPreview')
+    if (mode === 'error') return 'error'
+    if (mode === 'loading') return 'loading'
+    return 'default'
+  }, [])
+  const [gitBranchPickerPreview, setGitBranchPickerPreview] = useState<GitBranchesSnapshot>(
+    () => GIT_BRANCH_PICKER_PREVIEW,
+  )
+  const gitBranchPickerPreviewSnapshot = useMemo(() => {
+    if (!gitBranchPickerPreviewMode) return null
+    if (gitBranchPickerPreviewMode === 'error') return GIT_BRANCH_PICKER_PREVIEW_ERROR
+    if (gitBranchPickerPreviewMode === 'loading') return null
+    return gitBranchPickerPreview
+  }, [gitBranchPickerPreviewMode, gitBranchPickerPreview])
 
   // The active project's cwd, for scoping project skills in the Skills panel.
   // A no-project chat (navi-default) has no path → project skills aren't listed.
@@ -235,6 +261,28 @@ function HomePage() {
             <FloatingComposerExecutionPicker
               value={executionPickerPreview}
               onChange={(patch) => setExecutionPickerPreview((current) => ({ ...current, ...patch }))}
+            />
+          ) : undefined
+        }
+        footerLeft={
+          gitBranchPickerPreviewMode ? (
+            <GitBranchPicker
+              snapshot={gitBranchPickerPreviewSnapshot}
+              loading={gitBranchPickerPreviewMode === 'loading'}
+              onSwitchBranch={(branch) => {
+                if (gitBranchPickerPreviewMode !== 'default') return
+                setGitBranchPickerPreview((current) => {
+                  if (!current.ok) return current
+                  return {
+                    ...current,
+                    currentBranch: branch,
+                    branches: current.branches.map((entry) => ({
+                      ...entry,
+                      current: entry.name === branch,
+                    })),
+                  }
+                })
+              }}
             />
           ) : undefined
         }
