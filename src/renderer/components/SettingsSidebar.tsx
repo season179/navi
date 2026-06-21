@@ -16,6 +16,7 @@ import { ImageGenerationSettingsSectionPreview } from './ImageGenerationSettings
 import { MediaGenerationSettingsSectionPreview } from './MediaGenerationSettingsSection'
 import { WorktreeSettingsSectionPreview } from './WorktreeSettingsSection'
 import { ClawSettingsSectionPreview } from './ClawSettingsSection'
+import { WriteSettingsSectionPreview } from './WriteSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -180,6 +181,10 @@ export function SettingsSidebarPreviewContent({
       {category === 'general' ? (
         <div className="general-settings-preview-stack">
           <GeneralSettingsSectionPreview />
+        </div>
+      ) : category === 'write' ? (
+        <div className="write-settings-preview-stack">
+          <WriteSettingsSectionPreview />
         </div>
       ) : category === 'agents' ? (
         <div className="settings-controls-preview-stack">

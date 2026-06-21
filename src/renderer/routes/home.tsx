@@ -284,6 +284,10 @@ import {
   type ClawPreviewMode,
 } from '../components/ClawSettingsSection'
 import {
+  WriteSettingsSectionPreview,
+  type WritePreviewMode,
+} from '../components/WriteSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1375,6 +1379,16 @@ function HomePage() {
     return mode as ClawPreviewMode
   }, [])
 
+  // Visual preview for the ported WriteSettingsSection (?writePreview=1|disabled|customFont|advanced|…).
+  const writePreviewMode = useMemo((): WritePreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writePreview')) return null
+    const mode = params.get('writePreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as WritePreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1673,6 +1687,22 @@ function HomePage() {
           </p>
           <div className="claw-preview-stack">
             <ClawSettingsSectionPreview mode={clawPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (writePreviewMode) {
+    return (
+      <div className="write-preview">
+        <div className="write-preview-inner">
+          <h1 className="write-preview-title">Write</h1>
+          <p className="write-preview-subtitle">
+            Write category from Kun settings-section-write.tsx.
+          </p>
+          <div className="write-preview-stack">
+            <WriteSettingsSectionPreview mode={writePreviewMode} />
           </div>
         </div>
       </div>
