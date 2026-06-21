@@ -8,6 +8,7 @@ import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
 import {
   MessageBubble,
+  MESSAGE_BUBBLE_PREVIEW_APPROVAL_DONE,
   MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
   MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
   type MessageBubbleSnapshot,
@@ -34,6 +35,10 @@ export type ProcessEntrySnapshot = {
   detailFilePath?: string
   nestedBubble?: MessageBubbleSnapshot
   meta?: RuntimeMetaChipsSnapshot
+  /** Pending approval — force-opens like Kun isPendingApproval. */
+  pendingApproval?: boolean
+  /** Pending user_input — auto force-opens during active processing like Kun. */
+  pendingUserInput?: boolean
 }
 
 const PREVIEW_PATCH = `--- a/src/auth/middleware.ts
@@ -135,16 +140,24 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
     verb: 'Approve',
     rest: 'deploy to staging',
     active: true,
-    forceOpen: true,
+    pendingApproval: true,
     expanded: true,
     detailKind: 'approval',
     nestedBubble: MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
+  },
+  approvalResolved: {
+    verb: 'Approved',
+    rest: 'deploy to staging',
+    collapsible: true,
+    expanded: false,
+    detailKind: 'approval',
+    nestedBubble: MESSAGE_BUBBLE_PREVIEW_APPROVAL_DONE,
   },
   userInput: {
     verb: 'Request',
     rest: 'user input',
     active: true,
-    forceOpen: true,
+    pendingUserInput: true,
     expanded: true,
     detailKind: 'user_input',
     nestedBubble: MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
@@ -235,10 +248,9 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
     (Boolean(entry.detailText) || Boolean(entry.nestedBubble))
   const defaultOpen = entry.error === true
   const autoOpenPending =
-    entry.active === true &&
-    (entry.detailKind === 'approval' ||
-      entry.detailKind === 'user_input' ||
-      entry.showCompactionIcon === true)
+    entry.pendingApproval === true ||
+    (entry.active === true &&
+      (entry.pendingUserInput === true || entry.showCompactionIcon === true))
   const forceOpen =
     entry.forceOpen === true ||
     entry.detailKind === 'assistant' ||

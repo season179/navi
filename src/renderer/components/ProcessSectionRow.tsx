@@ -8,6 +8,7 @@ import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
 import {
   MessageBubble,
+  MESSAGE_BUBBLE_PREVIEW_APPROVAL_DONE,
   MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
   MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
   type MessageBubbleSnapshot,
@@ -35,6 +36,10 @@ export type ProcessStackEntrySnapshot = {
   showCompactionIcon?: boolean
   /** Running request_user_input tool — auto force-opens during processing like Kun. */
   requestUserInput?: boolean
+  /** Pending approval block — force-opens even when not active, like Kun isPendingApproval. */
+  pendingApproval?: boolean
+  /** Pending user_input block — auto force-opens during processing like Kun. */
+  pendingUserInput?: boolean
 }
 
 export type ProcessOutputEntrySnapshot = {
@@ -64,17 +69,17 @@ function entryAutoForceOpen(
   entry: ProcessStackEntrySnapshot,
   processing?: boolean,
 ): boolean {
-  if (entry.detailKind === 'approval') return true
+  if (entry.pendingApproval === true) return true
   if (processing === true && entry.requestUserInput === true) return true
   if (entry.active !== true) return false
-  if (entry.detailKind === 'user_input') return true
+  if (processing === true && entry.pendingUserInput === true) return true
   return processing === true && entry.showCompactionIcon === true
 }
 
 function sectionHasPendingApproval(section: ProcessSectionSnapshot): boolean {
   if (section.hasPendingApproval === true) return true
   return (
-    section.stackEntries?.some((entry) => entry.detailKind === 'approval') ?? false
+    section.stackEntries?.some((entry) => entry.pendingApproval === true) ?? false
   )
 }
 
@@ -85,7 +90,7 @@ function sectionHasRequestUserInput(section: ProcessSectionSnapshot): boolean {
     (section.stackEntries?.some(
       (entry) =>
         entry.requestUserInput === true ||
-        (entry.detailKind === 'user_input' && entry.active === true),
+        entry.pendingUserInput === true,
     ) ??
       false)
   )
@@ -269,7 +274,7 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         id: 'approval',
         summary: 'Approve deploy to staging',
         active: true,
-        forceOpen: true,
+        pendingApproval: true,
         detailKind: 'approval',
         nestedBubble: {
           ...MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
@@ -295,9 +300,30 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         id: 'approval',
         summary: 'Approve deploy to staging',
         active: true,
-        forceOpen: true,
+        pendingApproval: true,
         detailKind: 'approval',
         nestedBubble: MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
+      },
+      {
+        id: 'read',
+        summary: 'Read package.json',
+        filePath: 'package.json',
+      },
+    ],
+  },
+  executionApprovalResolved: {
+    kind: 'execution',
+    title: 'Approved deploy · Read 1 file',
+    collapsible: true,
+    expanded: false,
+    stackEntries: [
+      {
+        id: 'approval',
+        summary: 'Approved deploy to staging',
+        collapsible: true,
+        expanded: false,
+        detailKind: 'approval',
+        nestedBubble: MESSAGE_BUBBLE_PREVIEW_APPROVAL_DONE,
       },
       {
         id: 'read',
@@ -318,7 +344,7 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         id: 'user-input',
         summary: 'Request user input',
         active: true,
-        forceOpen: true,
+        pendingUserInput: true,
         detailKind: 'user_input',
         nestedBubble: MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
       },
@@ -417,6 +443,8 @@ function stackEntryToProcessEntry(
     nestedBubble: entry.nestedBubble,
     meta: entry.meta,
     showCompactionIcon: entry.showCompactionIcon,
+    pendingApproval: entry.pendingApproval,
+    pendingUserInput: entry.pendingUserInput,
   }
 }
 

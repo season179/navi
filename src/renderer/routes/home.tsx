@@ -747,7 +747,7 @@ function HomePage() {
   const [workMetaRowExpanded, setWorkMetaRowExpanded] = useState(false)
 
   // Visual preview for the ported ProcessSectionRow
-  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|executionAutoOpen|executionForceOpen|executionApproval|executionUserInput|executionRequestInput|error|output|outputStreaming).
+  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|executionAutoOpen|executionForceOpen|executionApproval|executionApprovalResolved|executionUserInput|executionRequestInput|error|output|outputStreaming).
   const processSectionRowPreviewMode = useMemo((): ProcessSectionRowPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -760,6 +760,7 @@ function HomePage() {
     if (mode === 'executionAutoOpen') return 'executionAutoOpen'
     if (mode === 'executionForceOpen') return 'executionForceOpen'
     if (mode === 'executionApproval') return 'executionApproval'
+    if (mode === 'executionApprovalResolved') return 'executionApprovalResolved'
     if (mode === 'executionUserInput') return 'executionUserInput'
     if (mode === 'executionRequestInput') return 'executionRequestInput'
     if (mode === 'error') return 'error'
@@ -770,7 +771,7 @@ function HomePage() {
   const [processSectionRowExpanded, setProcessSectionRowExpanded] = useState(false)
 
   // Visual preview for the ported ProcessEntryRow
-  // (?processEntryRow=default|expanded|active|compaction|error|meta|assistant|approval|userInput).
+  // (?processEntryRow=default|expanded|active|compaction|error|meta|assistant|approval|approvalResolved|userInput).
   const processEntryRowPreviewMode = useMemo((): ProcessEntryRowPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -784,6 +785,7 @@ function HomePage() {
     if (mode === 'meta') return 'meta'
     if (mode === 'assistant') return 'assistant'
     if (mode === 'approval') return 'approval'
+    if (mode === 'approvalResolved') return 'approvalResolved'
     if (mode === 'userInput') return 'userInput'
     return 'default'
   }, [])
