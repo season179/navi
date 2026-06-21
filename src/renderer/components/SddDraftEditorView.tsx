@@ -27,6 +27,13 @@ import {
   SDD_ASSISTANT_PANEL_PREVIEW_TIMELINE,
   type SddAssistantPanelSnapshot,
 } from './SddAssistantPanel'
+import {
+  isProductionSddDraftAssistantMode,
+  resolveProductionSddDraftMode,
+  type SddDraftEditorViewPreviewMode,
+} from '../lib/sddDraftPreviewModes'
+
+export type { SddDraftEditorViewPreviewMode } from '../lib/sddDraftPreviewModes'
 
 type SddSaveStatus = 'saved' | 'dirty' | 'saving' | 'error'
 type SddOperationStatus = 'idle' | 'upgrading' | 'error'
@@ -53,22 +60,6 @@ export type SddDraftSnapshot = {
   designContextOpen?: boolean
   notice?: { tone: 'success' | 'error'; message: string } | null
 }
-
-export type SddDraftEditorViewPreviewMode =
-  | 'default'
-  | 'dirty'
-  | 'saving'
-  | 'error'
-  | 'upgrading'
-  | 'designContext'
-  | 'noDraft'
-  | 'assistantOpen'
-  | 'assistantTimeline'
-  | 'assistantBusy'
-  | 'leftCollapsed'
-  | 'withNotice'
-  | 'inlineAgent'
-  | 'richFallback'
 
 const SDD_DESIGN_TONE_OPTIONS = [
   'Editorial',
@@ -834,31 +825,15 @@ export function SddDraftEditorViewPreview({ mode }: PreviewProps): ReactElement 
 
 const PRODUCTION_SDD_RIGHT_PANEL_WIDTH = 360
 
-function resolveProductionSddAssistantPreviewOpen(): boolean {
-  if (typeof window === 'undefined') return false
-  const params = new URLSearchParams(window.location.search)
-  const value = params.get('productionSddDraft')
-  return value === 'assistant' || value === 'assistantTimeline' || value === 'assistantBusy'
-}
-
-function resolveProductionSddAssistantSnapshot(): SddAssistantPanelSnapshot {
-  if (typeof window === 'undefined') {
-    return { ...SDD_ASSISTANT_PANEL_PREVIEW_DEFAULT, draftPath: SDD_DRAFT_EDITOR_PREVIEW_PATH }
-  }
-  const value = new URLSearchParams(window.location.search).get('productionSddDraft')
-  const draftPath = SDD_DRAFT_EDITOR_PREVIEW_PATH
-  if (value === 'assistantTimeline') {
-    return { ...SDD_ASSISTANT_PANEL_PREVIEW_TIMELINE, draftPath }
-  }
-  if (value === 'assistantBusy') {
-    return { ...SDD_ASSISTANT_PANEL_PREVIEW_BUSY, draftPath }
-  }
-  return { ...SDD_ASSISTANT_PANEL_PREVIEW_DEFAULT, draftPath }
+function resolveProductionSddAssistantSnapshot(
+  mode: SddDraftEditorViewPreviewMode,
+): SddAssistantPanelSnapshot {
+  return assistantPanelPreviewSnapshot(mode)
 }
 
 /** Production shell for SDD requirement draft — mock snapshots for visual parity. */
 export function SddDraftProductionView({
-  leftSidebarCollapsed,
+  leftSidebarCollapsed: leftSidebarCollapsedProp,
   onToggleLeftSidebar,
   onClose,
 }: {
@@ -866,25 +841,48 @@ export function SddDraftProductionView({
   onToggleLeftSidebar: () => void
   onClose: () => void
 }): ReactElement {
-  const [draft, setDraft] = useState<SddDraftSnapshot>(WORKBENCH_SDD_DRAFT_PREVIEW_SNAPSHOT)
-  const [assistantOpen, setAssistantOpen] = useState(() => resolveProductionSddAssistantPreviewOpen())
+  const productionMode = useMemo(() => resolveProductionSddDraftMode(), [])
+  const initial = useMemo(() => previewSnapshot(productionMode), [productionMode])
+  const [draft, setDraft] = useState<SddDraftSnapshot | null>(initial.draft)
+  const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(
+    () => (initial.leftSidebarCollapsed ? true : leftSidebarCollapsedProp),
+  )
+  const [assistantOpen, setAssistantOpen] = useState(() =>
+    isProductionSddDraftAssistantMode() ? assistantPanelPreviewOpen(productionMode) : false,
+  )
+  const [designContextOpen, setDesignContextOpen] = useState(
+    initial.draft?.designContextOpen ?? productionMode === 'designContext',
+  )
+  const [showInlineAgent, setShowInlineAgent] = useState(initial.showInlineAgent)
+  const [showRichFallback, setShowRichFallback] = useState(initial.showRichFallback)
   const [assistantInput, setAssistantInput] = useState('')
-  const assistantPanelSnapshot = useMemo(() => resolveProductionSddAssistantSnapshot(), [])
+  const assistantPanelSnapshot = useMemo(
+    () => resolveProductionSddAssistantSnapshot(productionMode),
+    [productionMode],
+  )
 
   const handleContentChange = useCallback((value: string) => {
-    setDraft((current) => ({
-      ...current,
-      content: value,
-      saveStatus: current.saveStatus === 'saved' ? 'dirty' : current.saveStatus,
-    }))
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            content: value,
+            saveStatus: current.saveStatus === 'saved' ? 'dirty' : current.saveStatus,
+          }
+        : current,
+    )
   }, [])
 
   const handleDesignContextChange = useCallback((patch: Partial<SddDesignContext>) => {
-    setDraft((current) => ({
-      ...current,
-      designContext: { ...current.designContext, ...patch },
-      saveStatus: current.saveStatus === 'saved' ? 'dirty' : current.saveStatus,
-    }))
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            designContext: { ...current.designContext, ...patch },
+            saveStatus: current.saveStatus === 'saved' ? 'dirty' : current.saveStatus,
+          }
+        : current,
+    )
   }, [])
 
   return (
@@ -895,11 +893,20 @@ export function SddDraftProductionView({
             draft={draft}
             leftSidebarCollapsed={leftSidebarCollapsed}
             assistantOpen={assistantOpen}
-            onToggleLeftSidebar={onToggleLeftSidebar}
+            designContextOpen={designContextOpen}
+            showInlineAgent={showInlineAgent}
+            showRichFallback={showRichFallback}
+            onToggleLeftSidebar={() => {
+              setLeftSidebarCollapsed((open) => !open)
+              onToggleLeftSidebar()
+            }}
             onToggleAssistant={() => setAssistantOpen((open) => !open)}
+            onToggleDesignContext={() => setDesignContextOpen((open) => !open)}
             onDesignContextChange={handleDesignContextChange}
             onContentChange={handleContentChange}
-            onSave={() => setDraft((current) => ({ ...current, saveStatus: 'saved' }))}
+            onSave={() =>
+              setDraft((current) => (current ? { ...current, saveStatus: 'saved' } : current))
+            }
             onClose={onClose}
           />
         </div>
