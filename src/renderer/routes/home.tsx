@@ -723,7 +723,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported ComposerChangeSummary
-  // (?composerChangeSummaryPreview=1|overflow).
+  // (?composerChangeSummaryPreview=1|overflow|reviewDisabled).
   const composerChangeSummaryPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
     const params = new URLSearchParams(window.location.search)
@@ -1326,7 +1326,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalPanel|attachments|attachmentsNoPreview|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
+  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalPanel|attachments|attachmentsNoPreview|changeSummary|changeSummaryReviewDisabled|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1345,6 +1345,7 @@ function HomePage() {
     if (value === 'goalPanel') return 'goalPanel'
     if (value === 'attachments') return 'attachments'
     if (value === 'changeSummary') return 'changeSummary'
+    if (value === 'changeSummaryReviewDisabled') return 'changeSummaryReviewDisabled'
     if (value === 'recording') return 'recording'
     if (value === 'busy') return 'busy'
     if (value === 'contextCapacity') return 'contextCapacity'
@@ -3906,6 +3907,9 @@ function HomePage() {
       fileMentionLoading={composerFileMentionPreview?.loading}
       changedFiles={composerChangeSummaryPreview?.files}
       changedStats={composerChangeSummaryPreview?.stats}
+      changeSummaryShowOpenChanges={composerChangeSummaryPreview?.showOpenChanges}
+      changeSummaryShowReviewChanges={composerChangeSummaryPreview?.showReviewChanges}
+      changeSummaryReviewDisabled={composerChangeSummaryPreview?.reviewChangesDisabled}
       fileReferences={composerFileReferencesPreview}
       attachments={composerAttachmentsPreview}
       attachmentUploadError={composerAttachmentErrorPreview}

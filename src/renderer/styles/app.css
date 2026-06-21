@@ -37208,6 +37208,15 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
   background: var(--ds-surface-hover);
 }
 
+.floating-composer-change-summary-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.floating-composer-change-summary-actions button:disabled:hover {
+  background: var(--ds-surface-elevated);
+}
+
 .floating-composer-file-ref-row,
 .floating-composer-attachment-row {
   position: relative;

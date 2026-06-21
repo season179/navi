@@ -63,6 +63,8 @@ import {
 import {
   COMPOSER_CHANGE_SUMMARY_PREVIEW,
   COMPOSER_CHANGE_SUMMARY_VISIBLE_LIMIT,
+  COMPOSER_OPEN_CHANGES_LABEL,
+  COMPOSER_REVIEW_CHANGES_LABEL,
   formatComposerChangedFilesMore,
   formatComposerChangedFilesTitle,
   type ComposerChangedFile,
@@ -155,6 +157,7 @@ export type FloatingComposerPreviewMode =
   | 'attachments'
   | 'attachmentsNoPreview'
   | 'changeSummary'
+  | 'changeSummaryReviewDisabled'
   | 'recording'
   | 'busy'
   | 'contextCapacity'
@@ -220,6 +223,9 @@ export type FloatingComposerSnapshot = {
   attachments: ComposerImageAttachment[]
   changedFiles: ChangedFilePreview[]
   changedStats: { added: number; removed: number }
+  changeSummaryShowOpenChanges: boolean
+  changeSummaryShowReviewChanges: boolean
+  changeSummaryReviewDisabled: boolean
   execution: ComposerExecutionSettings
   modelPicker: ComposerModelPickerSettings
   modelPickerGroups: typeof COMPOSER_MODEL_PICKER_GROUPS_PREVIEW
@@ -648,12 +654,27 @@ export function ComposerFileReferenceChips({
 export function ComposerChangeSummary({
   files,
   stats,
+  showOpenChanges = false,
+  showReviewChanges = false,
+  reviewChangesDisabled = false,
+  onOpenChanges,
+  onReviewChanges,
 }: {
   files: ComposerChangedFile[]
   stats: { added: number; removed: number }
+  /** When true, shows the Preview action button like Kun when onOpenChanges is wired. */
+  showOpenChanges?: boolean
+  /** When true, shows the Review action button like Kun when onReviewChanges is wired. */
+  showReviewChanges?: boolean
+  /** When true, disables the Review button like Kun's reviewChangesDisabled. */
+  reviewChangesDisabled?: boolean
+  onOpenChanges?: () => void
+  onReviewChanges?: () => void
 }): ReactElement {
   const visibleFiles = files.slice(0, COMPOSER_CHANGE_SUMMARY_VISIBLE_LIMIT)
   const hiddenFileCount = Math.max(0, files.length - visibleFiles.length)
+  const openChangesVisible = showOpenChanges || Boolean(onOpenChanges)
+  const reviewChangesVisible = showReviewChanges || Boolean(onReviewChanges)
 
   return (
     <div className="floating-composer-change-summary">
@@ -679,13 +700,25 @@ export function ComposerChangeSummary({
           ) : null}
         </div>
       </div>
-      <div className="floating-composer-change-summary-actions">
-        <button type="button">Open changes</button>
-        <button type="button">
-          <SearchCode strokeWidth={1.8} />
-          Review changes
-        </button>
-      </div>
+      {openChangesVisible || reviewChangesVisible ? (
+        <div className="floating-composer-change-summary-actions">
+          {openChangesVisible ? (
+            <button type="button" onClick={onOpenChanges}>
+              {COMPOSER_OPEN_CHANGES_LABEL}
+            </button>
+          ) : null}
+          {reviewChangesVisible ? (
+            <button
+              type="button"
+              disabled={reviewChangesDisabled}
+              onClick={onReviewChanges}
+            >
+              <SearchCode strokeWidth={1.8} />
+              {COMPOSER_REVIEW_CHANGES_LABEL}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -784,7 +817,10 @@ export function resolveFloatingComposerSnapshot(
     fileReferences: [],
     attachments: [],
     changedFiles: CHANGED_FILES_PREVIEW,
-    changedStats: { added: 428, removed: 12 },
+    changedStats: COMPOSER_CHANGE_SUMMARY_PREVIEW.stats,
+    changeSummaryShowOpenChanges: COMPOSER_CHANGE_SUMMARY_PREVIEW.showOpenChanges,
+    changeSummaryShowReviewChanges: COMPOSER_CHANGE_SUMMARY_PREVIEW.showReviewChanges,
+    changeSummaryReviewDisabled: COMPOSER_CHANGE_SUMMARY_PREVIEW.reviewChangesDisabled,
     execution: EXECUTION_PICKER_PREVIEW,
     modelPicker: COMPOSER_MODEL_PICKER_PREVIEW,
     modelPickerGroups: COMPOSER_MODEL_PICKER_GROUPS_PREVIEW,
@@ -848,6 +884,12 @@ export function resolveFloatingComposerSnapshot(
       }
     case 'changeSummary':
       return { ...base, showChangeSummary: true }
+    case 'changeSummaryReviewDisabled':
+      return {
+        ...base,
+        showChangeSummary: true,
+        changeSummaryReviewDisabled: true,
+      }
     case 'recording':
       return { ...base, recording: true, input: '' }
     case 'busy':
@@ -957,6 +999,9 @@ export function FloatingComposer({
             <ComposerChangeSummary
               files={snapshot.changedFiles}
               stats={snapshot.changedStats}
+              showOpenChanges={snapshot.changeSummaryShowOpenChanges}
+              showReviewChanges={snapshot.changeSummaryShowReviewChanges}
+              reviewChangesDisabled={snapshot.changeSummaryReviewDisabled}
             />
           ) : null}
 

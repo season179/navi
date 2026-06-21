@@ -106,6 +106,12 @@ interface ComposerProps {
   changedFiles?: ComposerChangedFile[]
   /** Diff stats for the change-summary card; defaults to zeros when omitted. */
   changedStats?: { added: number; removed: number }
+  /** When true, shows the Preview action button in the change-summary card. */
+  changeSummaryShowOpenChanges?: boolean
+  /** When true, shows the Review action button in the change-summary card. */
+  changeSummaryShowReviewChanges?: boolean
+  /** When true, disables the Review action button in the change-summary card. */
+  changeSummaryReviewDisabled?: boolean
   /** File reference chips shown below the textarea in Kun's composer shell. */
   fileReferences?: ComposerFileReferenceChip[]
   onRemoveFileReference?: (relativePath: string) => void
@@ -180,6 +186,9 @@ export function Composer({
   footerLeft,
   changedFiles,
   changedStats,
+  changeSummaryShowOpenChanges = false,
+  changeSummaryShowReviewChanges = false,
+  changeSummaryReviewDisabled = false,
   fileReferences,
   onRemoveFileReference,
   attachments,
@@ -579,6 +588,9 @@ export function Composer({
             <ComposerChangeSummary
               files={changedFiles}
               stats={changedStats ?? { added: 0, removed: 0 }}
+              showOpenChanges={changeSummaryShowOpenChanges}
+              showReviewChanges={changeSummaryShowReviewChanges}
+              reviewChangesDisabled={changeSummaryReviewDisabled}
             />
           ) : null}
           <textarea
