@@ -12,7 +12,7 @@ import { randomUUID } from 'crypto'
 import { app } from 'electron'
 import { promises as fs } from 'fs'
 import path from 'path'
-import type { ConversationMeta, PersistedMessage, ProjectMeta } from '../shared/flue'
+import type { ConversationMeta, PersistedMessage, ProjectMeta, ReasoningLevel } from '../shared/flue'
 import { projectLabel, projectName } from '../shared/projects'
 
 export const DEFAULT_PROJECT_ID = 'navi-default'
@@ -182,12 +182,17 @@ export async function listConversations(projectId?: string): Promise<Conversatio
   const { conversations } = await read()
   const filtered = projectId ? conversations.filter((c) => c.projectId === projectId) : conversations
   return filtered
-    .map(({ id, projectId: pid, title, createdAt, updatedAt }) => ({
+    .map(({ id, projectId: pid, title, createdAt, updatedAt, providerId, modelId, reasoning }) => ({
       id,
       projectId: pid,
       title,
       createdAt,
       updatedAt,
+      // Carry the per-conversation selection so the renderer can render the
+      // composer chip without a separate fetch on select.
+      ...(providerId ? { providerId } : {}),
+      ...(modelId ? { modelId } : {}),
+      ...(reasoning ? { reasoning } : {}),
     }))
     .sort((a, b) => b.updatedAt - a.updatedAt)
 }
@@ -245,5 +250,49 @@ export function deleteConversation(id: string): Promise<void> {
       store.conversations = next
       await write(store)
     }
+  })
+}
+
+// Per-conversation model selection. These set app-owned pointers the Flue agent
+// reads per turn (no backend restart). They mutate in place and do NOT bump
+// updatedAt — switching models must not reorder the sidebar. No-op if the record
+// doesn't exist yet (the renderer persists the thread first, so on send the
+// record is present; see F-firstturn).
+export function setActiveModel(id: string, providerId: string, modelId: string): Promise<void> {
+  return enqueue(async () => {
+    const store = await read()
+    const conv = store.conversations.find((c) => c.id === id)
+    if (!conv) return
+    conv.providerId = providerId
+    conv.modelId = modelId
+    await write(store)
+  })
+}
+
+export function setReasoning(id: string, reasoning: ReasoningLevel): Promise<void> {
+  return enqueue(async () => {
+    const store = await read()
+    const conv = store.conversations.find((c) => c.id === id)
+    if (!conv) return
+    conv.reasoning = reasoning
+    await write(store)
+  })
+}
+
+// Cascade-clear pointers referencing a deleted provider (§F1d) so a stale
+// `<deletedProvider>/<model>` specifier can never reach the agent. The agent
+// then falls back to the app default.
+export function clearProviderPointers(providerId: string): Promise<void> {
+  return enqueue(async () => {
+    const store = await read()
+    let changed = false
+    for (const c of store.conversations) {
+      if (c.providerId === providerId) {
+        delete c.providerId
+        delete c.modelId
+        changed = true
+      }
+    }
+    if (changed) await write(store)
   })
 }

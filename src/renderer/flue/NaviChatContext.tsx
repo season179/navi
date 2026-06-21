@@ -13,7 +13,16 @@ import { useNaviChat, type NaviChat } from './useNaviChat'
 
 type ThreadValue = Pick<
   NaviChat,
-  'messages' | 'status' | 'busy' | 'send' | 'cancel' | 'setApiKey' | 'setBaseUrl'
+  | 'messages'
+  | 'status'
+  | 'busy'
+  | 'send'
+  | 'cancel'
+  // The composer model picker is a thread consumer: the active selection is
+  // per-conversation, and picking changes it without touching the list slice.
+  | 'activeSelection'
+  | 'pickModel'
+  | 'pickReasoning'
 >
 type ListValue = Pick<
   NaviChat,
@@ -27,6 +36,13 @@ type ListValue = Pick<
   | 'createProject'
   | 'selectProject'
   | 'deleteProject'
+  // Provider config + CRUD live here (infrequent changes), not in the thread slice.
+  | 'providerProfiles'
+  | 'defaultSelection'
+  | 'upsertProvider'
+  | 'removeProvider'
+  | 'probeProvider'
+  | 'setDefaultSelection'
 >
 
 const ThreadContext = createContext<ThreadValue | null>(null)
@@ -42,10 +58,20 @@ export function NaviChatProvider({ children }: { children: ReactNode }) {
       busy: chat.busy,
       send: chat.send,
       cancel: chat.cancel,
-      setApiKey: chat.setApiKey,
-      setBaseUrl: chat.setBaseUrl,
+      activeSelection: chat.activeSelection,
+      pickModel: chat.pickModel,
+      pickReasoning: chat.pickReasoning,
     }),
-    [chat.messages, chat.status, chat.busy, chat.send, chat.cancel, chat.setApiKey, chat.setBaseUrl],
+    [
+      chat.messages,
+      chat.status,
+      chat.busy,
+      chat.send,
+      chat.cancel,
+      chat.activeSelection,
+      chat.pickModel,
+      chat.pickReasoning,
+    ],
   )
 
   const list = useMemo<ListValue>(
@@ -60,6 +86,12 @@ export function NaviChatProvider({ children }: { children: ReactNode }) {
       createProject: chat.createProject,
       selectProject: chat.selectProject,
       deleteProject: chat.deleteProject,
+      providerProfiles: chat.providerProfiles,
+      defaultSelection: chat.defaultSelection,
+      upsertProvider: chat.upsertProvider,
+      removeProvider: chat.removeProvider,
+      probeProvider: chat.probeProvider,
+      setDefaultSelection: chat.setDefaultSelection,
     }),
     [
       chat.conversations,
@@ -72,6 +104,12 @@ export function NaviChatProvider({ children }: { children: ReactNode }) {
       chat.createProject,
       chat.selectProject,
       chat.deleteProject,
+      chat.providerProfiles,
+      chat.defaultSelection,
+      chat.upsertProvider,
+      chat.removeProvider,
+      chat.probeProvider,
+      chat.setDefaultSelection,
     ],
   )
 

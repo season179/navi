@@ -3,14 +3,33 @@
 // SDK client and the bearer token, so the renderer only ever sees plain text.
 
 import { BrowserWindow, dialog, ipcMain } from 'electron'
-import type { FlueStatus, FlueStreamMessage, PersistedMessage } from '../shared/flue'
+import type {
+  DefaultSelection,
+  FlueStatus,
+  FlueStreamMessage,
+  PersistedMessage,
+  ProviderProfile,
+  ReasoningLevel,
+} from '../shared/flue'
 import { flueBackend } from './flue-backend'
-import { setApiKey, setBaseUrl } from './settings'
+import {
+  deleteProvider,
+  getProviderKey,
+  listProviders,
+  setDefaultSelection,
+  getDefaultSelection,
+  setProviderKey,
+  upsertProvider,
+} from './settings'
+import { probeProvider, type ProbeRequest } from './provider-probe'
 import {
   listConversations,
   getConversation,
   saveConversation,
   deleteConversation,
+  setActiveModel,
+  setReasoning,
+  clearProviderPointers,
   listProjects,
   createProject,
   deleteProject,
@@ -41,25 +60,75 @@ export function registerFlueIpc(): void {
     flueBackend.cancel(requestId)
   })
 
-  ipcMain.handle('flue:setApiKey', async (_evt, key: string) => {
-    try {
-      await setApiKey(key)
-      await flueBackend.refreshApiKey()
-      return { ok: true }
-    } catch (err) {
-      return { ok: false, error: err instanceof Error ? err.message : String(err) }
-    }
-  })
+  // --- Multi-provider ---
 
-  ipcMain.handle('flue:setBaseUrl', async (_evt, url: string) => {
+  ipcMain.handle('providers:list', () => listProviders())
+
+  // Create/replace a provider (+ optional key), then restart so registerProvider
+  // (boot-only) picks it up.
+  ipcMain.handle(
+    'providers:upsert',
+    async (_evt, profile: ProviderProfile, apiKey?: string) => {
+      try {
+        await upsertProvider(profile)
+        if (apiKey && apiKey.trim()) await setProviderKey(profile.id, apiKey)
+        await flueBackend.restart()
+        return { ok: true }
+      } catch (err) {
+        return { ok: false, error: err instanceof Error ? err.message : String(err) }
+      }
+    },
+  )
+
+  ipcMain.handle('providers:delete', async (_evt, id: string) => {
     try {
-      await setBaseUrl(url)
+      await deleteProvider(id)
+      await clearProviderPointers(id) // cascade-clear stale conversation pointers (§F1d)
       await flueBackend.restart()
       return { ok: true }
     } catch (err) {
       return { ok: false, error: err instanceof Error ? err.message : String(err) }
     }
   })
+
+  ipcMain.handle('providers:setKey', async (_evt, id: string, key: string) => {
+    try {
+      await setProviderKey(id, key)
+      await flueBackend.restart()
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : String(err) }
+    }
+  })
+
+  ipcMain.handle('providers:getDefault', () => getDefaultSelection())
+
+  ipcMain.handle('providers:setDefault', async (_evt, sel: DefaultSelection) => {
+    await setDefaultSelection(sel)
+    await flueBackend.restart() // refresh NAVI_DEFAULT_MODEL/_REASONING in the child
+  })
+
+  // Probe with the request's key, or fall back to the stored key for an
+  // existing provider so "Test connection" works without re-entering it.
+  ipcMain.handle('providers:probe', async (_evt, req: ProbeRequest) => {
+    let apiKey = req.apiKey
+    if (!apiKey?.trim() && req.id) {
+      const k = await getProviderKey(req.id)
+      if (k.state === 'ok') apiKey = k.key
+    }
+    return probeProvider({ ...req, apiKey })
+  })
+
+  // Per-conversation selection — store pointers only; NO restart.
+  ipcMain.handle(
+    'conversations:setActiveModel',
+    (_evt, id: string, providerId: string, modelId: string) =>
+      setActiveModel(id, providerId, modelId),
+  )
+
+  ipcMain.handle('conversations:setReasoning', (_evt, id: string, level: ReasoningLevel) =>
+    setReasoning(id, level),
+  )
 
   ipcMain.handle('projects:list', () => listProjects())
 

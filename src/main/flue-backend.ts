@@ -13,13 +13,30 @@ import { spawn, type ChildProcessByStdio } from 'child_process'
 import type { Readable } from 'stream'
 import { randomBytes, randomUUID } from 'crypto'
 import { EventEmitter } from 'events'
-import { existsSync, readFileSync } from 'fs'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import { createFlueClient, type FlueClient } from '@flue/sdk'
-import { AGENT_NAME, type FlueStatus, type FlueStreamMessage } from '../shared/flue'
+import {
+  AGENT_NAME,
+  type DefaultSelection,
+  type FlueStatus,
+  type FlueStreamMessage,
+  type ProviderProfile,
+  type ProviderStatus,
+} from '../shared/flue'
 import { resolveProjectCwd } from '../shared/projects'
 import { storePath } from './conversations'
-import { getApiKey, getBaseUrl } from './settings'
+import { getDefaultSelection, getProviderKey, listProviders } from './settings'
+
+// pi-ai env vars we scrub from the child: keys reach it via the keys file +
+// explicit registerProvider(apiKey), never the env fallback (§F4).
+const SCRUBBED_KEY_VARS = [
+  'OPENAI_API_KEY',
+  'DEEPSEEK_API_KEY',
+  'ZAI_API_KEY',
+  'ZAI_CODING_PLAN_API_KEY',
+  'ZAI_CODING_CN_API_KEY',
+]
 
 /** How long to wait for the child to print FLUE_READY before giving up. */
 const READY_TIMEOUT_MS = 20_000
@@ -41,7 +58,8 @@ class FlueBackend extends EventEmitter {
   private ready = false
   private lastError: string | undefined
   private hasKey = false
-  private baseUrl: string | undefined
+  private providerStatuses: ProviderStatus[] = []
+  private activeDefault: FlueStatus['active']
   private starting: Promise<void> | null = null
   private readonly active = new Map<string, ActivePrompt>()
 
@@ -58,7 +76,28 @@ class FlueBackend extends EventEmitter {
   }
 
   status(): FlueStatus {
-    return { ready: this.ready, hasApiKey: this.hasKey, baseUrl: this.baseUrl, error: this.lastError }
+    return {
+      ready: this.ready,
+      providers: this.providerStatuses,
+      active: this.activeDefault,
+      error: this.lastError,
+    }
+  }
+
+  private resolveActive(
+    profiles: ProviderProfile[],
+    def: DefaultSelection | undefined,
+  ): FlueStatus['active'] {
+    if (!def) return undefined
+    const model = profiles
+      .find((p) => p.id === def.providerId)
+      ?.models.find((m) => m.id === def.modelId)
+    return {
+      providerId: def.providerId,
+      modelId: def.modelId,
+      label: model?.label ?? def.modelId,
+      reasoning: def.reasoning,
+    }
   }
 
   private emitStatus() {
@@ -82,15 +121,51 @@ class FlueBackend extends EventEmitter {
   private async doStart(): Promise<void> {
     await this.stop()
 
-    const apiKey = await getApiKey()
-    this.hasKey = apiKey !== undefined
-    const baseUrl = await getBaseUrl()
-    this.baseUrl = baseUrl
+    // Resolve every provider's key in MAIN (env-first → safeStorage), build the
+    // per-provider status, and the keys map the child receives via a 0600 file.
+    const profiles = await listProviders()
+    const keys: Record<string, string> = {}
+    const statuses: ProviderStatus[] = []
+    for (const p of profiles) {
+      const k = await getProviderKey(p.id)
+      if (k.state === 'ok') keys[p.id] = k.key
+      statuses.push({ id: p.id, name: p.name, keyState: k.state, baseUrl: p.baseUrl })
+    }
+    this.providerStatuses = statuses
+    this.hasKey = statuses.some((s) => s.keyState === 'ok')
+
+    const def = await getDefaultSelection()
+    this.activeDefault = this.resolveActive(profiles, def)
+    // The OpenAI provider still honors a dev's OPENAI_BASE_URL env override when
+    // its profile leaves baseUrl blank (applied per-provider below).
+    const openaiEnvBase = process.env.OPENAI_BASE_URL?.trim() || undefined
     this.lastError = undefined
+
+    const userData = app.getPath('userData')
+    // The child can't call Electron, so it reads providers/keys from 0600 files
+    // and we inject only their paths (mirrors FLUE_DB_PATH / NAVI_CONVERSATIONS_PATH).
+    const providersFile = path.join(userData, 'navi-providers.json')
+    const keysFile = path.join(userData, 'navi-provider-keys.json')
+    const naviProviders = profiles.map((p) => {
+      const baseUrl = p.id === 'openai' ? (p.baseUrl ?? openaiEnvBase) : p.baseUrl
+      return {
+        id: p.id,
+        ...(p.api ? { api: p.api } : {}),
+        ...(baseUrl ? { baseUrl } : {}),
+        ...(p.headers ? { headers: p.headers } : {}),
+        models: p.models.map((m) => ({
+          id: m.id,
+          ...(m.contextWindow ? { contextWindow: m.contextWindow } : {}),
+          ...(m.maxTokens ? { maxTokens: m.maxTokens } : {}),
+        })),
+      }
+    })
+    writeFileSync(providersFile, JSON.stringify(naviProviders), { mode: 0o600 })
+    writeFileSync(keysFile, JSON.stringify(keys), { mode: 0o600 })
 
     const token = randomBytes(32).toString('hex')
     const port = '0'
-    const dbPath = path.join(app.getPath('userData'), 'flue.db')
+    const dbPath = path.join(userData, 'flue.db')
 
     const env: NodeJS.ProcessEnv = {
       ...process.env,
@@ -99,11 +174,17 @@ class FlueBackend extends EventEmitter {
       FLUE_TOKEN: token,
       FLUE_DB_PATH: dbPath,
       NAVI_CONVERSATIONS_PATH: storePath(),
+      NAVI_PROVIDERS_PATH: providersFile,
+      NAVI_PROVIDER_KEYS_PATH: keysFile,
     }
-    if (apiKey) env.OPENAI_API_KEY = apiKey
-    else delete env.OPENAI_API_KEY
-    if (baseUrl) env.OPENAI_BASE_URL = baseUrl
-    else delete env.OPENAI_BASE_URL
+    // Scrub pi-ai key vars + OPENAI_BASE_URL so the child can't pick up a
+    // stale/shell-inherited credential; keys flow only through the keys file (§F4).
+    for (const v of SCRUBBED_KEY_VARS) delete env[v]
+    delete env.OPENAI_BASE_URL
+    if (def) {
+      env.NAVI_DEFAULT_MODEL = `${def.providerId}/${def.modelId}`
+      env.NAVI_DEFAULT_REASONING = def.reasoning
+    }
 
     const child = spawn(process.execPath, ['--no-warnings', this.serverPath()], {
       env,
@@ -217,7 +298,7 @@ class FlueBackend extends EventEmitter {
       throw new Error('Flue backend is not ready.')
     }
     if (!this.hasKey) {
-      throw new Error('No OpenAI API key configured. Add one in Settings.')
+      throw new Error('No model provider configured. Add one in Settings.')
     }
 
     // Resolve the bound project folder up front. A missing/corrupt store must
@@ -389,11 +470,6 @@ class FlueBackend extends EventEmitter {
       prompt.controller.abort()
       this.active.delete(requestId)
     }
-  }
-
-  /** Recompute key presence and restart so the child gets the new key. */
-  async refreshApiKey(): Promise<void> {
-    await this.restart()
   }
 }
 

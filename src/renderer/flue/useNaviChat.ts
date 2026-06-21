@@ -12,11 +12,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type {
   ConversationMeta,
+  DefaultSelection,
   FlueStatus,
   FlueStreamMessage,
   PersistedMessage,
+  ProbeResult,
   ProjectMeta,
+  ProviderProfile,
+  ReasoningLevel,
 } from '../../shared/flue'
+
+interface ProbeReq {
+  baseUrl?: string
+  api: string
+  apiKey: string
+  id?: string
+}
 
 const DEFAULT_PROJECT_ID = 'navi-default'
 
@@ -77,17 +88,35 @@ export interface NaviChat {
   selectProject(id: string): Promise<void>
   /** Delete a project and its conversations. */
   deleteProject(id: string): Promise<void>
-  setApiKey(key: string): Promise<{ ok: boolean; error?: string }>
-  setBaseUrl(url: string): Promise<{ ok: boolean; error?: string }>
+  // --- Multi-provider ---
+  providerProfiles: ProviderProfile[]
+  defaultSelection?: DefaultSelection
+  upsertProvider(profile: ProviderProfile, apiKey?: string): Promise<{ ok: boolean; error?: string }>
+  removeProvider(id: string): Promise<{ ok: boolean; error?: string }>
+  probeProvider(req: ProbeReq): Promise<ProbeResult>
+  setDefaultSelection(sel: DefaultSelection): Promise<void>
+  /** The current conversation's resolved model + reasoning (for the composer chip). */
+  activeSelection?: DefaultSelection
+  /** Point the current conversation at a provider+model (persists if it has a record). */
+  pickModel(providerId: string, modelId: string): void
+  /** Set the current conversation's reasoning effort. */
+  pickReasoning(level: ReasoningLevel): void
 }
 
 export function useNaviChat(): NaviChat {
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [status, setStatus] = useState<FlueStatus>({ ready: false, hasApiKey: false })
+  const [status, setStatus] = useState<FlueStatus>({ ready: false, providers: [] })
   const [busy, setBusy] = useState(false)
   const [conversations, setConversations] = useState<ConversationMeta[]>([])
   const [projects, setProjects] = useState<ProjectMeta[]>([])
   const [currentProjectId, setCurrentProjectId] = useState(DEFAULT_PROJECT_ID)
+  const [providerProfiles, setProviderProfiles] = useState<ProviderProfile[]>([])
+  const [defaultSelection, setDefaultSelectionState] = useState<DefaultSelection | undefined>(undefined)
+  const defaultSelectionRef = useRef<DefaultSelection | undefined>(undefined)
+  // The current conversation's selection. Authoritative for the composer chip and
+  // flushed to the conversation pointer on send (F-firstturn).
+  const [activeSelection, setActiveSelectionRaw] = useState<DefaultSelection | undefined>(undefined)
+  const activeSelectionRef = useRef<DefaultSelection | undefined>(undefined)
 
   const conversationIdRef = useRef<string>(newId())
   const [currentId, setCurrentId] = useState<string>(conversationIdRef.current)
@@ -108,12 +137,38 @@ export function useNaviChat(): NaviChat {
     setMessages(next)
   }, [])
 
+  // Single writer for the active selection (state + the ref send() reads).
+  const commitSelection = useCallback((sel: DefaultSelection | undefined) => {
+    activeSelectionRef.current = sel
+    setActiveSelectionRaw(sel)
+  }, [])
+
+  // Resolve a conversation's selection from its stored pointer, else the default.
+  const selectionFromMeta = useCallback((meta?: ConversationMeta): DefaultSelection | undefined => {
+    if (meta?.providerId && meta?.modelId) {
+      return {
+        providerId: meta.providerId,
+        modelId: meta.modelId,
+        reasoning: meta.reasoning ?? defaultSelectionRef.current?.reasoning ?? 'medium',
+      }
+    }
+    return defaultSelectionRef.current
+  }, [])
+
   const refreshList = useCallback(async () => {
     setConversations(await window.navi.flue.listConversations())
   }, [])
 
   const refreshProjects = useCallback(async () => {
     setProjects(await window.navi.flue.listProjects())
+  }, [])
+
+  const refreshProviders = useCallback(async () => {
+    setProviderProfiles(await window.navi.flue.listProviders())
+  }, [])
+
+  const refreshStatus = useCallback(async () => {
+    setStatus(await window.navi.flue.status())
   }, [])
 
   const persistCurrent = useCallback(async () => {
@@ -169,11 +224,22 @@ export function useNaviChat(): NaviChat {
     [commit, persistCurrent],
   )
 
-  // Subscribe to backend status + streamed events.
+  // Subscribe to backend status + streamed events; load provider config once.
   useEffect(() => {
     let mounted = true
     window.navi.flue.status().then((s) => {
       if (mounted) setStatus(s)
+    })
+    window.navi.flue.listProviders().then((p) => {
+      if (mounted) setProviderProfiles(p)
+    })
+    window.navi.flue.getDefaultSelection().then((d) => {
+      if (!mounted) return
+      setDefaultSelectionState(d)
+      defaultSelectionRef.current = d
+      // Seed the current conversation's selection if it hasn't been set yet
+      // (fresh blank conversation before any pick / select).
+      if (!activeSelectionRef.current && d) commitSelection(d)
     })
     const offStatus = window.navi.flue.onStatus((s) => setStatus(s))
     const offEvent = window.navi.flue.onEvent(applyEvent)
@@ -208,12 +274,13 @@ export function useNaviChat(): NaviChat {
       setCurrentId(meta.id)
       currentProjectIdRef.current = meta.projectId
       setCurrentProjectId(meta.projectId)
+      commitSelection(selectionFromMeta(meta))
       commit(fromPersisted(loaded))
     })()
     return () => {
       mounted = false
     }
-  }, [commit])
+  }, [commit, commitSelection, selectionFromMeta])
 
   const send = useCallback(
     async (text: string) => {
@@ -232,6 +299,14 @@ export function useNaviChat(): NaviChat {
 
       const convAtSend = conversationIdRef.current
       try {
+        // F-firstturn: persistCurrent just created/updated this record, so the
+        // pointer write lands on an existing record. Await it BEFORE send so the
+        // agent reads the picked model on the very first turn (not the default).
+        const sel = activeSelectionRef.current
+        if (sel) {
+          await window.navi.flue.setActiveModel(convAtSend, sel.providerId, sel.modelId)
+          await window.navi.flue.setReasoning(convAtSend, sel.reasoning)
+        }
         const { requestId } = await window.navi.flue.send(convAtSend, trimmed)
         // The user switched/started another conversation while admission was in
         // flight — abandon this request so it can't strand busy state or stream
@@ -300,9 +375,10 @@ export function useNaviChat(): NaviChat {
       const id = newId()
       conversationIdRef.current = id
       setCurrentId(id)
+      commitSelection(defaultSelectionRef.current)
       commit([])
     },
-    [commit, persistCurrent, stopActive],
+    [commit, commitSelection, persistCurrent, stopActive],
   )
 
   const newConversation = useCallback(
@@ -337,11 +413,12 @@ export function useNaviChat(): NaviChat {
         currentProjectIdRef.current = meta.projectId
         setCurrentProjectId(meta.projectId)
       }
+      commitSelection(selectionFromMeta(meta))
       const loaded = await window.navi.flue.getConversation(id)
       if (conversationIdRef.current !== id) return
       commit(fromPersisted(loaded))
     },
-    [commit, persistCurrent, stopActive],
+    [commit, commitSelection, persistCurrent, selectionFromMeta, stopActive],
   )
 
   const selectProject = useCallback(
@@ -387,17 +464,64 @@ export function useNaviChat(): NaviChat {
     [refreshList, startBlank],
   )
 
-  const setApiKey = useCallback(async (key: string) => {
-    const res = await window.navi.flue.setApiKey(key)
-    if (res.ok) setStatus(await window.navi.flue.status())
-    return res
-  }, [])
+  const upsertProvider = useCallback(
+    async (profile: ProviderProfile, apiKey?: string) => {
+      const res = await window.navi.flue.upsertProvider(profile, apiKey)
+      if (res.ok) {
+        await refreshProviders()
+        await refreshStatus()
+      }
+      return res
+    },
+    [refreshProviders, refreshStatus],
+  )
 
-  const setBaseUrl = useCallback(async (url: string) => {
-    const res = await window.navi.flue.setBaseUrl(url)
-    if (res.ok) setStatus(await window.navi.flue.status())
-    return res
-  }, [])
+  const removeProvider = useCallback(
+    async (id: string) => {
+      const res = await window.navi.flue.deleteProvider(id)
+      if (res.ok) {
+        await refreshProviders()
+        await refreshStatus()
+      }
+      return res
+    },
+    [refreshProviders, refreshStatus],
+  )
+
+  const probeProvider = useCallback((req: ProbeReq) => window.navi.flue.probeProvider(req), [])
+
+  const setDefaultSelection = useCallback(
+    async (sel: DefaultSelection) => {
+      await window.navi.flue.setDefaultSelection(sel)
+      setDefaultSelectionState(sel)
+      defaultSelectionRef.current = sel
+      await refreshStatus()
+    },
+    [refreshStatus],
+  )
+
+  // Point the current conversation at a provider+model. Keep the existing
+  // reasoning effort. Persist eagerly (fire-and-forget): no-ops on disk until
+  // the conversation has a record, at which point send()'s flush rewrites it.
+  const pickModel = useCallback(
+    (providerId: string, modelId: string) => {
+      const reasoning = activeSelectionRef.current?.reasoning ?? defaultSelectionRef.current?.reasoning ?? 'medium'
+      commitSelection({ providerId, modelId, reasoning })
+      void window.navi.flue.setActiveModel(conversationIdRef.current, providerId, modelId)
+    },
+    [commitSelection],
+  )
+
+  // Change the current conversation's reasoning effort (keeps the model).
+  const pickReasoning = useCallback(
+    (level: ReasoningLevel) => {
+      const cur = activeSelectionRef.current ?? defaultSelectionRef.current
+      if (!cur) return
+      commitSelection({ ...cur, reasoning: level })
+      void window.navi.flue.setReasoning(conversationIdRef.current, level)
+    },
+    [commitSelection],
+  )
 
   return {
     messages,
@@ -415,7 +539,14 @@ export function useNaviChat(): NaviChat {
     createProject,
     selectProject,
     deleteProject,
-    setApiKey,
-    setBaseUrl,
+    providerProfiles,
+    defaultSelection,
+    upsertProvider,
+    removeProvider,
+    probeProvider,
+    setDefaultSelection,
+    activeSelection,
+    pickModel,
+    pickReasoning,
   }
 }
