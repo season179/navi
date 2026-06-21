@@ -172,6 +172,12 @@ type WorkbenchLayoutSnapshot = {
   sessionHeader: SessionHeaderSnapshot
 }
 
+export function getWorkbenchPreviewSnapshot(
+  mode: WorkbenchPreviewMode = 'default',
+): WorkbenchLayoutSnapshot {
+  return resolveWorkbenchLayout(mode)
+}
+
 function resolveWorkbenchLayout(mode: WorkbenchPreviewMode): WorkbenchLayoutSnapshot {
   const base: WorkbenchLayoutSnapshot = {
     leftSidebarCollapsed: false,

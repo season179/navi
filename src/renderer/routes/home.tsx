@@ -333,6 +333,10 @@ import {
   type WorkbenchPreviewMode,
 } from '../components/Workbench'
 import {
+  AppShellPreview,
+  type AppShellPreviewMode,
+} from '../components/AppShell'
+import {
   WriteWorkspaceEmptyState,
   WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
   type WriteWorkspaceEmptyStatePreviewMode,
@@ -939,6 +943,25 @@ function HomePage() {
     if (value === 'fileTree') return 'fileTree'
     if (value === 'sidechat') return 'sidechat'
     if (value === 'runtimeError') return 'runtimeError'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported AppShell orchestrator
+  // (?appShellPreview=default|windows|linux|settings|windowsSettings|loading|initialSetup|windowsInitialSetup|runtimeStatus|windowsRuntimeStatus).
+  const appShellPreviewMode = useMemo((): AppShellPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('appShellPreview')) return null
+    const value = params.get('appShellPreview')
+    if (value === 'windows') return 'windows'
+    if (value === 'linux') return 'linux'
+    if (value === 'settings') return 'settings'
+    if (value === 'windowsSettings') return 'windowsSettings'
+    if (value === 'loading') return 'loading'
+    if (value === 'initialSetup') return 'initialSetup'
+    if (value === 'windowsInitialSetup') return 'windowsInitialSetup'
+    if (value === 'runtimeStatus') return 'runtimeStatus'
+    if (value === 'windowsRuntimeStatus') return 'windowsRuntimeStatus'
     return 'default'
   }, [])
 
@@ -2402,6 +2425,10 @@ function HomePage() {
 
   if (sddDraftEditorViewPreviewMode) {
     return <SddDraftEditorViewPreview mode={sddDraftEditorViewPreviewMode} />
+  }
+
+  if (appShellPreviewMode) {
+    return <AppShellPreview mode={appShellPreviewMode} />
   }
 
   if (workbenchPreviewMode) {
