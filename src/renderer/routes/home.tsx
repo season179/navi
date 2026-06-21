@@ -2869,6 +2869,88 @@ function HomePage() {
     }
   }, [])
 
+  // Production ChatThread work process row via ?productionWorkProcess=…
+  const productionChatWorkProcess = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {
+        workProcessAtTurnIndex: undefined,
+        workProcess: undefined,
+      }
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionWorkProcess')) {
+      return {
+        workProcessAtTurnIndex: undefined,
+        workProcess: undefined,
+      }
+    }
+    const mode = params.get('productionWorkProcess')
+    const turnParam = params.get('productionWorkProcessTurnIndex')
+    const parsedTurnIndex = turnParam ? Number.parseInt(turnParam, 10) : 0
+    const workProcessAtTurnIndex = Number.isFinite(parsedTurnIndex) ? parsedTurnIndex : 0
+
+    if (mode === 'processing') {
+      return {
+        workProcessAtTurnIndex,
+        workProcess: {
+          processing: true,
+          workExpanded: true,
+          workMeta: WORK_META_ROW_PREVIEW.processing,
+          processSections: [
+            { ...PROCESS_SECTION_ROW_PREVIEW.reasoningActive, expanded: true },
+            {
+              ...PROCESS_SECTION_ROW_PREVIEW.execution,
+              active: true,
+              processing: true,
+              expanded: true,
+            },
+          ],
+        },
+      }
+    }
+
+    if (mode === 'steps') {
+      return {
+        workProcessAtTurnIndex,
+        workProcess: {
+          processing: false,
+          workExpanded: true,
+          workMeta: WORK_META_ROW_PREVIEW.steps,
+          processSections: [
+            { ...PROCESS_SECTION_ROW_PREVIEW.executionExpanded, expanded: true },
+          ],
+        },
+      }
+    }
+
+    if (mode === 'error') {
+      return {
+        workProcessAtTurnIndex,
+        workProcess: {
+          processing: false,
+          workExpanded: true,
+          workMeta: WORK_META_ROW_PREVIEW.processed,
+          processSections: [
+            { ...PROCESS_SECTION_ROW_PREVIEW.error, expanded: true },
+          ],
+        },
+      }
+    }
+
+    return {
+      workProcessAtTurnIndex,
+      workProcess: {
+        processing: false,
+        workExpanded: false,
+        workMeta: WORK_META_ROW_PREVIEW.processed,
+        processSections: [
+          { ...PROCESS_SECTION_ROW_PREVIEW.reasoning, expanded: false },
+          { ...PROCESS_SECTION_ROW_PREVIEW.execution, expanded: false },
+        ],
+      },
+    }
+  }, [])
+
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
   // toggles (a create/enable/disable in the Skills tab may have changed the set).
@@ -3518,6 +3600,8 @@ function HomePage() {
         turnChanges={productionChatTurnChanges.turnChanges}
         turnChangesCompact={productionChatTurnChanges.turnChangesCompact}
         turnChangesDefaultExpanded={productionChatTurnChanges.turnChangesDefaultExpanded}
+        workProcessAtTurnIndex={productionChatWorkProcess.workProcessAtTurnIndex}
+        workProcess={productionChatWorkProcess.workProcess}
       />
     </>
   )

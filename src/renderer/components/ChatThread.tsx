@@ -2,7 +2,13 @@
 // uses the ported MessageBubble chrome (Kun message-timeline-bubbles.tsx) while
 // mapping navi's simple ChatMessage thread onto user/assistant/system snapshots.
 
-import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactElement,
+} from 'react'
 import type { ChatMessage } from '../flue/useNaviChat'
 import { goalTimelinePaddingClass, LiveTurnProgressRow } from './LiveTurnProgressRow'
 import { MessageBubble, type MessageBubbleSnapshot } from './MessageBubble'
@@ -19,9 +25,14 @@ import { ReviewPlanCard } from './ReviewPlanCard'
 import { ReviewSummaryCard, type ReviewSummarySnapshot } from './ReviewSummaryCard'
 import { ThreadForkBanner, ThreadForkPoint } from './ThreadForkBanner'
 import {
+  ProcessSectionRow,
+  type ProcessSectionSnapshot,
+} from './ProcessSectionRow'
+import {
   TurnChangeSummary,
   type TurnChangeSnapshot,
 } from './TurnChangeSummary'
+import { WorkMetaRow } from './WorkMetaRow'
 
 const TURN_PAGE_SIZE = 18
 const AUTO_COLLAPSE_THRESHOLD = 24
@@ -130,6 +141,20 @@ type ChatThreadProps = {
   turnChanges?: TurnChangeSnapshot[]
   turnChangesCompact?: boolean
   turnChangesDefaultExpanded?: boolean
+  /** When set with workProcess, renders Kun's work meta row and process sections at this turn. */
+  workProcessAtTurnIndex?: number
+  workProcess?: {
+    processing: boolean
+    workExpanded?: boolean
+    workMeta: {
+      processing: boolean
+      stepCount: number
+      durationMs?: number
+      reasoningDurationMs?: number
+      collapsible?: boolean
+    }
+    processSections: ProcessSectionSnapshot[]
+  }
 }
 
 export function ChatThread({
@@ -154,9 +179,12 @@ export function ChatThread({
   turnChanges,
   turnChangesCompact = false,
   turnChangesDefaultExpanded = false,
+  workProcessAtTurnIndex,
+  workProcess,
 }: ChatThreadProps): ReactElement {
   const bottomRef = useRef<HTMLDivElement>(null)
   const turnRefMap = useRef(new Map<string, HTMLDivElement>())
+  const [workExpandedOverride, setWorkExpandedOverride] = useState<boolean | null>(null)
   const turns = useMemo(() => groupMessagesIntoTurns(messages), [messages])
   const [visibleTurnCount, setVisibleTurnCount] = useState(TURN_PAGE_SIZE)
   const [historyExpanded, setHistoryExpanded] = useState(false)
@@ -266,6 +294,18 @@ export function ChatThread({
             turnChanges.length > 0 &&
             typeof changesAtTurnIndex === 'number' &&
             changesAtTurnIndex === absoluteTurnIndex
+          const showWorkProcess =
+            workProcess != null &&
+            typeof workProcessAtTurnIndex === 'number' &&
+            workProcessAtTurnIndex === absoluteTurnIndex
+          const processSections = workProcess?.processSections ?? []
+          const hasProcessError = processSections.some((section) => section.hasError)
+          const workExpanded =
+            hasProcessError ||
+            (workExpandedOverride ??
+              workProcess?.workExpanded ??
+              workProcess?.processing ??
+              false)
 
           return (
             <div
@@ -281,20 +321,64 @@ export function ChatThread({
             >
               {showForkPoint ? <ThreadForkPoint parentTitle={forkedFromTitle} /> : null}
               <div className="message-timeline-turn">
-                {turn.messages.map((message) => {
-                  const snapshot = chatMessageToSnapshot(message)
-                  const streaming = message.status === 'streaming'
-                  const showBubble =
-                    snapshot &&
-                    !(streaming && snapshot.kind === 'assistant' && snapshot.text.trim() === '')
+                {turn.messages
+                  .filter((message) => message.role === 'user')
+                  .map((message) => {
+                    const snapshot = chatMessageToSnapshot(message)
+                    return snapshot ? (
+                      <MessageBubble key={message.id} block={snapshot} />
+                    ) : null
+                  })}
 
-                  return (
-                    <div key={message.id}>
-                      {showBubble ? <MessageBubble block={snapshot} /> : null}
-                      {streaming ? <LiveTurnProgressRow /> : null}
-                    </div>
-                  )
-                })}
+                {showWorkProcess && workProcess?.workMeta ? (
+                  <div className="message-timeline-turn-process">
+                    <WorkMetaRow
+                      processing={workProcess.workMeta.processing}
+                      stepCount={workProcess.workMeta.stepCount}
+                      durationMs={workProcess.workMeta.durationMs}
+                      reasoningDurationMs={workProcess.workMeta.reasoningDurationMs}
+                      expanded={workExpanded}
+                      collapsible={
+                        workProcess.workMeta.collapsible !== false && !hasProcessError
+                      }
+                      onToggle={() =>
+                        setWorkExpandedOverride((value) => !(value ?? workProcess.processing))
+                      }
+                    />
+                    {workExpanded && processSections.length > 0 ? (
+                      <div className="message-timeline-turn-process-sections">
+                        {processSections.map((section) => (
+                          <ProcessSectionRow
+                            key={section.title}
+                            section={section}
+                            expanded={section.expanded === true}
+                          />
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {turn.messages
+                  .filter((message) => message.role !== 'user')
+                  .map((message) => {
+                    const snapshot = chatMessageToSnapshot(message)
+                    const streaming = message.status === 'streaming'
+                    const showBubble =
+                      snapshot &&
+                      !(
+                        streaming &&
+                        snapshot.kind === 'assistant' &&
+                        snapshot.text.trim() === ''
+                      )
+
+                    return (
+                      <div key={message.id}>
+                        {showBubble ? <MessageBubble block={snapshot} /> : null}
+                        {streaming ? <LiveTurnProgressRow /> : null}
+                      </div>
+                    )
+                  })}
                 {showGeneratedFiles ? (
                   <GeneratedFilesPanel media={generatedFiles} />
                 ) : null}
