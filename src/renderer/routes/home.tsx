@@ -313,6 +313,10 @@ import {
   WriteFontSizeControlPreview,
   type WriteFontSizeControlPreviewMode,
 } from '../components/WriteFontSizeControl'
+import {
+  WriteWorkspaceToolbarPreview,
+  type WriteWorkspaceToolbarPreviewMode,
+} from '../components/WriteWorkspaceToolbar'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -719,6 +723,27 @@ function HomePage() {
       const value = params.get('writeFontSizeControl')
       if (value === 'min') return 'min'
       if (value === 'max') return 'max'
+      return 'default'
+    }, [])
+
+  // Visual preview for the ported WriteWorkspaceToolbar
+  // (?writeWorkspaceToolbar=1|pdf|dirty|saving|error|readonly|exportMenu|modeMenu|assistant|review|image).
+  const writeWorkspaceToolbarPreviewMode =
+    useMemo((): WriteWorkspaceToolbarPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('writeWorkspaceToolbar')) return null
+      const value = params.get('writeWorkspaceToolbar')
+      if (value === 'pdf') return 'pdf'
+      if (value === 'dirty') return 'dirty'
+      if (value === 'saving') return 'saving'
+      if (value === 'error') return 'error'
+      if (value === 'readonly') return 'readonly'
+      if (value === 'exportMenu') return 'exportMenu'
+      if (value === 'modeMenu') return 'modeMenu'
+      if (value === 'assistant') return 'assistant'
+      if (value === 'review') return 'review'
+      if (value === 'image') return 'image'
       return 'default'
     }, [])
 
@@ -1599,6 +1624,10 @@ function HomePage() {
 
   if (writeFontSizeControlPreviewMode) {
     return <WriteFontSizeControlPreview mode={writeFontSizeControlPreviewMode} />
+  }
+
+  if (writeWorkspaceToolbarPreviewMode) {
+    return <WriteWorkspaceToolbarPreview mode={writeWorkspaceToolbarPreviewMode} />
   }
 
   if (generalSettingsPreviewMode) {

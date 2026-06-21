@@ -4703,6 +4703,648 @@ a.runtime-meta-chip:hover {
 
 
 /* =====================================================
+   Write workspace toolbar (Kun WriteWorkspaceToolbar)
+   ===================================================== */
+.write-workspace-toolbar-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  container-type: inline-size;
+  container-name: write-workspace;
+  overflow: auto;
+  padding: 24px;
+  background: var(--ds-bg-main);
+}
+
+.write-workspace-toolbar-preview-body {
+  margin-top: 24px;
+  padding: 0 12px;
+}
+
+.write-workspace-toolbar-preview-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ds-text-faint);
+}
+
+.write-workspace-toolbar-inset {
+  flex-shrink: 0;
+  margin-inline: -12px;
+}
+
+@media (min-width: 640px) {
+  .write-workspace-toolbar-inset {
+    margin-inline: -16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .write-workspace-toolbar-inset {
+    margin-inline: -24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .write-workspace-toolbar-inset {
+    margin-inline: -32px;
+  }
+}
+
+.write-workspace-toolbar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  min-height: 56px;
+  width: 100%;
+  align-items: stretch;
+  margin-top: 12px;
+  overflow: visible;
+  border-radius: 18px;
+  background: transparent;
+  border: 0;
+}
+
+.write-workspace-toolbar-pdf {
+  min-height: 52px;
+}
+
+.write-workspace-toolbar-grid,
+.write-pdf-topbar-grid {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+@media (min-width: 640px) {
+  .write-workspace-toolbar-grid,
+  .write-pdf-topbar-grid {
+    padding-inline: 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  .write-workspace-toolbar-grid {
+    padding-left: 20px;
+    padding-right: 8px;
+  }
+
+  .write-pdf-topbar-grid {
+    padding-left: 20px;
+    padding-right: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .write-workspace-toolbar-grid {
+    gap: 16px;
+  }
+}
+
+.write-workspace-toolbar-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.write-pdf-topbar-grid {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.write-workspace-toolbar-file {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.write-workspace-toolbar-file-badge {
+  display: inline-flex;
+  height: 32px;
+  width: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+  color: var(--ds-accent);
+}
+
+.write-workspace-toolbar-file-copy {
+  min-width: 0;
+  flex: 1;
+  line-height: 1;
+}
+
+.write-workspace-toolbar-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ds-text);
+}
+
+.write-workspace-toolbar-file-meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--ds-text-faint);
+}
+
+.write-workspace-toolbar-file-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.write-workspace-toolbar-stats-pill {
+  flex-shrink: 0;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  background: var(--ds-hover);
+}
+
+.write-workspace-toolbar-modes {
+  position: relative;
+  display: flex;
+  min-width: max-content;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, #ffffff 68%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+[data-theme='dark'] .write-workspace-toolbar-modes {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+.write-workspace-toolbar-mode-btn {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 13px;
+  color: var(--ds-text-faint);
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease,
+    box-shadow 0.14s ease;
+}
+
+.write-workspace-toolbar-mode-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, #ffffff 70%, transparent);
+  color: var(--ds-text);
+}
+
+[data-theme='dark'] .write-workspace-toolbar-mode-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.write-workspace-toolbar-mode-btn-active {
+  background: #ffffff;
+  color: var(--ds-text);
+  box-shadow: 0 1px 2px rgba(20, 47, 95, 0.06);
+  box-shadow:
+    0 1px 2px rgba(20, 47, 95, 0.06),
+    inset 0 0 0 1px var(--ds-border-muted);
+}
+
+[data-theme='dark'] .write-workspace-toolbar-mode-btn-active {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.write-workspace-toolbar-mode-btn-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.write-workspace-toolbar-mode-menu-btn {
+  padding-inline: 8px;
+}
+
+.write-workspace-toolbar-mode-label {
+  display: none;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+@media (min-width: 640px) {
+  .write-workspace-toolbar-mode-label {
+    display: inline;
+  }
+}
+
+.write-workspace-toolbar-chevron {
+  transition: transform 0.15s ease;
+}
+
+.write-workspace-toolbar-chevron-open {
+  transform: rotate(180deg);
+}
+
+.write-workspace-toolbar-mode-menu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  z-index: 30;
+  min-width: 188px;
+  overflow: hidden;
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(20, 47, 95, 0.12);
+}
+
+[data-theme='dark'] .write-workspace-toolbar-mode-menu {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #131722;
+}
+
+.write-workspace-toolbar-mode-menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 13px;
+  text-align: left;
+  color: var(--ds-text);
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.write-workspace-toolbar-mode-menu-item:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+[data-theme='dark'] .write-workspace-toolbar-mode-menu-item:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.write-workspace-toolbar-mode-menu-item-active {
+  background: color-mix(in srgb, var(--ds-accent) 12%, transparent);
+  color: var(--ds-accent);
+}
+
+.write-workspace-toolbar-mode-menu-item-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.write-workspace-toolbar-mode-menu-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.write-workspace-toolbar-mode-menu-on {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.write-workspace-toolbar-actions {
+  display: flex;
+  min-width: max-content;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.write-workspace-toolbar-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.write-workspace-toolbar-icon-btn,
+.write-workspace-toolbar-menu-btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ds-text-faint);
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+}
+
+.write-workspace-toolbar-icon-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.write-workspace-toolbar-icon-btn:hover:not(:disabled),
+.write-workspace-toolbar-menu-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, #ffffff 70%, transparent);
+  color: var(--ds-text);
+}
+
+[data-theme='dark'] .write-workspace-toolbar-icon-btn:hover:not(:disabled),
+[data-theme='dark'] .write-workspace-toolbar-menu-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.write-workspace-toolbar-icon-btn:disabled,
+.write-workspace-toolbar-menu-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.write-workspace-toolbar-icon-btn-active,
+.write-workspace-toolbar-menu-btn-active {
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+  color: var(--ds-accent);
+}
+
+.write-workspace-toolbar-menu-btn {
+  height: 32px;
+  gap: 4px;
+  padding: 0 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.write-workspace-toolbar-export-label {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .write-workspace-toolbar-export-label {
+    display: inline;
+  }
+}
+
+.write-workspace-toolbar-export-chevron {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.write-workspace-toolbar-save-pill {
+  display: inline-flex;
+  min-width: 64px;
+  justify-content: center;
+  margin-left: 4px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.write-workspace-toolbar-save-pill-saved {
+  background: color-mix(in srgb, #10b981 12%, transparent);
+  color: #047857;
+}
+
+[data-theme='dark'] .write-workspace-toolbar-save-pill-saved {
+  color: #6ee7b7;
+}
+
+.write-workspace-toolbar-save-pill-dirty {
+  background: color-mix(in srgb, #f59e0b 12%, transparent);
+  color: #b45309;
+}
+
+[data-theme='dark'] .write-workspace-toolbar-save-pill-dirty {
+  color: #fcd34d;
+}
+
+.write-workspace-toolbar-save-pill-saving {
+  background: color-mix(in srgb, #0ea5e9 12%, transparent);
+  color: #0369a1;
+}
+
+[data-theme='dark'] .write-workspace-toolbar-save-pill-saving {
+  color: #7dd3fc;
+}
+
+.write-workspace-toolbar-save-pill-error {
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+  color: #dc2626;
+}
+
+[data-theme='dark'] .write-workspace-toolbar-save-pill-error {
+  color: #fca5a5;
+}
+
+.write-workspace-toolbar-save-pill-readonly {
+  background: color-mix(in srgb, #64748b 12%, transparent);
+  color: #334155;
+}
+
+[data-theme='dark'] .write-workspace-toolbar-save-pill-readonly {
+  color: #cbd5e1;
+}
+
+.write-workspace-toolbar-save-pill-review {
+  background: color-mix(in srgb, var(--ds-accent) 12%, transparent);
+  color: var(--ds-accent);
+}
+
+.write-workspace-toolbar-export-wrap {
+  position: relative;
+}
+
+.write-workspace-toolbar-export-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 30;
+  width: 208px;
+  max-width: calc(100vw - 2rem);
+  overflow: hidden;
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid var(--ds-border);
+  background: color-mix(in srgb, var(--ds-card) 95%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 22px 48px rgba(20, 47, 95, 0.16);
+}
+
+.write-workspace-toolbar-export-menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 13px;
+  text-align: left;
+  color: var(--ds-text);
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.write-workspace-toolbar-export-menu-item:hover {
+  background: color-mix(in srgb, var(--ds-hover) 80%, transparent);
+}
+
+.write-workspace-toolbar-export-menu-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--ds-text-faint);
+}
+
+.write-workspace-toolbar-export-format {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-text-faint);
+}
+
+.write-workspace-toolbar-export-divider {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--ds-border-muted);
+}
+
+.write-workspace-toolbar-spin {
+  animation: write-workspace-toolbar-spin 0.8s linear infinite;
+}
+
+@keyframes write-workspace-toolbar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.write-pdf-topbar-file-icon {
+  display: inline-flex;
+  height: 32px;
+  width: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+  color: var(--ds-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ds-accent) 12%, transparent);
+}
+
+.write-pdf-topbar-status {
+  display: none;
+  min-width: max-content;
+  align-items: center;
+  gap: 7px;
+  justify-self: end;
+  padding: 7px 10px;
+  border-radius: 9999px;
+  border: 1px solid var(--ds-border-muted);
+  background: rgba(255, 255, 255, 0.56);
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ds-text-muted);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+[data-theme='dark'] .write-pdf-topbar-status {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+.write-pdf-topbar-dot {
+  height: 3px;
+  width: 3px;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.42;
+}
+
+.write-pdf-topbar-actions {
+  display: flex;
+  min-width: max-content;
+  justify-content: flex-end;
+}
+
+.write-workspace-toolbar-modes,
+.write-workspace-toolbar-actions {
+  min-width: max-content;
+}
+
+.write-workspace-toolbar-actions {
+  justify-self: end;
+  justify-content: flex-end;
+}
+
+@container (min-width: 520px) {
+  .write-workspace-toolbar-grid {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .write-pdf-topbar-status {
+    display: inline-flex;
+  }
+
+  .write-pdf-topbar-grid {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .write-workspace-toolbar-modes,
+  .write-workspace-toolbar-actions {
+    justify-self: end;
+  }
+
+  .write-workspace-toolbar-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
+@container (min-width: 620px) {
+  .write-workspace-toolbar-grid {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .write-workspace-toolbar-actions {
+    grid-column: auto;
+  }
+}
+
+@container (min-width: 900px) {
+  .write-workspace-toolbar-grid {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .write-workspace-toolbar-modes {
+    justify-self: center;
+  }
+}
+
+
+/* =====================================================
    Initial session usage heatmap (Kun InitialSessionUsageHeatmap)
    ===================================================== */
 .initial-session-usage-heatmap {
