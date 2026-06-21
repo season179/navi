@@ -319,7 +319,8 @@ export function ClawSidebarContent({
   )
 }
 
-const PREVIEW_CHANNELS: ClawImChannelSidebarSnapshot[] = [
+/** Mock channel snapshots for production claw-route sidebar wiring. */
+export const CLAW_SIDEBAR_PRODUCTION_CHANNELS: ClawImChannelSidebarSnapshot[] = [
   {
     id: 'feishu-team',
     provider: 'feishu',
@@ -356,6 +357,8 @@ const PREVIEW_CHANNELS: ClawImChannelSidebarSnapshot[] = [
   },
 ]
 
+const PREVIEW_CHANNELS = CLAW_SIDEBAR_PRODUCTION_CHANNELS
+
 const PREVIEW_CHANNELS_DISABLED: ClawImChannelSidebarSnapshot[] = PREVIEW_CHANNELS.map(
   (channel, index) => ({
     ...channel,
@@ -390,6 +393,35 @@ function previewSnapshot(mode: ClawSidebarPreviewMode): {
     activeChannelId: 'weixin-support',
     activeThreadId: null,
   }
+}
+
+type ClawSidebarProductionPanelProps = {
+  onOpenConnectPhone: () => void
+  onOpenSettings: () => void
+}
+
+/** Production claw-route sidebar body with mock channel snapshots for visual parity. */
+export function ClawSidebarProductionPanel({
+  onOpenConnectPhone,
+  onOpenSettings,
+}: ClawSidebarProductionPanelProps): ReactElement {
+  const [activeChannelId, setActiveChannelId] = useState(
+    () => CLAW_SIDEBAR_PRODUCTION_CHANNELS[0]?.id ?? '',
+  )
+
+  return (
+    <ClawSidebarContent
+      channels={CLAW_SIDEBAR_PRODUCTION_CHANNELS}
+      activeChannelId={activeChannelId}
+      activeThreadId={
+        CLAW_SIDEBAR_PRODUCTION_CHANNELS.find((channel) => channel.id === activeChannelId)
+          ?.threadId ?? null
+      }
+      onSelectChannel={setActiveChannelId}
+      onAddChannel={onOpenConnectPhone}
+      onOpenSettings={onOpenSettings}
+    />
+  )
 }
 
 /** Full sidebar preview shell for ?clawSidebarPreview URL hooks. */

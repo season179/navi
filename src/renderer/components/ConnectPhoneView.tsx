@@ -453,6 +453,7 @@ type ConnectPhoneSidebarPanelProps = {
   disconnecting: boolean
   disconnectError: string
   onTargetChange?: (target: ClawInstallTarget) => void
+  onEnterClawRoute?: () => void
 }
 
 export function ConnectPhoneSidebarPanel({
@@ -466,6 +467,7 @@ export function ConnectPhoneSidebarPanel({
   disconnecting,
   disconnectError,
   onTargetChange,
+  onEnterClawRoute,
 }: ConnectPhoneSidebarPanelProps): ReactElement {
   const targetProvider = connectPhoneProviderForTarget(target)
   const connectedChannel = channels.find((channel) => channel.provider === targetProvider) ?? null
@@ -535,7 +537,10 @@ export function ConnectPhoneSidebarPanel({
                     type="button"
                     className={`connect-phone-sidebar-channel-row${active ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`}
                     title={disabled ? COPY.clawImDisabledSidebar : channel.label}
-                    onClick={() => onTargetChange?.(providerTarget)}
+                    onClick={() => {
+                      onTargetChange?.(providerTarget)
+                      onEnterClawRoute?.()
+                    }}
                   >
                     <MessageSquare
                       className="connect-phone-sidebar-channel-msg-icon"

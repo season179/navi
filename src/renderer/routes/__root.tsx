@@ -39,6 +39,7 @@ import {
   type ConnectPhoneQrStatus,
 } from '../components/ConnectPhoneView'
 import { WriteSidebarProductionPanel } from '../components/WriteSidebar'
+import { ClawSidebarProductionPanel } from '../components/ClawSidebar'
 import { type ClawInstallTarget } from '../components/ClawAddImDialog'
 
 function resolveProductionPlatform(): string {
@@ -47,10 +48,10 @@ function resolveProductionPlatform(): string {
 }
 
 function RootLayoutInner() {
-  const { scheduleActive } = useSidebarRoute()
+  const { scheduleActive, clawActive } = useSidebarRoute()
 
   return (
-    <WorkspaceModeProvider scheduleActive={scheduleActive}>
+    <WorkspaceModeProvider scheduleActive={scheduleActive} clawActive={clawActive}>
       <RootLayoutContent />
     </WorkspaceModeProvider>
   )
@@ -63,9 +64,11 @@ function RootLayoutContent() {
     route: sidebarRoute,
     pluginsActive,
     scheduleActive,
+    clawActive,
     openChatRoute,
     openScheduleRoute,
     openPluginsRoute,
+    openClawRoute,
   } = useSidebarRoute()
   const [collapsed, setCollapsed] = useState(false)
   const toggle = useCallback(() => setCollapsed((v) => !v), [])
@@ -118,12 +121,24 @@ function RootLayoutContent() {
     setConnectPhoneSidebarOpen((open) => !open)
   }, [openChatRoute])
 
+  const enterClawRouteFromConnectPhone = useCallback(() => {
+    setConnectPhoneSidebarOpen(false)
+    openClawRoute()
+  }, [openClawRoute])
+
+  const openConnectPhoneFromClawSidebar = useCallback(() => {
+    openChatRoute()
+    setConnectPhoneSidebarOpen(true)
+  }, [openChatRoute])
+
   const mainStageClass =
     sidebarRoute === 'plugins'
       ? 'stage ds-stage-surface workbench-chat-stage production-main-stage production-main-stage--plugins'
-      : workspaceModeActiveView === 'write'
-        ? 'stage ds-stage-surface production-main-stage production-main-stage--write'
-        : 'stage ds-stage-surface ds-chat-stage workbench-chat-stage production-main-stage'
+      : sidebarRoute === 'claw'
+        ? 'stage ds-stage-surface ds-chat-stage workbench-chat-stage production-main-stage production-main-stage--claw'
+        : workspaceModeActiveView === 'write'
+          ? 'stage ds-stage-surface production-main-stage production-main-stage--write'
+          : 'stage ds-stage-surface ds-chat-stage workbench-chat-stage production-main-stage'
 
   const platform = useMemo(() => resolveProductionPlatform(), [])
   const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
@@ -292,7 +307,7 @@ function RootLayoutContent() {
                     }}
                   />
 
-                  {!scheduleActive ? (
+                  {!scheduleActive && !clawActive ? (
                     <>
                       <SidebarCommandRow
                         icon={<Plus className="h-4 w-4" strokeWidth={2} />}
@@ -342,6 +357,12 @@ function RootLayoutContent() {
                       setConnectPhoneTarget(target)
                       setConnectPhoneQrStatus('idle')
                     }}
+                    onEnterClawRoute={enterClawRouteFromConnectPhone}
+                  />
+                ) : clawActive ? (
+                  <ClawSidebarProductionPanel
+                    onOpenConnectPhone={openConnectPhoneFromClawSidebar}
+                    onOpenSettings={toggleSettings}
                   />
                 ) : (
                   <SidebarProjects />

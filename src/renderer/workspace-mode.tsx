@@ -39,9 +39,11 @@ function resolveWorkspaceModeTabsPreviewMode(): WorkspaceModeView | null {
 export function WorkspaceModeProvider({
   children,
   scheduleActive,
+  clawActive = false,
 }: {
   children: ReactNode
   scheduleActive: boolean
+  clawActive?: boolean
 }) {
   const workspaceModeTabsPreviewMode = useMemo(() => resolveWorkspaceModeTabsPreviewMode(), [])
   const [workspaceModeTabsPreviewView, setWorkspaceModeTabsPreviewView] = useState<
@@ -52,11 +54,13 @@ export function WorkspaceModeProvider({
   const workspaceMode = useMemo((): WorkspaceModeView => {
     if (workspaceModeTabsPreviewMode !== null) return workspaceModeTabsPreviewView
     if (scheduleActive) return 'schedule'
+    if (clawActive) return 'chat'
     return productionWorkspaceMode
   }, [
     workspaceModeTabsPreviewMode,
     workspaceModeTabsPreviewView,
     scheduleActive,
+    clawActive,
     productionWorkspaceMode,
   ])
 

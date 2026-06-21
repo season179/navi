@@ -180,6 +180,20 @@ textarea {
   padding-right: 0;
 }
 
+.production-main-stage--claw {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.production-claw-stage {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: auto;
+}
+
 .production-plugins-stage {
   display: flex;
   height: 100%;

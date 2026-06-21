@@ -3383,6 +3383,17 @@ function HomePage() {
     )
   }
 
+  if (sidebarRoute === 'claw') {
+    return (
+      <div className="stage-scroll production-claw-stage">
+        <ClawEmptyHero
+          agentName={CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME}
+          hasInboundConversation
+        />
+      </div>
+    )
+  }
+
   if (workspaceMode === 'write') {
     return (
       <WriteWorkspaceProductionView
