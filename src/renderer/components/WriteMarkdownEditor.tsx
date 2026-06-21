@@ -22,6 +22,7 @@ import {
   type Panel,
 } from '@codemirror/view'
 import { unifiedMergeView } from '@codemirror/merge'
+import { writeMarkdownLivePreviewExtensions } from '../lib/writeMarkdownLivePreview'
 import { WRITE_MARKDOWN_PREVIEW_SAMPLE } from './WriteMarkdownPreview'
 
 const COPY = {
@@ -161,6 +162,7 @@ export function WriteMarkdownEditor({
   const viewRef = useRef<EditorView | null>(null)
   const themeCompartmentRef = useRef<Compartment | null>(null)
   const editableCompartmentRef = useRef<Compartment | null>(null)
+  const livePreviewCompartmentRef = useRef<Compartment | null>(null)
   const mergeCompartmentRef = useRef<Compartment | null>(null)
   const onChangeRef = useRef(onChange)
   const lastEmittedValueRef = useRef<string | null>(null)
@@ -172,9 +174,11 @@ export function WriteMarkdownEditor({
 
     const themeCompartment = new Compartment()
     const editableCompartment = new Compartment()
+    const livePreviewCompartment = new Compartment()
     const mergeCompartment = new Compartment()
     themeCompartmentRef.current = themeCompartment
     editableCompartmentRef.current = editableCompartment
+    livePreviewCompartmentRef.current = livePreviewCompartment
     mergeCompartmentRef.current = mergeCompartment
 
     const initialDoc = showDiffReview ? DIFF_REVIEW_NEXT : value
@@ -194,6 +198,9 @@ export function WriteMarkdownEditor({
       extensions: [
         themeCompartment.of(buildEditorTheme(appearance)),
         editableCompartment.of(buildInteractionExtensions(readOnly, appearance)),
+        livePreviewCompartment.of(
+          appearance === 'live' ? writeMarkdownLivePreviewExtensions() : [],
+        ),
         mergeCompartment.of(mergeExtensions),
         markdown({ base: markdownLanguage, codeLanguages: languages }),
         history(),
@@ -226,6 +233,7 @@ export function WriteMarkdownEditor({
       viewRef.current = null
       themeCompartmentRef.current = null
       editableCompartmentRef.current = null
+      livePreviewCompartmentRef.current = null
       mergeCompartmentRef.current = null
     }
     // Mount-once editor shell for preview verification.
@@ -236,11 +244,15 @@ export function WriteMarkdownEditor({
     const view = viewRef.current
     const themeCompartment = themeCompartmentRef.current
     const editableCompartment = editableCompartmentRef.current
-    if (!view || !themeCompartment || !editableCompartment) return
+    const livePreviewCompartment = livePreviewCompartmentRef.current
+    if (!view || !themeCompartment || !editableCompartment || !livePreviewCompartment) return
     view.dispatch({
       effects: [
         themeCompartment.reconfigure(buildEditorTheme(appearance)),
         editableCompartment.reconfigure(buildInteractionExtensions(readOnly, appearance)),
+        livePreviewCompartment.reconfigure(
+          appearance === 'live' ? writeMarkdownLivePreviewExtensions() : [],
+        ),
       ],
     })
   }, [appearance, readOnly])

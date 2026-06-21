@@ -16,6 +16,18 @@ export function parsePendingInfographicId(src: string | undefined): string | nul
   return match ? match[1] : null
 }
 
+/** Parse `![alt](kun-pending-infographic://id)` image markdown. */
+export function parsePendingInfographicImage(
+  source: string,
+): { alt: string; id: string; src: string } | null {
+  const match = /^!\[([^\]]*)\]\(\s*(?:<([^>]*)>|([^)\s]+))\s*\)$/.exec(source.trim())
+  if (!match) return null
+  const src = (match[2] ?? match[3] ?? '').trim()
+  const id = parsePendingInfographicId(src)
+  if (!id) return null
+  return { alt: match[1] ?? '', id, src }
+}
+
 /** Whether an image src points at a local HTML document to embed inline. */
 export function isHtmlEmbedSrc(src: string | undefined): boolean {
   if (!src) return false
