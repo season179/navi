@@ -9,6 +9,9 @@ import {
   CONTEXT_CAPACITY_PREVIEW,
 } from '../components/ContextCapacityPopover'
 import { Composer } from '../components/Composer'
+import {
+  QUEUED_MESSAGES_PREVIEW,
+} from '../components/FloatingComposerQueuedMessages'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -68,6 +71,13 @@ function HomePage() {
   const contextCapacityPreview = useMemo(() => {
     if (typeof window === 'undefined') return false
     return new URLSearchParams(window.location.search).has('contextCapacityPreview')
+  }, [])
+
+  // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
+  const queuedMessagesPreview = useMemo(() => {
+    if (typeof window === 'undefined') return undefined
+    if (!new URLSearchParams(window.location.search).has('queuedMessagesPreview')) return undefined
+    return QUEUED_MESSAGES_PREVIEW
   }, [])
 
   // The active project's cwd, for scoping project skills in the Skills panel.
@@ -196,6 +206,7 @@ function HomePage() {
           />
         }
         voiceRecording={voiceRecording}
+        queuedMessages={queuedMessagesPreview}
       />
 
       {contextCapacityPreview ? (

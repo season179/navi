@@ -12,6 +12,10 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNod
 import { Plus, ArrowUp, Send, Square } from 'lucide-react'
 import { SkillPicker } from './SkillPicker'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
+import {
+  FloatingComposerQueuedMessages,
+  type QueuedComposerMessage,
+} from './FloatingComposerQueuedMessages'
 import type { SkillSummary } from '../../shared/flue'
 
 interface ComposerProps {
@@ -33,6 +37,9 @@ interface ComposerProps {
     onStop?: () => void
     onSend?: () => void
   }
+  /** Queued messages shown above the composer shell while a reply is streaming. */
+  queuedMessages?: QueuedComposerMessage[]
+  onRemoveQueuedMessage?: (id: string) => void
 }
 
 /**
@@ -58,6 +65,8 @@ export function Composer({
   modelChip,
   skills,
   voiceRecording,
+  queuedMessages,
+  onRemoveQueuedMessage,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -117,21 +126,28 @@ export function Composer({
 
   return (
     <div className="composer-wrap">
-      {pickerOpen && query !== null ? (
-        <SkillPicker
-          skills={skills ?? []}
-          query={query}
-          onPick={injectSkillHint}
-          onClose={() => {
-            // Closing the picker without a pick: drop the leading slash so the
-            // draft doesn't keep re-triggering it. Leave the rest of the text.
-            if (value.startsWith('/')) onChange(value.slice(1))
-            setPickerOpen(false)
-            textareaRef.current?.focus()
-          }}
-        />
-      ) : null}
-      <div className="composer">
+      <div className="composer-stack">
+        {queuedMessages && queuedMessages.length > 0 ? (
+          <FloatingComposerQueuedMessages
+            messages={queuedMessages}
+            onRemove={onRemoveQueuedMessage}
+          />
+        ) : null}
+        {pickerOpen && query !== null ? (
+          <SkillPicker
+            skills={skills ?? []}
+            query={query}
+            onPick={injectSkillHint}
+            onClose={() => {
+              // Closing the picker without a pick: drop the leading slash so the
+              // draft doesn't keep re-triggering it. Leave the rest of the text.
+              if (value.startsWith('/')) onChange(value.slice(1))
+              setPickerOpen(false)
+              textareaRef.current?.focus()
+            }}
+          />
+        ) : null}
+        <div className="composer">
         <textarea
           ref={textareaRef}
           rows={1}
@@ -195,6 +211,7 @@ export function Composer({
               </button>
             )}
           </div>
+        </div>
         </div>
       </div>
     </div>
