@@ -43,7 +43,7 @@ type SddRequirementBlock = {
   status: SddRequirementStatus
 }
 
-type SddDraftSnapshot = {
+export type SddDraftSnapshot = {
   relativePath: string
   content: string
   saveStatus: SddSaveStatus
@@ -131,7 +131,21 @@ Send the export to a verified email address.
 - [x] Shows confirmation toast
 `
 
-const SDD_DRAFT_EDITOR_PREVIEW_PATH = 'units/export/requirement.md'
+export const SDD_DRAFT_EDITOR_PREVIEW_PATH = 'units/export/requirement.md'
+
+/** Default SDD draft snapshot for Workbench preview integration. */
+export const WORKBENCH_SDD_DRAFT_PREVIEW_SNAPSHOT: SddDraftSnapshot = {
+  relativePath: SDD_DRAFT_EDITOR_PREVIEW_PATH,
+  content: SDD_DRAFT_EDITOR_PREVIEW_SAMPLE,
+  saveStatus: 'saved',
+  operationStatus: 'idle',
+  error: null,
+  designContext: {
+    designType: 'product',
+    brandColor: '#3b82d8',
+    tone: ['Minimal', 'Professional'],
+  },
+}
 
 function parseSddRequirementBlocks(markdown: string): SddRequirementBlock[] {
   const blocks: SddRequirementBlock[] = []

@@ -1064,7 +1064,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported Workbench orchestrator
-  // (?workbenchPreview=default|empty|busy|multi|rich|collapsedSidebar|todo|changes|browser|plan|file|terminal|fileTree|sidechat|runtimeError).
+  // (?workbenchPreview=default|empty|busy|multi|rich|collapsedSidebar|todo|changes|browser|plan|file|terminal|fileTree|sidechat|runtimeError|sddDraft|sddDraftAssistant).
   const workbenchPreviewMode = useMemo((): WorkbenchPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1084,6 +1084,8 @@ function HomePage() {
     if (value === 'fileTree') return 'fileTree'
     if (value === 'sidechat') return 'sidechat'
     if (value === 'runtimeError') return 'runtimeError'
+    if (value === 'sddDraft') return 'sddDraft'
+    if (value === 'sddDraftAssistant') return 'sddDraftAssistant'
     return 'default'
   }, [])
 

@@ -54,6 +54,17 @@ import {
   SideConversationPanel,
   SIDE_CONVERSATION_PANEL_PREVIEW_SIDES,
 } from './SideConversationPanel'
+import {
+  SddDraftEditorView,
+  WORKBENCH_SDD_DRAFT_PREVIEW_SNAPSHOT,
+  SDD_DRAFT_EDITOR_PREVIEW_PATH,
+  type SddDraftSnapshot,
+} from './SddDraftEditorView'
+import {
+  SddAssistantPanel,
+  SDD_ASSISTANT_PANEL_PREVIEW_TIMELINE,
+  type SddAssistantPanelSnapshot,
+} from './SddAssistantPanel'
 import { IkunCameoLayer, KunCelebrationLayer } from './AnimatedWorkLogo'
 import type { ClawImChannelSidebarSnapshot } from './ClawSidebar'
 import type { ClawInstallTarget } from './ClawAddImDialog'
@@ -153,6 +164,10 @@ export type WorkbenchPreviewMode =
   | 'fileTree'
   | 'sidechat'
   | 'runtimeError'
+  | 'sddDraft'
+  | 'sddDraftAssistant'
+
+type WorkbenchMainStage = 'chat' | 'sddDraft'
 
 type WorkbenchLayoutSnapshot = {
   leftSidebarCollapsed: boolean
@@ -164,6 +179,8 @@ type WorkbenchLayoutSnapshot = {
   timelineMode: MessageTimelinePreviewMode
   busy: boolean
   sessionHeader: SessionHeaderSnapshot
+  mainStage: WorkbenchMainStage
+  sddAssistantTimeline: boolean
 }
 
 export function getWorkbenchPreviewSnapshot(
@@ -183,6 +200,8 @@ function resolveWorkbenchLayout(mode: WorkbenchPreviewMode): WorkbenchLayoutSnap
     timelineMode: 'single',
     busy: false,
     sessionHeader: SESSION_HEADER_PREVIEW.default,
+    mainStage: 'chat',
+    sddAssistantTimeline: false,
   }
 
   switch (mode) {
@@ -217,6 +236,18 @@ function resolveWorkbenchLayout(mode: WorkbenchPreviewMode): WorkbenchLayoutSnap
         ...base,
         runtimeError: true,
         timelineMode: 'empty',
+      }
+    case 'sddDraft':
+      return {
+        ...base,
+        mainStage: 'sddDraft',
+      }
+    case 'sddDraftAssistant':
+      return {
+        ...base,
+        mainStage: 'sddDraft',
+        rightPanelMode: 'sdd-ai',
+        sddAssistantTimeline: true,
       }
     case 'default':
     default:
@@ -255,6 +286,10 @@ function WorkbenchComposer({
 function renderRightPanel(
   mode: RightPanelMode,
   onCollapse: () => void,
+  sddAssistant?: {
+    snapshot: SddAssistantPanelSnapshot
+    onInputChange: (value: string) => void
+  },
 ): ReactElement | null {
   switch (mode) {
     case 'todo':
@@ -299,6 +334,15 @@ function renderRightPanel(
           onCollapse={onCollapse}
         />
       )
+    case 'sdd-ai':
+      return sddAssistant ? (
+        <SddAssistantPanel
+          snapshot={sddAssistant.snapshot}
+          className="h-full max-h-full w-full"
+          onCollapse={onCollapse}
+          onInputChange={sddAssistant.onInputChange}
+        />
+      ) : null
     default:
       return null
   }
@@ -328,6 +372,13 @@ export function Workbench({
   const [connectPhoneSidebarOpen, setConnectPhoneSidebarOpen] = useState(
     sidebarSnapshot.connectPhoneSidebarOpen,
   )
+  const [sddDraft, setSddDraft] = useState<SddDraftSnapshot>(
+    WORKBENCH_SDD_DRAFT_PREVIEW_SNAPSHOT,
+  )
+  const [sddAssistantInput, setSddAssistantInput] = useState('')
+
+  const isSddDraftStage = snapshot.mainStage === 'sddDraft'
+  const sddAssistantOpen = rightPanelMode === 'sdd-ai'
 
   const timelineSnapshot = useMemo(
     () => resolveMessageTimelinePreviewSnapshot(snapshot.timelineMode),
@@ -348,6 +399,21 @@ export function Workbench({
   const toggleRightPanel = (mode: Exclude<RightPanelMode, null>): void => {
     setRightPanelMode((current) => (current === mode ? null : mode))
   }
+
+  const toggleSddAssistantPanel = (): void => {
+    setRightPanelMode((current) => (current === 'sdd-ai' ? null : 'sdd-ai'))
+  }
+
+  const sddAssistantSnapshot = useMemo((): SddAssistantPanelSnapshot => {
+    const base = snapshot.sddAssistantTimeline
+      ? SDD_ASSISTANT_PANEL_PREVIEW_TIMELINE
+      : { ...SDD_ASSISTANT_PANEL_PREVIEW_TIMELINE, hasTimeline: false, blocks: [] }
+    return {
+      ...base,
+      draftPath: SDD_DRAFT_EDITOR_PREVIEW_PATH,
+      input: sddAssistantInput || base.input,
+    }
+  }, [snapshot.sddAssistantTimeline, sddAssistantInput])
 
   return (
     <div className="ds-workbench-shell">
@@ -375,6 +441,32 @@ export function Workbench({
 
         <div className="workbench-main-row">
           <div className="workbench-chat-column">
+            {isSddDraftStage ? (
+              <SddDraftEditorView
+                draft={sddDraft}
+                leftSidebarCollapsed={leftSidebarCollapsed}
+                assistantOpen={sddAssistantOpen}
+                onToggleLeftSidebar={() => setLeftSidebarCollapsed((value) => !value)}
+                onToggleAssistant={toggleSddAssistantPanel}
+                onContentChange={(value) =>
+                  setSddDraft((current) =>
+                    current
+                      ? {
+                          ...current,
+                          content: value,
+                          saveStatus: current.saveStatus === 'saved' ? 'dirty' : current.saveStatus,
+                        }
+                      : current,
+                  )
+                }
+                onSave={() =>
+                  setSddDraft((current) =>
+                    current ? { ...current, saveStatus: 'saved' } : current,
+                  )
+                }
+              />
+            ) : (
+              <>
             <section className="ds-chat-stage workbench-chat-stage">
               <div className="ds-stage-inset workbench-chat-stage-inset">
                 <header className="chat-topbar ds-topbar-surface workbench-chat-topbar">
@@ -460,6 +552,8 @@ export function Workbench({
                 onMinimize={() => setSideChatOpen(false)}
               />
             ) : null}
+              </>
+            )}
           </div>
 
           {rightPanelVisible ? (
@@ -470,7 +564,16 @@ export function Workbench({
                 className="ds-workbench-divider ds-no-drag"
               />
               <div className="workbench-right-panel" style={{ width: RIGHT_SIDEBAR_WIDTH }}>
-                {renderRightPanel(rightPanelMode, () => setRightPanelMode(null))}
+                {renderRightPanel(
+                  rightPanelMode,
+                  () => setRightPanelMode(null),
+                  rightPanelMode === 'sdd-ai'
+                    ? {
+                        snapshot: sddAssistantSnapshot,
+                        onInputChange: setSddAssistantInput,
+                      }
+                    : undefined,
+                )}
               </div>
             </>
           ) : null}
