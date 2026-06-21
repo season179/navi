@@ -9,6 +9,7 @@ import { KeyboardShortcutsSettingsSectionPreview } from './KeyboardShortcutsSett
 import { EasterEggSettingsSectionPreview } from './EasterEggSettingsSection'
 import { ArchivedThreadsSettingsSectionPreview } from './ArchivedThreadsSettingsSection'
 import { UpdatesSettingsSectionPreview } from './UpdatesSettingsSection'
+import { LlmDebugSettingsSectionPreview } from './LlmDebugSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -193,6 +194,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'archives' ? (
         <div className="archived-threads-preview-stack">
           <ArchivedThreadsSettingsSectionPreview />
+        </div>
+      ) : category === 'debug' ? (
+        <div className="llm-debug-preview-stack">
+          <LlmDebugSettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">

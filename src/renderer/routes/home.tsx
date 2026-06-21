@@ -256,6 +256,10 @@ import {
   type UpdatesSettingsPreviewMode,
 } from '../components/UpdatesSettingsSection'
 import {
+  LlmDebugSettingsSectionPreview,
+  type LlmDebugPreviewMode,
+} from '../components/LlmDebugSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1277,6 +1281,16 @@ function HomePage() {
     return mode as UpdatesSettingsPreviewMode
   }, [])
 
+  // Visual preview for the ported LlmDebugSettingsSection (?llmDebugPreview=1|empty|error|expanded|loading).
+  const llmDebugPreviewMode = useMemo((): LlmDebugPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('llmDebugPreview')) return null
+    const mode = params.get('llmDebugPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as LlmDebugPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1463,6 +1477,22 @@ function HomePage() {
           </p>
           <div className="updates-settings-preview-stack">
             <UpdatesSettingsSectionPreview mode={updatesSettingsPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (llmDebugPreviewMode) {
+    return (
+      <div className="llm-debug-preview">
+        <div className="llm-debug-preview-inner">
+          <h1 className="llm-debug-preview-title">LLM request troubleshooting</h1>
+          <p className="llm-debug-preview-subtitle">
+            Debug category from Kun settings-section-llm-debug.tsx.
+          </p>
+          <div className="llm-debug-preview-stack">
+            <LlmDebugSettingsSectionPreview mode={llmDebugPreviewMode} />
           </div>
         </div>
       </div>
