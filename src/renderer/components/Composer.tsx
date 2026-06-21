@@ -10,7 +10,7 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
 import { ListTodo, Loader2, Mic, Plus, Send, Sparkles, Square, Target } from 'lucide-react'
-import { filterSkillSlashCommands } from '../lib/composerSlashCommands'
+import { filterSkillSlashCommands, COMPOSER_SLASH_COMMAND_EMPTY } from '../lib/composerSlashCommands'
 import {
   filterWorkspaceFileMentionSuggestions,
   getFileMentionAtCursor,
@@ -563,7 +563,7 @@ export function Composer({
               onHover={setSlashActiveIndex}
               emptyMessage={
                 slashCommandsOverride
-                  ? 'No matching command. Keep typing to send the raw text instead.'
+                  ? COMPOSER_SLASH_COMMAND_EMPTY
                   : query?.trim()
                     ? `No skills match “${query.trim()}”.`
                     : 'No skills available.'

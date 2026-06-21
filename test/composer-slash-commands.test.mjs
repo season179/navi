@@ -18,8 +18,11 @@ buildSync({
 const {
   filterSkillSlashCommands,
   COMPOSER_SLASH_COMMAND_MENU_TITLE,
+  COMPOSER_SLASH_COMMAND_EMPTY,
   COMPOSER_SLASH_COMMANDS_PREVIEW,
+  COMPOSER_SLASH_COMMANDS_SKILLS_PREVIEW,
   COMPOSER_SLASH_COMMANDS_PREVIEW_DRAFT,
+  COMPOSER_SLASH_COMMANDS_SKILLS_PREVIEW_DRAFT,
   resolveComposerSlashCommandsPreview,
 } = await import(out)
 
@@ -72,6 +75,13 @@ test('slash command menu title matches Kun slashCommandMenuTitle locale string',
   assert.equal(COMPOSER_SLASH_COMMAND_MENU_TITLE, 'Commands')
 })
 
+test('slash command empty message matches Kun slashCommandEmpty locale string', () => {
+  assert.equal(
+    COMPOSER_SLASH_COMMAND_EMPTY,
+    'No matching command. Keep typing to send the raw text instead.',
+  )
+})
+
 test('COMPOSER_SLASH_COMMANDS_PREVIEW matches Kun slash-command row copy', () => {
   assert.equal(COMPOSER_SLASH_COMMANDS_PREVIEW.length, 6)
   assert.equal(COMPOSER_SLASH_COMMANDS_PREVIEW[0].title, 'New session')
@@ -84,4 +94,12 @@ test('resolveComposerSlashCommandsPreview returns slash-menu draft and commands'
   const preview = resolveComposerSlashCommandsPreview('1')
   assert.equal(preview.draft, COMPOSER_SLASH_COMMANDS_PREVIEW_DRAFT)
   assert.deepEqual(preview.commands, COMPOSER_SLASH_COMMANDS_PREVIEW)
+})
+
+test('resolveComposerSlashCommandsPreview skills mode returns scope labels', () => {
+  const preview = resolveComposerSlashCommandsPreview('skills')
+  assert.equal(preview.draft, COMPOSER_SLASH_COMMANDS_SKILLS_PREVIEW_DRAFT)
+  assert.deepEqual(preview.commands, COMPOSER_SLASH_COMMANDS_SKILLS_PREVIEW)
+  assert.equal(preview.commands[0].scopeLabel, 'Built-in')
+  assert.equal(preview.commands[1].scopeLabel, 'Project')
 })

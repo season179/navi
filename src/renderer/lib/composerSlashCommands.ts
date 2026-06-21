@@ -6,6 +6,10 @@ import type { SkillSummary, SkillSource } from '../../shared/flue'
 /** English copy matching Kun's slashCommandMenuTitle locale string. */
 export const COMPOSER_SLASH_COMMAND_MENU_TITLE = 'Commands'
 
+/** English copy matching Kun's slashCommandEmpty locale string. */
+export const COMPOSER_SLASH_COMMAND_EMPTY =
+  'No matching command. Keep typing to send the raw text instead.'
+
 export type ComposerSlashCommandPreviewIcon =
   | 'plus'
   | 'search'
@@ -13,6 +17,7 @@ export type ComposerSlashCommandPreviewIcon =
   | 'target'
   | 'archive'
   | 'searchCode'
+  | 'sparkles'
 
 export type ComposerSlashCommandPreviewRow = {
   id: string
@@ -20,6 +25,7 @@ export type ComposerSlashCommandPreviewRow = {
   description: string
   badge: string
   icon: ComposerSlashCommandPreviewIcon
+  scopeLabel?: string
   active?: boolean
 }
 
@@ -74,15 +80,45 @@ export const COMPOSER_SLASH_COMMANDS_PREVIEW: ComposerSlashCommandPreviewRow[] =
 /** Draft shown when verifying slash-command overlay in production Composer. */
 export const COMPOSER_SLASH_COMMANDS_PREVIEW_DRAFT = '/res'
 
+/** Mock skill slash rows for ?composerSlashCommandsPreview=skills scope-label verification. */
+export const COMPOSER_SLASH_COMMANDS_SKILLS_PREVIEW: ComposerSlashCommandPreviewRow[] = [
+  {
+    id: 'skill:release-notes',
+    title: 'release-notes',
+    description: 'Draft release notes from recent commits',
+    badge: '/skill:release-notes',
+    scopeLabel: 'Built-in',
+    icon: 'sparkles',
+    active: true,
+  },
+  {
+    id: 'skill:code-review',
+    title: 'code-review',
+    description: 'Review code changes in the workspace',
+    badge: '/skill:code-review',
+    scopeLabel: 'Project',
+    icon: 'sparkles',
+  },
+]
+
+/** Draft shown when verifying skill slash rows with scope labels. */
+export const COMPOSER_SLASH_COMMANDS_SKILLS_PREVIEW_DRAFT = '/release'
+
 export type ComposerSlashCommandsPreviewState = {
   draft: string
   commands: ComposerSlashCommandPreviewRow[]
 }
 
-/** Routes ?composerSlashCommandsPreview=1 production preview hooks. */
+/** Routes ?composerSlashCommandsPreview production preview hooks. */
 export function resolveComposerSlashCommandsPreview(
-  _mode: string | null = 'default',
+  mode: string | null = 'default',
 ): ComposerSlashCommandsPreviewState {
+  if (mode === 'skills') {
+    return {
+      draft: COMPOSER_SLASH_COMMANDS_SKILLS_PREVIEW_DRAFT,
+      commands: COMPOSER_SLASH_COMMANDS_SKILLS_PREVIEW,
+    }
+  }
   return {
     draft: COMPOSER_SLASH_COMMANDS_PREVIEW_DRAFT,
     commands: COMPOSER_SLASH_COMMANDS_PREVIEW,

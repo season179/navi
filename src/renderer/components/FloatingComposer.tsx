@@ -27,6 +27,7 @@ import {
   Search,
   SearchCode,
   Send,
+  Sparkles,
   Square,
   Target,
   Trash2,
@@ -119,8 +120,10 @@ import {
   COMPOSER_VOICE_TRANSCRIBING_LABEL,
 } from '../lib/composerVoiceDictation'
 import {
+  COMPOSER_SLASH_COMMAND_EMPTY,
   COMPOSER_SLASH_COMMAND_MENU_TITLE,
   COMPOSER_SLASH_COMMANDS_PREVIEW,
+  resolveComposerSlashCommandsPreview,
   type ComposerSlashCommandPreviewIcon,
   type ComposerSlashCommandPreviewRow,
 } from '../lib/composerSlashCommands'
@@ -150,6 +153,7 @@ export type FloatingComposerPreviewMode =
   | 'plusMenuNoAttach'
   | 'plusMenuNoWorktree'
   | 'slashCommands'
+  | 'slashCommandsSkills'
   | 'fileMention'
   | 'fileMentionLoading'
   | 'fileMentionEmpty'
@@ -251,32 +255,29 @@ const SLASH_COMMAND_PREVIEW_ICONS: Record<ComposerSlashCommandPreviewIcon, React
   target: <Target strokeWidth={1.9} />,
   archive: <Archive strokeWidth={1.9} />,
   searchCode: <SearchCode strokeWidth={1.9} />,
+  sparkles: <Sparkles strokeWidth={1.9} />,
 }
 
 function mapComposerSlashCommandPreviewRows(
   rows: ComposerSlashCommandPreviewRow[],
+  activeIndex = 0,
 ): SlashCommandPreview[] {
-  return rows.map((row) => ({
+  return rows.map((row, index) => ({
     id: row.id,
     title: row.title,
     description: row.description,
     badge: row.badge,
+    scopeLabel: row.scopeLabel,
     icon: SLASH_COMMAND_PREVIEW_ICONS[row.icon],
-    active: row.active,
+    active: row.active ?? index === activeIndex,
   }))
 }
 
 export function buildComposerSlashCommandsPreview(
+  rows: ComposerSlashCommandPreviewRow[] = COMPOSER_SLASH_COMMANDS_PREVIEW,
   activeIndex = 0,
 ): ComposerSlashCommandItem[] {
-  return COMPOSER_SLASH_COMMANDS_PREVIEW.map((row, index) => ({
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    badge: row.badge,
-    icon: SLASH_COMMAND_PREVIEW_ICONS[row.icon],
-    active: index === activeIndex,
-  }))
+  return mapComposerSlashCommandPreviewRows(rows, activeIndex)
 }
 
 const SLASH_COMMANDS_PREVIEW: SlashCommandPreview[] =
@@ -435,7 +436,7 @@ export function ComposerSlashMenu({
   commands,
   onPick,
   onHover,
-  emptyMessage = 'No commands match.',
+  emptyMessage = COMPOSER_SLASH_COMMAND_EMPTY,
 }: {
   commands: ComposerSlashCommandItem[]
   onPick?: (command: ComposerSlashCommandItem) => void
@@ -468,7 +469,12 @@ export function ComposerSlashMenu({
                 <span className="floating-composer-slash-title">{command.title}</span>
                 <span className="floating-composer-slash-desc">{command.description}</span>
               </span>
-              <span className="floating-composer-slash-badge">{command.badge}</span>
+              <span className="floating-composer-slash-trailing">
+                {command.scopeLabel ? (
+                  <span className="floating-composer-slash-scope-label">{command.scopeLabel}</span>
+                ) : null}
+                <span className="floating-composer-slash-badge">{command.badge}</span>
+              </span>
             </button>
           ))}
         </div>
@@ -863,6 +869,15 @@ export function resolveFloatingComposerSnapshot(
       return { ...base, showPlusMenu: true, plusMenuShowWorktreeMode: false }
     case 'slashCommands':
       return { ...base, input: '/res', showSlashMenu: true }
+    case 'slashCommandsSkills':
+      return {
+        ...base,
+        input: '/release',
+        showSlashMenu: true,
+        slashCommands: buildComposerSlashCommandsPreview(
+          resolveComposerSlashCommandsPreview('skills').commands,
+        ),
+      }
     case 'fileMention':
       return { ...base, input: 'Check @src/rend', showFileMentionMenu: true }
     case 'fileMentionLoading':

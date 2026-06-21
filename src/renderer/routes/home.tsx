@@ -839,13 +839,15 @@ function HomePage() {
     return new URLSearchParams(window.location.search).has('composerBusyPreview')
   }, [])
 
-  // Visual preview for the ported ComposerSlashMenu (?composerSlashCommandsPreview=1).
+  // Visual preview for the ported ComposerSlashMenu (?composerSlashCommandsPreview=1|skills).
   const composerSlashCommandsPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
-    if (!new URLSearchParams(window.location.search).has('composerSlashCommandsPreview')) {
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerSlashCommandsPreview')) {
       return undefined
     }
-    return buildComposerSlashCommandsPreview()
+    const preview = resolveComposerSlashCommandsPreview(params.get('composerSlashCommandsPreview'))
+    return buildComposerSlashCommandsPreview(preview.commands)
   }, [])
 
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
@@ -1338,6 +1340,7 @@ function HomePage() {
     if (value === 'plusMenuNoAttach') return 'plusMenuNoAttach'
     if (value === 'plusMenuNoWorktree') return 'plusMenuNoWorktree'
     if (value === 'slashCommands') return 'slashCommands'
+    if (value === 'slashCommandsSkills') return 'slashCommandsSkills'
     if (value === 'fileMention') return 'fileMention'
     if (value === 'fileMentionLoading') return 'fileMentionLoading'
     if (value === 'fileMentionEmpty') return 'fileMentionEmpty'
