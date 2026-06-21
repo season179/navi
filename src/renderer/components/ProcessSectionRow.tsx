@@ -7,6 +7,12 @@ import { ChevronDown, ChevronRight } from 'lucide-react'
 import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
 import {
+  MessageBubble,
+  MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
+  MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
+  type MessageBubbleSnapshot,
+} from './MessageBubble'
+import {
   ProcessEntryRow,
   type ProcessEntrySnapshot,
 } from './ProcessEntryRow'
@@ -21,8 +27,9 @@ export type ProcessStackEntrySnapshot = {
   collapsible?: boolean
   forceOpen?: boolean
   detailText?: string
-  detailKind?: 'text' | 'patch' | 'error' | 'assistant'
+  detailKind?: 'text' | 'patch' | 'error' | 'assistant' | 'approval' | 'user_input'
   detailFilePath?: string
+  nestedBubble?: MessageBubbleSnapshot
 }
 
 export type ProcessOutputEntrySnapshot = {
@@ -222,8 +229,57 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         summary: 'Approve deploy to staging',
         active: true,
         forceOpen: true,
-        detailText: 'The agent wants to run `npm run deploy:staging` against the preview cluster.',
-        detailKind: 'text',
+        detailKind: 'approval',
+        nestedBubble: {
+          ...MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
+          summary: 'Run npm run deploy:staging against the preview cluster.',
+        },
+      },
+      {
+        id: 'read',
+        summary: 'Read package.json',
+        filePath: 'package.json',
+      },
+    ],
+  },
+  executionApproval: {
+    kind: 'execution',
+    title: 'Waiting for approval',
+    processing: true,
+    active: true,
+    collapsible: true,
+    expanded: true,
+    stackEntries: [
+      {
+        id: 'approval',
+        summary: 'Approve deploy to staging',
+        active: true,
+        forceOpen: true,
+        detailKind: 'approval',
+        nestedBubble: MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
+      },
+      {
+        id: 'read',
+        summary: 'Read package.json',
+        filePath: 'package.json',
+      },
+    ],
+  },
+  executionUserInput: {
+    kind: 'execution',
+    title: 'Waiting for input',
+    processing: true,
+    active: true,
+    collapsible: true,
+    expanded: true,
+    stackEntries: [
+      {
+        id: 'user-input',
+        summary: 'Request user input',
+        active: true,
+        forceOpen: true,
+        detailKind: 'user_input',
+        nestedBubble: MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
       },
       {
         id: 'read',
@@ -283,11 +339,12 @@ function stackEntryToProcessEntry(
     active: entry.active ?? section.active,
     error: entry.error ?? section.hasError,
     collapsible: entry.collapsible,
-    forceOpen: section.forceExpanded === true,
+    forceOpen: entry.forceOpen === true || section.forceExpanded === true,
     expanded: entry.expanded ?? section.expanded,
     detailText: entry.detailText,
     detailKind: entry.detailKind,
     detailFilePath: entry.detailFilePath ?? entry.filePath,
+    nestedBubble: entry.nestedBubble,
   }
 }
 
@@ -317,6 +374,10 @@ function ProcessStackEntryDetail({
 }: {
   entry: ProcessStackEntrySnapshot
 }): ReactElement | null {
+  if (entry.detailKind === 'approval' || entry.detailKind === 'user_input') {
+    if (!entry.nestedBubble) return null
+    return <MessageBubble block={entry.nestedBubble} nested />
+  }
   if (!entry.detailText) return null
   if (entry.detailKind === 'patch') {
     return (
@@ -345,7 +406,7 @@ function ProcessStackEntryDetail({
       </div>
     )
   }
-  return <pre className="process-stack-entry-text">{entry.detailText}</pre>
+  return <p className="process-stack-entry-muted-text">{entry.detailText}</p>
 }
 
 function ProcessStackEntryRow({
@@ -359,7 +420,9 @@ function ProcessStackEntryRow({
   canToggle: boolean
   onToggle: () => void
 }): ReactElement {
-  const canExpand = Boolean(entry.detailText) && entry.collapsible !== false
+  const canExpand =
+    (Boolean(entry.detailText) || Boolean(entry.nestedBubble)) &&
+    entry.collapsible !== false
   const rowActive = entry.active === true
 
   const handleToggleButton = (event: MouseEvent<HTMLButtonElement>): void => {
@@ -411,7 +474,7 @@ function ProcessStackEntryRow({
           {row}
         </div>
       )}
-      {open && entry.detailText ? (
+      {open && (entry.detailText || entry.nestedBubble) ? (
         entry.detailKind === 'assistant' ? (
           <div className="process-stack-entry-assistant">
             <ProcessStackEntryDetail entry={entry} />
@@ -450,9 +513,9 @@ function ProcessStackRows({
   const [closedBlockIds, setClosedBlockIds] = useState<ReadonlySet<string>>(() => new Set())
 
   return (
-    <div className="process-stack">
+    <div className="ds-work-stack">
       {entries.map((entry) => {
-        const hasDetail = Boolean(entry.detailText)
+        const hasDetail = Boolean(entry.detailText) || Boolean(entry.nestedBubble)
         const staticOpen = hasDetail && entry.collapsible === false
         const defaultOpen = entry.error === true
         const forceOpen = entry.forceOpen === true

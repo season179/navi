@@ -7,6 +7,12 @@ import { ChevronDown, ChevronRight, Minimize2 } from 'lucide-react'
 import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
 import {
+  MessageBubble,
+  MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
+  MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
+  type MessageBubbleSnapshot,
+} from './MessageBubble'
+import {
   RuntimeMetaChips,
   RUNTIME_META_CHIPS_PREVIEW,
   type RuntimeMetaChipsSnapshot,
@@ -24,8 +30,9 @@ export type ProcessEntrySnapshot = {
   forceOpen?: boolean
   expanded?: boolean
   detailText?: string
-  detailKind?: 'text' | 'patch' | 'error' | 'assistant'
+  detailKind?: 'text' | 'patch' | 'error' | 'assistant' | 'approval' | 'user_input'
   detailFilePath?: string
+  nestedBubble?: MessageBubbleSnapshot
   meta?: RuntimeMetaChipsSnapshot
 }
 
@@ -113,6 +120,24 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
     detailText: 'I will normalize Bearer token extraction and call verifyToken before next().',
     detailKind: 'assistant',
   },
+  approval: {
+    verb: 'Approve',
+    rest: 'deploy to staging',
+    active: true,
+    forceOpen: true,
+    expanded: true,
+    detailKind: 'approval',
+    nestedBubble: MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
+  },
+  userInput: {
+    verb: 'Request',
+    rest: 'user input',
+    active: true,
+    forceOpen: true,
+    expanded: true,
+    detailKind: 'user_input',
+    nestedBubble: MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
+  },
 } as const satisfies Record<string, ProcessEntrySnapshot>
 
 export type ProcessEntryRowPreviewMode = keyof typeof PROCESS_ENTRY_ROW_PREVIEW
@@ -149,6 +174,10 @@ function ProcessEntryDetail({
 }: {
   entry: ProcessEntrySnapshot
 }): ReactElement | null {
+  if (entry.detailKind === 'approval' || entry.detailKind === 'user_input') {
+    if (!entry.nestedBubble) return null
+    return <MessageBubble block={entry.nestedBubble} nested />
+  }
   if (!entry.detailText) return null
   if (entry.detailKind === 'patch') {
     return (
@@ -177,12 +206,14 @@ function ProcessEntryDetail({
       </div>
     )
   }
-  return <pre className="process-stack-entry-text">{entry.detailText}</pre>
+  return <p className="process-stack-entry-muted-text">{entry.detailText}</p>
 }
 
 export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElement {
   const [internalExpanded, setInternalExpanded] = useState(entry.expanded === true)
-  const canExpand = entry.collapsible !== false && Boolean(entry.detailText)
+  const canExpand =
+    entry.collapsible !== false &&
+    (Boolean(entry.detailText) || Boolean(entry.nestedBubble))
   const forceOpen = entry.forceOpen === true
   const isOpen = canExpand && (forceOpen || (expanded ?? internalExpanded))
   const canToggle = canExpand && !forceOpen
@@ -264,7 +295,7 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
         <RuntimeMetaChips meta={entry.meta} placement="process-entry" />
       ) : null}
 
-      {isOpen && entry.detailText ? (
+      {isOpen && (entry.detailText || entry.nestedBubble) ? (
         <div
           className={
             entry.detailKind === 'assistant'

@@ -747,7 +747,7 @@ function HomePage() {
   const [workMetaRowExpanded, setWorkMetaRowExpanded] = useState(false)
 
   // Visual preview for the ported ProcessSectionRow
-  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|executionAutoOpen|executionForceOpen|error|output|outputStreaming).
+  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|executionAutoOpen|executionForceOpen|executionApproval|executionUserInput|error|output|outputStreaming).
   const processSectionRowPreviewMode = useMemo((): ProcessSectionRowPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -759,6 +759,8 @@ function HomePage() {
     if (mode === 'executionExpanded') return 'executionExpanded'
     if (mode === 'executionAutoOpen') return 'executionAutoOpen'
     if (mode === 'executionForceOpen') return 'executionForceOpen'
+    if (mode === 'executionApproval') return 'executionApproval'
+    if (mode === 'executionUserInput') return 'executionUserInput'
     if (mode === 'error') return 'error'
     if (mode === 'output') return 'output'
     if (mode === 'outputStreaming') return 'outputStreaming'
@@ -767,7 +769,7 @@ function HomePage() {
   const [processSectionRowExpanded, setProcessSectionRowExpanded] = useState(false)
 
   // Visual preview for the ported ProcessEntryRow
-  // (?processEntryRow=default|expanded|active|compaction|error|meta|assistant).
+  // (?processEntryRow=default|expanded|active|compaction|error|meta|assistant|approval|userInput).
   const processEntryRowPreviewMode = useMemo((): ProcessEntryRowPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -779,6 +781,8 @@ function HomePage() {
     if (mode === 'error') return 'error'
     if (mode === 'meta') return 'meta'
     if (mode === 'assistant') return 'assistant'
+    if (mode === 'approval') return 'approval'
+    if (mode === 'userInput') return 'userInput'
     return 'default'
   }, [])
   const [processEntryRowExpanded, setProcessEntryRowExpanded] = useState(false)
@@ -4241,6 +4245,8 @@ function HomePage() {
               processSectionRowPreviewMode === 'executionExpanded' ||
               processSectionRowPreviewMode === 'executionAutoOpen' ||
               processSectionRowPreviewMode === 'executionForceOpen' ||
+              processSectionRowPreviewMode === 'executionApproval' ||
+              processSectionRowPreviewMode === 'executionUserInput' ||
               processSectionRowPreviewMode === 'error'
                 ? true
                 : processSectionRowExpanded
@@ -4258,7 +4264,9 @@ function HomePage() {
               processEntryRowPreviewMode === 'expanded' ||
               processEntryRowPreviewMode === 'active' ||
               processEntryRowPreviewMode === 'error' ||
-              processEntryRowPreviewMode === 'assistant'
+              processEntryRowPreviewMode === 'assistant' ||
+              processEntryRowPreviewMode === 'approval' ||
+              processEntryRowPreviewMode === 'userInput'
                 ? true
                 : processEntryRowExpanded
             }

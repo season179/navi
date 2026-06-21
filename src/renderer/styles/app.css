@@ -1885,6 +1885,14 @@ html[data-theme='dark'] .process-stack-entry-row.is-error {
   color: var(--ds-text);
 }
 
+.process-stack-entry-muted-text {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ds-text-muted);
+}
+
 .process-stack-entry-error-panel {
   overflow: hidden;
   border-radius: 10px;
