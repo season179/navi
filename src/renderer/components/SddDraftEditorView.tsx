@@ -20,7 +20,13 @@ import {
   type WriteInlineAgentPosition,
 } from './WriteInlineAgent'
 import { WRITE_SETTINGS_PREVIEW_DEFAULT } from './WriteSettingsSection'
-import { SddAssistantPanel } from './SddAssistantPanel'
+import {
+  SddAssistantPanel,
+  SDD_ASSISTANT_PANEL_PREVIEW_BUSY,
+  SDD_ASSISTANT_PANEL_PREVIEW_DEFAULT,
+  SDD_ASSISTANT_PANEL_PREVIEW_TIMELINE,
+  type SddAssistantPanelSnapshot,
+} from './SddAssistantPanel'
 
 type SddSaveStatus = 'saved' | 'dirty' | 'saving' | 'error'
 type SddOperationStatus = 'idle' | 'upgrading' | 'error'
@@ -57,6 +63,8 @@ export type SddDraftEditorViewPreviewMode =
   | 'designContext'
   | 'noDraft'
   | 'assistantOpen'
+  | 'assistantTimeline'
+  | 'assistantBusy'
   | 'leftCollapsed'
   | 'withNotice'
   | 'inlineAgent'
@@ -123,23 +131,7 @@ Send the export to a verified email address.
 - [x] Shows confirmation toast
 `
 
-const SDD_ASSISTANT_PREVIEW_SNAPSHOT = {
-  draftPath: 'units/export/requirement.md',
-  hasTimeline: true,
-  blocks: [
-    {
-      id: 'user-1',
-      kind: 'user' as const,
-      text: 'What acceptance criteria are still missing for the export toolbar?',
-    },
-    {
-      id: 'assistant-1',
-      kind: 'assistant' as const,
-      text: 'The toolbar entry needs explicit keyboard-accessible focus states and a loading indicator while the export job runs.',
-    },
-  ],
-  canCreateConversation: true,
-}
+const SDD_DRAFT_EDITOR_PREVIEW_PATH = 'units/export/requirement.md'
 
 function parseSddRequirementBlocks(markdown: string): SddRequirementBlock[] {
   const blocks: SddRequirementBlock[] = []
@@ -192,7 +184,7 @@ function previewSnapshot(mode: SddDraftEditorViewPreviewMode): {
   }
 
   const base: SddDraftSnapshot = {
-    relativePath: 'units/export/requirement.md',
+    relativePath: SDD_DRAFT_EDITOR_PREVIEW_PATH,
     content: SDD_DRAFT_EDITOR_PREVIEW_SAMPLE,
     saveStatus: 'saved',
     operationStatus: 'idle',
@@ -253,7 +245,7 @@ function previewSnapshot(mode: SddDraftEditorViewPreviewMode): {
       showRichFallback: false,
     }
   }
-  if (mode === 'assistantOpen') {
+  if (mode === 'assistantOpen' || mode === 'assistantTimeline' || mode === 'assistantBusy') {
     return {
       draft: base,
       leftSidebarCollapsed: false,
@@ -715,23 +707,44 @@ type PreviewProps = {
   mode: SddDraftEditorViewPreviewMode
 }
 
+function assistantPanelPreviewSnapshot(
+  mode: SddDraftEditorViewPreviewMode,
+): SddAssistantPanelSnapshot {
+  const draftPath = SDD_DRAFT_EDITOR_PREVIEW_PATH
+  if (mode === 'assistantTimeline') {
+    return { ...SDD_ASSISTANT_PANEL_PREVIEW_TIMELINE, draftPath }
+  }
+  if (mode === 'assistantBusy') {
+    return { ...SDD_ASSISTANT_PANEL_PREVIEW_BUSY, draftPath }
+  }
+  return { ...SDD_ASSISTANT_PANEL_PREVIEW_DEFAULT, draftPath }
+}
+
+function assistantPanelPreviewOpen(mode: SddDraftEditorViewPreviewMode): boolean {
+  return (
+    mode === 'assistantOpen' || mode === 'assistantTimeline' || mode === 'assistantBusy'
+  )
+}
+
 /** Full-page preview shell for ?sddDraftEditorViewPreview URL hooks. */
 export function SddDraftEditorViewPreview({ mode }: PreviewProps): ReactElement {
   const initial = useMemo(() => previewSnapshot(mode), [mode])
   const [draft, setDraft] = useState<SddDraftSnapshot | null>(initial.draft)
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(initial.leftSidebarCollapsed)
-  const [assistantOpen, setAssistantOpen] = useState(initial.assistantOpen)
+  const [assistantOpen, setAssistantOpen] = useState(() => assistantPanelPreviewOpen(mode))
+  const [assistantInput, setAssistantInput] = useState('')
   const [designContextOpen, setDesignContextOpen] = useState(
     initial.draft?.designContextOpen ?? mode === 'designContext',
   )
   const [showInlineAgent, setShowInlineAgent] = useState(initial.showInlineAgent)
   const [showRichFallback, setShowRichFallback] = useState(initial.showRichFallback)
+  const assistantPanelSnapshot = useMemo(() => assistantPanelPreviewSnapshot(mode), [mode])
 
   useEffect(() => {
     const next = previewSnapshot(mode)
     setDraft(next.draft)
     setLeftSidebarCollapsed(next.leftSidebarCollapsed)
-    setAssistantOpen(next.assistantOpen)
+    setAssistantOpen(assistantPanelPreviewOpen(mode))
     setDesignContextOpen(next.draft?.designContextOpen ?? mode === 'designContext')
     setShowInlineAgent(next.showInlineAgent)
     setShowRichFallback(next.showRichFallback)
@@ -763,28 +776,44 @@ export function SddDraftEditorViewPreview({ mode }: PreviewProps): ReactElement 
 
   return (
     <div className="sdd-draft-editor-view-preview">
-      <SddDraftEditorView
-        draft={draft}
-        leftSidebarCollapsed={leftSidebarCollapsed}
-        assistantOpen={assistantOpen}
-        designContextOpen={designContextOpen}
-        showInlineAgent={showInlineAgent}
-        showRichFallback={showRichFallback}
-        onToggleLeftSidebar={() => setLeftSidebarCollapsed((open) => !open)}
-        onToggleAssistant={() => setAssistantOpen((open) => !open)}
-        onToggleDesignContext={() => setDesignContextOpen((open) => !open)}
-        onDesignContextChange={handleDesignContextChange}
-        onContentChange={handleContentChange}
-        onSave={() =>
-          setDraft((current) => (current ? { ...current, saveStatus: 'saved' } : current))
-        }
-      />
-      {assistantOpen ? (
-        <SddAssistantPanel
-          className="sdd-draft-editor-view-preview-assistant"
-          snapshot={SDD_ASSISTANT_PREVIEW_SNAPSHOT}
+      <div className="sdd-draft-editor-view-main">
+        <SddDraftEditorView
+          draft={draft}
+          leftSidebarCollapsed={leftSidebarCollapsed}
+          assistantOpen={assistantOpen}
+          designContextOpen={designContextOpen}
+          showInlineAgent={showInlineAgent}
+          showRichFallback={showRichFallback}
+          onToggleLeftSidebar={() => setLeftSidebarCollapsed((open) => !open)}
+          onToggleAssistant={() => setAssistantOpen((open) => !open)}
+          onToggleDesignContext={() => setDesignContextOpen((open) => !open)}
+          onDesignContextChange={handleDesignContextChange}
+          onContentChange={handleContentChange}
+          onSave={() =>
+            setDraft((current) => (current ? { ...current, saveStatus: 'saved' } : current))
+          }
         />
-      ) : null}
+        {assistantOpen ? (
+          <>
+            <div
+              role="separator"
+              aria-orientation="vertical"
+              className="ds-workbench-divider ds-no-drag"
+            />
+            <div className="sdd-draft-editor-view-assistant-panel">
+              <SddAssistantPanel
+                className="sdd-draft-editor-view-assistant-panel-inner"
+                snapshot={{
+                  ...assistantPanelSnapshot,
+                  input: assistantInput || assistantPanelSnapshot.input,
+                }}
+                onCollapse={() => setAssistantOpen(false)}
+                onInputChange={setAssistantInput}
+              />
+            </div>
+          </>
+        ) : null}
+      </div>
     </div>
   )
 }

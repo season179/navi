@@ -9843,10 +9843,27 @@ a.runtime-meta-chip:hover {
   background: var(--ds-bg-main);
 }
 
-.sdd-draft-editor-view-preview-assistant {
+.sdd-draft-editor-view-main {
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sdd-draft-editor-view-assistant-panel {
+  display: flex;
   width: 360px;
+  min-height: 0;
   flex-shrink: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sdd-draft-editor-view-assistant-panel-inner {
+  height: 100%;
   max-height: 100%;
+  width: 100%;
 }
 
 
