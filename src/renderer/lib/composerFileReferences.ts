@@ -138,6 +138,26 @@ export type ComposerFileReferenceChip = {
   isDirectory?: boolean
 }
 
+/** Menu row item for Kun's composer @-mention overlay. */
+export type ComposerFileMentionMenuItem = {
+  relativePath: string
+  name: string
+  isDirectory?: boolean
+  active?: boolean
+}
+
+export function buildComposerFileMentionMenuItem(
+  reference: Pick<ComposerFileReference, 'relativePath' | 'name' | 'type'>,
+  active = false,
+): ComposerFileMentionMenuItem {
+  return {
+    relativePath: reference.relativePath,
+    name: reference.name,
+    isDirectory: isComposerDirectoryReference(reference),
+    active,
+  }
+}
+
 /** Mock file references for ?composerFileReferencesPreview visual verification. */
 export const COMPOSER_FILE_REFERENCES_PREVIEW: ComposerFileReferenceChip[] = [
   { relativePath: 'src/renderer/components/Composer.tsx' },

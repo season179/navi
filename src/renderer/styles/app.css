@@ -36845,20 +36845,61 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
   }
 }
 
-.floating-composer-file-mention-item svg {
-  width: 0.875rem;
-  height: 0.875rem;
-  flex-shrink: 0;
-  color: var(--ds-text-faint);
+.floating-composer-file-mention-item {
+  min-height: 2.875rem;
 }
 
-.floating-composer-file-mention-path {
+.floating-composer-file-mention-item.is-active {
+  box-shadow: inset 0 0 0 1px rgba(20, 47, 95, 0.06);
+}
+
+.floating-composer-file-mention-icon {
+  display: flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--ds-surface-hover);
+  color: var(--ds-text-muted);
+}
+
+.floating-composer-file-mention-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.floating-composer-file-mention-item.is-active .floating-composer-file-mention-icon {
+  background: var(--ds-surface-elevated);
+  color: var(--ds-accent);
+  box-shadow: 0 1px 2px rgba(20, 47, 95, 0.06);
+}
+
+.floating-composer-file-mention-copy {
   min-width: 0;
   flex: 1 1 auto;
+}
+
+.floating-composer-file-mention-name {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.25rem;
+}
+
+.floating-composer-file-mention-subline {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.125rem;
+  font-size: 12px;
+  line-height: 1rem;
+  color: var(--ds-text-faint);
 }
 
 .floating-composer-file-mention-token {

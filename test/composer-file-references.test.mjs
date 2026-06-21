@@ -20,6 +20,7 @@ const {
   getFileMentionAtCursor,
   filterWorkspaceFileMentionSuggestions,
   replaceFileMentionInInput,
+  buildComposerFileMentionMenuItem,
   COMPOSER_FILE_REFERENCES_PREVIEW,
   COMPOSER_FILE_MENTION_MENU_TITLE,
   COMPOSER_FILE_MENTION_LOADING,
@@ -48,6 +49,25 @@ test('resolveComposerFileMentionPreview routes preview query values', () => {
   assert.equal(defaults.loading, false)
   assert.ok(defaults.candidates.length > 0)
   assert.match(defaults.draft, /@src\/ren$/)
+})
+
+test('buildComposerFileMentionMenuItem matches Kun file-mention menu row shape', () => {
+  assert.deepEqual(
+    buildComposerFileMentionMenuItem(
+      {
+        relativePath: 'src/renderer/routes',
+        name: 'routes',
+        type: 'directory',
+      },
+      true,
+    ),
+    {
+      relativePath: 'src/renderer/routes',
+      name: 'routes',
+      isDirectory: true,
+      active: true,
+    },
+  )
 })
 
 test('COMPOSER_FILE_REFERENCES_PREVIEW matches Kun file-reference chip mock data', () => {

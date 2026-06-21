@@ -74,6 +74,7 @@ import {
   COMPOSER_FILE_MENTION_LOADING,
   COMPOSER_FILE_MENTION_MENU_TITLE,
   COMPOSER_FILE_REFERENCES_PREVIEW,
+  formatComposerFileMentionToken,
   type ComposerFileReferenceChip,
 } from '../lib/composerFileReferences'
 import {
@@ -187,6 +188,7 @@ type SlashCommandPreview = ComposerSlashCommandItem
 
 export type ComposerFileMentionItem = {
   relativePath: string
+  name: string
   isDirectory?: boolean
   active?: boolean
 }
@@ -281,9 +283,13 @@ const SLASH_COMMANDS_PREVIEW: SlashCommandPreview[] =
   mapComposerSlashCommandPreviewRows(COMPOSER_SLASH_COMMANDS_PREVIEW)
 
 const FILE_MENTIONS_PREVIEW: FileMentionPreview[] = [
-  { relativePath: 'src/renderer/components/FloatingComposer.tsx', active: true },
-  { relativePath: 'src/renderer/styles/app.css' },
-  { relativePath: 'src/renderer/routes', isDirectory: true },
+  {
+    relativePath: 'src/renderer/components/FloatingComposer.tsx',
+    name: 'FloatingComposer.tsx',
+    active: true,
+  },
+  { relativePath: 'src/renderer/styles/app.css', name: 'app.css' },
+  { relativePath: 'src/renderer/routes', name: 'routes', isDirectory: true },
 ]
 
 const FILE_REFERENCES_PREVIEW: FileReferencePreview[] = COMPOSER_FILE_REFERENCES_PREVIEW
@@ -501,7 +507,7 @@ export function ComposerFileMentionMenu({
         <div className="floating-composer-file-mention-list">
           {items.map((item, index) => (
             <button
-              key={item.relativePath}
+              key={`${item.isDirectory ? 'dir' : 'file'}:${item.relativePath}`}
               type="button"
               className={
                 item.active
@@ -511,16 +517,23 @@ export function ComposerFileMentionMenu({
               onMouseEnter={() => onHover?.(index)}
               onClick={() => onPick?.(item)}
             >
-              {item.isDirectory ? (
-                <Folder strokeWidth={1.8} />
-              ) : (
-                <FileText strokeWidth={1.8} />
-              )}
-              <span className="floating-composer-file-mention-path">
-                {item.isDirectory ? `${item.relativePath}/` : item.relativePath}
+              <span className="floating-composer-file-mention-icon">
+                {item.isDirectory ? (
+                  <Folder strokeWidth={1.8} />
+                ) : (
+                  <FileText strokeWidth={1.8} />
+                )}
+              </span>
+              <span className="floating-composer-file-mention-copy">
+                <span className="floating-composer-file-mention-name">
+                  {item.isDirectory ? `${item.name}/` : item.name}
+                </span>
+                <span className="floating-composer-file-mention-subline">
+                  {item.isDirectory ? `${item.relativePath}/` : item.relativePath}
+                </span>
               </span>
               <span className="floating-composer-file-mention-token">
-                @{item.isDirectory ? `${item.relativePath}/` : item.relativePath}
+                {formatComposerFileMentionToken(item.relativePath, item.isDirectory)}
               </span>
             </button>
           ))}

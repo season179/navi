@@ -286,6 +286,7 @@ export function Composer({
   const fileMentionItems = useMemo((): ComposerFileMentionItem[] => {
     return fileMentionSuggestions.map((reference, index) => ({
       relativePath: reference.relativePath,
+      name: reference.name,
       isDirectory: isComposerDirectoryReference(reference),
       active: index === fileMentionActiveIndex,
     }))
