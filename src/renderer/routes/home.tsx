@@ -329,6 +329,10 @@ import {
   WriteSidebarPreview,
   type WriteSidebarPreviewMode,
 } from '../components/WriteSidebar'
+import {
+  WriteInlineAgentPreview,
+  type WriteInlineAgentPreviewMode,
+} from '../components/WriteInlineAgent'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -797,6 +801,22 @@ function HomePage() {
     if (value === 'error') return 'error'
     if (value === 'createFile') return 'createFile'
     if (value === 'deleteFile') return 'deleteFile'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported WriteInlineAgent
+  // (?writeInlineAgent=1|blockMenu|emptyAgents|askOnly|inFlight|skills|imageMode).
+  const writeInlineAgentPreviewMode = useMemo((): WriteInlineAgentPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writeInlineAgent')) return null
+    const value = params.get('writeInlineAgent')
+    if (value === 'blockMenu') return 'blockMenu'
+    if (value === 'emptyAgents') return 'emptyAgents'
+    if (value === 'askOnly') return 'askOnly'
+    if (value === 'inFlight') return 'inFlight'
+    if (value === 'skills') return 'skills'
+    if (value === 'imageMode') return 'imageMode'
     return 'default'
   }, [])
 
@@ -1689,6 +1709,10 @@ function HomePage() {
 
   if (writeSidebarPreviewMode) {
     return <WriteSidebarPreview mode={writeSidebarPreviewMode} />
+  }
+
+  if (writeInlineAgentPreviewMode) {
+    return <WriteInlineAgentPreview mode={writeInlineAgentPreviewMode} />
   }
 
   if (writeFileTreePreviewMode) {

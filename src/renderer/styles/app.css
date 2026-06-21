@@ -6419,6 +6419,548 @@ a.runtime-meta-chip:hover {
 
 
 /* =====================================================
+   Write inline agent (Kun WriteInlineAgent)
+   ===================================================== */
+.write-inline-agent {
+  transform-origin: top center;
+  animation: write-inline-agent-in 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.write-inline-agent[data-origin='bottom-center'] {
+  transform-origin: bottom center;
+}
+
+.write-inline-agent-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--ds-accent) 16%, var(--ds-border));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--ds-card-strong) 96%, transparent);
+  padding: 0.4rem;
+  box-shadow:
+    0 20px 52px rgba(20, 47, 95, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+}
+
+.write-inline-agent-block {
+  position: relative;
+}
+
+.write-inline-agent-block-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2rem;
+  border: 0;
+  border-radius: 10px;
+  padding: 0.32rem 0.5rem;
+  background: transparent;
+  color: var(--ds-text);
+  font-size: 0.86rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  transition: background-color 140ms ease;
+}
+
+.write-inline-agent-block-trigger:hover {
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+}
+
+.write-inline-agent-block-trigger-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.write-inline-agent-icon-muted {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  color: var(--ds-text-muted);
+}
+
+.write-inline-agent-icon-faint {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  color: var(--ds-text-faint);
+}
+
+.write-inline-agent-block-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.write-inline-agent-block-pop {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  width: max(100%, 11rem);
+  max-height: 15rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  border: 1px solid color-mix(in srgb, var(--ds-accent) 16%, var(--ds-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ds-card-strong) 98%, transparent);
+  padding: 0.3rem;
+  box-shadow: 0 18px 44px rgba(20, 47, 95, 0.18);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+}
+
+.write-inline-agent-block-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 1.95rem;
+  border: 0;
+  border-radius: 9px;
+  padding: 0.3rem 0.45rem;
+  background: transparent;
+  color: var(--ds-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.write-inline-agent-block-item:hover {
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+}
+
+.write-inline-agent-block-item.is-active {
+  color: var(--ds-accent);
+  background: color-mix(in srgb, var(--ds-accent) 12%, transparent);
+}
+
+.write-inline-agent-block-item-icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.write-inline-agent-block-item-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.write-inline-agent-section-label {
+  padding: 0.2rem 0.5rem 0.1rem;
+  color: var(--ds-text-faint);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.write-inline-agent-format-row {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.05rem 0.05rem 0.32rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ds-border) 70%, transparent);
+}
+
+.write-inline-agent-format {
+  display: inline-flex;
+  width: 2rem;
+  height: 1.9rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ds-text-muted);
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.write-inline-agent-format:hover {
+  background: color-mix(in srgb, var(--ds-accent) 12%, transparent);
+  color: var(--ds-accent);
+}
+
+.write-inline-agent-format-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.write-inline-agent-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.write-inline-agent-action-row {
+  display: flex;
+  align-items: center;
+  gap: 0.58rem;
+  width: 100%;
+  min-height: 2rem;
+  border: 0;
+  border-radius: 10px;
+  padding: 0.32rem 0.5rem;
+  background: transparent;
+  color: var(--ds-text);
+  font-size: 0.86rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  transition: background-color 140ms ease;
+}
+
+.write-inline-agent-action-row:hover {
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+}
+
+.write-inline-agent-action-row:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background: transparent;
+}
+
+.write-inline-agent-action-accent {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  color: var(--ds-accent);
+}
+
+.write-inline-agent-action-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.write-inline-agent-action-hint {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: 0 0 auto;
+  color: var(--ds-text-faint);
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.write-inline-agent-action-row:hover .write-inline-agent-action-hint {
+  opacity: 0.7;
+}
+
+.write-inline-agent-agent-section {
+  margin-bottom: 0.25rem;
+}
+
+.write-inline-agent-agent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-right: 0.25rem;
+}
+
+.write-inline-agent-manage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 0;
+  border-radius: 6px;
+  padding: 0.125rem 0.375rem;
+  background: transparent;
+  color: var(--ds-text-faint);
+  font-size: 11px;
+  transition: color 140ms ease;
+}
+
+.write-inline-agent-manage-btn:hover {
+  color: var(--ds-accent);
+}
+
+.write-inline-agent-manage-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.write-inline-agent-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+  padding: 0 0.25rem;
+}
+
+.write-inline-agent-pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 150px;
+  border: 1px solid var(--ds-border);
+  border-radius: 999px;
+  padding: 0.25rem 0.625rem;
+  background: var(--ds-card);
+  color: var(--ds-text-faint);
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+}
+
+.write-inline-agent-pill-named {
+  color: var(--ds-text);
+}
+
+.write-inline-agent-pill:hover {
+  border-color: color-mix(in srgb, var(--ds-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--ds-accent) 5%, transparent);
+}
+
+.write-inline-agent-pill.is-active {
+  border-color: color-mix(in srgb, var(--ds-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--ds-accent) 12%, transparent);
+  color: var(--ds-accent);
+}
+
+.write-inline-agent-pill-emoji {
+  margin-right: 0.25rem;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.write-inline-agent-pill-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.write-inline-agent-empty-hint {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px dashed var(--ds-border);
+  border-radius: 8px;
+  padding: 0.375rem 0.625rem;
+  background: transparent;
+  color: var(--ds-text);
+  font-size: 12px;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.write-inline-agent-empty-hint:hover {
+  border-color: color-mix(in srgb, var(--ds-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--ds-accent) 5%, transparent);
+}
+
+.write-inline-agent-empty-hint-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: 0 0 auto;
+  color: var(--ds-accent);
+}
+
+.write-inline-agent-empty-hint-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.write-inline-agent-empty-hint-chevron {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: 0 0 auto;
+  opacity: 0.6;
+}
+
+.write-inline-agent-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ds-text) 5%, transparent);
+  padding: 0.34rem 0.34rem 0.34rem 0.62rem;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.write-inline-agent-edit:focus-within {
+  border-color: color-mix(in srgb, var(--ds-accent) 38%, var(--ds-border));
+  background: var(--ds-card);
+}
+
+.write-inline-agent-edit-icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  color: var(--ds-accent);
+}
+
+.write-inline-agent-input {
+  min-height: 1.55rem;
+  max-height: 6.5rem;
+  flex: 1 1 auto;
+  resize: none;
+  overflow-y: auto;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  scrollbar-width: none;
+}
+
+.write-inline-agent-input::-webkit-scrollbar {
+  display: none;
+}
+
+.write-inline-agent-input::placeholder {
+  color: var(--ds-text-faint);
+}
+
+.write-inline-agent-input:disabled {
+  opacity: 0.72;
+}
+
+.write-inline-agent-secondary {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--ds-border) 82%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ds-card) 84%, transparent);
+  color: var(--ds-text-muted);
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease, opacity 140ms ease;
+}
+
+.write-inline-agent-secondary:hover {
+  background: color-mix(in srgb, var(--ds-accent) 10%, var(--ds-card));
+  color: var(--ds-accent);
+  transform: translateY(-1px);
+}
+
+.write-inline-agent-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+  transform: none;
+}
+
+.write-inline-agent-secondary-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.write-inline-agent-submit {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--ds-accent) 84%, transparent);
+  border-radius: 12px;
+  background: var(--ds-accent);
+  color: white;
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--ds-accent) 22%, transparent);
+  transition: filter 140ms ease, transform 140ms ease, opacity 140ms ease;
+}
+
+.write-inline-agent-submit:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.write-inline-agent-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+  filter: grayscale(0.2);
+  transform: none;
+}
+
+.write-inline-agent-submit-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.write-inline-agent-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes write-inline-agent-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.write-inline-agent-preview {
+  min-height: 100dvh;
+  padding: 2.5rem 1.5rem 6rem;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--ds-accent) 8%, transparent), transparent),
+    var(--ds-bg-main);
+}
+
+.write-inline-agent-preview-doc {
+  max-width: 640px;
+  margin: 0 auto;
+  border: 1px solid color-mix(in srgb, var(--ds-border) 70%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--ds-card) 92%, transparent);
+  padding: 2rem 2.25rem;
+  box-shadow: 0 18px 44px rgba(20, 47, 95, 0.08);
+}
+
+.write-inline-agent-preview-lead,
+.write-inline-agent-preview-trail {
+  margin: 0 0 1rem;
+  color: var(--ds-text-muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.write-inline-agent-preview-selection {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.write-inline-agent-preview-mark {
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--ds-accent) 18%, transparent);
+  color: var(--ds-text);
+  padding: 0.1rem 0.2rem;
+}
+
+
+/* =====================================================
    Initial session usage heatmap (Kun InitialSessionUsageHeatmap)
    ===================================================== */
 .initial-session-usage-heatmap {
