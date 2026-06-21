@@ -51,6 +51,8 @@ function RootLayout() {
   }, [])
   const [workspaceModeTabsPreviewView, setWorkspaceModeTabsPreviewView] =
     useState<WorkspaceModeView>(() => workspaceModeTabsPreviewMode ?? 'chat')
+  const [productionWorkspaceMode, setProductionWorkspaceMode] =
+    useState<WorkspaceModeView>('chat')
 
   const platform = useMemo(() => resolveProductionPlatform(), [])
   const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
@@ -136,15 +138,29 @@ function RootLayout() {
                   </>
                 }
               >
-                {workspaceModeTabsPreviewMode ? (
-                  <div className="ds-no-drag flex flex-col px-1">
-                    <WorkspaceModeTabs
-                      activeView={workspaceModeTabsPreviewView}
-                      onCodeOpen={() => setWorkspaceModeTabsPreviewView('chat')}
-                      onWriteOpen={() => setWorkspaceModeTabsPreviewView('write')}
-                    />
-                  </div>
-                ) : null}
+                <div className="ds-no-drag flex flex-col px-1">
+                  <WorkspaceModeTabs
+                    activeView={
+                      workspaceModeTabsPreviewMode !== null
+                        ? workspaceModeTabsPreviewView
+                        : productionWorkspaceMode
+                    }
+                    onCodeOpen={() => {
+                      if (workspaceModeTabsPreviewMode) {
+                        setWorkspaceModeTabsPreviewView('chat')
+                        return
+                      }
+                      setProductionWorkspaceMode('chat')
+                    }}
+                    onWriteOpen={() => {
+                      if (workspaceModeTabsPreviewMode) {
+                        setWorkspaceModeTabsPreviewView('write')
+                        return
+                      }
+                      setProductionWorkspaceMode('write')
+                    }}
+                  />
+                </div>
 
                 <div className="ds-no-drag flex flex-col px-1">
                   <SidebarCommandRow
