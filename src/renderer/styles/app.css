@@ -6522,8 +6522,28 @@ a.runtime-meta-chip:hover {
   color: var(--ds-muted);
 }
 
+.write-markdown-preview-image-error {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  margin: 1.2rem 0;
+  border: 1px solid rgba(254, 202, 202, 0.7);
+  border-radius: 8px;
+  background: rgba(254, 242, 242, 0.8);
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1.25;
+  color: #b91c1c;
+}
+
 [data-theme='dark'] .write-markdown-preview-image-chip {
   border-color: color-mix(in srgb, var(--ds-text) 18%, transparent);
+}
+
+[data-theme='dark'] .write-markdown-preview-image-error {
+  border-color: rgba(127, 29, 29, 0.6);
+  background: rgba(69, 10, 10, 0.4);
+  color: #fecaca;
 }
 
 [data-theme='dark'] .write-markdown-preview pre {

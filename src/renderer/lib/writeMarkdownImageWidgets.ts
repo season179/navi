@@ -4,6 +4,7 @@
 export type WriteInfographicPendingKind = 'infographic' | 'design' | 'prototype'
 export type WriteInfographicPendingState = 'active' | 'stale'
 export type WriteHtmlEmbedVisualState = 'cover' | 'loaded' | 'error' | 'missing'
+export type WriteMarkdownPreviewImageState = 'pending' | 'error'
 
 export const PENDING_INFOGRAPHIC_PROTOCOL = 'kun-pending-infographic:'
 
@@ -46,12 +47,17 @@ export type WriteMarkdownPreviewWidgetOverrides = {
   htmlEmbed?: {
     visualState?: WriteHtmlEmbedVisualState
   }
+  image?: {
+    state?: WriteMarkdownPreviewImageState
+  }
 }
 
 export type WriteMarkdownPreviewPreviewMode =
   | 'default'
   | 'plain'
   | 'error'
+  | 'imagePending'
+  | 'imageError'
   | 'infographic'
   | 'infographicStale'
   | 'infographicDesign'
@@ -72,6 +78,18 @@ This section shows the animated placeholder Kun renders while an infographic gen
 The final PNG replaces the placeholder when generation completes.
 `
 
+const PREVIEW_BROKEN_IMAGE_SRC = './assets/missing-hero.png'
+
+/** Sample markdown with a broken local image for preview hooks. */
+export const WRITE_MARKDOWN_PREVIEW_IMAGE_ERROR_SAMPLE = `# Launch plan draft
+
+This section shows the error chip Kun renders when a markdown image fails to load.
+
+![Hero screenshot](${PREVIEW_BROKEN_IMAGE_SRC})
+
+The chip keeps alt text readable when the asset is missing or unreadable.
+`
+
 /** Sample markdown with an HTML prototype embed for preview hooks. */
 export const WRITE_MARKDOWN_PREVIEW_HTML_EMBED_SAMPLE = `# Launch plan draft
 
@@ -89,6 +107,8 @@ export function resolveWriteMarkdownPreviewMode(
   const value = params.get('writeMarkdownPreview')
   if (value === 'plain') return 'plain'
   if (value === 'error') return 'error'
+  if (value === 'imagePending') return 'imagePending'
+  if (value === 'imageError') return 'imageError'
   if (value === 'infographic') return 'infographic'
   if (value === 'infographicStale') return 'infographicStale'
   if (value === 'infographicDesign') return 'infographicDesign'
@@ -119,6 +139,12 @@ export function widgetOverridesForPreviewMode(
   if (mode === 'htmlEmbedLoaded') {
     return { htmlEmbed: { visualState: 'loaded' } }
   }
+  if (mode === 'imagePending') {
+    return { image: { state: 'pending' } }
+  }
+  if (mode === 'imageError') {
+    return { image: { state: 'error' } }
+  }
   return undefined
 }
 
@@ -136,6 +162,13 @@ export function previewContentForMode(mode: WriteMarkdownPreviewPreviewMode): {
       content: WRITE_MARKDOWN_PREVIEW_SAMPLE,
       isMarkdown: true,
       showErrorFallback: true,
+    }
+  }
+  if (mode === 'imagePending' || mode === 'imageError') {
+    return {
+      content: WRITE_MARKDOWN_PREVIEW_IMAGE_ERROR_SAMPLE,
+      isMarkdown: true,
+      widgetOverrides: widgetOverridesForPreviewMode(mode),
     }
   }
   if (

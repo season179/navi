@@ -2,7 +2,7 @@
 // (../Kun/src/renderer/src/components/write/WriteMarkdownPreview.tsx).
 // Visual only: Streamdown markdown with infographic and HTML embed widgets.
 
-import { Component, type ImgHTMLAttributes, type ReactElement, type ReactNode } from 'react'
+import { Component, useState, type ImgHTMLAttributes, type ReactElement, type ReactNode } from 'react'
 import { Streamdown, type StreamdownProps } from 'streamdown'
 import remarkGfm from 'remark-gfm'
 import { harden } from 'rehype-harden'
@@ -106,7 +106,10 @@ function WriteMarkdownPreviewImage({
   widgetOverrides,
   ...props
 }: PreviewImageProps): ReactElement {
+  const [loadError, setLoadError] = useState(false)
   const imageSrc = typeof src === 'string' ? src : undefined
+  const altText = typeof alt === 'string' ? alt : undefined
+  const forcedImageState = widgetOverrides?.image?.state
   const pendingId = parsePendingInfographicId(imageSrc)
 
   if (pendingId !== null) {
@@ -126,20 +129,31 @@ function WriteMarkdownPreviewImage({
       <span className="block">
         <WriteHtmlEmbed
           rawSrc={imageSrc}
-          alt={typeof alt === 'string' ? alt : ''}
+          alt={altText ?? ''}
           visualState={widgetOverrides?.htmlEmbed?.visualState ?? 'cover'}
         />
       </span>
     )
   }
 
-  if (!imageSrc) {
+  if (forcedImageState === 'error' || loadError) {
+    return (
+      <span
+        className="write-markdown-preview-image-error"
+        title={altText ?? imageSrc ?? 'Image could not be loaded'}
+      >
+        {altText || imageSrc || 'Image could not be loaded'}
+      </span>
+    )
+  }
+
+  if (!imageSrc || forcedImageState === 'pending') {
     return (
       <span
         className="write-markdown-preview-image-chip"
-        title={typeof alt === 'string' ? alt : undefined}
+        title={altText ?? imageSrc}
       >
-        {alt || 'Image'}
+        {altText || imageSrc || 'Image'}
       </span>
     )
   }
@@ -148,7 +162,8 @@ function WriteMarkdownPreviewImage({
     <img
       {...props}
       src={imageSrc}
-      alt={typeof alt === 'string' ? alt : ''}
+      alt={altText ?? ''}
+      onError={() => setLoadError(true)}
     />
   )
 }

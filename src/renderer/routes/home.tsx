@@ -1426,7 +1426,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported WriteMarkdownPreview
-  // (?writeMarkdownPreview=1|plain|error|infographic|htmlEmbed|…).
+  // (?writeMarkdownPreview=1|plain|error|imagePending|imageError|infographic|htmlEmbed|…).
   const writeMarkdownPreviewPreviewMode = useMemo((): WriteMarkdownPreviewPreviewMode | null => {
     if (typeof window === 'undefined') return null
     return resolveWriteMarkdownPreviewMode(new URLSearchParams(window.location.search))

@@ -34,9 +34,28 @@ test('resolveWriteMarkdownPreviewMode maps widget preview params', () => {
     resolveWriteMarkdownPreviewMode(new URLSearchParams('writeMarkdownPreview=htmlEmbedLoaded')),
     'htmlEmbedLoaded',
   )
+  assert.equal(
+    resolveWriteMarkdownPreviewMode(new URLSearchParams('writeMarkdownPreview=imageError')),
+    'imageError',
+  )
+  assert.equal(
+    resolveWriteMarkdownPreviewMode(new URLSearchParams('writeMarkdownPreview=imagePending')),
+    'imagePending',
+  )
 })
 
-test('previewContentForMode wires widget overrides for infographic and html embed modes', () => {
+test('previewContentForMode wires widget overrides for image, infographic, and html embed modes', () => {
+  const imageError = previewContentForMode('imageError')
+  assert.match(imageError.content, /missing-hero\.png/)
+  assert.deepEqual(widgetOverridesForPreviewMode('imageError'), {
+    image: { state: 'error' },
+  })
+
+  const imagePending = previewContentForMode('imagePending')
+  assert.deepEqual(imagePending.widgetOverrides, {
+    image: { state: 'pending' },
+  })
+
   const infographic = previewContentForMode('infographicPrototype')
   assert.match(infographic.content, /kun-pending-infographic:\/\//)
   assert.deepEqual(widgetOverridesForPreviewMode('infographicPrototype'), {
