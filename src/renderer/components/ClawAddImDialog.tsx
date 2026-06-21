@@ -23,6 +23,7 @@ import {
   X,
 } from 'lucide-react'
 import {
+  CLAW_SIDEBAR_PRODUCTION_CHANNELS,
   ClawProviderLogo,
   clawProviderDisplayLabel,
   type ClawImChannelSidebarSnapshot,
@@ -1229,6 +1230,125 @@ export function ClawAddImDialogPreview({
       loadingConfig={false}
       busy={initial.busy}
       onClose={() => undefined}
+      onSelectStep={setActiveStep}
+      onEnterManageConfigure={(channelId) => {
+        setSelectedChannelId(channelId)
+        setManageStage('configure')
+      }}
+      onReturnToManageSelection={() => setManageStage('select')}
+      onUpdateAgentProfile={(patch) => setAgentProfile((prev) => ({ ...prev, ...patch }))}
+      onSetChannelModel={setChannelModel}
+      onSetChannelEnabled={setChannelEnabled}
+      onSetChannelWorkspaceRoot={setChannelWorkspaceRoot}
+      onSetOfficialInstallTarget={setOfficialInstallTarget}
+      onSetAdvancedOpen={setAdvancedOpen}
+      onSetImEnabled={setImEnabled}
+      onSetRunMode={setRunMode}
+      onSetImPort={setImPort}
+      onSetImPath={setImPath}
+      onSetResponseTimeoutSec={setResponseTimeoutSec}
+      onSetSecret={setSecret}
+      onToggleShowSecret={() => setShowSecret((value) => !value)}
+      onCopyBinding={() => {
+        setCopied(true)
+        window.setTimeout(() => setCopied(false), 1600)
+      }}
+      onGenerateQr={() => setInstallQrStatus('showing')}
+      onPrevStep={() => {
+        const stepIndex = DIALOG_STEPS.findIndex((step) => step.id === activeStep)
+        if (stepIndex > 0) setActiveStep(DIALOG_STEPS[stepIndex - 1].id)
+      }}
+      onPrimaryAction={onPrimaryAction}
+    />
+  )
+}
+
+type ClawAddImDialogProductionProps = {
+  mode: ClawImDialogMode
+  onClose: () => void
+}
+
+/** Production claw-route IM dialog with mock snapshots for visual parity. */
+export function ClawAddImDialogProduction({
+  mode,
+  onClose,
+}: ClawAddImDialogProductionProps): ReactElement {
+  const [manageStage, setManageStage] = useState<ClawManageStage>(
+    mode === 'edit' ? 'select' : 'select',
+  )
+  const [activeStep, setActiveStep] = useState<ClawDialogStep>('defaults')
+  const [selectedChannelId, setSelectedChannelId] = useState(
+    () => CLAW_SIDEBAR_PRODUCTION_CHANNELS[0]?.id ?? '',
+  )
+  const [provider] = useState<ClawImProvider>('feishu')
+  const [installQrStatus, setInstallQrStatus] = useState<ClawInstallQrStatus>('idle')
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [channelModel, setChannelModel] = useState('auto')
+  const [channelEnabled, setChannelEnabled] = useState(true)
+  const [channelWorkspaceRoot, setChannelWorkspaceRoot] = useState('')
+  const [officialInstallTarget, setOfficialInstallTarget] = useState<ClawInstallTarget>('feishu')
+  const [imEnabled, setImEnabled] = useState(true)
+  const [runMode, setRunMode] = useState('agent')
+  const [imPort, setImPort] = useState(8787)
+  const [imPath, setImPath] = useState('/claw/im')
+  const [responseTimeoutSec, setResponseTimeoutSec] = useState(120)
+  const [secret, setSecret] = useState('')
+  const [showSecret, setShowSecret] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [agentProfile, setAgentProfile] = useState<ClawAgentProfile>({
+    name: 'feishu agent',
+    description: '',
+    identity: '',
+    personality: '',
+    userContext: '',
+    replyRules: '',
+  })
+
+  const endpoint = `http://127.0.0.1:${imPort}${imPath.startsWith('/') ? imPath : `/${imPath}`}`
+  const channels = mode === 'edit' ? CLAW_SIDEBAR_PRODUCTION_CHANNELS : []
+
+  const onPrimaryAction = (): void => {
+    if (mode === 'edit' && manageStage === 'select') {
+      setManageStage('configure')
+      return
+    }
+    const stepIndex = DIALOG_STEPS.findIndex((step) => step.id === activeStep)
+    if (stepIndex < DIALOG_STEPS.length - 1) {
+      setActiveStep(DIALOG_STEPS[stepIndex + 1].id)
+    }
+  }
+
+  return (
+    <ClawAddImDialogView
+      mode={mode}
+      manageStage={manageStage}
+      activeStep={activeStep}
+      provider={provider}
+      channels={channels}
+      selectedChannelId={selectedChannelId}
+      agentProfile={agentProfile}
+      channelModel={channelModel}
+      channelEnabled={channelEnabled}
+      channelWorkspaceRoot={channelWorkspaceRoot}
+      officialInstallTarget={officialInstallTarget}
+      advancedOpen={advancedOpen}
+      imEnabled={imEnabled}
+      runMode={runMode}
+      imPort={imPort}
+      imPath={imPath}
+      responseTimeoutSec={responseTimeoutSec}
+      secret={secret}
+      showSecret={showSecret}
+      endpoint={endpoint}
+      copied={copied}
+      installQrStatus={installQrStatus}
+      installQrTimeLeft={0}
+      installQrUserCode=""
+      installQrError=""
+      error={null}
+      loadingConfig={false}
+      busy={false}
+      onClose={onClose}
       onSelectStep={setActiveStep}
       onEnterManageConfigure={(channelId) => {
         setSelectedChannelId(channelId)

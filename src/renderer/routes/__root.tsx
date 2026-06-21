@@ -40,7 +40,11 @@ import {
 } from '../components/ConnectPhoneView'
 import { WriteSidebarProductionPanel } from '../components/WriteSidebar'
 import { ClawSidebarProductionPanel } from '../components/ClawSidebar'
-import { type ClawInstallTarget } from '../components/ClawAddImDialog'
+import {
+  ClawAddImDialogProduction,
+  type ClawImDialogMode,
+  type ClawInstallTarget,
+} from '../components/ClawAddImDialog'
 
 function resolveProductionPlatform(): string {
   if (typeof window === 'undefined') return 'darwin'
@@ -126,10 +130,22 @@ function RootLayoutContent() {
     openClawRoute()
   }, [openClawRoute])
 
-  const openConnectPhoneFromClawSidebar = useCallback(() => {
-    openChatRoute()
-    setConnectPhoneSidebarOpen(true)
-  }, [openChatRoute])
+  const clawAddImDialogPreviewMode = useMemo((): ClawImDialogMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    const mode = params.get('clawAddImDialog')
+    if (mode === 'add' || mode === 'edit') return mode
+    return null
+  }, [])
+  const [clawImDialogMode, setClawImDialogMode] = useState<ClawImDialogMode | null>(
+    () => clawAddImDialogPreviewMode,
+  )
+  const openClawAddImDialog = useCallback((mode: ClawImDialogMode) => {
+    setClawImDialogMode(mode)
+  }, [])
+  const closeClawAddImDialog = useCallback(() => {
+    setClawImDialogMode(null)
+  }, [])
 
   const mainStageClass =
     sidebarRoute === 'plugins'
@@ -361,8 +377,8 @@ function RootLayoutContent() {
                   />
                 ) : clawActive ? (
                   <ClawSidebarProductionPanel
-                    onOpenConnectPhone={openConnectPhoneFromClawSidebar}
-                    onOpenSettings={toggleSettings}
+                    onAddChannel={() => openClawAddImDialog('add')}
+                    onOpenClawSettings={() => openClawAddImDialog('edit')}
                   />
                 ) : (
                   <SidebarProjects />
@@ -377,6 +393,9 @@ function RootLayoutContent() {
           </main>
             </div>
           </div>
+          {clawActive && clawImDialogMode ? (
+            <ClawAddImDialogProduction mode={clawImDialogMode} onClose={closeClawAddImDialog} />
+          ) : null}
         </div>
       </SettingsContext.Provider>
     </SidebarContext.Provider>

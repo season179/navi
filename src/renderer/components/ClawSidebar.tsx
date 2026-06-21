@@ -396,14 +396,14 @@ function previewSnapshot(mode: ClawSidebarPreviewMode): {
 }
 
 type ClawSidebarProductionPanelProps = {
-  onOpenConnectPhone: () => void
-  onOpenSettings: () => void
+  onAddChannel: () => void
+  onOpenClawSettings: () => void
 }
 
 /** Production claw-route sidebar body with mock channel snapshots for visual parity. */
 export function ClawSidebarProductionPanel({
-  onOpenConnectPhone,
-  onOpenSettings,
+  onAddChannel,
+  onOpenClawSettings,
 }: ClawSidebarProductionPanelProps): ReactElement {
   const [activeChannelId, setActiveChannelId] = useState(
     () => CLAW_SIDEBAR_PRODUCTION_CHANNELS[0]?.id ?? '',
@@ -418,8 +418,8 @@ export function ClawSidebarProductionPanel({
           ?.threadId ?? null
       }
       onSelectChannel={setActiveChannelId}
-      onAddChannel={onOpenConnectPhone}
-      onOpenSettings={onOpenSettings}
+      onAddChannel={onAddChannel}
+      onOpenSettings={onOpenClawSettings}
     />
   )
 }
