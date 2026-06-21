@@ -45,8 +45,12 @@ import { useWriteSplitScrollSync } from './useWriteSplitScrollSync'
 import {
   resolveProductionWriteWorkspaceParam,
   resolveProductionWriteWorkspaceSnapshotMode,
+  isWriteWorkspaceInlineAgentPreviewMode,
+  resolveWriteWorkspaceInlineAgentPreviewMode,
   type WriteWorkspaceViewPreviewMode,
 } from '../lib/writeWorkspacePreviewModes'
+import type { WriteInlineAgentPreviewMode } from '../lib/writeInlineAgentPreviewModes'
+import { resolveWriteInlineAgentPreviewState } from '../lib/writeInlineAgentPreviewState'
 
 export type { WriteWorkspaceViewPreviewMode } from '../lib/writeWorkspacePreviewModes'
 
@@ -79,6 +83,7 @@ type WorkspaceSnapshot = {
   readOnly: boolean
   reviewActive: boolean
   showInlineAgent: boolean
+  inlineAgentPreviewMode: WriteInlineAgentPreviewMode | null
   fileError: string | null
   exportNotice: WriteNotice | null
   runtimeBanner: RuntimeBannerSnapshot | null
@@ -119,6 +124,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     | 'readOnly'
     | 'reviewActive'
     | 'showInlineAgent'
+    | 'inlineAgentPreviewMode'
     | 'fileError'
     | 'exportNotice'
     | 'runtimeBanner'
@@ -155,6 +161,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       readOnly: false,
       reviewActive: false,
       showInlineAgent: false,
+      inlineAgentPreviewMode: null,
       fileError: null,
       exportNotice: null,
       runtimeBanner: null,
@@ -197,6 +204,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       readOnly: false,
       reviewActive: false,
       showInlineAgent: false,
+      inlineAgentPreviewMode: null,
       fileError: null,
       exportNotice: null,
       runtimeBanner: null,
@@ -240,6 +248,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       readOnly: true,
       reviewActive: false,
       showInlineAgent: false,
+      inlineAgentPreviewMode: null,
       fileError: null,
       exportNotice: null,
       runtimeBanner: null,
@@ -275,6 +284,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       readOnly: false,
       reviewActive: false,
       showInlineAgent: false,
+      inlineAgentPreviewMode: null,
       fileError: null,
       exportNotice: null,
       runtimeBanner: null,
@@ -312,6 +322,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       readOnly: false,
       reviewActive: false,
       showInlineAgent: false,
+      inlineAgentPreviewMode: null,
       fileError: null,
       exportNotice: null,
       runtimeBanner: null,
@@ -348,6 +359,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       readOnly: false,
       reviewActive: false,
       showInlineAgent: false,
+      inlineAgentPreviewMode: null,
       fileError: null,
       exportNotice: null,
       runtimeBanner: null,
@@ -384,6 +396,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       readOnly: false,
       reviewActive: false,
       showInlineAgent: false,
+      inlineAgentPreviewMode: null,
       fileError: null,
       exportNotice: null,
       runtimeBanner: null,
@@ -420,6 +433,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       readOnly: false,
       reviewActive: false,
       showInlineAgent: false,
+      inlineAgentPreviewMode: null,
       fileError: null,
       exportNotice: null,
       runtimeBanner: null,
@@ -456,6 +470,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       readOnly: true,
       reviewActive: false,
       showInlineAgent: false,
+      inlineAgentPreviewMode: null,
       fileError: null,
       exportNotice: null,
       runtimeBanner: null,
@@ -503,7 +518,8 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     saveStatus: mode === 'dirty' ? 'dirty' : mode === 'saving' ? 'saving' : 'saved',
     readOnly: mode === 'readonly',
     reviewActive: mode === 'review',
-    showInlineAgent: mode === 'inlineAgent',
+    showInlineAgent: isWriteWorkspaceInlineAgentPreviewMode(mode),
+    inlineAgentPreviewMode: resolveWriteWorkspaceInlineAgentPreviewMode(mode),
     fileError: mode === 'error' ? 'Could not save the file. Check disk space and try again.' : null,
     exportNotice:
       mode === 'exportSuccess'
@@ -578,6 +594,7 @@ type ViewProps = {
   readOnly?: boolean
   reviewActive?: boolean
   showInlineAgent?: boolean
+  inlineAgentPreviewMode?: WriteInlineAgentPreviewMode | null
   fileError?: string | null
   exportNotice?: WriteNotice | null
   exportInFlight?: boolean
@@ -625,6 +642,7 @@ export function WriteWorkspaceView({
   readOnly = false,
   reviewActive = false,
   showInlineAgent = false,
+  inlineAgentPreviewMode = null,
   fileError = null,
   exportNotice = null,
   exportInFlight = false,
@@ -661,11 +679,24 @@ export function WriteWorkspaceView({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const editorPaneRef = useRef<HTMLDivElement | null>(null)
   const previewPaneRef = useRef<HTMLDivElement | null>(null)
-  const [inlineValue, setInlineValue] = useState('')
-  const [blockType, setBlockType] = useState<WriteBlockType>('paragraph')
-  const [activeAgentId, setActiveAgentId] = useState(
-    WRITE_SETTINGS_PREVIEW_DEFAULT.agentPresets[0]?.id ?? '',
+  const inlineAgentPreviewState = useMemo(
+    () =>
+      inlineAgentPreviewMode
+        ? resolveWriteInlineAgentPreviewState(inlineAgentPreviewMode)
+        : null,
+    [inlineAgentPreviewMode],
   )
+  const [inlineValue, setInlineValue] = useState(() => {
+    if (!inlineAgentPreviewMode) return ''
+    return resolveWriteInlineAgentPreviewState(inlineAgentPreviewMode).initialValue
+  })
+  const [blockType, setBlockType] = useState<WriteBlockType>('paragraph')
+  const [activeAgentId, setActiveAgentId] = useState(() => {
+    if (!inlineAgentPreviewMode) {
+      return WRITE_SETTINGS_PREVIEW_DEFAULT.agentPresets[0]?.id ?? ''
+    }
+    return resolveWriteInlineAgentPreviewState(inlineAgentPreviewMode).initialActiveAgentId
+  })
 
   const liveModeActive = resolveLiveModeActive(
     toolbarPreviewModeState,
@@ -796,26 +827,41 @@ export function WriteWorkspaceView({
         <WriteInlineAgent
           action={inlinePosition}
           value={inlineValue}
-          inFlight={false}
+          inFlight={inlineAgentPreviewState?.inFlight ?? false}
           textareaRef={textareaRef}
           onValueChange={setInlineValue}
           onSubmitPrompt={() => undefined}
           onApplyEdit={() => undefined}
-          askOnly={activeFileIsPdf}
+          askOnly={inlineAgentPreviewState?.askOnly ?? activeFileIsPdf}
           preferAbove={activeFileIsPdf}
-          formattingEnabled={activeFileIsText && !readOnly}
+          formattingEnabled={
+            inlineAgentPreviewState?.formattingEnabled ?? (activeFileIsText && !readOnly)
+          }
           onApplyFormat={() => undefined}
           blockType={blockType}
           onSetBlockType={setBlockType}
-          quickActions={WRITE_SETTINGS_PREVIEW_DEFAULT.selectionAssist.quickActions}
+          defaultBlockMenuOpen={inlineAgentPreviewState?.defaultBlockMenuOpen ?? false}
+          quickActions={
+            inlineAgentPreviewState?.quickActions ??
+            WRITE_SETTINGS_PREVIEW_DEFAULT.selectionAssist.quickActions
+          }
           onQuickAction={() => undefined}
-          agentPresets={WRITE_SETTINGS_PREVIEW_DEFAULT.agentPresets}
+          agentPresets={
+            inlineAgentPreviewState?.agentPresets ?? WRITE_SETTINGS_PREVIEW_DEFAULT.agentPresets
+          }
           activeAgentId={activeAgentId}
           onSelectAgent={setActiveAgentId}
           onOpenAgentSettings={() => undefined}
           onQuoteSelection={() => undefined}
-          infographicEnabled={activeFileIsText && !readOnly}
+          infographicEnabled={
+            inlineAgentPreviewState?.infographicEnabled ?? (activeFileIsText && !readOnly)
+          }
           onGenerateInfographic={() => undefined}
+          designDraftEnabled={inlineAgentPreviewState?.designDraftEnabled ?? false}
+          onGenerateDesignDraft={() => undefined}
+          prototypeEnabled={inlineAgentPreviewState?.prototypeEnabled ?? false}
+          onGeneratePrototype={() => undefined}
+          imageMode={inlineAgentPreviewState?.imageMode ?? false}
         />
       ) : null}
       {fileError ? (
@@ -904,6 +950,7 @@ export function WriteWorkspaceProductionView({
         readOnly={snapshot.readOnly}
         reviewActive={snapshot.reviewActive}
         showInlineAgent={snapshot.showInlineAgent}
+        inlineAgentPreviewMode={snapshot.inlineAgentPreviewMode}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}
         exportInFlight={snapshotMode === 'exporting'}
@@ -986,6 +1033,7 @@ export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement 
         readOnly={snapshot.readOnly}
         reviewActive={snapshot.reviewActive}
         showInlineAgent={snapshot.showInlineAgent}
+        inlineAgentPreviewMode={snapshot.inlineAgentPreviewMode}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}
         exportInFlight={mode === 'exporting'}

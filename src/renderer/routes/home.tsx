@@ -433,6 +433,7 @@ import {
   type WriteWorkspaceViewPreviewMode,
 } from '../components/WriteWorkspaceView'
 import { resolveWriteWorkspaceViewPreviewMode } from '../lib/writeWorkspacePreviewModes'
+import { resolveWriteInlineAgentPreviewMode } from '../lib/writeInlineAgentPreviewModes'
 import { resolveWriteWorkspaceDocumentPanePreviewMode } from '../lib/writeWorkspaceDocumentPanePreviewModes'
 import { resolveWriteWorkspaceToolbarPreviewMode } from '../lib/writeWorkspaceToolbarPreviewModes'
 import {
@@ -1353,16 +1354,7 @@ function HomePage() {
   // (?writeInlineAgent=1|blockMenu|emptyAgents|askOnly|inFlight|skills|imageMode).
   const writeInlineAgentPreviewMode = useMemo((): WriteInlineAgentPreviewMode | null => {
     if (typeof window === 'undefined') return null
-    const params = new URLSearchParams(window.location.search)
-    if (!params.has('writeInlineAgent')) return null
-    const value = params.get('writeInlineAgent')
-    if (value === 'blockMenu') return 'blockMenu'
-    if (value === 'emptyAgents') return 'emptyAgents'
-    if (value === 'askOnly') return 'askOnly'
-    if (value === 'inFlight') return 'inFlight'
-    if (value === 'skills') return 'skills'
-    if (value === 'imageMode') return 'imageMode'
-    return 'default'
+    return resolveWriteInlineAgentPreviewMode(new URLSearchParams(window.location.search))
   }, [])
 
   // Visual preview for the ported WriteAssistantPanel
@@ -1496,7 +1488,7 @@ function HomePage() {
     }, [])
 
   // Visual preview for the ported WriteWorkspaceView
-  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|rich|preview|pdf|image|loading|unsupported|largeFile|truncated|liveDisabled|inlineAgent|assistant|assistantTimeline|assistantQuoted|assistantPdf|assistantNoFile|assistantStreaming|runtimeBanner|error|exportSuccess|exportError|exporting|dirty|saving|readonly|review|exportMenu|modeMenu).
+  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|rich|preview|pdf|image|loading|unsupported|largeFile|truncated|liveDisabled|inlineAgent|inlineAgentBlockMenu|inlineAgentEmptyAgents|inlineAgentAskOnly|inlineAgentInFlight|inlineAgentSkills|inlineAgentImageMode|assistant|assistantTimeline|assistantQuoted|assistantPdf|assistantNoFile|assistantStreaming|runtimeBanner|error|exportSuccess|exportError|exporting|dirty|saving|readonly|review|exportMenu|modeMenu).
   const writeWorkspaceViewPreviewMode = useMemo((): WriteWorkspaceViewPreviewMode | null => {
     if (typeof window === 'undefined') return null
     return resolveWriteWorkspaceViewPreviewMode(new URLSearchParams(window.location.search))

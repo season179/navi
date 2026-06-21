@@ -71,6 +71,33 @@ test('routes liveDisabled toolbar mode strip preview mode', () => {
   )
 })
 
+test('routes inline agent orchestrator preview modes', () => {
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=inlineAgentBlockMenu')),
+    'inlineAgentBlockMenu',
+  )
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=inlineAgentEmptyAgents')),
+    'inlineAgentEmptyAgents',
+  )
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=inlineAgentAskOnly')),
+    'inlineAgentAskOnly',
+  )
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=inlineAgentInFlight')),
+    'inlineAgentInFlight',
+  )
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=inlineAgentSkills')),
+    'inlineAgentSkills',
+  )
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=inlineAgentImageMode')),
+    'inlineAgentImageMode',
+  )
+})
+
 test('routes assistant panel preview modes', () => {
   assert.equal(
     resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=assistantPdf')),

@@ -45,6 +45,11 @@ import {
   type WriteAgentPresetSnapshot,
   type WriteQuickActionSnapshot,
 } from './WriteSettingsSection'
+import type { WriteInlineAgentPreviewMode } from '../lib/writeInlineAgentPreviewModes'
+import { resolveWriteInlineAgentPreviewState } from '../lib/writeInlineAgentPreviewState'
+
+export type { WriteInlineAgentPreviewMode } from '../lib/writeInlineAgentPreviewModes'
+export { resolveWriteInlineAgentPreviewMode } from '../lib/writeInlineAgentPreviewModes'
 
 export const INLINE_AGENT_GAP = 8
 
@@ -77,15 +82,6 @@ export type WriteInlineAgentPosition = {
   anchorTop: number
   anchorBottom: number
 }
-
-export type WriteInlineAgentPreviewMode =
-  | 'default'
-  | 'blockMenu'
-  | 'emptyAgents'
-  | 'askOnly'
-  | 'inFlight'
-  | 'skills'
-  | 'imageMode'
 
 const COPY = {
   writeInlineAgentPlaceholder: 'Tell AI what to do with this selection…',
@@ -629,12 +625,11 @@ type PreviewProps = {
 
 /** Full-page preview shell for ?writeInlineAgent URL hooks. */
 export function WriteInlineAgentPreview({ mode }: PreviewProps): ReactElement {
+  const previewState = resolveWriteInlineAgentPreviewState(mode)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-  const [value, setValue] = useState(mode === 'inFlight' ? 'Tighten this paragraph' : '')
+  const [value, setValue] = useState(previewState.initialValue)
   const [blockType, setBlockType] = useState<WriteBlockType>('paragraph')
-  const [activeAgentId, setActiveAgentId] = useState(
-    mode === 'default' ? WRITE_SETTINGS_PREVIEW_DEFAULT.agentPresets[0]?.id ?? '' : '',
-  )
+  const [activeAgentId, setActiveAgentId] = useState(previewState.initialActiveAgentId)
   const [position, setPosition] = useState<WriteInlineAgentPosition>(() =>
     typeof window === 'undefined'
       ? { left: 0, width: 300, anchorTop: 320, anchorBottom: 348 }
@@ -648,9 +643,8 @@ export function WriteInlineAgentPreview({ mode }: PreviewProps): ReactElement {
     return () => window.removeEventListener('resize', update)
   }, [])
 
-  const agentPresets =
-    mode === 'emptyAgents' ? [] : WRITE_SETTINGS_PREVIEW_DEFAULT.agentPresets
-  const quickActions = WRITE_SETTINGS_PREVIEW_DEFAULT.selectionAssist.quickActions
+  const agentPresets = previewState.agentPresets
+  const quickActions = previewState.quickActions
 
   return (
     <div className="write-inline-agent-preview">
@@ -670,31 +664,31 @@ export function WriteInlineAgentPreview({ mode }: PreviewProps): ReactElement {
       <WriteInlineAgent
         action={position}
         value={value}
-        inFlight={mode === 'inFlight'}
+        inFlight={previewState.inFlight}
         textareaRef={textareaRef}
         onValueChange={setValue}
         onSubmitPrompt={() => undefined}
         onApplyEdit={() => undefined}
-        askOnly={mode === 'askOnly'}
-        formattingEnabled={mode !== 'imageMode' && mode !== 'askOnly'}
+        askOnly={previewState.askOnly}
+        formattingEnabled={previewState.formattingEnabled}
         onApplyFormat={() => undefined}
         blockType={blockType}
         onSetBlockType={setBlockType}
-        defaultBlockMenuOpen={mode === 'blockMenu'}
-        quickActions={mode === 'imageMode' ? [] : quickActions}
+        defaultBlockMenuOpen={previewState.defaultBlockMenuOpen}
+        quickActions={quickActions}
         onQuickAction={() => undefined}
-        agentPresets={mode === 'imageMode' ? [] : agentPresets}
+        agentPresets={agentPresets}
         activeAgentId={activeAgentId}
         onSelectAgent={setActiveAgentId}
         onOpenAgentSettings={() => undefined}
         onQuoteSelection={() => undefined}
-        infographicEnabled={mode === 'skills'}
+        infographicEnabled={previewState.infographicEnabled}
         onGenerateInfographic={() => undefined}
-        designDraftEnabled={mode === 'skills' || mode === 'imageMode'}
+        designDraftEnabled={previewState.designDraftEnabled}
         onGenerateDesignDraft={() => undefined}
-        prototypeEnabled={mode === 'skills' || mode === 'imageMode'}
+        prototypeEnabled={previewState.prototypeEnabled}
         onGeneratePrototype={() => undefined}
-        imageMode={mode === 'imageMode'}
+        imageMode={previewState.imageMode}
       />
     </div>
   )

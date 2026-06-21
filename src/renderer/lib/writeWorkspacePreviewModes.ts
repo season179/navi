@@ -1,5 +1,7 @@
 // Shared WriteWorkspaceView preview mode identifiers.
 
+import type { WriteInlineAgentPreviewMode } from './writeInlineAgentPreviewModes'
+
 export type WriteWorkspaceViewPreviewMode =
   | 'empty'
   | 'emptyError'
@@ -16,6 +18,12 @@ export type WriteWorkspaceViewPreviewMode =
   | 'largeFile'
   | 'truncated'
   | 'inlineAgent'
+  | 'inlineAgentBlockMenu'
+  | 'inlineAgentEmptyAgents'
+  | 'inlineAgentAskOnly'
+  | 'inlineAgentInFlight'
+  | 'inlineAgentSkills'
+  | 'inlineAgentImageMode'
   | 'assistant'
   | 'assistantTimeline'
   | 'assistantQuoted'
@@ -54,6 +62,12 @@ export function resolveWriteWorkspaceViewPreviewMode(
   if (value === 'largeFile') return 'largeFile'
   if (value === 'truncated') return 'truncated'
   if (value === 'inlineAgent') return 'inlineAgent'
+  if (value === 'inlineAgentBlockMenu') return 'inlineAgentBlockMenu'
+  if (value === 'inlineAgentEmptyAgents') return 'inlineAgentEmptyAgents'
+  if (value === 'inlineAgentAskOnly') return 'inlineAgentAskOnly'
+  if (value === 'inlineAgentInFlight') return 'inlineAgentInFlight'
+  if (value === 'inlineAgentSkills') return 'inlineAgentSkills'
+  if (value === 'inlineAgentImageMode') return 'inlineAgentImageMode'
   if (value === 'assistant') return 'assistant'
   if (value === 'assistantTimeline') return 'assistantTimeline'
   if (value === 'assistantQuoted') return 'assistantQuoted'
@@ -92,6 +106,12 @@ export const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceV
   'largeFile',
   'truncated',
   'inlineAgent',
+  'inlineAgentBlockMenu',
+  'inlineAgentEmptyAgents',
+  'inlineAgentAskOnly',
+  'inlineAgentInFlight',
+  'inlineAgentSkills',
+  'inlineAgentImageMode',
   'error',
   'exportSuccess',
   'exportError',
@@ -112,6 +132,35 @@ export function resolveProductionWriteWorkspaceParam(
   }
   if (typeof window === 'undefined') return null
   return new URLSearchParams(window.location.search).get('productionWriteWorkspace')
+}
+
+const INLINE_AGENT_WORKSPACE_PREVIEW_MODES = new Set<WriteWorkspaceViewPreviewMode>([
+  'inlineAgent',
+  'inlineAgentBlockMenu',
+  'inlineAgentEmptyAgents',
+  'inlineAgentAskOnly',
+  'inlineAgentInFlight',
+  'inlineAgentSkills',
+  'inlineAgentImageMode',
+])
+
+export function isWriteWorkspaceInlineAgentPreviewMode(
+  mode: WriteWorkspaceViewPreviewMode,
+): boolean {
+  return INLINE_AGENT_WORKSPACE_PREVIEW_MODES.has(mode)
+}
+
+export function resolveWriteWorkspaceInlineAgentPreviewMode(
+  mode: WriteWorkspaceViewPreviewMode,
+): WriteInlineAgentPreviewMode | null {
+  if (mode === 'inlineAgent') return 'default'
+  if (mode === 'inlineAgentBlockMenu') return 'blockMenu'
+  if (mode === 'inlineAgentEmptyAgents') return 'emptyAgents'
+  if (mode === 'inlineAgentAskOnly') return 'askOnly'
+  if (mode === 'inlineAgentInFlight') return 'inFlight'
+  if (mode === 'inlineAgentSkills') return 'skills'
+  if (mode === 'inlineAgentImageMode') return 'imageMode'
+  return null
 }
 
 export function resolveProductionWriteWorkspaceSnapshotMode(
