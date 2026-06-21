@@ -338,6 +338,10 @@ import {
   type WriteAssistantPanelPreviewMode,
 } from '../components/WriteAssistantPanel'
 import {
+  SddAssistantPanelPreview,
+  type SddAssistantPanelPreviewMode,
+} from '../components/SddAssistantPanel'
+import {
   WriteMarkdownPreviewPreview,
   type WriteMarkdownPreviewPreviewMode,
 } from '../components/WriteMarkdownPreview'
@@ -914,6 +918,19 @@ function HomePage() {
     if (value === 'pdf') return 'pdf'
     if (value === 'noFile') return 'noFile'
     if (value === 'streaming') return 'streaming'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported SddAssistantPanel
+  // (?sddAssistantPanelPreview=1|timeline|busy|disabled).
+  const sddAssistantPanelPreviewMode = useMemo((): SddAssistantPanelPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('sddAssistantPanelPreview')) return null
+    const value = params.get('sddAssistantPanelPreview')
+    if (value === 'timeline') return 'timeline'
+    if (value === 'busy') return 'busy'
+    if (value === 'disabled') return 'disabled'
     return 'default'
   }, [])
 
@@ -2172,6 +2189,10 @@ function HomePage() {
 
   if (writeAssistantPanelPreviewMode) {
     return <WriteAssistantPanelPreview mode={writeAssistantPanelPreviewMode} />
+  }
+
+  if (sddAssistantPanelPreviewMode) {
+    return <SddAssistantPanelPreview mode={sddAssistantPanelPreviewMode} />
   }
 
   if (writeMarkdownPreviewPreviewMode) {
