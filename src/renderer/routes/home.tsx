@@ -29,6 +29,10 @@ import {
   WORKSPACE_PROJECT_PICKER_PREVIEW_EMPTY,
   type WorkspaceProjectsSnapshot,
 } from '../components/WorkspaceProjectPicker'
+import {
+  ImagePreviewLightbox,
+  IMAGE_PREVIEW_LIGHTBOX_SAMPLE,
+} from '../components/ImagePreviewLightbox'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -152,6 +156,13 @@ function HomePage() {
     if (workspaceProjectPickerPreviewMode === 'empty') return WORKSPACE_PROJECT_PICKER_PREVIEW_EMPTY
     return workspaceProjectPickerPreview
   }, [workspaceProjectPickerPreviewMode, workspaceProjectPickerPreview])
+
+  // Visual preview for the ported ImagePreviewLightbox (?imagePreviewLightbox=1).
+  const imagePreviewLightboxPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return new URLSearchParams(window.location.search).has('imagePreviewLightbox')
+  }, [])
+  const [imagePreviewLightboxDismissed, setImagePreviewLightboxDismissed] = useState(false)
 
   const composerFooterPreview =
     gitBranchPickerPreviewMode != null || workspaceProjectPickerPreviewMode != null
@@ -337,6 +348,16 @@ function HomePage() {
           <ContextCapacityPopover capacity={CONTEXT_CAPACITY_PREVIEW} />
         </div>
       ) : null}
+
+      <ImagePreviewLightbox
+        open={imagePreviewLightboxPreview && !imagePreviewLightboxDismissed}
+        src={IMAGE_PREVIEW_LIGHTBOX_SAMPLE.src}
+        alt={IMAGE_PREVIEW_LIGHTBOX_SAMPLE.alt}
+        title={IMAGE_PREVIEW_LIGHTBOX_SAMPLE.title}
+        downloadHref={IMAGE_PREVIEW_LIGHTBOX_SAMPLE.src}
+        downloadName="preview.svg"
+        onClose={() => setImagePreviewLightboxDismissed(true)}
+      />
     </>
   )
 }

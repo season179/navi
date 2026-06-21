@@ -26,6 +26,18 @@ html {
   color-scheme: light;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Stay clickable/editable/selectable — opt out of window-drag. */
 button,
 input,
@@ -1496,6 +1508,184 @@ textarea {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* =====================================================
+   Image preview lightbox (full-screen zoom overlay)
+   ===================================================== */
+.image-preview-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  color: #ffffff;
+  background: rgba(9, 9, 11, 0.82);
+  backdrop-filter: blur(2px);
+}
+
+.image-preview-lightbox-toolbar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .image-preview-lightbox-toolbar {
+    top: 16px;
+    right: 16px;
+  }
+}
+
+.image-preview-lightbox-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #3f3f46;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.image-preview-lightbox-btn:hover:not(:disabled) {
+  background: #fafafa;
+  color: #09090b;
+}
+
+.image-preview-lightbox-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.image-preview-lightbox-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+[data-theme='dark'] .image-preview-lightbox-btn {
+  background: #f4f4f5;
+  color: #27272a;
+}
+
+.image-preview-lightbox-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 80px 16px;
+}
+
+@media (min-width: 640px) {
+  .image-preview-lightbox-stage {
+    padding: 80px 32px;
+  }
+}
+
+.image-preview-lightbox-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: min(1120px, calc(100vw - 32px));
+  max-height: calc(100dvh - 128px);
+  padding: 8px;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 250, 242, 0.96);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+}
+
+@media (min-width: 640px) {
+  .image-preview-lightbox-frame {
+    max-height: calc(100dvh - 144px);
+  }
+}
+
+[data-theme='dark'] .image-preview-lightbox-frame {
+  background: rgba(9, 9, 11, 0.88);
+}
+
+.image-preview-lightbox-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-preview-lightbox-image.is-zoomed {
+  max-width: none;
+  object-fit: contain;
+}
+
+.image-preview-lightbox-zoom {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #3f3f46;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+  transform: translateX(-50%);
+}
+
+[data-theme='dark'] .image-preview-lightbox-zoom {
+  background: #f4f4f5;
+  color: #27272a;
+}
+
+.image-preview-lightbox-zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.image-preview-lightbox-zoom-btn:hover:not(:disabled) {
+  background: #f4f4f4;
+}
+
+.image-preview-lightbox-zoom-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.image-preview-lightbox-zoom-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.image-preview-lightbox-zoom-label {
+  min-width: 64px;
+  height: 40px;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.image-preview-lightbox-zoom-label:hover {
+  background: #f4f4f4;
 }
 
 .composer-footer {
