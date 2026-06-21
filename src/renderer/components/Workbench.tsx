@@ -1,10 +1,9 @@
 // Workbench orchestrator echoing Kun's Workbench
 // (../Kun/src/renderer/src/components/Workbench.tsx).
 // Visual only: composes Sidebar, SessionHeader, WorkbenchTopBar, MessageTimeline,
-// Composer, right panels, terminal drawer, and side conversation overlay.
+// FloatingComposer, right panels, terminal drawer, and side conversation overlay.
 
 import { useMemo, useState, type ReactElement } from 'react'
-import { ChevronDown } from 'lucide-react'
 import { Sidebar } from './Sidebar'
 import { SidebarTitlebarToggleButton } from './SidebarPrimitives'
 import {
@@ -22,16 +21,11 @@ import {
   type MessageTimelinePreviewMode,
 } from './MessageTimeline'
 import { RuntimeBanner, RUNTIME_BANNER_PREVIEW } from './RuntimeBanner'
-import { Composer } from './Composer'
 import {
-  FloatingComposerExecutionPicker,
-  EXECUTION_PICKER_PREVIEW,
-} from './FloatingComposerExecutionPicker'
-import { GitBranchPicker, GIT_BRANCH_PICKER_PREVIEW } from './GitBranchPicker'
-import {
-  WorkspaceProjectPicker,
-  WORKSPACE_PROJECT_PICKER_PREVIEW,
-} from './WorkspaceProjectPicker'
+  FloatingComposer,
+  resolveFloatingComposerSnapshot,
+  type FloatingComposerPreviewMode,
+} from './FloatingComposer'
 import {
   TodoPanel,
   TODO_PANEL_PREVIEW_ITEMS,
@@ -230,51 +224,30 @@ function resolveWorkbenchLayout(mode: WorkbenchPreviewMode): WorkbenchLayoutSnap
   }
 }
 
-function WorkbenchComposerFooter(): ReactElement {
-  return (
-    <div className="workbench-composer-footer">
-      <WorkspaceProjectPicker snapshot={WORKSPACE_PROJECT_PICKER_PREVIEW} />
-      <GitBranchPicker snapshot={GIT_BRANCH_PICKER_PREVIEW} />
-    </div>
-  )
-}
-
-function WorkbenchModelChip(): ReactElement {
-  return (
-    <button type="button" className="model-chip" aria-label="Model">
-      Claude Sonnet 4
-      <span className="model-chip-reasoning">medium</span>
-      <ChevronDown aria-hidden="true" />
-    </button>
-  )
+function resolveWorkbenchComposerMode(
+  busy: boolean,
+  rightPanelMode: RightPanelMode,
+): FloatingComposerPreviewMode {
+  if (rightPanelMode === 'plan') return 'planMode'
+  if (busy) return 'busy'
+  return 'default'
 }
 
 function WorkbenchComposer({
   busy,
+  rightPanelMode,
 }: {
   busy: boolean
+  rightPanelMode: RightPanelMode
 }): ReactElement {
-  const [input, setInput] = useState('')
-  const [execution, setExecution] = useState(EXECUTION_PICKER_PREVIEW)
+  const snapshot = useMemo(
+    () => resolveFloatingComposerSnapshot(resolveWorkbenchComposerMode(busy, rightPanelMode)),
+    [busy, rightPanelMode],
+  )
 
   return (
-    <div className="ds-floating-composer workbench-composer-shell">
-      <Composer
-        value={input}
-        onChange={setInput}
-        onSend={() => undefined}
-        onCancel={() => undefined}
-        busy={busy}
-        placeholder="Send a message to Navi…"
-        modelChip={<WorkbenchModelChip />}
-        executionPicker={
-          <FloatingComposerExecutionPicker
-            value={execution}
-            onChange={(patch) => setExecution((current) => ({ ...current, ...patch }))}
-          />
-        }
-        footerLeft={<WorkbenchComposerFooter />}
-      />
+    <div className="workbench-composer-shell">
+      <FloatingComposer snapshot={snapshot} />
     </div>
   )
 }
@@ -456,7 +429,7 @@ export function Workbench({
                 </div>
 
                 <div className="workbench-composer-wrap">
-                  <WorkbenchComposer busy={snapshot.busy} />
+                  <WorkbenchComposer busy={snapshot.busy} rightPanelMode={rightPanelMode} />
                 </div>
               </div>
 
