@@ -353,6 +353,7 @@ function ProcessStackRows({
 }
 
 export function ProcessSectionRow({ section, expanded, onToggle }: Props): ReactElement {
+  const [userExpanded, setUserExpanded] = useState<boolean | null>(null)
   const [expandedEntryId, setExpandedEntryId] = useState<string | null>(() => {
     const preset = section.stackEntries?.find((entry) => entry.expanded)?.id
     return preset ?? null
@@ -364,16 +365,9 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
       : null
 
   if (singleExecutionEntry) {
-    const entrySnapshot = stackEntryToProcessEntry(singleExecutionEntry, {
-      ...section,
-      expanded: expanded ?? section.expanded,
-    })
+    const entrySnapshot = stackEntryToProcessEntry(singleExecutionEntry, section)
     return (
-      <ProcessEntryRow
-        entry={entrySnapshot}
-        expanded={expanded ?? section.expanded}
-        onToggle={onToggle}
-      />
+      <ProcessEntryRow entry={entrySnapshot} expanded={expanded} onToggle={onToggle} />
     )
   }
 
@@ -381,9 +375,28 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
     section.kind === 'reasoning'
       ? Boolean(section.reasoningText?.trim())
       : (section.stackEntries?.length ?? 0) > 0
+  const defaultExpanded =
+    section.hasError === true ||
+    (section.active === true && section.kind === 'reasoning') ||
+    (section.processing === true && section.active === true && section.kind === 'execution') ||
+    section.expanded === true
+  const forceExpanded = section.forceExpanded === true
+  const isControlled = expanded !== undefined
+  const isExpanded =
+    hasDetails &&
+    (forceExpanded || (isControlled ? expanded : (userExpanded ?? defaultExpanded)))
   const canToggleSection =
-    section.collapsible !== false && hasDetails && section.forceExpanded !== true
-  const isExpanded = section.expanded === true
+    section.collapsible !== false && hasDetails && !forceExpanded
+
+  const handleSectionToggle = (): void => {
+    if (!canToggleSection || forceExpanded) return
+    if (onToggle) {
+      onToggle()
+      return
+    }
+    if (isControlled) return
+    setUserExpanded(!(userExpanded ?? defaultExpanded))
+  }
   const showActiveError = section.showActiveError === true
   const titleClass = section.hasError ? 'is-error' : ''
   const titleShimmer = section.active && !section.hasError ? 'ds-shiny-text' : ''
@@ -413,7 +426,7 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
           type="button"
           aria-expanded={isExpanded}
           className={`process-section-row-toggle ${titleClass}`}
-          onClick={onToggle}
+          onClick={handleSectionToggle}
         >
           {header}
         </button>
