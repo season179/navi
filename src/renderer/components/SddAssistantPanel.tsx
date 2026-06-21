@@ -7,12 +7,10 @@ import {
   useEffect,
   useMemo,
   useState,
-  type KeyboardEvent as ReactKeyboardEvent,
   type ReactElement,
 } from 'react'
 import {
   AlertTriangle,
-  ArrowUp,
   FileQuestion,
   FileText,
   FlaskConical,
@@ -29,11 +27,18 @@ import {
   SlidersHorizontal,
   Sparkles,
   SpellCheck,
-  Square,
   Users,
   type LucideIcon,
 } from 'lucide-react'
-import { Markdown } from './Markdown'
+import { Composer } from './Composer'
+import {
+  COMPOSER_MODEL_PICKER_GROUPS_PREVIEW,
+  COMPOSER_MODEL_PICKER_PREVIEW,
+  FloatingComposerModelPicker,
+  type ComposerModelPickerSettings,
+} from './FloatingComposerModelPicker'
+import { MessageTimeline } from './MessageTimeline'
+import { type MessageTurnSnapshot } from './MessageTurn'
 import { SidebarTitlebarToggleButton } from './SidebarPrimitives'
 
 type SddWorkflowStage = 'discover' | 'structure' | 'risk'
@@ -233,6 +238,8 @@ function SddAssistantCompactComposer({
   onInterrupt,
   busy = false,
   disabled = false,
+  modelPicker,
+  onModelPickerChange,
 }: {
   value: string
   onChange: (value: string) => void
@@ -240,82 +247,117 @@ function SddAssistantCompactComposer({
   onInterrupt: () => void
   busy?: boolean
   disabled?: boolean
+  modelPicker: ComposerModelPickerSettings
+  onModelPickerChange: (patch: Partial<ComposerModelPickerSettings>) => void
 }): ReactElement {
-  const sendDisabled = disabled || (!busy && value.trim().length === 0)
+  return (
+    <Composer
+      variant="compact"
+      value={value}
+      onChange={onChange}
+      onSend={onSend}
+      onCancel={onInterrupt}
+      busy={busy}
+      disabled={disabled}
+      placeholder={COPY.sddAssistantComposerPlaceholder}
+      modelChip={
+        <FloatingComposerModelPicker
+          compact
+          stretch
+          value={modelPicker}
+          groups={COMPOSER_MODEL_PICKER_GROUPS_PREVIEW}
+          disabled={disabled}
+          onChange={onModelPickerChange}
+        />
+      }
+    />
+  )
+}
 
-  const handleKeyDown = (event: ReactKeyboardEvent<HTMLTextAreaElement>): void => {
-    if (event.key !== 'Enter' || event.shiftKey || event.metaKey || event.ctrlKey) return
-    event.preventDefault()
-    if (busy) {
-      onInterrupt()
-      return
+function sddAssistantBlocksToTurns(
+  blocks: SddAssistantTimelineBlock[],
+  options?: { busy?: boolean; liveAssistant?: string },
+): MessageTurnSnapshot[] {
+  const turns: MessageTurnSnapshot[] = []
+
+  for (const block of blocks) {
+    if (block.kind === 'user') {
+      turns.push({
+        key: block.id,
+        user: {
+          kind: 'user',
+          id: block.id,
+          text: block.text,
+          canEdit: false,
+          route: 'write',
+        },
+        assistantBlocks: [],
+      })
+      continue
     }
-    if (!sendDisabled) onSend()
+
+    if (turns.length === 0) {
+      turns.push({
+        key: block.id,
+        assistantBlocks: [{ kind: 'assistant', id: block.id, text: block.text }],
+      })
+      continue
+    }
+
+    const last = turns[turns.length - 1]
+    turns[turns.length - 1] = {
+      ...last,
+      assistantBlocks: [
+        ...(last.assistantBlocks ?? []),
+        { kind: 'assistant', id: block.id, text: block.text },
+      ],
+    }
   }
 
-  return (
-    <div className="sdd-assistant-composer-shell">
-      <textarea
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        onKeyDown={handleKeyDown}
-        disabled={disabled}
-        rows={1}
-        placeholder={COPY.sddAssistantComposerPlaceholder}
-        className="sdd-assistant-composer-input"
-      />
-      <div className="sdd-assistant-composer-toolbar">
-        <div className="sdd-assistant-composer-toolbar-left">
-          <button type="button" className="sdd-assistant-composer-plus" aria-label="Add">
-            <Plus strokeWidth={2} />
-          </button>
-          <button type="button" className="sdd-assistant-composer-model" aria-label="Model">
-            <span className="sdd-assistant-composer-model-label">claude-sonnet-4</span>
-          </button>
-        </div>
-        <div className="sdd-assistant-composer-toolbar-right">
-          <button
-            type="button"
-            className={`sdd-assistant-composer-send${busy ? ' is-stop' : ''}`}
-            disabled={sendDisabled && !busy}
-            onClick={busy ? onInterrupt : onSend}
-            aria-label={busy ? 'Stop' : 'Send'}
-            title={busy ? 'Stop' : 'Send'}
-          >
-            {busy ? <Square strokeWidth={2.4} /> : <ArrowUp strokeWidth={2.2} />}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
+  const busy = options?.busy === true
+  const liveText = options?.liveAssistant?.trim() ?? ''
+  if (turns.length === 0) return turns
+
+  const lastIndex = turns.length - 1
+  const last = turns[lastIndex]
+  turns[lastIndex] = {
+    ...last,
+    processing: busy,
+    liveAssistant: liveText
+      ? {
+          kind: 'assistant',
+          id: 'live-assistant',
+          text: liveText,
+          streaming: true,
+        }
+      : undefined,
+    showLiveProgress: busy && !liveText,
+  }
+
+  return turns
 }
 
 function SddAssistantTimeline({
   blocks,
   liveAssistant,
+  busy = false,
 }: {
   blocks: SddAssistantTimelineBlock[]
   liveAssistant?: string
+  busy?: boolean
 }): ReactElement {
+  const turns = useMemo(
+    () => sddAssistantBlocksToTurns(blocks, { busy, liveAssistant }),
+    [blocks, busy, liveAssistant],
+  )
+
   return (
-    <div className="sdd-assistant-timeline ds-chat-column-inset">
-      {blocks.map((block) =>
-        block.kind === 'user' ? (
-          <div key={block.id} className="ds-user-message">
-            <div className="ds-user-message-bubble">{block.text}</div>
-          </div>
-        ) : (
-          <div key={block.id} className="ds-chat-answer">
-            <Markdown text={block.text} streaming={false} />
-          </div>
-        ),
-      )}
-      {liveAssistant?.trim() ? (
-        <div className="ds-chat-answer">
-          <span>{liveAssistant}</span>
-        </div>
-      ) : null}
-    </div>
+    <MessageTimeline
+      hasContent
+      activeThreadId="sdd-assistant"
+      turns={turns}
+      compactCards
+    />
   )
 }
 
@@ -402,6 +444,14 @@ export function SddAssistantPanel({
     blocks.length > 0 ||
     Boolean(liveAssistant?.trim())
 
+  const [modelPicker, setModelPicker] = useState<ComposerModelPickerSettings>(
+    COMPOSER_MODEL_PICKER_PREVIEW,
+  )
+
+  const handleModelPickerChange = useCallback((patch: Partial<ComposerModelPickerSettings>) => {
+    setModelPicker((current) => ({ ...current, ...patch }))
+  }, [])
+
   return (
     <aside
       className={`sdd-assistant-panel ds-no-drag${busy ? ' is-busy' : ''} ${className}`.trim()}
@@ -438,7 +488,7 @@ export function SddAssistantPanel({
 
       <div className="sdd-assistant-body">
         {showTimeline ? (
-          <SddAssistantTimeline blocks={blocks} liveAssistant={liveAssistant} />
+          <SddAssistantTimeline blocks={blocks} liveAssistant={liveAssistant} busy={busy} />
         ) : (
           <SddAssistantEmptyBody onApplyFramework={onApplyFramework} />
         )}
@@ -452,6 +502,8 @@ export function SddAssistantPanel({
           onInterrupt={() => onInterrupt?.()}
           busy={busy}
           disabled={!canCreateConversation && !busy}
+          modelPicker={modelPicker}
+          onModelPickerChange={handleModelPickerChange}
         />
       </div>
     </aside>

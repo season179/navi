@@ -8881,6 +8881,15 @@ a.runtime-meta-chip:hover {
   background: transparent;
 }
 
+.sdd-assistant-body .message-timeline {
+  min-height: 100%;
+}
+
+.sdd-assistant-body .message-timeline-content.ds-chat-column-inset {
+  max-width: none;
+  padding: 1.25rem clamp(1.45rem, 4.2vw, 2.35rem) 1.35rem;
+}
+
 .sdd-assistant-timeline {
   animation: sdd-soft-enter 180ms ease-out;
 }
@@ -9069,6 +9078,7 @@ a.runtime-meta-chip:hover {
 }
 
 .sdd-assistant-composer {
+  flex-shrink: 0;
   border-top: 1px solid var(--ds-border-muted);
   background: rgba(255, 255, 255, 0.92);
   padding: 0.75rem 1rem 1rem;
