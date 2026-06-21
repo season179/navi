@@ -118,12 +118,26 @@ export function writeMarkdownInlineCompletionPreviewExtensions(
 
 export function resolveWriteMarkdownEditorPreviewMode(
   value: string | null,
-): 'default' | 'source' | 'readonly' | 'diffReview' | 'inlineCompletion' | 'inlineEdit' {
+):
+  | 'default'
+  | 'source'
+  | 'readonly'
+  | 'diffReview'
+  | 'inlineCompletion'
+  | 'inlineEdit'
+  | 'infographic'
+  | 'htmlEmbed'
+  | 'imageError'
+  | 'loadedImage' {
   if (value === 'source') return 'source'
   if (value === 'readonly') return 'readonly'
   if (value === 'diffReview') return 'diffReview'
   if (value === 'inlineCompletion') return 'inlineCompletion'
   if (value === 'inlineEdit') return 'inlineEdit'
+  if (value === 'infographic') return 'infographic'
+  if (value === 'htmlEmbed') return 'htmlEmbed'
+  if (value === 'imageError') return 'imageError'
+  if (value === 'loadedImage') return 'loadedImage'
   return 'default'
 }
 

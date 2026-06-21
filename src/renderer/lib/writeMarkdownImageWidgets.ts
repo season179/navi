@@ -261,3 +261,41 @@ function example() {
   return 'no markdown parsing'
 }
 `
+
+export type WriteMarkdownEditorImageWidgetPreviewMode =
+  | 'infographic'
+  | 'htmlEmbed'
+  | 'imageError'
+  | 'loadedImage'
+
+/** Tiny inline SVG used for loaded-image live-preview editor mode. */
+export const WRITE_MARKDOWN_EDITOR_PREVIEW_IMAGE_DATA_URL =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360' viewBox='0 0 640 360'%3E%3Crect width='640' height='360' fill='%23e8edf4'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2364748b' font-family='system-ui' font-size='20'%3EPreview image%3C/text%3E%3C/svg%3E"
+
+const WRITE_MARKDOWN_EDITOR_LOADED_IMAGE_SAMPLE = `# Launch plan draft
+
+This section shows a resolved workspace image inside CodeMirror live preview.
+
+![Hero screenshot](${WRITE_MARKDOWN_EDITOR_PREVIEW_IMAGE_DATA_URL})
+`
+
+export function isWriteMarkdownEditorImageWidgetMode(
+  value: string | null | undefined,
+): value is WriteMarkdownEditorImageWidgetPreviewMode {
+  return (
+    value === 'infographic' ||
+    value === 'htmlEmbed' ||
+    value === 'imageError' ||
+    value === 'loadedImage'
+  )
+}
+
+/** Markdown sample for ?writeMarkdownEditor live-preview widget modes. */
+export function editorPreviewContentForImageWidgetMode(
+  mode: WriteMarkdownEditorImageWidgetPreviewMode,
+): string {
+  if (mode === 'infographic') return WRITE_MARKDOWN_PREVIEW_INFOGRAPHIC_SAMPLE
+  if (mode === 'htmlEmbed') return WRITE_MARKDOWN_PREVIEW_HTML_EMBED_SAMPLE
+  if (mode === 'imageError') return WRITE_MARKDOWN_PREVIEW_IMAGE_ERROR_SAMPLE
+  return WRITE_MARKDOWN_EDITOR_LOADED_IMAGE_SAMPLE
+}

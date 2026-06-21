@@ -26,6 +26,10 @@ import {
   writeMarkdownInlineCompletionPreviewExtensions,
   type WriteMarkdownInlineCompletionPreviewMode,
 } from '../lib/writeMarkdownInlineCompletionPreview'
+import {
+  editorPreviewContentForImageWidgetMode,
+  isWriteMarkdownEditorImageWidgetMode,
+} from '../lib/writeMarkdownImageWidgets'
 import { writeMarkdownLivePreviewExtensions } from '../lib/writeMarkdownLivePreview'
 import { WRITE_MARKDOWN_PREVIEW_SAMPLE } from './WriteMarkdownPreview'
 
@@ -42,6 +46,10 @@ export type WriteMarkdownEditorPreviewMode =
   | 'diffReview'
   | 'inlineCompletion'
   | 'inlineEdit'
+  | 'infographic'
+  | 'htmlEmbed'
+  | 'imageError'
+  | 'loadedImage'
 
 /** Sample document for ?writeMarkdownEditor preview hooks. */
 export const WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE = WRITE_MARKDOWN_PREVIEW_SAMPLE
@@ -321,16 +329,24 @@ type PreviewProps = {
   mode: WriteMarkdownEditorPreviewMode
 }
 
+function previewInitialContent(mode: WriteMarkdownEditorPreviewMode): string {
+  if (isWriteMarkdownEditorImageWidgetMode(mode)) {
+    return editorPreviewContentForImageWidgetMode(mode)
+  }
+  return WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE
+}
+
 /** Full-page preview shell for ?writeMarkdownEditor URL hooks. */
 export function WriteMarkdownEditorPreview({ mode }: PreviewProps): ReactElement {
-  const [value, setValue] = useState(WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE)
+  const [value, setValue] = useState(() => previewInitialContent(mode))
   const inlineCompletionPreview =
     mode === 'inlineCompletion' ? 'completion' : mode === 'inlineEdit' ? 'edit' : undefined
   const readOnly =
     mode === 'readonly' ||
     mode === 'diffReview' ||
     mode === 'inlineCompletion' ||
-    mode === 'inlineEdit'
+    mode === 'inlineEdit' ||
+    isWriteMarkdownEditorImageWidgetMode(mode)
 
   return (
     <div className="write-markdown-editor-preview">
