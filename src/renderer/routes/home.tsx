@@ -60,6 +60,11 @@ import {
   type ProcessSectionRowPreviewMode,
 } from '../components/ProcessSectionRow'
 import {
+  ProcessEntryRow,
+  PROCESS_ENTRY_ROW_PREVIEW,
+  type ProcessEntryRowPreviewMode,
+} from '../components/ProcessEntryRow'
+import {
   TurnChangeSummary,
   TURN_CHANGE_SUMMARY_PREVIEW,
   TURN_CHANGE_SUMMARY_PREVIEW_SINGLE,
@@ -326,6 +331,23 @@ function HomePage() {
     return 'reasoning'
   }, [])
   const [processSectionRowExpanded, setProcessSectionRowExpanded] = useState(false)
+
+  // Visual preview for the ported ProcessEntryRow
+  // (?processEntryRow=default|expanded|active|compaction|error|meta|assistant).
+  const processEntryRowPreviewMode = useMemo((): ProcessEntryRowPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('processEntryRow')) return null
+    const mode = params.get('processEntryRow')
+    if (mode === 'expanded') return 'expanded'
+    if (mode === 'active') return 'active'
+    if (mode === 'compaction') return 'compaction'
+    if (mode === 'error') return 'error'
+    if (mode === 'meta') return 'meta'
+    if (mode === 'assistant') return 'assistant'
+    return 'default'
+  }, [])
+  const [processEntryRowExpanded, setProcessEntryRowExpanded] = useState(false)
 
   // Visual preview for the ported TurnChangeSummary (?turnChangeSummary=1).
   const turnChangeSummaryPreviewMode = useMemo((): TurnChangeSummaryPreviewMode | null => {
@@ -808,6 +830,23 @@ function HomePage() {
                 : processSectionRowExpanded
             }
             onToggle={() => setProcessSectionRowExpanded((value) => !value)}
+          />
+        </div>
+      ) : null}
+
+      {processEntryRowPreviewMode ? (
+        <div className="process-entry-row-preview">
+          <ProcessEntryRow
+            entry={PROCESS_ENTRY_ROW_PREVIEW[processEntryRowPreviewMode]}
+            expanded={
+              processEntryRowPreviewMode === 'expanded' ||
+              processEntryRowPreviewMode === 'active' ||
+              processEntryRowPreviewMode === 'error' ||
+              processEntryRowPreviewMode === 'assistant'
+                ? true
+                : processEntryRowExpanded
+            }
+            onToggle={() => setProcessEntryRowExpanded((value) => !value)}
           />
         </div>
       ) : null}

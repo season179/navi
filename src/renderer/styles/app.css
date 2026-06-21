@@ -1882,6 +1882,152 @@ html[data-theme='dark'] .process-stack-entry-error-text {
 }
 
 /* =====================================================
+   Process entry row (Kun ProcessEntryRow)
+   ===================================================== */
+.process-entry-row {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.process-entry-row-header {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  padding: 4px 8px;
+  text-align: left;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ds-text-faint);
+  cursor: default;
+}
+
+button.process-entry-row-header {
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+button.process-entry-row-header:hover {
+  color: var(--ds-text);
+  background: color-mix(in srgb, var(--ds-hover) 70%, transparent);
+}
+
+.process-entry-row-header.is-error {
+  color: #dc2626;
+}
+
+html[data-theme='dark'] .process-entry-row-header.is-error {
+  color: #fca5a5;
+}
+
+.process-entry-row-compaction-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+.process-entry-row-summary {
+  min-width: 0;
+  flex: 1;
+}
+
+.process-entry-row-summary.is-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.process-entry-row-summary.is-wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.process-entry-row-verb {
+  font-weight: 500;
+}
+
+.process-entry-row-verb.is-muted {
+  color: var(--ds-text-muted);
+}
+
+.process-entry-row-rest {
+  margin-left: 6px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 13px;
+}
+
+.process-entry-row-toggle {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: default;
+  transition: background-color 0.15s ease;
+}
+
+.process-entry-row-toggle.is-clickable {
+  cursor: pointer;
+}
+
+.process-entry-row-toggle.is-clickable:hover {
+  background: color-mix(in srgb, var(--ds-hover) 70%, transparent);
+}
+
+.process-entry-row-chevron {
+  width: 12px;
+  height: 12px;
+  opacity: 0.45;
+}
+
+.process-entry-row-detail {
+  margin-top: 4px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ds-surface-subtle) 72%, transparent);
+  padding: 10px 14px;
+}
+
+.process-entry-row-detail.is-assistant {
+  margin-top: 4px;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.process-entry-row-assistant {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ds-text);
+}
+
+.runtime-meta-chips.is-process-entry {
+  margin-top: 4px;
+  margin-left: 28px;
+}
+
+.process-entry-row-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  width: min(calc(100% - 32px), 560px);
+  transform: translateX(-50%);
+  bottom: calc(var(--composer-height, 120px) + 24px);
+}
+
+/* =====================================================
    Turn change summary (Kun TurnChangeSummary)
    ===================================================== */
 .turn-change-summary {
