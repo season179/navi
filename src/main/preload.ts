@@ -33,6 +33,17 @@ const flue: FlueBridge = {
   saveConversation: (id, projectId, title, messages) =>
     ipcRenderer.invoke('conversations:save', id, projectId, title, messages),
   deleteConversation: (id) => ipcRenderer.invoke('conversations:delete', id),
+
+  // --- Agent skills ---
+  listSkills: (projectPath) => ipcRenderer.invoke('skills:list', projectPath),
+  getSkill: (source, name, projectPath) =>
+    ipcRenderer.invoke('skills:get', source, name, projectPath),
+  createGlobalSkill: (draft) => ipcRenderer.invoke('skills:createGlobal', draft),
+  updateGlobalSkill: (name, draft) => ipcRenderer.invoke('skills:updateGlobal', name, draft),
+  deleteGlobalSkill: (name) => ipcRenderer.invoke('skills:deleteGlobal', name),
+  setGlobalSkillEnabled: (name, enabled) =>
+    ipcRenderer.invoke('skills:setEnabled', name, enabled),
+  openSkillFile: (source, name) => ipcRenderer.invoke('skills:openFile', source, name),
 }
 
 contextBridge.exposeInMainWorld('navi', {

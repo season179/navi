@@ -22,6 +22,13 @@ interface StoredSettings {
   providerKeys?: Record<string, string>
   /** Model applied to new conversations. */
   defaultSelection?: DefaultSelection
+  /**
+   * Names of user-global skills (under userData/skills/) that are currently
+   * enabled. Absent ⇒ all existing globals are enabled (the default; mirrors how
+   * a fresh install treats built-in skills as on). A name present on disk but
+   * absent here is disabled. Plan §D3-C / §D6.
+   */
+  enabledGlobalSkills?: string[]
   // --- legacy single-provider fields, migrated on first read (then dropped) ---
   apiKeyEnc?: string
   baseUrl?: string
@@ -186,6 +193,51 @@ export function setDefaultSelection(sel: DefaultSelection): Promise<void> {
   return enqueue(async () => {
     const s = await readRaw()
     await writeRaw({ ...s, defaultSelection: sel })
+  })
+}
+
+// --- Global skills enable list ---------------------------------------------
+//
+// Global skills (plan §D3-C) live as SKILL.md files under userData/skills/; the
+// files are the source of truth for "what exists", and this list is the source
+// of truth for "which are active". Absent list ⇒ all enabled (so a brand-new
+// global skill the user just created is on by default, matching how built-ins
+// behave). This keeps the enable state out of the skill files themselves (which
+// must stay spec-pure and portable) and in the app-owned settings file.
+
+export async function getEnabledGlobalSkills(): Promise<string[] | undefined> {
+  const { enabledGlobalSkills } = await readRaw()
+  return enabledGlobalSkills
+}
+
+export function setEnabledGlobalSkills(names: string[]): Promise<void> {
+  return enqueue(async () => {
+    const s = await readRaw()
+    await writeRaw({ ...s, enabledGlobalSkills: names })
+  })
+}
+
+/**
+ * Add a name to the enabled set (no-op if already present). Used by the create
+ * path so a brand-new skill honors the documented default-on even AFTER the
+ * enable list has been materialized by a prior toggle: `resolveEnabled` reads an
+ * absent list as "all on", but a *present* list is an explicit opt-in set, so a
+ * newly-written skill whose name isn't in it would otherwise read as disabled
+ * and never load.
+ *
+ * CRITICAL: when the stored list is ABSENT we must NOT materialize it. An absent
+ * list already means "all enabled" (so the new skill is on), and writing
+ * `[name]` would instead flip every other on-disk skill to disabled. Only touch
+ * the store when a list is already present (the case the default-on rule fails
+ * for). Atomic read-modify-write (shares the settings queue).
+ */
+export function ensureGlobalSkillEnabled(name: string): Promise<void> {
+  return enqueue(async () => {
+    const s = await readRaw()
+    if (s.enabledGlobalSkills === undefined) return // absent ⇒ all-on already; don't materialize
+    const set = new Set(s.enabledGlobalSkills)
+    set.add(name)
+    await writeRaw({ ...s, enabledGlobalSkills: [...set].sort() })
   })
 }
 

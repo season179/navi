@@ -11,19 +11,12 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { buildSync } from 'esbuild'
+import { bundleAgent } from './_helpers/bundle-agent.mjs'
 
 const require = createRequire(import.meta.url)
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-const outfile = join(ROOT, 'node_modules', '.agent-model-selection-test.cjs')
-buildSync({
-  entryPoints: [join(ROOT, '.flue', 'agents', 'navi-assistant.ts')],
-  bundle: true,
-  platform: 'node',
-  format: 'cjs',
-  outfile,
-})
+const outfile = await bundleAgent(ROOT, 'agent-model-selection-test')
 const agent = require(outfile).default
 
 function withStore(conversations, fn) {

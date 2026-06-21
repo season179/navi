@@ -232,4 +232,119 @@ export interface FlueBridge {
   ): Promise<void>
   /** Delete a stored conversation thread. */
   deleteConversation(id: string): Promise<void>
+
+  // --- Agent skills (plan §D3 / §D6) ---
+  /**
+   * List every available skill across all three sources, for the Skills panel
+   * and the composer picker. `projectPath` (the active conversation's project
+   * cwd, if any) scopes which project skills are surfaced — absent ⇒ no project
+   * skills (no-project chat). Built-in and global skills are always present.
+   */
+  listSkills(projectPath?: string): Promise<SkillSummary[]>
+  /**
+   * Load one skill's full detail (body + path). Null if missing/invalid.
+   * `projectPath` is required to resolve a project skill (it has no global
+   * location); built-in/global skills ignore it.
+   */
+  getSkill(source: SkillSource, name: string, projectPath?: string): Promise<SkillDetail | null>
+  /** Create a global skill (validates + persists). Rejects `navi-*` (§D7). */
+  createGlobalSkill(draft: SkillDraft): Promise<{ ok: boolean; error?: string }>
+  /** Update an existing global skill's description/body (name is fixed). */
+  updateGlobalSkill(
+    name: string,
+    draft: { description: string; body: string },
+  ): Promise<{ ok: boolean; error?: string }>
+  /** Delete a global skill directory. */
+  deleteGlobalSkill(name: string): Promise<{ ok: boolean; error?: string }>
+  /** Enable/disable a global skill (persisted; takes effect on next restart). */
+  setGlobalSkillEnabled(name: string, enabled: boolean): Promise<void>
+  /** Reveal a skill's SKILL.md in the OS file manager. */
+  openSkillFile(source: SkillSource, name: string): Promise<void>
 }
+
+// ---------------------------------------------------------------------------
+// Agent skills (plan §D3 / §D6)
+//
+// Three sources, each surfaced honestly in the UI:
+//   built-in — bundled navi-* skills, always on (every conversation).
+//   project  — auto-discovered under <project-cwd>/.agents/skills/ (project
+//              chats only; Flue does the discovery, navi just lists them).
+//   global   — userData/skills/<name>/, user-managed, toggleable, every
+//              conversation via the packagedSkills seam (§D5).
+// ---------------------------------------------------------------------------
+
+export type SkillSource = 'built-in' | 'project' | 'global'
+
+/** A skill as shown in lists (panel + composer picker). */
+export interface SkillSummary {
+  name: string
+  description: string
+  source: SkillSource
+  /**
+   * Whether the skill is active in the current context. Honest state (§D6):
+   *   built-in → always true (rebuild to remove; never a fake toggle);
+   *   project  → true only when a project is open (the only context it loads in);
+   *   global   → the persisted enable flag.
+   */
+  availableNow: boolean
+  /** Built-in/project skills are always-on; only global supports a real toggle. */
+  canToggle: boolean
+}
+
+/** A skill with its full SKILL.md body + filesystem path (detail view). */
+export interface SkillDetail extends SkillSummary {
+  /** SKILL.md body (after frontmatter). */
+  body: string
+  /** Absolute path to the directory, for "open file" (built-ins have none). */
+  dirPath?: string
+}
+
+/** Fields for creating/editing a global skill. */
+export interface SkillDraft {
+  name: string
+  description: string
+  body: string
+}
+
+/**
+ * The built-in navi-* skill catalog. Mirrors the imports in
+ * .flue/agents/navi-assistant.ts — keep these in sync when adding a built-in.
+ * The renderer reads this to render built-in cards without crossing into the
+ * agent bundle, and the IPC layer reads it to answer listSkills() for built-ins.
+ * Test (§7) asserts this set matches the agent's BUILT_IN_NAMES.
+ */
+export const BUILT_IN_SKILLS: readonly { name: string; description: string }[] = [
+  {
+    name: 'navi-release-notes',
+    description:
+      'Draft concise, user-facing release notes from a git diff or a list of commits.',
+  },
+  {
+    name: 'navi-commit-message',
+    description:
+      'Write a Conventional Commits message for staged or recent changes.',
+  },
+]
+
+/**
+ * One-click global-skill starters (plan §D6). Body is a spec-valid SKILL.md
+ * body; name + description seed the frontmatter. None use the reserved
+ * `navi-*` prefix. Curated to cover common personal-skill shapes.
+ */
+export const SKILL_STARTERS: readonly SkillDraft[] = [
+  {
+    name: 'summarize-thread',
+    description: 'Condense a long chat or document into a tight bulleted summary.',
+    body: `# Summarize\n\nProduce a summary a busy reader can act on.\n\n## Steps\n1. Read the full input once.\n2. Pull out the decisions, open questions, and action items.\n3. Drop restatements and filler.\n\n## Format\n- Lead with a one-sentence TL;DR.\n- Then bullets grouped as **Decisions**, **Actions** (with owners if known), **Open questions**.\n- One line per bullet. Skip empty groups.\n`,
+  },
+  {
+    name: 'explain-code',
+    description: 'Explain a code snippet clearly for someone unfamiliar with it.',
+    body: `# Explain code\n\nExplain code so a newcomer can follow.\n\n## Steps\n1. Say what the code does in one plain sentence first.\n2. Walk through the non-obvious parts in order of importance, not line order.\n3. Call out any trap, invariant, or implicit assumption.\n\n## Rules\n- No jargon without a one-line gloss.\n- Skip what the reader can already see. Explain the *why*, not the *what*.\n`,
+  },
+  {
+    name: 'meeting-notes',
+    description: 'Turn raw meeting notes or a transcript into clean, shareable notes.',
+    body: `# Meeting notes\n\nTurn rough notes into notes others can use.\n\n## Format\n\`\`\`\n# <topic> — <date>\n\nAttendees: …\n\n## Decisions\n- …\n\n## Action items\n- [ ] <task> — @owner\n\n## Discussion\n- …\n\`\`\`\n\n## Rules\n- Decisions are past-tense, final.\n- Every action item has an owner; if unknown, mark \`@unassigned\`.\n- Discussion is compressed to the points that explain the decisions.\n`,
+  },
+]

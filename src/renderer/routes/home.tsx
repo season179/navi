@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
 import { TopBar } from '../components/TopBar'
@@ -7,7 +7,8 @@ import { Composer } from '../components/Composer'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
-import { hasUsableProvider } from '../../shared/flue'
+import { SkillsSettings } from '../components/skills/SkillsSettings'
+import { hasUsableProvider, type SkillSummary } from '../../shared/flue'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
 import { useSettings } from '../settings'
@@ -19,10 +20,15 @@ function statusLabel(ready: boolean, hasProvider: boolean, error?: string): stri
   return 'ready'
 }
 
+// Which settings sub-panel is shown while the settings stage is open. Open/close
+// itself is owned by useSettings(); this only selects the tab.
+type SettingsTab = 'providers' | 'skills'
+
 function HomePage() {
   const { collapsed, toggle } = useSidebar()
   const { settingsOpen, openSettings, closeSettings, toggleSettings } = useSettings()
   const [draft, setDraft] = useState('')
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>('providers')
   const { messages, status, busy, send, cancel, activeSelection, pickModel, pickReasoning } =
     useNaviThread()
   const {
@@ -32,11 +38,38 @@ function HomePage() {
     removeProvider,
     probeProvider,
     setDefaultSelection,
+    projects,
+    currentProjectId,
   } = useNaviList()
 
   const empty = messages.length === 0
   const hasProvider = hasUsableProvider(status, providerProfiles)
   const composerDisabled = !status.ready || !hasProvider
+
+  // The active project's cwd, for scoping project skills in the Skills panel.
+  // A no-project chat (navi-default) has no path → project skills aren't listed.
+  const projectPath = useMemo(() => {
+    const proj = projects.find((p) => p.id === currentProjectId)
+    return proj?.path || undefined
+  }, [projects, currentProjectId])
+
+  // Available skills for the composer `/skill` picker, scoped to the active
+  // project. Reloaded when the project changes or when the settings stage
+  // toggles (a create/enable/disable in the Skills tab may have changed the set).
+  const [skills, setSkills] = useState<SkillSummary[]>([])
+  const refreshSkills = useCallback(() => {
+    void window.navi.flue.listSkills(projectPath).then(setSkills)
+  }, [projectPath])
+  useEffect(() => {
+    refreshSkills()
+  }, [refreshSkills, settingsOpen])
+
+  // Open the settings stage on a specific tab. The provider entry points always
+  // want the Providers tab, regardless of the last-selected one.
+  const openSettingsTab = (tab: SettingsTab) => {
+    setSettingsTab(tab)
+    openSettings()
+  }
 
   const handleSend = () => {
     const text = draft
@@ -58,17 +91,35 @@ function HomePage() {
       {settingsOpen ? (
         <div className="stage-scroll">
           <div className="providers-wrap">
-            <ProvidersSettings
-              providers={providerProfiles}
-              statuses={status.providers}
-              ready={status.ready}
-              defaultSelection={defaultSelection}
-              onUpsert={upsertProvider}
-              onDelete={removeProvider}
-              onSetDefault={setDefaultSelection}
-              onProbe={probeProvider}
-              onClose={closeSettings}
-            />
+            <div className="settings-tabs">
+              <button
+                className={settingsTab === 'providers' ? 'settings-tab is-active' : 'settings-tab'}
+                onClick={() => setSettingsTab('providers')}
+              >
+                Providers
+              </button>
+              <button
+                className={settingsTab === 'skills' ? 'settings-tab is-active' : 'settings-tab'}
+                onClick={() => setSettingsTab('skills')}
+              >
+                Skills
+              </button>
+            </div>
+            {settingsTab === 'providers' ? (
+              <ProvidersSettings
+                providers={providerProfiles}
+                statuses={status.providers}
+                ready={status.ready}
+                defaultSelection={defaultSelection}
+                onUpsert={upsertProvider}
+                onDelete={removeProvider}
+                onSetDefault={setDefaultSelection}
+                onProbe={probeProvider}
+                onClose={closeSettings}
+              />
+            ) : (
+              <SkillsSettings projectPath={projectPath} onClose={closeSettings} />
+            )}
           </div>
         </div>
       ) : empty ? (
@@ -80,7 +131,10 @@ function HomePage() {
               Navi is your local-first companion. Start a conversation below.
             </p>
             {!hasProvider ? (
-              <button className="btn btn-primary connect-provider" onClick={openSettings}>
+              <button
+                className="btn btn-primary connect-provider"
+                onClick={() => openSettingsTab('providers')}
+              >
                 Connect a provider
               </button>
             ) : null}
@@ -104,6 +158,7 @@ function HomePage() {
               ? 'Connecting to Navi…'
               : 'Send a message to Navi…'
         }
+        skills={skills}
         modelChip={
           <FloatingModelPicker
             providers={providerProfiles}
@@ -111,7 +166,7 @@ function HomePage() {
             active={activeSelection}
             onPickModel={pickModel}
             onPickReasoning={pickReasoning}
-            onConfigure={openSettings}
+            onConfigure={() => openSettingsTab('providers')}
           />
         }
       />
