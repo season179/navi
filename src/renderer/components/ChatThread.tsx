@@ -13,6 +13,10 @@ import {
 } from './TimelinePaginationControls'
 import { CompactionDivider, type CompactionDividerSnapshot } from './CompactionDivider'
 import { ThreadForkBanner, ThreadForkPoint } from './ThreadForkBanner'
+import {
+  TurnChangeSummary,
+  type TurnChangeSnapshot,
+} from './TurnChangeSummary'
 
 const TURN_PAGE_SIZE = 18
 const AUTO_COLLAPSE_THRESHOLD = 24
@@ -101,6 +105,11 @@ type ChatThreadProps = {
   /** When set with compactionBlock, renders Kun's compaction divider at this turn. */
   compactionAtTurnIndex?: number
   compactionBlock?: CompactionDividerSnapshot
+  /** When set with turnChanges, renders Kun's turn change summary at this turn. */
+  changesAtTurnIndex?: number
+  turnChanges?: TurnChangeSnapshot[]
+  turnChangesCompact?: boolean
+  turnChangesDefaultExpanded?: boolean
 }
 
 export function ChatThread({
@@ -110,6 +119,10 @@ export function ChatThread({
   forkBoundaryTurnIndex,
   compactionAtTurnIndex,
   compactionBlock,
+  changesAtTurnIndex,
+  turnChanges,
+  turnChangesCompact = false,
+  turnChangesDefaultExpanded = false,
 }: ChatThreadProps): ReactElement {
   const bottomRef = useRef<HTMLDivElement>(null)
   const turnRefMap = useRef(new Map<string, HTMLDivElement>())
@@ -198,6 +211,11 @@ export function ChatThread({
             compactionBlock != null &&
             typeof compactionAtTurnIndex === 'number' &&
             compactionAtTurnIndex === absoluteTurnIndex
+          const showTurnChanges =
+            turnChanges != null &&
+            turnChanges.length > 0 &&
+            typeof changesAtTurnIndex === 'number' &&
+            changesAtTurnIndex === absoluteTurnIndex
 
           return (
             <div
@@ -227,6 +245,13 @@ export function ChatThread({
                     </div>
                   )
                 })}
+                {showTurnChanges ? (
+                  <TurnChangeSummary
+                    changes={turnChanges}
+                    compact={turnChangesCompact}
+                    defaultExpanded={turnChangesDefaultExpanded}
+                  />
+                ) : null}
                 {showCompaction ? <CompactionDivider block={compactionBlock} /> : null}
               </div>
             </div>

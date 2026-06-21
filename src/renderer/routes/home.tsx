@@ -2703,6 +2703,46 @@ function HomePage() {
     }
   }, [])
 
+  // Production ChatThread turn change summary via ?productionTurnChangeSummary=…
+  const productionChatTurnChanges = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {
+        changesAtTurnIndex: undefined,
+        turnChanges: undefined,
+        turnChangesCompact: false,
+        turnChangesDefaultExpanded: false,
+      }
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionTurnChangeSummary')) {
+      return {
+        changesAtTurnIndex: undefined,
+        turnChanges: undefined,
+        turnChangesCompact: false,
+        turnChangesDefaultExpanded: false,
+      }
+    }
+    const mode = params.get('productionTurnChangeSummary')
+    const previewMode: TurnChangeSummaryPreviewMode =
+      mode === 'compact'
+        ? 'compact'
+        : mode === 'single'
+          ? 'single'
+          : 'default'
+    const turnParam = params.get('productionTurnChangeTurnIndex')
+    const parsedTurnIndex = turnParam ? Number.parseInt(turnParam, 10) : 0
+    const changesAtTurnIndex = Number.isFinite(parsedTurnIndex) ? parsedTurnIndex : 0
+    return {
+      changesAtTurnIndex,
+      turnChanges:
+        previewMode === 'single'
+          ? TURN_CHANGE_SUMMARY_PREVIEW_SINGLE
+          : TURN_CHANGE_SUMMARY_PREVIEW,
+      turnChangesCompact: previewMode === 'compact',
+      turnChangesDefaultExpanded: mode === 'expanded',
+    }
+  }, [])
+
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
   // toggles (a create/enable/disable in the Skills tab may have changed the set).
@@ -3337,6 +3377,10 @@ function HomePage() {
         forkBoundaryTurnIndex={productionChatFork.forkBoundaryTurnIndex}
         compactionAtTurnIndex={productionChatCompaction.compactionAtTurnIndex}
         compactionBlock={productionChatCompaction.compactionBlock}
+        changesAtTurnIndex={productionChatTurnChanges.changesAtTurnIndex}
+        turnChanges={productionChatTurnChanges.turnChanges}
+        turnChangesCompact={productionChatTurnChanges.turnChangesCompact}
+        turnChangesDefaultExpanded={productionChatTurnChanges.turnChangesDefaultExpanded}
       />
     </>
   )
