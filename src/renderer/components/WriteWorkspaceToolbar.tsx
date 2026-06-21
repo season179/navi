@@ -111,7 +111,7 @@ function formatSaveLabel(status: WriteSaveStatus): string {
   return COPY.writeSaved
 }
 
-function buildModeMenuItems(previewMode: WritePreviewMode): WriteModeMenuItem[] {
+export function buildModeMenuItems(previewMode: WritePreviewMode): WriteModeMenuItem[] {
   const richModeActive = previewMode === 'rich'
   const sourceModeActive = previewMode === 'source'
   return [

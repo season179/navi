@@ -353,6 +353,10 @@ import {
   WriteWorkspaceDocumentPanePreview,
   type WriteWorkspaceDocumentPanePreviewMode,
 } from '../components/WriteWorkspaceDocumentPane'
+import {
+  WriteWorkspaceViewPreview,
+  type WriteWorkspaceViewPreviewMode,
+} from '../components/WriteWorkspaceView'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -915,6 +919,30 @@ function HomePage() {
       if (value === 'truncated') return 'truncated'
       return 'split'
     }, [])
+
+  // Visual preview for the ported WriteWorkspaceView
+  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|preview|pdf|image|inlineAgent|error|exportSuccess|exportError|dirty|saving).
+  const writeWorkspaceViewPreviewMode = useMemo((): WriteWorkspaceViewPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writeWorkspaceView')) return null
+    const value = params.get('writeWorkspaceView')
+    if (value === 'empty') return 'empty'
+    if (value === 'emptyError') return 'emptyError'
+    if (value === 'start') return 'start'
+    if (value === 'live') return 'live'
+    if (value === 'source') return 'source'
+    if (value === 'preview') return 'preview'
+    if (value === 'pdf') return 'pdf'
+    if (value === 'image') return 'image'
+    if (value === 'inlineAgent') return 'inlineAgent'
+    if (value === 'error') return 'error'
+    if (value === 'exportSuccess') return 'exportSuccess'
+    if (value === 'exportError') return 'exportError'
+    if (value === 'dirty') return 'dirty'
+    if (value === 'saving') return 'saving'
+    return 'split'
+  }, [])
 
   // Visual preview for the ported InitialSessionUsageHeatmap
   // (?initialSessionUsageHeatmap=populated|loading|empty|error|collapsed|models).
@@ -1821,6 +1849,10 @@ function HomePage() {
 
   if (writePdfViewerPreviewMode) {
     return <WritePdfViewerPreview mode={writePdfViewerPreviewMode} />
+  }
+
+  if (writeWorkspaceViewPreviewMode) {
+    return <WriteWorkspaceViewPreview mode={writeWorkspaceViewPreviewMode} />
   }
 
   if (writeWorkspaceDocumentPanePreviewMode) {
