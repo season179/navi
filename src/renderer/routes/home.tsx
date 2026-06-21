@@ -189,6 +189,11 @@ import {
   type ChatFileTreePreviewMode,
 } from '../components/ChatFileTreePanel'
 import {
+  TerminalPanel,
+  TERMINAL_PANEL_PREVIEW_TABS,
+  type TerminalPreviewMode,
+} from '../components/TerminalPanel'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -911,6 +916,46 @@ function HomePage() {
     }
   }, [chatFileTreePanelPreviewMode])
 
+  // Visual preview for the ported TerminalPanel (?terminalPanelPreview=1|single|error|exited).
+  const terminalPanelPreviewMode = useMemo((): TerminalPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('terminalPanelPreview')) return null
+    const mode = params.get('terminalPanelPreview')
+    if (mode === 'single' || mode === 'error' || mode === 'exited') return mode
+    return 'default'
+  }, [])
+  const terminalPanelPreviewProps = useMemo(() => {
+    if (!terminalPanelPreviewMode) return null
+    if (terminalPanelPreviewMode === 'single') {
+      return {
+        tabs: TERMINAL_PANEL_PREVIEW_TABS.slice(0, 1),
+        error: null as string | null,
+        exited: false,
+      }
+    }
+    if (terminalPanelPreviewMode === 'error') {
+      return {
+        tabs: TERMINAL_PANEL_PREVIEW_TABS,
+        error: 'Could not spawn shell in workspace.',
+        exited: false,
+      }
+    }
+    if (terminalPanelPreviewMode === 'exited') {
+      return {
+        tabs: TERMINAL_PANEL_PREVIEW_TABS,
+        error: null as string | null,
+        exited: true,
+      }
+    }
+    return {
+      tabs: TERMINAL_PANEL_PREVIEW_TABS,
+      error: null as string | null,
+      exited: false,
+    }
+  }, [terminalPanelPreviewMode])
+  const [terminalPanelPreviewOpen, setTerminalPanelPreviewOpen] = useState(true)
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -1205,6 +1250,18 @@ function HomePage() {
             fill
             onPreviewFile={setChatFileTreePanelPreviewSelectedPath}
             onAddReference={() => undefined}
+          />
+        </div>
+      ) : null}
+
+      {terminalPanelPreviewMode && terminalPanelPreviewProps && terminalPanelPreviewOpen ? (
+        <div className="terminal-panel-preview-wrap">
+          <TerminalPanel
+            height={280}
+            tabs={terminalPanelPreviewProps.tabs}
+            error={terminalPanelPreviewProps.error}
+            exited={terminalPanelPreviewProps.exited}
+            onCollapse={() => setTerminalPanelPreviewOpen(false)}
           />
         </div>
       ) : null}
