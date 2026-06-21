@@ -25,6 +25,7 @@ export type WriteWorkspaceViewPreviewMode =
   | 'exportError'
   | 'dirty'
   | 'saving'
+  | 'review'
 
 export function resolveWriteWorkspaceViewPreviewMode(
   params: URLSearchParams,
@@ -54,6 +55,7 @@ export function resolveWriteWorkspaceViewPreviewMode(
   if (value === 'exportError') return 'exportError'
   if (value === 'dirty') return 'dirty'
   if (value === 'saving') return 'saving'
+  if (value === 'review') return 'review'
   return 'split'
 }
 
@@ -79,6 +81,7 @@ export const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceV
   'exportError',
   'dirty',
   'saving',
+  'review',
 ])
 
 export function resolveProductionWriteWorkspaceParam(

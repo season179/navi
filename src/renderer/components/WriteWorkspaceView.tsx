@@ -73,6 +73,7 @@ type WorkspaceSnapshot = {
   documentStatsLabel: string | null
   saveStatus: WriteSaveStatus
   readOnly: boolean
+  reviewActive: boolean
   showInlineAgent: boolean
   fileError: string | null
   exportNotice: WriteNotice | null
@@ -112,6 +113,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     | 'documentStatsLabel'
     | 'saveStatus'
     | 'readOnly'
+    | 'reviewActive'
     | 'showInlineAgent'
     | 'fileError'
     | 'exportNotice'
@@ -147,6 +149,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       documentStatsLabel: null,
       saveStatus: 'saved',
       readOnly: false,
+      reviewActive: false,
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
@@ -188,6 +191,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       documentStatsLabel: null,
       saveStatus: 'saved',
       readOnly: false,
+      reviewActive: false,
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
@@ -222,6 +226,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       documentStatsLabel: null,
       saveStatus: 'saved',
       readOnly: true,
+      reviewActive: false,
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
@@ -256,6 +261,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       documentStatsLabel: null,
       saveStatus: 'saved',
       readOnly: false,
+      reviewActive: false,
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
@@ -292,6 +298,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       documentStatsLabel: null,
       saveStatus: 'saved',
       readOnly: false,
+      reviewActive: false,
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
@@ -327,6 +334,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       documentStatsLabel: null,
       saveStatus: 'saved',
       readOnly: false,
+      reviewActive: false,
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
@@ -362,6 +370,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       documentStatsLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.documentStatsLabel,
       saveStatus: 'saved',
       readOnly: false,
+      reviewActive: false,
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
@@ -397,6 +406,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       documentStatsLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.documentStatsLabel,
       saveStatus: 'saved',
       readOnly: true,
+      reviewActive: false,
       showInlineAgent: false,
       fileError: null,
       exportNotice: null,
@@ -444,6 +454,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     documentStatsLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.documentStatsLabel,
     saveStatus: mode === 'dirty' ? 'dirty' : mode === 'saving' ? 'saving' : 'saved',
     readOnly: false,
+    reviewActive: mode === 'review',
     showInlineAgent: mode === 'inlineAgent',
     fileError: mode === 'error' ? 'Could not save the file. Check disk space and try again.' : null,
     exportNotice:
@@ -517,6 +528,7 @@ type ViewProps = {
   documentStatsLabel?: string | null
   saveStatus?: WriteSaveStatus
   readOnly?: boolean
+  reviewActive?: boolean
   showInlineAgent?: boolean
   fileError?: string | null
   exportNotice?: WriteNotice | null
@@ -558,6 +570,7 @@ export function WriteWorkspaceView({
   documentStatsLabel = WRITE_WORKSPACE_TOOLBAR_PREVIEW.documentStatsLabel,
   saveStatus = 'saved',
   readOnly = false,
+  reviewActive = false,
   showInlineAgent = false,
   fileError = null,
   exportNotice = null,
@@ -663,7 +676,7 @@ export function WriteWorkspaceView({
         previewMode={toolbarPreviewModeState}
         readOnly={readOnly}
         saveStatus={saveStatus}
-        reviewActive={false}
+        reviewActive={reviewActive}
         onToggleLeftSidebar={onToggleLeftSidebar}
         onToggleAssistant={() => setAssistantOpen((open) => !open)}
         onToggleExportMenu={() => setExportMenuOpen((open) => !open)}
@@ -824,6 +837,7 @@ export function WriteWorkspaceProductionView({
         documentStatsLabel={snapshot.documentStatsLabel}
         saveStatus={snapshot.saveStatus}
         readOnly={snapshot.readOnly}
+        reviewActive={snapshot.reviewActive}
         showInlineAgent={snapshot.showInlineAgent}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}
@@ -898,6 +912,7 @@ export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement 
         documentStatsLabel={snapshot.documentStatsLabel}
         saveStatus={snapshot.saveStatus}
         readOnly={snapshot.readOnly}
+        reviewActive={snapshot.reviewActive}
         showInlineAgent={snapshot.showInlineAgent}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}

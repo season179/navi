@@ -45,6 +45,7 @@ test('maps document-pane and toolbar snapshot modes', () => {
     'exportError',
     'dirty',
     'saving',
+    'review',
   ]) {
     assert.ok(PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES.has(mode), `expected ${mode} in snapshot modes`)
     assert.equal(

@@ -34,3 +34,10 @@ test('routes largeFile and truncated file-guard preview modes', () => {
     'truncated',
   )
 })
+
+test('routes review toolbar preview mode', () => {
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=review')),
+    'review',
+  )
+})
