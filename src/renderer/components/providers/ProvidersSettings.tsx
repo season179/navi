@@ -444,6 +444,7 @@ export function ProvidersSettings({
 
       {importIds !== null && form ? (
         <ProviderModelImportDialog
+          providerName={form.name.trim() || form.id}
           modelIds={importIds}
           existing={form.models}
           onConfirm={mergeImport}

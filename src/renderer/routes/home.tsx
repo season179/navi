@@ -475,6 +475,10 @@ import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
+import {
+  ProviderModelImportDialogPreview,
+  type ProviderModelImportDialogPreviewMode,
+} from '../components/providers/ProviderModelImportDialog'
 import { SkillsSettings } from '../components/skills/SkillsSettings'
 import { hasUsableProvider, type SkillSummary } from '../../shared/flue'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
@@ -1344,6 +1348,20 @@ function HomePage() {
     if (value === 'error') return 'error'
     return 'add'
   }, [])
+
+  // Visual preview for the ported ProviderModelImportDialog
+  // (?providerModelImportDialogPreview=1|empty|allExisting|chatOnly).
+  const providerModelImportDialogPreviewMode =
+    useMemo((): ProviderModelImportDialogPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('providerModelImportDialogPreview')) return null
+      const value = params.get('providerModelImportDialogPreview')
+      if (value === 'empty') return 'empty'
+      if (value === 'allExisting') return 'allExisting'
+      if (value === 'chatOnly') return 'chatOnly'
+      return 'default'
+    }, [])
 
   // Visual preview for the ported ScheduleDefaultsDialog
   // (?scheduleDefaultsDialogPreview=1|disabled|empty|singleProvider).
@@ -2600,6 +2618,10 @@ function HomePage() {
 
   if (scheduleTasksViewPreviewMode) {
     return <ScheduleTasksViewPreview mode={scheduleTasksViewPreviewMode} />
+  }
+
+  if (providerModelImportDialogPreviewMode) {
+    return <ProviderModelImportDialogPreview mode={providerModelImportDialogPreviewMode} />
   }
 
   if (scheduleDefaultsDialogPreviewMode) {
