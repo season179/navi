@@ -23,6 +23,12 @@ import {
   GIT_BRANCH_PICKER_PREVIEW_ERROR,
   type GitBranchesSnapshot,
 } from '../components/GitBranchPicker'
+import {
+  WorkspaceProjectPicker,
+  WORKSPACE_PROJECT_PICKER_PREVIEW,
+  WORKSPACE_PROJECT_PICKER_PREVIEW_EMPTY,
+  type WorkspaceProjectsSnapshot,
+} from '../components/WorkspaceProjectPicker'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -128,6 +134,27 @@ function HomePage() {
     if (gitBranchPickerPreviewMode === 'loading') return null
     return gitBranchPickerPreview
   }, [gitBranchPickerPreviewMode, gitBranchPickerPreview])
+
+  // Visual preview for the ported WorkspaceProjectPicker (?workspaceProjectPickerPreview=1).
+  const workspaceProjectPickerPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('workspaceProjectPickerPreview')) return null
+    const mode = params.get('workspaceProjectPickerPreview')
+    if (mode === 'empty') return 'empty'
+    if (mode === 'acting') return 'acting'
+    return 'default'
+  }, [])
+  const [workspaceProjectPickerPreview, setWorkspaceProjectPickerPreview] =
+    useState<WorkspaceProjectsSnapshot>(() => WORKSPACE_PROJECT_PICKER_PREVIEW)
+  const workspaceProjectPickerPreviewSnapshot = useMemo(() => {
+    if (!workspaceProjectPickerPreviewMode) return null
+    if (workspaceProjectPickerPreviewMode === 'empty') return WORKSPACE_PROJECT_PICKER_PREVIEW_EMPTY
+    return workspaceProjectPickerPreview
+  }, [workspaceProjectPickerPreviewMode, workspaceProjectPickerPreview])
+
+  const composerFooterPreview =
+    gitBranchPickerPreviewMode != null || workspaceProjectPickerPreviewMode != null
 
   // The active project's cwd, for scoping project skills in the Skills panel.
   // A no-project chat (navi-default) has no path → project skills aren't listed.
@@ -265,25 +292,42 @@ function HomePage() {
           ) : undefined
         }
         footerLeft={
-          gitBranchPickerPreviewMode ? (
-            <GitBranchPicker
-              snapshot={gitBranchPickerPreviewSnapshot}
-              loading={gitBranchPickerPreviewMode === 'loading'}
-              onSwitchBranch={(branch) => {
-                if (gitBranchPickerPreviewMode !== 'default') return
-                setGitBranchPickerPreview((current) => {
-                  if (!current.ok) return current
-                  return {
-                    ...current,
-                    currentBranch: branch,
-                    branches: current.branches.map((entry) => ({
-                      ...entry,
-                      current: entry.name === branch,
-                    })),
-                  }
-                })
-              }}
-            />
+          composerFooterPreview ? (
+            <>
+              {workspaceProjectPickerPreviewMode ? (
+                <WorkspaceProjectPicker
+                  snapshot={workspaceProjectPickerPreviewSnapshot ?? WORKSPACE_PROJECT_PICKER_PREVIEW_EMPTY}
+                  acting={workspaceProjectPickerPreviewMode === 'acting'}
+                  onSelect={(root) => {
+                    if (workspaceProjectPickerPreviewMode !== 'default') return
+                    setWorkspaceProjectPickerPreview((current) => ({
+                      ...current,
+                      currentRoot: root,
+                    }))
+                  }}
+                />
+              ) : null}
+              {gitBranchPickerPreviewMode ? (
+                <GitBranchPicker
+                  snapshot={gitBranchPickerPreviewSnapshot}
+                  loading={gitBranchPickerPreviewMode === 'loading'}
+                  onSwitchBranch={(branch) => {
+                    if (gitBranchPickerPreviewMode !== 'default') return
+                    setGitBranchPickerPreview((current) => {
+                      if (!current.ok) return current
+                      return {
+                        ...current,
+                        currentBranch: branch,
+                        branches: current.branches.map((entry) => ({
+                          ...entry,
+                          current: entry.name === branch,
+                        })),
+                      }
+                    })
+                  }}
+                />
+              ) : null}
+            </>
           ) : undefined
         }
       />
