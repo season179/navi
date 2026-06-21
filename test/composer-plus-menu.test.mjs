@@ -16,9 +16,16 @@ buildSync({
 })
 
 const {
+  COMPOSER_PLUS_MENU_ADD_IMAGE_LABEL,
+  COMPOSER_PLUS_MENU_PURSUE_GOAL_LABEL,
   COMPOSER_PLUS_MENU_PREVIEW_DEFAULT,
   resolveComposerPlusMenuPreview,
 } = await import(out)
+
+test('plus menu copy matches Kun locale strings', () => {
+  assert.equal(COMPOSER_PLUS_MENU_ADD_IMAGE_LABEL, 'Attach image')
+  assert.equal(COMPOSER_PLUS_MENU_PURSUE_GOAL_LABEL, 'Pursue goal')
+})
 
 test('COMPOSER_PLUS_MENU_PREVIEW_DEFAULT matches Kun plusMenu snapshot toggles', () => {
   assert.equal(COMPOSER_PLUS_MENU_PREVIEW_DEFAULT.planMode, false)
@@ -26,7 +33,7 @@ test('COMPOSER_PLUS_MENU_PREVIEW_DEFAULT matches Kun plusMenu snapshot toggles',
   assert.equal(COMPOSER_PLUS_MENU_PREVIEW_DEFAULT.worktreeMode, false)
 })
 
-test('resolveComposerPlusMenuPreview routes plan, goal, and worktree modes', () => {
+test('resolveComposerPlusMenuPreview routes plan, goal, worktree, and uploading modes', () => {
   assert.deepEqual(resolveComposerPlusMenuPreview('default'), {
     open: true,
     toggles: COMPOSER_PLUS_MENU_PREVIEW_DEFAULT,
@@ -35,4 +42,5 @@ test('resolveComposerPlusMenuPreview routes plan, goal, and worktree modes', () 
   assert.equal(resolveComposerPlusMenuPreview('plan').toggles.goalActive, false)
   assert.equal(resolveComposerPlusMenuPreview('goal').toggles.goalActive, true)
   assert.equal(resolveComposerPlusMenuPreview('worktree').toggles.worktreeMode, true)
+  assert.equal(resolveComposerPlusMenuPreview('uploading').attachmentUploadBusy, true)
 })

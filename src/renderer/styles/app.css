@@ -36634,6 +36634,10 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
   flex-shrink: 0;
 }
 
+.floating-composer-plus-menu-spinner {
+  animation: spin 1s linear infinite;
+}
+
 .floating-composer-plus-menu-item > span:nth-child(2) {
   min-width: 0;
   flex: 1 1 auto;

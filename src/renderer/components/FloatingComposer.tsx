@@ -119,6 +119,13 @@ import {
   type ComposerSlashCommandPreviewIcon,
   type ComposerSlashCommandPreviewRow,
 } from '../lib/composerSlashCommands'
+import {
+  COMPOSER_PLUS_MENU_ADD_IMAGE_LABEL,
+  COMPOSER_PLUS_MENU_PLAN_MODE_LABEL,
+  COMPOSER_PLUS_MENU_PURSUE_GOAL_LABEL,
+  COMPOSER_PLUS_MENU_WORKTREE_MODE_LABEL,
+  COMPOSER_PLUS_MENU_PREVIEW_DEFAULT,
+} from '../lib/composerPlusMenu'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
@@ -133,6 +140,7 @@ export type FloatingComposerPreviewMode =
   | 'default'
   | 'queued'
   | 'plusMenu'
+  | 'plusMenuUploading'
   | 'slashCommands'
   | 'fileMention'
   | 'fileMentionLoading'
@@ -217,6 +225,7 @@ export type FloatingComposerSnapshot = {
   dictationError: string | null
   voiceTranscribing: boolean
   attachmentUploadError: string | null
+  attachmentUploadBusy: boolean
 }
 
 const SLASH_COMMAND_PREVIEW_ICONS: Record<ComposerSlashCommandPreviewIcon, ReactNode> = {
@@ -321,26 +330,32 @@ export function ComposerPlusMenu({
   goalActive = true,
   worktreeMode = false,
   showAddImage = true,
+  attachmentUploadBusy = false,
 }: {
   planMode?: boolean
   goalActive?: boolean
   worktreeMode?: boolean
   showAddImage?: boolean
+  attachmentUploadBusy?: boolean
 } = {}): ReactElement {
   return (
     <div className="floating-composer-plus-menu" role="menu" aria-label="Composer menu">
       {showAddImage ? (
         <>
           <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
-            <ImagePlus strokeWidth={1.9} />
-            <span>Add image</span>
+            {attachmentUploadBusy ? (
+              <Loader2 className="floating-composer-plus-menu-spinner" strokeWidth={1.9} />
+            ) : (
+              <ImagePlus strokeWidth={1.9} />
+            )}
+            <span>{COMPOSER_PLUS_MENU_ADD_IMAGE_LABEL}</span>
           </button>
           <div className="floating-composer-plus-menu-divider" aria-hidden />
         </>
       ) : null}
       <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
         <ListTodo strokeWidth={1.9} />
-        <span>Plan mode</span>
+        <span>{COMPOSER_PLUS_MENU_PLAN_MODE_LABEL}</span>
         <span
           className="floating-composer-toggle-switch"
           role="switch"
@@ -350,7 +365,7 @@ export function ComposerPlusMenu({
       </button>
       <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
         <Target strokeWidth={1.9} />
-        <span>Pursue a goal</span>
+        <span>{COMPOSER_PLUS_MENU_PURSUE_GOAL_LABEL}</span>
         <span
           className="floating-composer-toggle-switch"
           role="switch"
@@ -360,7 +375,7 @@ export function ComposerPlusMenu({
       </button>
       <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
         <GitBranch strokeWidth={1.9} />
-        <span>Worktree mode</span>
+        <span>{COMPOSER_PLUS_MENU_WORKTREE_MODE_LABEL}</span>
         <span
           className="floating-composer-toggle-switch"
           role="switch"
@@ -749,6 +764,7 @@ export function resolveFloatingComposerSnapshot(
     dictationError: null,
     voiceTranscribing: false,
     attachmentUploadError: null,
+    attachmentUploadBusy: false,
   }
 
   switch (mode) {
@@ -756,6 +772,8 @@ export function resolveFloatingComposerSnapshot(
       return { ...base, queuedMessages: QUEUED_MESSAGES_PREVIEW, busy: true }
     case 'plusMenu':
       return { ...base, showPlusMenu: true }
+    case 'plusMenuUploading':
+      return { ...base, showPlusMenu: true, attachmentUploadBusy: true }
     case 'slashCommands':
       return { ...base, input: '/res', showSlashMenu: true }
     case 'fileMention':
@@ -865,7 +883,14 @@ export function FloatingComposer({
           <ComposerGoalFloater goal={snapshot.goal} />
         ) : null}
 
-        {menuOpen || snapshot.showPlusMenu ? <ComposerPlusMenu /> : null}
+        {menuOpen || snapshot.showPlusMenu ? (
+          <ComposerPlusMenu
+            planMode={COMPOSER_PLUS_MENU_PREVIEW_DEFAULT.planMode}
+            goalActive={COMPOSER_PLUS_MENU_PREVIEW_DEFAULT.goalActive}
+            worktreeMode={COMPOSER_PLUS_MENU_PREVIEW_DEFAULT.worktreeMode}
+            attachmentUploadBusy={snapshot.attachmentUploadBusy}
+          />
+        ) : null}
 
         {snapshot.showSlashMenu ? (
           <ComposerSlashMenu commands={snapshot.slashCommands} />

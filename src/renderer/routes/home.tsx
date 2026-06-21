@@ -786,14 +786,19 @@ function HomePage() {
     return resolveComposerThreadUsagePreview(params.get('composerThreadUsagePreview'))
   }, [])
 
-  // Visual preview for the ported ComposerPlusMenu (?composerPlusMenuPreview=1|plan|goal|worktree).
+  // Visual preview for the ported ComposerPlusMenu (?composerPlusMenuPreview=1|plan|goal|worktree|uploading).
   const composerPlusMenuPreview = useMemo(() => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
     if (!params.has('composerPlusMenuPreview')) return null
     const value = params.get('composerPlusMenuPreview')
     const mode: ComposerPlusMenuPreviewMode =
-      value === 'plan' || value === 'goal' || value === 'worktree' ? value : 'default'
+      value === 'plan' ||
+      value === 'goal' ||
+      value === 'worktree' ||
+      value === 'uploading'
+        ? value
+        : 'default'
     return resolveComposerPlusMenuPreview(mode)
   }, [])
 
@@ -1315,7 +1320,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
+  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1323,6 +1328,7 @@ function HomePage() {
     const value = params.get('floatingComposerPreview')
     if (value === 'queued') return 'queued'
     if (value === 'plusMenu') return 'plusMenu'
+    if (value === 'plusMenuUploading') return 'plusMenuUploading'
     if (value === 'slashCommands') return 'slashCommands'
     if (value === 'fileMention') return 'fileMention'
     if (value === 'fileMentionLoading') return 'fileMentionLoading'
@@ -3904,6 +3910,7 @@ function HomePage() {
       threadUsageLoading={composerThreadUsagePreview?.loading}
       defaultPlusMenuOpen={composerPlusMenuPreview?.open}
       plusMenuToggles={composerPlusMenuPreview?.toggles}
+      plusMenuAttachmentUploadBusy={composerPlusMenuPreview?.attachmentUploadBusy}
       footerHint={composerFooterHintPreview}
       dictationError={composerDictationErrorPreview}
       voiceTranscribing={composerVoiceTranscribingPreview}

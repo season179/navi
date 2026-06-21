@@ -130,6 +130,8 @@ interface ComposerProps {
   defaultPlusMenuOpen?: boolean
   /** Toggle states for Kun's composer plus menu rows. */
   plusMenuToggles?: ComposerPlusMenuToggles
+  /** When true, shows Loader2 on the plus menu Attach image row. */
+  plusMenuAttachmentUploadBusy?: boolean
   /** Footer hint shown beside project/branch pickers (e.g. slash or worktree copy). */
   footerHint?: string | null
   /** When set, shows Kun's slash-command overlay with these rows instead of skill filtering. */
@@ -186,6 +188,7 @@ export function Composer({
   threadUsageLoading = false,
   defaultPlusMenuOpen = false,
   plusMenuToggles,
+  plusMenuAttachmentUploadBusy = false,
   footerHint,
   slashCommandsOverride,
 }: ComposerProps) {
@@ -528,6 +531,7 @@ export function Composer({
               planMode={plusMenuToggles?.planMode}
               goalActive={plusMenuToggles?.goalActive}
               worktreeMode={plusMenuToggles?.worktreeMode}
+              attachmentUploadBusy={plusMenuAttachmentUploadBusy}
             />
           </div>
         ) : null}
