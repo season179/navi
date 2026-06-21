@@ -66,6 +66,11 @@ import {
   WRITE_PROMPT_META_DISCLOSURE_PREVIEW,
   WRITE_PROMPT_META_DISCLOSURE_PREVIEW_QUOTES,
 } from '../components/WritePromptMetaDisclosure'
+import {
+  ClawInboundMessageCard,
+  CLAW_INBOUND_MESSAGE_CARD_PREVIEW,
+  CLAW_INBOUND_MESSAGE_CARD_PREVIEW_MINIMAL,
+} from '../components/ClawInboundMessageCard'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -278,6 +283,14 @@ function HomePage() {
   const [writePromptMetaExpanded, setWritePromptMetaExpanded] = useState(
     writePromptMetaDisclosureDefaultExpanded,
   )
+
+  // Visual preview for the ported ClawInboundMessageCard (?clawInboundMessageCard=1).
+  const clawInboundMessageCardPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('clawInboundMessageCard')) return null
+    return params.get('clawInboundMessageCard') === 'minimal' ? 'minimal' : 'full'
+  }, [])
 
   const composerFooterPreview =
     gitBranchPickerPreviewMode != null || workspaceProjectPickerPreviewMode != null
@@ -570,6 +583,16 @@ function HomePage() {
               onToggle={() => setWritePromptMetaExpanded((value) => !value)}
             />
           </div>
+        </div>
+      ) : null}
+
+      {clawInboundMessageCardPreviewMode ? (
+        <div className="claw-inbound-message-card-preview">
+          <ClawInboundMessageCard
+            {...(clawInboundMessageCardPreviewMode === 'minimal'
+              ? CLAW_INBOUND_MESSAGE_CARD_PREVIEW_MINIMAL
+              : CLAW_INBOUND_MESSAGE_CARD_PREVIEW)}
+          />
         </div>
       ) : null}
     </>
