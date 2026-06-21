@@ -4600,6 +4600,107 @@ a.runtime-meta-chip:hover {
   }
 }
 
+/* =====================================================
+   Write font size control (Kun WriteFontSizeControl)
+   ===================================================== */
+.write-font-size-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border-radius: 12px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, #ffffff 68%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+[data-theme='dark'] .write-font-size-control {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+.write-font-size-control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ds-text);
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    opacity 0.14s ease;
+}
+
+.write-font-size-control-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ds-hover) 80%, transparent);
+}
+
+.write-font-size-control-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.write-font-size-control-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.write-font-size-control-value {
+  min-width: 30px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text);
+}
+
+.write-font-size-control-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 24px;
+  background: var(--ds-bg-main);
+}
+
+.write-font-size-control-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: min(420px, calc(100vw - 48px));
+  padding: 28px 24px;
+  border-radius: 18px;
+  border: 1px solid var(--ds-border-muted);
+  background: var(--ds-surface-elevated);
+  box-shadow: var(--ds-shadow-card);
+}
+
+[data-theme='dark'] .write-font-size-control-preview-card {
+  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.write-font-size-control-preview-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-text-faint);
+}
+
+.write-font-size-control-preview-sample {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  line-height: 1.6;
+  color: var(--ds-text-muted);
+}
+
 
 /* =====================================================
    Initial session usage heatmap (Kun InitialSessionUsageHeatmap)

@@ -309,6 +309,10 @@ import {
   WriteWorkspaceStart,
   WRITE_WORKSPACE_START_PREVIEW,
 } from '../components/WriteWorkspaceStart'
+import {
+  WriteFontSizeControlPreview,
+  type WriteFontSizeControlPreviewMode,
+} from '../components/WriteFontSizeControl'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -704,6 +708,19 @@ function HomePage() {
     const params = new URLSearchParams(window.location.search)
     return params.has('writeWorkspaceStart')
   }, [])
+
+  // Visual preview for the ported WriteFontSizeControl
+  // (?writeFontSizeControl=1|min|max).
+  const writeFontSizeControlPreviewMode =
+    useMemo((): WriteFontSizeControlPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('writeFontSizeControl')) return null
+      const value = params.get('writeFontSizeControl')
+      if (value === 'min') return 'min'
+      if (value === 'max') return 'max'
+      return 'default'
+    }, [])
 
   // Visual preview for the ported InitialSessionUsageHeatmap
   // (?initialSessionUsageHeatmap=populated|loading|empty|error|collapsed|models).
@@ -1578,6 +1595,10 @@ function HomePage() {
         />
       </div>
     )
+  }
+
+  if (writeFontSizeControlPreviewMode) {
+    return <WriteFontSizeControlPreview mode={writeFontSizeControlPreviewMode} />
   }
 
   if (generalSettingsPreviewMode) {
