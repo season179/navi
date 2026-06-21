@@ -18,6 +18,7 @@ import {
   ProcessEntryRow,
   type ProcessEntrySnapshot,
 } from './ProcessEntryRow'
+import { ProcessSummaryText } from './ProcessFileReference'
 import { type RuntimeMetaChipsSnapshot, RUNTIME_META_CHIPS_PREVIEW } from './RuntimeMetaChips'
 
 /** Kun getProcessDetail skips expand affordance for short system messages. */
@@ -774,32 +775,6 @@ function stackEntryToProcessEntry(
   }
 }
 
-function ProcessSummaryLine({
-  summary,
-  filePath,
-}: {
-  summary: string
-  filePath?: string
-}): ReactElement {
-  if (!filePath) return <>{summary}</>
-  const index = summary.indexOf(filePath)
-  if (index < 0) return <>{summary}</>
-  return (
-    <>
-      {summary.slice(0, index)}
-      <button
-        type="button"
-        className="ds-process-file-reference"
-        title="Preview file"
-        onMouseDown={(event) => event.stopPropagation()}
-      >
-        {filePath}
-      </button>
-      {summary.slice(index + filePath.length)}
-    </>
-  )
-}
-
 function ProcessStackEntryDetail({
   entry,
   processing,
@@ -886,7 +861,7 @@ function ProcessStackEntryRow({
           rowActive && !entry.error ? 'ds-shiny-text' : ''
         }`}
       >
-        <ProcessSummaryLine summary={entry.summary} filePath={entry.filePath} />
+        <ProcessSummaryText summary={entry.summary} filePath={entry.filePath} />
       </span>
       {canExpand ? (
         <button

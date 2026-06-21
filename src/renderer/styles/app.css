@@ -1769,7 +1769,7 @@ html[data-theme='dark'] .process-section-row-error-dot {
 
 .process-section-row-reasoning {
   font-size: 13.5px;
-  line-height: 1.5;
+  line-height: 24px;
   color: var(--ds-text-muted);
 }
 
@@ -1799,7 +1799,7 @@ html[data-theme='dark'] .process-section-row-error-dot {
   padding: 2px 4px;
   text-align: left;
   font-size: 13.5px;
-  line-height: 1.5;
+  line-height: 24px;
   color: var(--ds-text-faint);
   cursor: default;
 }
@@ -1881,7 +1881,7 @@ html[data-theme='dark'] .process-stack-entry-row.is-error {
   word-break: break-word;
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 24px;
   color: var(--ds-text);
 }
 
@@ -1889,7 +1889,7 @@ html[data-theme='dark'] .process-stack-entry-row.is-error {
   margin: 0;
   white-space: pre-wrap;
   font-size: 13.5px;
-  line-height: 1.5;
+  line-height: 24px;
   color: var(--ds-text-muted);
 }
 
@@ -1901,7 +1901,7 @@ html[data-theme='dark'] .process-stack-entry-row.is-error {
   word-break: break-word;
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 24px;
   color: var(--ds-text);
 }
 
@@ -1941,7 +1941,7 @@ html[data-theme='dark'] .process-stack-entry-error-path {
   word-break: break-word;
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 24px;
   color: #991b1b;
 }
 
@@ -2100,7 +2100,7 @@ html[data-theme='dark'] .process-entry-row-header.is-error {
 
 .process-entry-row-assistant {
   font-size: 13.5px;
-  line-height: 1.5;
+  line-height: 24px;
   color: var(--ds-text);
 }
 

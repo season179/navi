@@ -13,6 +13,7 @@ import {
   MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
   type MessageBubbleSnapshot,
 } from './MessageBubble'
+import { ProcessSummaryText } from './ProcessFileReference'
 import {
   RuntimeMetaChips,
   RUNTIME_META_CHIPS_PREVIEW,
@@ -320,32 +321,6 @@ type Props = {
   onToggle?: () => void
 }
 
-function ProcessSummaryLine({
-  summary,
-  filePath,
-}: {
-  summary: string
-  filePath?: string
-}): ReactElement {
-  if (!filePath) return <>{summary}</>
-  const index = summary.indexOf(filePath)
-  if (index < 0) return <>{summary}</>
-  return (
-    <>
-      {summary.slice(0, index)}
-      <button
-        type="button"
-        className="ds-process-file-reference"
-        title="Preview file"
-        onMouseDown={(event) => event.stopPropagation()}
-      >
-        {filePath}
-      </button>
-      {summary.slice(index + filePath.length)}
-    </>
-  )
-}
-
 function ProcessEntryDetail({
   entry,
   processing,
@@ -468,7 +443,7 @@ export function ProcessEntryRow({
         </span>
         {entry.rest ? (
           <span className="process-entry-row-rest">
-            <ProcessSummaryLine summary={entry.rest} filePath={entry.filePath} />
+            <ProcessSummaryText summary={entry.rest} filePath={entry.filePath} />
           </span>
         ) : null}
       </span>
