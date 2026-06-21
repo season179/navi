@@ -1351,7 +1351,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported WriteInlineAgent
-  // (?writeInlineAgent=1|blockMenu|emptyAgents|askOnly|inFlight|skills|imageMode).
+  // (?writeInlineAgent=1|blockMenu|emptyAgents|askOnly|preferAbove|inFlight|skills|imageMode).
   const writeInlineAgentPreviewMode = useMemo((): WriteInlineAgentPreviewMode | null => {
     if (typeof window === 'undefined') return null
     return resolveWriteInlineAgentPreviewMode(new URLSearchParams(window.location.search))
@@ -1488,7 +1488,7 @@ function HomePage() {
     }, [])
 
   // Visual preview for the ported WriteWorkspaceView
-  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|rich|preview|pdf|image|loading|unsupported|largeFile|truncated|liveDisabled|inlineAgent|inlineAgentBlockMenu|inlineAgentEmptyAgents|inlineAgentAskOnly|inlineAgentInFlight|inlineAgentSkills|inlineAgentImageMode|assistant|assistantTimeline|assistantQuoted|assistantPdf|assistantNoFile|assistantStreaming|runtimeBanner|error|exportSuccess|exportError|exporting|dirty|saving|readonly|review|exportMenu|modeMenu).
+  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|rich|preview|pdf|image|loading|unsupported|largeFile|truncated|liveDisabled|inlineAgent|inlineAgentBlockMenu|inlineAgentEmptyAgents|inlineAgentAskOnly|inlineAgentPreferAbove|inlineAgentInFlight|inlineAgentSkills|inlineAgentImageMode|assistant|assistantTimeline|assistantQuoted|assistantPdf|assistantNoFile|assistantStreaming|runtimeBanner|error|exportSuccess|exportError|exporting|dirty|saving|readonly|review|exportMenu|modeMenu).
   const writeWorkspaceViewPreviewMode = useMemo((): WriteWorkspaceViewPreviewMode | null => {
     if (typeof window === 'undefined') return null
     return resolveWriteWorkspaceViewPreviewMode(new URLSearchParams(window.location.search))

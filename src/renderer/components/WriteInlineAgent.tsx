@@ -670,6 +670,7 @@ export function WriteInlineAgentPreview({ mode }: PreviewProps): ReactElement {
         onSubmitPrompt={() => undefined}
         onApplyEdit={() => undefined}
         askOnly={previewState.askOnly}
+        preferAbove={previewState.preferAbove}
         formattingEnabled={previewState.formattingEnabled}
         onApplyFormat={() => undefined}
         blockType={blockType}

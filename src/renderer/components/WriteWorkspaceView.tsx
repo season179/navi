@@ -220,6 +220,14 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     return previewSnapshot('start')
   }
 
+  if (mode === 'inlineAgentPreferAbove') {
+    return {
+      ...previewSnapshot('pdf'),
+      showInlineAgent: true,
+      inlineAgentPreviewMode: 'preferAbove',
+    }
+  }
+
   if (mode === 'pdf') {
     return {
       workspaceReady: true,
@@ -833,7 +841,7 @@ export function WriteWorkspaceView({
           onSubmitPrompt={() => undefined}
           onApplyEdit={() => undefined}
           askOnly={inlineAgentPreviewState?.askOnly ?? activeFileIsPdf}
-          preferAbove={activeFileIsPdf}
+          preferAbove={inlineAgentPreviewState?.preferAbove ?? activeFileIsPdf}
           formattingEnabled={
             inlineAgentPreviewState?.formattingEnabled ?? (activeFileIsText && !readOnly)
           }

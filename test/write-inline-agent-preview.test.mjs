@@ -27,6 +27,10 @@ test('routes inline agent sub-state preview modes', () => {
     'askOnly',
   )
   assert.equal(
+    resolveWriteInlineAgentPreviewMode(new URLSearchParams('writeInlineAgent=preferAbove')),
+    'preferAbove',
+  )
+  assert.equal(
     resolveWriteInlineAgentPreviewMode(new URLSearchParams('writeInlineAgent=inFlight')),
     'inFlight',
   )

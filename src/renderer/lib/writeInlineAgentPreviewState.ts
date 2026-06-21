@@ -9,6 +9,7 @@ import type { WriteInlineAgentPreviewMode } from './writeInlineAgentPreviewModes
 
 export type WriteInlineAgentPreviewState = {
   askOnly: boolean
+  preferAbove: boolean
   inFlight: boolean
   formattingEnabled: boolean
   defaultBlockMenuOpen: boolean
@@ -30,9 +31,10 @@ export function resolveWriteInlineAgentPreviewState(
   const quickActions = WRITE_SETTINGS_PREVIEW_DEFAULT.selectionAssist.quickActions
 
   return {
-    askOnly: mode === 'askOnly',
+    askOnly: mode === 'askOnly' || mode === 'preferAbove',
+    preferAbove: mode === 'preferAbove',
     inFlight: mode === 'inFlight',
-    formattingEnabled: mode !== 'imageMode' && mode !== 'askOnly',
+    formattingEnabled: mode !== 'imageMode' && mode !== 'askOnly' && mode !== 'preferAbove',
     defaultBlockMenuOpen: mode === 'blockMenu',
     agentPresets: mode === 'imageMode' ? [] : agentPresets,
     quickActions: mode === 'imageMode' ? [] : quickActions,

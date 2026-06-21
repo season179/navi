@@ -21,6 +21,7 @@ export type WriteWorkspaceViewPreviewMode =
   | 'inlineAgentBlockMenu'
   | 'inlineAgentEmptyAgents'
   | 'inlineAgentAskOnly'
+  | 'inlineAgentPreferAbove'
   | 'inlineAgentInFlight'
   | 'inlineAgentSkills'
   | 'inlineAgentImageMode'
@@ -65,6 +66,7 @@ export function resolveWriteWorkspaceViewPreviewMode(
   if (value === 'inlineAgentBlockMenu') return 'inlineAgentBlockMenu'
   if (value === 'inlineAgentEmptyAgents') return 'inlineAgentEmptyAgents'
   if (value === 'inlineAgentAskOnly') return 'inlineAgentAskOnly'
+  if (value === 'inlineAgentPreferAbove') return 'inlineAgentPreferAbove'
   if (value === 'inlineAgentInFlight') return 'inlineAgentInFlight'
   if (value === 'inlineAgentSkills') return 'inlineAgentSkills'
   if (value === 'inlineAgentImageMode') return 'inlineAgentImageMode'
@@ -109,6 +111,7 @@ export const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceV
   'inlineAgentBlockMenu',
   'inlineAgentEmptyAgents',
   'inlineAgentAskOnly',
+  'inlineAgentPreferAbove',
   'inlineAgentInFlight',
   'inlineAgentSkills',
   'inlineAgentImageMode',
@@ -139,6 +142,7 @@ const INLINE_AGENT_WORKSPACE_PREVIEW_MODES = new Set<WriteWorkspaceViewPreviewMo
   'inlineAgentBlockMenu',
   'inlineAgentEmptyAgents',
   'inlineAgentAskOnly',
+  'inlineAgentPreferAbove',
   'inlineAgentInFlight',
   'inlineAgentSkills',
   'inlineAgentImageMode',
@@ -157,6 +161,7 @@ export function resolveWriteWorkspaceInlineAgentPreviewMode(
   if (mode === 'inlineAgentBlockMenu') return 'blockMenu'
   if (mode === 'inlineAgentEmptyAgents') return 'emptyAgents'
   if (mode === 'inlineAgentAskOnly') return 'askOnly'
+  if (mode === 'inlineAgentPreferAbove') return 'preferAbove'
   if (mode === 'inlineAgentInFlight') return 'inFlight'
   if (mode === 'inlineAgentSkills') return 'skills'
   if (mode === 'inlineAgentImageMode') return 'imageMode'

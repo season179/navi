@@ -85,6 +85,10 @@ test('routes inline agent orchestrator preview modes', () => {
     'inlineAgentAskOnly',
   )
   assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=inlineAgentPreferAbove')),
+    'inlineAgentPreferAbove',
+  )
+  assert.equal(
     resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=inlineAgentInFlight')),
     'inlineAgentInFlight',
   )
