@@ -76,6 +76,12 @@ import {
   USER_FILE_REFERENCE_CHIPS_PREVIEW,
   USER_FILE_REFERENCE_CHIPS_PREVIEW_DIRECTORY,
 } from '../components/UserFileReferenceChips'
+import {
+  RuntimeMetaChips,
+  RUNTIME_META_CHIPS_PREVIEW,
+  RUNTIME_META_CHIPS_PREVIEW_MINIMAL,
+  RUNTIME_META_CHIPS_PREVIEW_TOOL,
+} from '../components/RuntimeMetaChips'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -303,6 +309,17 @@ function HomePage() {
     const params = new URLSearchParams(window.location.search)
     if (!params.has('userFileReferenceChips')) return null
     return params.get('userFileReferenceChips') === 'directory' ? 'directory' : 'full'
+  }, [])
+
+  // Visual preview for the ported RuntimeMetaChips (?runtimeMetaChips=1|tool|minimal).
+  const runtimeMetaChipsPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('runtimeMetaChips')) return null
+    const mode = params.get('runtimeMetaChips')
+    if (mode === 'tool') return 'tool'
+    if (mode === 'minimal') return 'minimal'
+    return 'full'
   }, [])
 
   const composerFooterPreview =
@@ -621,6 +638,39 @@ function HomePage() {
                   ? USER_FILE_REFERENCE_CHIPS_PREVIEW_DIRECTORY
                   : USER_FILE_REFERENCE_CHIPS_PREVIEW
               }
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {runtimeMetaChipsPreviewMode === 'tool' ? (
+        <div className="runtime-meta-chips-preview-tool">
+          <div className="runtime-meta-chips-preview-tool-card">
+            <div className="runtime-meta-chips-preview-tool-header">
+              <div className="runtime-meta-chips-preview-tool-label">Tool</div>
+              <div className="runtime-meta-chips-preview-tool-summary">
+                Ran npm test in the workspace root.
+              </div>
+              <RuntimeMetaChips meta={RUNTIME_META_CHIPS_PREVIEW_TOOL} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {runtimeMetaChipsPreviewMode && runtimeMetaChipsPreviewMode !== 'tool' ? (
+        <div className="runtime-meta-chips-preview">
+          <div className="runtime-meta-chips-preview-bubble">
+            <div className="runtime-meta-chips-preview-text">
+              Review the auth middleware and suggest improvements.
+            </div>
+            <RuntimeMetaChips
+              meta={
+                runtimeMetaChipsPreviewMode === 'minimal'
+                  ? RUNTIME_META_CHIPS_PREVIEW_MINIMAL
+                  : RUNTIME_META_CHIPS_PREVIEW
+              }
+              align="right"
+              hideAttachments
             />
           </div>
         </div>
