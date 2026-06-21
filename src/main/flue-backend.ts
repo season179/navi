@@ -173,6 +173,30 @@ class FlueBackend extends EventEmitter {
     const port = '0'
     const dbPath = path.join(userData, 'flue.db')
 
+    // Global skills manifest (plan §D5). The child can't touch userData, so main
+    // pre-packages enabled globals into a 0600 JSON file and injects only its
+    // path — mirroring the providers/keys handoff above. The server patch reads
+    // it at boot to register packaged directories; the agent factory reads it
+    // per turn to synthesize matching SkillReferences. Built like the providers
+    // file on every start (cheap; it's a small dir), so enable/disable + edits
+    // take effect on the next restart, same lifecycle as provider key changes.
+    let globalSkillsFile: string | undefined
+    try {
+      const { buildGlobalSkillsManifest } = await import('./skills')
+      const manifest = await buildGlobalSkillsManifest()
+      if (manifest.length > 0) {
+        globalSkillsFile = path.join(userData, 'navi-global-skills.json')
+        writeFileSync(globalSkillsFile, JSON.stringify(manifest), { mode: 0o600 })
+        this.handoffFiles.push(globalSkillsFile)
+      }
+    } catch (e) {
+      // A failure to build the manifest must NOT block the backend — global
+      // skills are an enhancement layer. Log and proceed without them.
+      process.stderr.write(
+        `[flue] global skills manifest build failed: ${e instanceof Error ? e.message : e}\n`,
+      )
+    }
+
     const env: NodeJS.ProcessEnv = {
       ...process.env,
       ELECTRON_RUN_AS_NODE: '1',
@@ -182,6 +206,7 @@ class FlueBackend extends EventEmitter {
       NAVI_CONVERSATIONS_PATH: storePath(),
       NAVI_PROVIDERS_PATH: providersFile,
       NAVI_PROVIDER_KEYS_PATH: keysFile,
+      ...(globalSkillsFile ? { NAVI_GLOBAL_SKILLS_MANIFEST: globalSkillsFile } : {}),
     }
     // Scrub pi-ai key vars + OPENAI_BASE_URL so the child can't pick up a
     // stale/shell-inherited credential; keys flow only through the keys file (§F4).

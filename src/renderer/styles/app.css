@@ -1851,3 +1851,343 @@ textarea {
   font-size: 12.5px;
   color: var(--ds-text-faint);
 }
+
+/* =====================================================
+   Settings tabs + Skills panel (plan §D6)
+   Reuses .providers-panel / .provider-card / .apikey-input
+   structure; adds only the skill-specific surfaces.
+   ===================================================== */
+
+.settings-tabs {
+  display: inline-flex;
+  gap: 2px;
+  margin-bottom: 12px;
+  padding: 3px;
+  border: 1px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-card-muted);
+}
+
+.settings-tab {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text-faint);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.settings-tab:hover {
+  color: var(--ds-text-secondary);
+}
+
+.settings-tab.is-active {
+  background: var(--ds-card-strong);
+  color: var(--ds-text);
+  box-shadow: var(--ds-shadow-card-soft);
+}
+
+/* Skills list groups + cards */
+.skill-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.skill-group:last-child {
+  margin-bottom: 0;
+}
+
+.skill-group-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-text-faint);
+  padding: 4px 4px 6px;
+}
+
+.skill-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  text-align: left;
+  padding: 10px 12px;
+}
+
+.skill-card-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.skill-card-state {
+  font-size: 11px;
+  color: var(--ds-text-faint);
+  font-style: italic;
+}
+
+/* Source badge — honest encoding of where a skill comes from */
+.skill-badge {
+  flex: none;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-card-strong);
+  color: var(--ds-text-secondary);
+  white-space: nowrap;
+}
+
+.skill-badge--built-in {
+  color: var(--ds-text-secondary);
+  background: var(--ds-chip-bg);
+}
+
+.skill-badge--project {
+  color: var(--accent);
+  border-color: var(--accent-soft);
+  background: var(--accent-soft);
+}
+
+.skill-badge--global {
+  color: var(--success);
+  border-color: rgba(18, 138, 74, 0.25);
+  background: rgba(18, 138, 74, 0.1);
+}
+
+/* Toggle — only ever rendered for global skills (§D6 honesty). CSS-only switch. */
+.skill-toggle {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--ds-border);
+  border: 1px solid var(--ds-border);
+  cursor: pointer;
+  transition: background 0.14s;
+  margin-top: 2px;
+}
+
+.skill-toggle.is-on {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.skill-toggle-knob {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.14s;
+}
+
+.skill-toggle.is-on .skill-toggle-knob {
+  transform: translateX(14px);
+}
+
+/* Skill detail pane */
+.skill-detail-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skill-detail-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skill-detail-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.skill-detail-state {
+  font-size: 11.5px;
+  color: var(--ds-text-faint);
+  font-style: italic;
+}
+
+.skill-detail-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-detail-desc {
+  font-size: 13px;
+  color: var(--ds-text-secondary);
+  line-height: 1.5;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--ds-card-muted);
+  border: 1px solid var(--ds-border);
+}
+
+.skill-detail-body {
+  flex: 1;
+  margin: 0;
+  padding: 14px 16px;
+  font-family: var(--ds-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ds-text-secondary);
+  background: var(--ds-card-muted);
+  border: 1px solid var(--ds-border);
+  border-radius: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+  max-height: 52vh;
+}
+
+/* Skill editor (create/edit global skill) */
+.skill-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.skill-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.skill-editor-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.skill-body-input {
+  min-height: 180px;
+  max-height: 40vh;
+  resize: vertical;
+  font-family: var(--ds-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.field-error {
+  display: block;
+  margin-top: 5px;
+  font-size: 11.5px;
+  color: var(--danger);
+}
+
+/* Starter template menu entries carry a one-line description */
+.add-provider-menu .menu-item-desc,
+.add-provider-menu button .menu-item-desc {
+  display: block;
+  font-size: 10.5px;
+  color: var(--ds-text-faint);
+  font-weight: 400;
+  margin-top: 1px;
+}
+
+/* =====================================================
+   Composer `/skill` picker (plan §D6)
+   ===================================================== */
+
+.skill-picker {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(100% + 6px);
+  z-index: 30;
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ds-border);
+  border-radius: 14px;
+  background: var(--ds-card-strong);
+  box-shadow: var(--ds-shadow-panel);
+  overflow: hidden;
+}
+
+.skill-picker-hint {
+  flex: none;
+  padding: 8px 14px;
+  font-size: 10.5px;
+  color: var(--ds-text-faint);
+  border-bottom: 1px solid var(--ds-border);
+  background: var(--ds-card-muted);
+}
+
+.skill-picker-list {
+  flex: 1;
+  overflow: auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.skill-picker-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.skill-picker-row.is-active {
+  background: var(--ds-sidebar-row-active);
+}
+
+.skill-picker-row-main {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.skill-picker-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text);
+  font-family: var(--ds-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+}
+
+.skill-picker-desc {
+  font-size: 11.5px;
+  color: var(--ds-text-faint);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skill-picker-empty {
+  padding: 16px 14px;
+  font-size: 12.5px;
+  color: var(--ds-text-faint);
+  text-align: center;
+}
+
+
