@@ -244,6 +244,10 @@ import {
   type KeyboardShortcutsPreviewMode,
 } from '../components/KeyboardShortcutsSettingsSection'
 import {
+  EasterEggSettingsSectionPreview,
+  type EasterEggPreviewMode,
+} from '../components/EasterEggSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1235,6 +1239,16 @@ function HomePage() {
     return mode as KeyboardShortcutsPreviewMode
   }, [])
 
+  // Visual preview for the ported EasterEggSettingsSection (?easterEggPreview=1|empty|pluginActive|…).
+  const easterEggPreviewMode = useMemo((): EasterEggPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('easterEggPreview')) return null
+    const mode = params.get('easterEggPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as EasterEggPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1373,6 +1387,22 @@ function HomePage() {
           </p>
           <div className="keyboard-shortcuts-preview-stack">
             <KeyboardShortcutsSettingsSectionPreview mode={keyboardShortcutsPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (easterEggPreviewMode) {
+    return (
+      <div className="easter-egg-preview">
+        <div className="easter-egg-preview-inner">
+          <h1 className="easter-egg-preview-title">Mode workshop</h1>
+          <p className="easter-egg-preview-subtitle">
+            Easter egg category from Kun settings-section-easter-egg.tsx.
+          </p>
+          <div className="easter-egg-preview-stack">
+            <EasterEggSettingsSectionPreview mode={easterEggPreviewMode} />
           </div>
         </div>
       </div>

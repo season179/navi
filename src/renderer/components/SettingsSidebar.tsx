@@ -6,6 +6,7 @@ import type { Dispatch, ReactElement, SetStateAction } from 'react'
 import { SettingsControlsPreview } from './SettingsControls'
 import { GeneralSettingsSectionPreview } from './GeneralSettingsSection'
 import { KeyboardShortcutsSettingsSectionPreview } from './KeyboardShortcutsSettingsSection'
+import { EasterEggSettingsSectionPreview } from './EasterEggSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -182,6 +183,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'shortcuts' ? (
         <div className="keyboard-shortcuts-preview-stack">
           <KeyboardShortcutsSettingsSectionPreview />
+        </div>
+      ) : category === 'easterEgg' ? (
+        <div className="easter-egg-preview-stack">
+          <EasterEggSettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">

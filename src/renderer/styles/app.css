@@ -14373,3 +14373,250 @@ button.usage-heatmap-cell:focus {
   margin-top: 32px;
 }
 
+/* =====================================================
+   Easter egg settings (Kun settings-section-easter-egg.tsx)
+   ===================================================== */
+.easter-egg-settings-control {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.easter-egg-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .easter-egg-mode-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.easter-egg-mode-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--ds-border);
+  border-radius: 16px;
+  background: var(--ds-card);
+  text-align: center;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.easter-egg-mode-card:not(.is-active):hover {
+  border-color: color-mix(in srgb, var(--ds-accent) 25%, var(--ds-border));
+  background: var(--ds-hover);
+}
+
+.easter-egg-mode-card.is-active {
+  border-color: color-mix(in srgb, var(--ds-accent) 45%, var(--ds-border));
+  background: color-mix(in srgb, var(--ds-accent) 8%, var(--ds-card));
+  box-shadow: 0 10px 28px rgba(59, 130, 216, 0.12);
+}
+
+.easter-egg-mode-card-preview {
+  display: flex;
+  height: 64px;
+  width: 64px;
+  align-items: center;
+  justify-content: center;
+}
+
+.easter-egg-mode-card-mascot {
+  max-height: 64px;
+  max-width: 64px;
+}
+
+.easter-egg-mode-card-placeholder {
+  display: block;
+  height: 48px;
+  width: 48px;
+  border-radius: 12px;
+  background: var(--ds-surface-subtle);
+}
+
+.easter-egg-mode-card-copy {
+  min-width: 0;
+  width: 100%;
+}
+
+.easter-egg-mode-card-title {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.easter-egg-mode-card-subtitle {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--ds-text-faint);
+}
+
+.easter-egg-mode-card-action {
+  margin-top: 4px;
+  width: 100%;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ds-surface-subtle);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.easter-egg-mode-card-action:not(.is-active):not(:disabled):hover {
+  background: color-mix(in srgb, var(--ds-accent) 12%, var(--ds-surface-subtle));
+  color: var(--ds-accent);
+}
+
+.easter-egg-mode-card-action.is-active {
+  background: color-mix(in srgb, var(--ds-accent) 15%, transparent);
+  color: var(--ds-accent);
+  cursor: default;
+}
+
+.easter-egg-mode-card-action:disabled:not(.is-active) {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.easter-egg-mode-card-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ds-text-faint);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.easter-egg-mode-card-remove:hover {
+  background: var(--ds-danger-soft);
+  color: var(--ds-danger);
+}
+
+.easter-egg-mode-card-remove-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.easter-egg-plugin-empty {
+  font-size: 12.5px;
+  line-height: 1.25rem;
+  color: var(--ds-text-faint);
+}
+
+.easter-egg-install-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.easter-egg-install-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ds-accent) 12%, transparent);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ds-accent);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.easter-egg-install-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ds-accent) 18%, transparent);
+}
+
+.easter-egg-install-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.easter-egg-install-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.easter-egg-install-hint {
+  font-size: 12px;
+  color: var(--ds-text-faint);
+}
+
+.easter-egg-install-errors {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--ds-danger-soft);
+  list-style: none;
+  font-size: 12px;
+  line-height: 1.25rem;
+  color: var(--ds-danger);
+}
+
+.easter-egg-last-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ds-danger);
+}
+
+.easter-egg-preview {
+  min-height: 100vh;
+  padding: 48px 24px;
+  background: var(--ds-bg-main);
+}
+
+.easter-egg-preview-inner {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.easter-egg-preview-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+}
+
+.easter-egg-preview-subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ds-text-muted);
+}
+
+.easter-egg-preview-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 32px;
+}
+
