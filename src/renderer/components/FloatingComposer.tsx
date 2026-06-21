@@ -62,6 +62,9 @@ import {
 } from './WorkspaceProjectPicker'
 import {
   COMPOSER_CHANGE_SUMMARY_PREVIEW,
+  COMPOSER_CHANGE_SUMMARY_VISIBLE_LIMIT,
+  formatComposerChangedFilesMore,
+  formatComposerChangedFilesTitle,
   type ComposerChangedFile,
 } from '../lib/composerChangeSummary'
 import {
@@ -589,6 +592,9 @@ export function ComposerChangeSummary({
   files: ComposerChangedFile[]
   stats: { added: number; removed: number }
 }): ReactElement {
+  const visibleFiles = files.slice(0, COMPOSER_CHANGE_SUMMARY_VISIBLE_LIMIT)
+  const hiddenFileCount = Math.max(0, files.length - visibleFiles.length)
+
   return (
     <div className="floating-composer-change-summary">
       <span className="floating-composer-change-summary-icon">
@@ -596,16 +602,21 @@ export function ComposerChangeSummary({
       </span>
       <div className="floating-composer-change-summary-copy">
         <div className="floating-composer-change-summary-title">
-          <span>{files.length} changed files</span>
+          <span>{formatComposerChangedFilesTitle(files.length)}</span>
           <span className="floating-composer-change-summary-added">+{stats.added}</span>
           <span className="floating-composer-change-summary-removed">-{stats.removed}</span>
         </div>
         <div className="floating-composer-change-summary-files">
-          {files.map((file) => (
+          {visibleFiles.map((file) => (
             <span key={file.path} title={file.path}>
               {file.path}
             </span>
           ))}
+          {hiddenFileCount > 0 ? (
+            <span className="floating-composer-change-summary-more">
+              {formatComposerChangedFilesMore(hiddenFileCount)}
+            </span>
+          ) : null}
         </div>
       </div>
       <div className="floating-composer-change-summary-actions">

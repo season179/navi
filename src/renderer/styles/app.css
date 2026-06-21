@@ -37174,6 +37174,11 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
   white-space: nowrap;
 }
 
+.floating-composer-change-summary-more {
+  max-width: none;
+  color: var(--ds-text-faint);
+}
+
 .floating-composer-change-summary-actions {
   display: flex;
   flex-shrink: 0;

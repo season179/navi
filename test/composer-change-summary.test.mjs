@@ -15,11 +15,34 @@ buildSync({
   format: 'esm',
 })
 
-const { COMPOSER_CHANGE_SUMMARY_PREVIEW } = await import(out)
+const {
+  COMPOSER_CHANGE_SUMMARY_PREVIEW,
+  COMPOSER_CHANGE_SUMMARY_OVERFLOW_PREVIEW,
+  COMPOSER_CHANGE_SUMMARY_VISIBLE_LIMIT,
+  formatComposerChangedFilesMore,
+  formatComposerChangedFilesTitle,
+  resolveComposerChangeSummaryPreview,
+} = await import(out)
 
 test('COMPOSER_CHANGE_SUMMARY_PREVIEW matches Kun change-summary mock data', () => {
   assert.equal(COMPOSER_CHANGE_SUMMARY_PREVIEW.files.length, 3)
   assert.equal(COMPOSER_CHANGE_SUMMARY_PREVIEW.stats.added, 428)
   assert.equal(COMPOSER_CHANGE_SUMMARY_PREVIEW.stats.removed, 12)
   assert.match(COMPOSER_CHANGE_SUMMARY_PREVIEW.files[0].path, /FloatingComposer\.tsx$/)
+})
+
+test('change-summary copy matches Kun locale strings', () => {
+  assert.equal(formatComposerChangedFilesTitle(3), '3 files changed')
+  assert.equal(formatComposerChangedFilesMore(2), '+2 more')
+  assert.equal(COMPOSER_CHANGE_SUMMARY_VISIBLE_LIMIT, 3)
+})
+
+test('resolveComposerChangeSummaryPreview routes overflow mode', () => {
+  assert.equal(resolveComposerChangeSummaryPreview(null), COMPOSER_CHANGE_SUMMARY_PREVIEW)
+  assert.equal(resolveComposerChangeSummaryPreview('1'), COMPOSER_CHANGE_SUMMARY_PREVIEW)
+  assert.equal(
+    resolveComposerChangeSummaryPreview('overflow'),
+    COMPOSER_CHANGE_SUMMARY_OVERFLOW_PREVIEW,
+  )
+  assert.equal(COMPOSER_CHANGE_SUMMARY_OVERFLOW_PREVIEW.files.length, 5)
 })

@@ -367,7 +367,7 @@ import {
   AppPreview,
   type AppPreviewMode,
 } from '../components/App'
-import { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
+import { resolveComposerChangeSummaryPreview } from '../lib/composerChangeSummary'
 import {
   FloatingComposerPreview,
   buildComposerSlashCommandsPreview,
@@ -721,13 +721,13 @@ function HomePage() {
     return resolveComposerFileMentionPreview(params.get('composerFileMentionPreview'))
   }, [])
 
-  // Visual preview for the ported ComposerChangeSummary (?composerChangeSummaryPreview=1).
+  // Visual preview for the ported ComposerChangeSummary
+  // (?composerChangeSummaryPreview=1|overflow).
   const composerChangeSummaryPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
-    if (!new URLSearchParams(window.location.search).has('composerChangeSummaryPreview')) {
-      return undefined
-    }
-    return COMPOSER_CHANGE_SUMMARY_PREVIEW
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerChangeSummaryPreview')) return undefined
+    return resolveComposerChangeSummaryPreview(params.get('composerChangeSummaryPreview'))
   }, [])
 
   // Visual preview for the ported ComposerFileReferenceChips (?composerFileReferencesPreview=1).
