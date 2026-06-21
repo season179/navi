@@ -1860,6 +1860,19 @@ html[data-theme='dark'] .process-stack-entry-row.is-error {
   padding: 10px 14px;
 }
 
+.process-stack-entry-assistant {
+  margin-top: 4px;
+  margin-left: 4px;
+}
+
+.process-stack-entry-toggle.is-static {
+  cursor: default;
+}
+
+.process-stack-entry-toggle.is-static:hover {
+  background: transparent;
+}
+
 .process-stack-entry-text {
   max-height: 18rem;
   overflow: auto;

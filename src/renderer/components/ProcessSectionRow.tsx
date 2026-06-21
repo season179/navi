@@ -2,7 +2,7 @@
 // (../Kun/src/renderer/src/components/chat/message-timeline-process.tsx).
 // Visual only: parent supplies section snapshots and optional toggle callbacks.
 
-import { useState, type ReactElement } from 'react'
+import { useState, type MouseEvent, type ReactElement } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
@@ -19,8 +19,9 @@ export type ProcessStackEntrySnapshot = {
   error?: boolean
   expanded?: boolean
   collapsible?: boolean
+  forceOpen?: boolean
   detailText?: string
-  detailKind?: 'text' | 'patch' | 'error'
+  detailKind?: 'text' | 'patch' | 'error' | 'assistant'
   detailFilePath?: string
 }
 
@@ -179,6 +180,58 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
       },
     ],
   },
+  executionAutoOpen: {
+    kind: 'execution',
+    title: 'Edited 1 file · Ran 1 command',
+    collapsible: true,
+    expanded: true,
+    stackEntries: [
+      {
+        id: 'read',
+        summary: 'Read src/auth/middleware.ts',
+        filePath: 'src/auth/middleware.ts',
+      },
+      {
+        id: 'test',
+        summary: 'Run npm test',
+        error: true,
+        detailKind: 'error',
+        detailText: 'Command failed with exit code 1\n\n✗ session store persistence test failed',
+      },
+      {
+        id: 'edit',
+        summary: 'Edit src/auth/middleware.ts',
+        filePath: 'src/auth/middleware.ts',
+        collapsible: true,
+        detailKind: 'patch',
+        detailText: PREVIEW_PATCH,
+        detailFilePath: 'src/auth/middleware.ts',
+      },
+    ],
+  },
+  executionForceOpen: {
+    kind: 'execution',
+    title: 'Waiting for approval',
+    processing: true,
+    active: true,
+    collapsible: true,
+    expanded: true,
+    stackEntries: [
+      {
+        id: 'approval',
+        summary: 'Approve deploy to staging',
+        active: true,
+        forceOpen: true,
+        detailText: 'The agent wants to run `npm run deploy:staging` against the preview cluster.',
+        detailKind: 'text',
+      },
+      {
+        id: 'read',
+        summary: 'Read package.json',
+        filePath: 'package.json',
+      },
+    ],
+  },
   output: {
     kind: 'output',
     title: '',
@@ -285,20 +338,34 @@ function ProcessStackEntryDetail({
       </div>
     )
   }
+  if (entry.detailKind === 'assistant') {
+    return (
+      <div className="process-entry-row-assistant ds-markdown">
+        <Markdown text={entry.detailText} streaming={entry.active === true} />
+      </div>
+    )
+  }
   return <pre className="process-stack-entry-text">{entry.detailText}</pre>
 }
 
 function ProcessStackEntryRow({
   entry,
-  expanded,
+  open,
+  canToggle,
   onToggle,
 }: {
   entry: ProcessStackEntrySnapshot
-  expanded: boolean
-  onToggle?: () => void
+  open: boolean
+  canToggle: boolean
+  onToggle: () => void
 }): ReactElement {
-  const canToggle = entry.collapsible !== false && Boolean(entry.detailText)
+  const canExpand = Boolean(entry.detailText) && entry.collapsible !== false
   const rowActive = entry.active === true
+
+  const handleToggleButton = (event: MouseEvent<HTMLButtonElement>): void => {
+    event.stopPropagation()
+    onToggle()
+  }
 
   const row = (
     <>
@@ -309,18 +376,16 @@ function ProcessStackEntryRow({
       >
         <ProcessSummaryLine summary={entry.summary} filePath={entry.filePath} />
       </span>
-      {canToggle ? (
+      {canExpand ? (
         <button
           type="button"
-          aria-label={expanded ? 'Collapse detail' : 'Expand detail'}
-          aria-expanded={expanded}
-          className="process-stack-entry-toggle"
-          onClick={(event) => {
-            event.stopPropagation()
-            onToggle?.()
-          }}
+          aria-label={open ? 'Collapse detail' : 'Expand detail'}
+          aria-expanded={open}
+          disabled={!canToggle}
+          className={`process-stack-entry-toggle ${canToggle ? '' : 'is-static'}`}
+          onClick={handleToggleButton}
         >
-          {expanded ? (
+          {open ? (
             <ChevronDown className="process-stack-entry-chevron" strokeWidth={2} />
           ) : (
             <ChevronRight className="process-stack-entry-chevron" strokeWidth={2} />
@@ -335,7 +400,7 @@ function ProcessStackEntryRow({
       {canToggle ? (
         <button
           type="button"
-          aria-expanded={expanded}
+          aria-expanded={open}
           className={`process-stack-entry-row ${entry.error ? 'is-error' : ''}`}
           onClick={onToggle}
         >
@@ -346,10 +411,16 @@ function ProcessStackEntryRow({
           {row}
         </div>
       )}
-      {expanded && entry.detailText ? (
-        <div className="process-stack-entry-detail">
-          <ProcessStackEntryDetail entry={entry} />
-        </div>
+      {open && entry.detailText ? (
+        entry.detailKind === 'assistant' ? (
+          <div className="process-stack-entry-assistant">
+            <ProcessStackEntryDetail entry={entry} />
+          </div>
+        ) : (
+          <div className="process-stack-entry-detail ds-work-timeline-detail">
+            <ProcessStackEntryDetail entry={entry} />
+          </div>
+        )
       ) : null}
     </div>
   )
@@ -369,36 +440,67 @@ function ProcessOutputDetail({
 
 function ProcessStackRows({
   entries,
-  expandedEntryId,
-  onToggleEntry,
 }: {
   entries: ProcessStackEntrySnapshot[]
-  expandedEntryId: string | null
-  onToggleEntry: (id: string) => void
 }): ReactElement {
+  const [openBlockId, setOpenBlockId] = useState<string | null>(() => {
+    const preset = entries.find((entry) => entry.expanded)?.id
+    return preset ?? null
+  })
+  const [closedBlockIds, setClosedBlockIds] = useState<ReadonlySet<string>>(() => new Set())
+
   return (
     <div className="process-stack">
-      {entries.map((entry) => (
-        <ProcessStackEntryRow
-          key={entry.id}
-          entry={entry}
-          expanded={expandedEntryId === entry.id}
-          onToggle={
-            entry.collapsible === false ? undefined : () => onToggleEntry(entry.id)
+      {entries.map((entry) => {
+        const hasDetail = Boolean(entry.detailText)
+        const staticOpen = hasDetail && entry.collapsible === false
+        const defaultOpen = entry.error === true
+        const forceOpen = entry.forceOpen === true
+        const userClosed = closedBlockIds.has(entry.id)
+        const userOpened = openBlockId === entry.id
+        const open =
+          hasDetail &&
+          (staticOpen || forceOpen || userOpened || (defaultOpen && !userClosed))
+        const canExpand = hasDetail && !staticOpen
+        const canToggle = canExpand && !forceOpen
+        const handleToggle = (): void => {
+          if (!canToggle) return
+          if (open) {
+            setOpenBlockId((id) => (id === entry.id ? null : id))
+            if (defaultOpen) {
+              setClosedBlockIds((ids) => {
+                const next = new Set(ids)
+                next.add(entry.id)
+                return next
+              })
+            }
+            return
           }
-        />
-      ))}
+          setClosedBlockIds((ids) => {
+            if (!ids.has(entry.id)) return ids
+            const next = new Set(ids)
+            next.delete(entry.id)
+            return next
+          })
+          setOpenBlockId(entry.id)
+        }
+
+        return (
+          <ProcessStackEntryRow
+            key={entry.id}
+            entry={entry}
+            open={open}
+            canToggle={canToggle}
+            onToggle={handleToggle}
+          />
+        )
+      })}
     </div>
   )
 }
 
 export function ProcessSectionRow({ section, expanded, onToggle }: Props): ReactElement {
   const [userExpanded, setUserExpanded] = useState<boolean | null>(null)
-  const [expandedEntryId, setExpandedEntryId] = useState<string | null>(() => {
-    const preset = section.stackEntries?.find((entry) => entry.expanded)?.id
-    return preset ?? null
-  })
-
   const singleExecutionEntry =
     section.kind === 'execution' && section.stackEntries?.length === 1
       ? section.stackEntries[0]
@@ -497,13 +599,7 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
               />
             </div>
           ) : section.stackEntries ? (
-            <ProcessStackRows
-              entries={section.stackEntries}
-              expandedEntryId={expandedEntryId}
-              onToggleEntry={(id) =>
-                setExpandedEntryId((current) => (current === id ? null : id))
-              }
-            />
+            <ProcessStackRows entries={section.stackEntries} />
           ) : null}
         </div>
       ) : null}

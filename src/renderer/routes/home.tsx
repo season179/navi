@@ -747,7 +747,7 @@ function HomePage() {
   const [workMetaRowExpanded, setWorkMetaRowExpanded] = useState(false)
 
   // Visual preview for the ported ProcessSectionRow
-  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|error|output|outputStreaming).
+  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|executionAutoOpen|executionForceOpen|error|output|outputStreaming).
   const processSectionRowPreviewMode = useMemo((): ProcessSectionRowPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -757,6 +757,8 @@ function HomePage() {
     if (mode === 'reasoningActive') return 'reasoningActive'
     if (mode === 'execution') return 'execution'
     if (mode === 'executionExpanded') return 'executionExpanded'
+    if (mode === 'executionAutoOpen') return 'executionAutoOpen'
+    if (mode === 'executionForceOpen') return 'executionForceOpen'
     if (mode === 'error') return 'error'
     if (mode === 'output') return 'output'
     if (mode === 'outputStreaming') return 'outputStreaming'
@@ -4237,6 +4239,8 @@ function HomePage() {
               processSectionRowPreviewMode === 'reasoningExpanded' ||
               processSectionRowPreviewMode === 'reasoningActive' ||
               processSectionRowPreviewMode === 'executionExpanded' ||
+              processSectionRowPreviewMode === 'executionAutoOpen' ||
+              processSectionRowPreviewMode === 'executionForceOpen' ||
               processSectionRowPreviewMode === 'error'
                 ? true
                 : processSectionRowExpanded
