@@ -28744,3 +28744,284 @@ button.usage-heatmap-cell:focus {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   text-align: center;
 }
+
+/* =====================================================
+   chat-sidebar (Kun Sidebar port)
+   ===================================================== */
+.chat-sidebar-preview-wrap,
+.sidebar-projects-preview-wrap {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 900;
+  width: 280px;
+  border-right: 1px solid var(--ds-border-muted);
+}
+
+.chat-sidebar-preview-shell,
+.sidebar-projects-preview-shell {
+  position: relative;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ds-sidebar-shell {
+  background: var(--ds-sidebar-gradient), var(--ds-bg-sidebar);
+  border-color: var(--ds-sidebar-border);
+  isolation: isolate;
+  backdrop-filter: blur(14px) saturate(112%);
+  -webkit-backdrop-filter: blur(14px) saturate(112%);
+}
+
+.ds-sidebar-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--ds-sidebar-haze);
+  pointer-events: none;
+}
+
+.ds-sidebar-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.ds-sidebar-titlebar-spacer {
+  flex-shrink: 0;
+  padding: 12px 0 20px;
+}
+
+.ds-sidebar-titlebar-row {
+  display: flex;
+  min-height: 34px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.ds-titlebar-safe-block {
+  min-width: 86px;
+}
+
+.sidebar-focus-toggle {
+  display: inline-flex;
+  height: 32px;
+  width: 112px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid var(--ds-sidebar-divider);
+  background: var(--ds-sidebar-field-bg);
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #5c6675;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.46);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+:root[data-theme='dark'] .sidebar-focus-toggle {
+  color: rgba(255, 255, 255, 0.62);
+  box-shadow: none;
+}
+
+.sidebar-focus-toggle:hover {
+  background: var(--ds-sidebar-row-hover);
+  color: #1f2733;
+}
+
+:root[data-theme='dark'] .sidebar-focus-toggle:hover {
+  color: #fff;
+}
+
+.sidebar-focus-toggle.is-enabled {
+  border-color: rgba(79, 124, 255, 0.35);
+  background: var(--ds-sidebar-row-active);
+  color: #1f1f1f;
+  box-shadow:
+    0 1px 3px rgba(20, 47, 95, 0.07),
+    inset 0 0 0 1px var(--ds-sidebar-row-ring),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+:root[data-theme='dark'] .sidebar-focus-toggle.is-enabled {
+  color: #fff;
+}
+
+.sidebar-focus-toggle-label {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebar-focus-toggle-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.sidebar-focus-toggle-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-focus-toggle-track {
+  position: relative;
+  height: 16px;
+  width: 28px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.75);
+  box-shadow: inset 0 0 0 1px rgba(100, 116, 139, 0.16);
+  transition: background-color 0.15s ease;
+}
+
+:root[data-theme='dark'] .sidebar-focus-toggle-track {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-focus-toggle.is-enabled .sidebar-focus-toggle-track {
+  background: rgba(79, 124, 255, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-focus-toggle-thumb {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  height: 12px;
+  width: 12px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(20, 47, 95, 0.24);
+  transition: transform 0.15s ease;
+}
+
+.sidebar-focus-toggle.is-enabled .sidebar-focus-toggle-thumb {
+  transform: translateX(12px);
+}
+
+/* Kun state mascots (SVG stand-ins for image figures) */
+.ds-kun-state {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ds-kun-state:hover {
+  z-index: 5;
+  transform: scale(1.5);
+}
+
+.ds-kun-state .ds-kun-state-figure {
+  display: block;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ds-kun-state-greet .ds-kun-state-figure {
+  animation: ds-kun-greet-wave 2.6s ease-in-out infinite;
+  transform-origin: 50% 88%;
+}
+
+.ds-kun-state-sleep .ds-kun-state-figure {
+  animation: ds-kun-sleep-breathe 3.6s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+.ds-kun-state-sit .ds-kun-state-figure {
+  animation: ds-kun-sit-sway 4.2s ease-in-out infinite;
+  transform-origin: 50% 92%;
+}
+
+@keyframes ds-kun-greet-wave {
+  0%,
+  48%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  12% {
+    transform: rotate(-5deg) translateY(-1px);
+  }
+  24% {
+    transform: rotate(4deg) translateY(-1.6px);
+  }
+  36% {
+    transform: rotate(-3deg) translateY(-0.6px);
+  }
+}
+
+@keyframes ds-kun-sleep-breathe {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.015, 1.045) translateY(-0.4px);
+  }
+}
+
+@keyframes ds-kun-sit-sway {
+  0%,
+  100% {
+    transform: rotate(-1.6deg);
+  }
+  50% {
+    transform: rotate(1.6deg);
+  }
+}
+
+.ds-sidebar-mascot {
+  height: 46px;
+  width: 56px;
+  opacity: 0.92;
+  animation: ds-kun-mascot-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ds-kun-mascot-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(5px) scale(0.7);
+  }
+  100% {
+    opacity: 0.92;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-sidebar-mascot,
+  .ds-kun-state-greet .ds-kun-state-figure,
+  .ds-kun-state-sleep .ds-kun-state-figure,
+  .ds-kun-state-sit .ds-kun-state-figure {
+    animation: none;
+  }
+
+  .ds-kun-state:hover {
+    transform: none;
+  }
+}
+
+.ds-thread-context-menu {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}

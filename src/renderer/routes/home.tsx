@@ -399,6 +399,14 @@ import {
   type ConnectPhoneViewPreviewMode,
   type ConnectPhoneSidebarPreviewMode,
 } from '../components/ConnectPhoneView'
+import {
+  SidebarPreview,
+  type SidebarPreviewMode,
+} from '../components/Sidebar'
+import {
+  SidebarProjectsSectionPreview,
+  type SidebarProjectsPreviewMode,
+} from '../components/SidebarProjectsSection'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -1093,6 +1101,46 @@ function HomePage() {
       if (value === 'disabled') return 'disabled'
       return value as ConnectPhoneSidebarPreviewMode
     }, [])
+
+  // Visual preview for the ported Sidebar
+  // (?sidebarPreview=1|empty|search|multiWorkspace|running|forked|claw|connectPhone|focusMode|schedule|renameDialog|contextMenu).
+  const sidebarPreviewMode = useMemo((): SidebarPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('sidebarPreview')) return null
+    const value = params.get('sidebarPreview')
+    if (!value || value === '1' || value === 'default') return 'default'
+    if (value === 'empty') return 'empty'
+    if (value === 'search') return 'search'
+    if (value === 'multiWorkspace') return 'multiWorkspace'
+    if (value === 'running') return 'running'
+    if (value === 'forked') return 'forked'
+    if (value === 'claw') return 'claw'
+    if (value === 'connectPhone') return 'connectPhone'
+    if (value === 'focusMode') return 'focusMode'
+    if (value === 'schedule') return 'schedule'
+    if (value === 'renameDialog') return 'renameDialog'
+    if (value === 'contextMenu') return 'contextMenu'
+    return value as SidebarPreviewMode
+  }, [])
+
+  // Visual preview for the ported SidebarProjectsSection
+  // (?sidebarProjectsPreview=1|empty|search|multiWorkspace|running|forked|renameDialog|contextMenu).
+  const sidebarProjectsPreviewMode = useMemo((): SidebarProjectsPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('sidebarProjectsPreview')) return null
+    const value = params.get('sidebarProjectsPreview')
+    if (!value || value === '1' || value === 'default') return 'default'
+    if (value === 'empty') return 'empty'
+    if (value === 'search') return 'search'
+    if (value === 'multiWorkspace') return 'multiWorkspace'
+    if (value === 'running') return 'running'
+    if (value === 'forked') return 'forked'
+    if (value === 'renameDialog') return 'renameDialog'
+    if (value === 'contextMenu') return 'contextMenu'
+    return value as SidebarProjectsPreviewMode
+  }, [])
 
   // Visual preview for the ported PluginMarketplaceView
   // (?pluginMarketplaceViewPreview=1|skill|empty|customOpen|noticeSuccess|noticeError|mcpOverlayError|skillLoading|installed).
@@ -2102,6 +2150,14 @@ function HomePage() {
 
   if (connectPhoneSidebarPreviewMode) {
     return <ConnectPhoneSidebarPreview mode={connectPhoneSidebarPreviewMode} />
+  }
+
+  if (sidebarPreviewMode) {
+    return <SidebarPreview mode={sidebarPreviewMode} />
+  }
+
+  if (sidebarProjectsPreviewMode) {
+    return <SidebarProjectsSectionPreview mode={sidebarProjectsPreviewMode} />
   }
 
   if (pluginMarketplaceViewPreviewMode) {
