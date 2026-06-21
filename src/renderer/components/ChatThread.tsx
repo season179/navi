@@ -12,6 +12,7 @@ import {
   TimelineShowEarlierButton,
 } from './TimelinePaginationControls'
 import { CompactionDivider, type CompactionDividerSnapshot } from './CompactionDivider'
+import { DevPreviewLaunchCard } from './DevPreviewLaunchCard'
 import { ReviewPlanCard } from './ReviewPlanCard'
 import { ReviewSummaryCard, type ReviewSummarySnapshot } from './ReviewSummaryCard'
 import { ThreadForkBanner, ThreadForkPoint } from './ThreadForkBanner'
@@ -114,6 +115,11 @@ type ChatThreadProps = {
   /** When set with turnReviews, renders Kun's review summary cards at this turn. */
   reviewsAtTurnIndex?: number
   turnReviews?: ReviewSummarySnapshot[]
+  /** When set with devPreviewUrl, renders Kun's dev preview launch card at this turn. */
+  devPreviewAtTurnIndex?: number
+  devPreviewUrl?: string
+  devPreviewOpened?: boolean
+  onDevPreviewOpen?: () => void
   /** When set with turnChanges, renders Kun's turn change summary at this turn. */
   changesAtTurnIndex?: number
   turnChanges?: TurnChangeSnapshot[]
@@ -133,6 +139,10 @@ export function ChatThread({
   planRelativePath,
   reviewsAtTurnIndex,
   turnReviews,
+  devPreviewAtTurnIndex,
+  devPreviewUrl,
+  devPreviewOpened = false,
+  onDevPreviewOpen,
   changesAtTurnIndex,
   turnChanges,
   turnChangesCompact = false,
@@ -235,6 +245,10 @@ export function ChatThread({
             turnReviews.length > 0 &&
             typeof reviewsAtTurnIndex === 'number' &&
             reviewsAtTurnIndex === absoluteTurnIndex
+          const showDevPreview =
+            devPreviewUrl != null &&
+            typeof devPreviewAtTurnIndex === 'number' &&
+            devPreviewAtTurnIndex === absoluteTurnIndex
           const showTurnChanges =
             turnChanges != null &&
             turnChanges.length > 0 &&
@@ -274,6 +288,13 @@ export function ChatThread({
                       <ReviewSummaryCard key={review.title} review={review} />
                     ))
                   : null}
+                {showDevPreview ? (
+                  <DevPreviewLaunchCard
+                    url={devPreviewUrl}
+                    opened={devPreviewOpened}
+                    onOpen={onDevPreviewOpen}
+                  />
+                ) : null}
                 {showPlan ? (
                   <ReviewPlanCard title={planTitle} relativePath={planRelativePath} />
                 ) : null}

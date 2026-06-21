@@ -2805,6 +2805,39 @@ function HomePage() {
     }
   }, [])
 
+  // Production ChatThread dev preview launch card via ?productionDevPreviewLaunchCard=…
+  const productionDevPreviewLaunchCardMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionDevPreviewLaunchCard')) return null
+    return params.get('productionDevPreviewLaunchCard') === 'opened' ? 'opened' : 'default'
+  }, [])
+  const [productionDevPreviewOpened, setProductionDevPreviewOpened] = useState(
+    () => productionDevPreviewLaunchCardMode === 'opened',
+  )
+  const productionChatDevPreview = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {
+        devPreviewAtTurnIndex: undefined,
+        devPreviewUrl: undefined,
+      }
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionDevPreviewLaunchCard')) {
+      return {
+        devPreviewAtTurnIndex: undefined,
+        devPreviewUrl: undefined,
+      }
+    }
+    const turnParam = params.get('productionDevPreviewTurnIndex')
+    const parsedTurnIndex = turnParam ? Number.parseInt(turnParam, 10) : 0
+    const devPreviewAtTurnIndex = Number.isFinite(parsedTurnIndex) ? parsedTurnIndex : 0
+    return {
+      devPreviewAtTurnIndex,
+      devPreviewUrl: DEV_PREVIEW_LAUNCH_CARD_PREVIEW.url,
+    }
+  }, [])
+
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
   // toggles (a create/enable/disable in the Skills tab may have changed the set).
@@ -3444,6 +3477,10 @@ function HomePage() {
         planRelativePath={productionChatPlan.planRelativePath}
         reviewsAtTurnIndex={productionChatReviews.reviewsAtTurnIndex}
         turnReviews={productionChatReviews.turnReviews}
+        devPreviewAtTurnIndex={productionChatDevPreview.devPreviewAtTurnIndex}
+        devPreviewUrl={productionChatDevPreview.devPreviewUrl}
+        devPreviewOpened={productionDevPreviewOpened}
+        onDevPreviewOpen={() => setProductionDevPreviewOpened(true)}
         changesAtTurnIndex={productionChatTurnChanges.changesAtTurnIndex}
         turnChanges={productionChatTurnChanges.turnChanges}
         turnChangesCompact={productionChatTurnChanges.turnChangesCompact}
