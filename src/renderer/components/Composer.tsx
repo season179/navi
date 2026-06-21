@@ -40,6 +40,8 @@ interface ComposerProps {
   /** Queued messages shown above the composer shell while a reply is streaming. */
   queuedMessages?: QueuedComposerMessage[]
   onRemoveQueuedMessage?: (id: string) => void
+  /** Execution picker (approval + sandbox) rendered in the toolbar after the model chip. */
+  executionPicker?: ReactNode
 }
 
 /**
@@ -67,6 +69,7 @@ export function Composer({
   voiceRecording,
   queuedMessages,
   onRemoveQueuedMessage,
+  executionPicker,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -163,6 +166,7 @@ export function Composer({
               <Plus />
             </button>
             {modelChip}
+            {executionPicker}
           </div>
           <div className={voiceRecording ? 'composer-toolbar-right is-recording' : 'composer-toolbar-right'}>
             {voiceRecording ? (

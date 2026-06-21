@@ -12,6 +12,11 @@ import { Composer } from '../components/Composer'
 import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
+import {
+  FloatingComposerExecutionPicker,
+  EXECUTION_PICKER_PREVIEW,
+  type ComposerExecutionSettings,
+} from '../components/FloatingComposerExecutionPicker'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -79,6 +84,24 @@ function HomePage() {
     if (!new URLSearchParams(window.location.search).has('queuedMessagesPreview')) return undefined
     return QUEUED_MESSAGES_PREVIEW
   }, [])
+
+  // Visual preview for the ported FloatingComposerExecutionPicker (?executionPickerPreview=1).
+  const executionPickerPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('executionPickerPreview')) return null
+    return params.get('executionPickerPreview') === 'danger' ? 'danger' : 'default'
+  }, [])
+  const [executionPickerPreview, setExecutionPickerPreview] = useState<ComposerExecutionSettings>(
+    () => ({
+      ...EXECUTION_PICKER_PREVIEW,
+      sandboxMode:
+        typeof window !== 'undefined' &&
+        new URLSearchParams(window.location.search).get('executionPickerPreview') === 'danger'
+          ? 'danger-full-access'
+          : EXECUTION_PICKER_PREVIEW.sandboxMode,
+    }),
+  )
 
   // The active project's cwd, for scoping project skills in the Skills panel.
   // A no-project chat (navi-default) has no path → project skills aren't listed.
@@ -207,6 +230,14 @@ function HomePage() {
         }
         voiceRecording={voiceRecording}
         queuedMessages={queuedMessagesPreview}
+        executionPicker={
+          executionPickerPreviewMode ? (
+            <FloatingComposerExecutionPicker
+              value={executionPickerPreview}
+              onChange={(patch) => setExecutionPickerPreview((current) => ({ ...current, ...patch }))}
+            />
+          ) : undefined
+        }
       />
 
       {contextCapacityPreview ? (

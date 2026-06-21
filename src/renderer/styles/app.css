@@ -1072,6 +1072,156 @@ textarea {
   pointer-events: none;
 }
 
+/* =====================================================
+   Composer execution picker (approval + sandbox access)
+   ===================================================== */
+.execution-picker {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.execution-picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 2px 10px;
+  border: 1px solid var(--ds-border-muted);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ds-card) 72%, transparent);
+  box-shadow: 0 1px 2px rgba(20, 47, 95, 0.08);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ds-text-muted);
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+
+.execution-picker-trigger:hover:not(:disabled) {
+  background: var(--ds-surface-hover);
+  color: var(--ds-text);
+}
+
+.execution-picker-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.execution-picker-trigger svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.execution-picker-trigger.is-danger {
+  border-color: color-mix(in srgb, #fdba74 70%, transparent);
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.execution-picker-trigger.is-danger:hover:not(:disabled) {
+  background: #ffedd5;
+}
+
+[data-theme='dark'] .execution-picker-trigger.is-danger {
+  border-color: color-mix(in srgb, #9a3412 70%, transparent);
+  background: color-mix(in srgb, #431407 30%, transparent);
+  color: #fed7aa;
+}
+
+[data-theme='dark'] .execution-picker-trigger.is-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, #431407 45%, transparent);
+}
+
+.execution-picker-label {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.execution-picker-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 40;
+  width: 260px;
+  overflow: hidden;
+  padding: 8px;
+  border: 1px solid var(--ds-border);
+  border-radius: 16px;
+  background: var(--ds-card-strong);
+  box-shadow: 0 18px 48px rgba(20, 47, 95, 0.16);
+  font-size: 13px;
+  color: var(--ds-text-muted);
+}
+
+[data-theme='dark'] .execution-picker-menu {
+  background: var(--ds-card);
+}
+
+.execution-picker-section-label {
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ds-text-faint);
+}
+
+.execution-picker-hint {
+  padding: 0 8px 4px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ds-text-faint);
+}
+
+.execution-picker-divider {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--ds-border-muted);
+}
+
+.execution-picker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.execution-picker-row:hover {
+  background: color-mix(in srgb, var(--ds-surface-hover) 70%, transparent);
+  color: var(--ds-text);
+}
+
+.execution-picker-row.is-selected {
+  background: var(--ds-surface-hover);
+  color: var(--ds-text);
+}
+
+.execution-picker-row-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.execution-picker-row svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 /* Round tool button (plus menu, etc.) */
 .tool-btn {
   display: inline-flex;
