@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
-import { Plus, Settings, PanelLeft, Sun, Moon } from 'lucide-react'
+import { Plus, Settings, Sun, Moon } from 'lucide-react'
 import { useTheme } from '../theme'
 import { SidebarContext } from '../sidebar'
 import { SettingsContext } from '../settings'
@@ -10,6 +10,7 @@ import {
   WorkspaceModeTabs,
   type WorkspaceModeView,
 } from '../components/WorkspaceModeTabs'
+import { SidebarCommandRow, SidebarFrame } from '../components/SidebarPrimitives'
 
 function RootLayout() {
   const { theme, toggleTheme } = useTheme()
@@ -21,15 +22,11 @@ function RootLayout() {
   const toggleSettings = useCallback(() => setSettingsOpen((v) => !v), [])
   const { newConversation } = useNaviList()
 
-  // Starting a fresh conversation leaves the settings view (mirrors Kun, where
-  // openCode() flips route back to chat) so you land in the new chat, not on
-  // the providers page.
   const handleNew = () => {
     closeSettings()
     newConversation()
   }
 
-  // Visual preview for the ported WorkspaceModeTabs (?workspaceModeTabsPreview=1|write).
   const workspaceModeTabsPreviewMode = useMemo((): WorkspaceModeView | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -44,58 +41,67 @@ function RootLayout() {
       <SettingsContext.Provider
         value={{ settingsOpen, openSettings, closeSettings, toggleSettings }}
       >
-      <div className="workbench" style={{ ['--sidebar-width' as string]: collapsed ? '0px' : '264px' }}>
-        {!collapsed ? (
-          <aside className="sidebar">
-            <div className="sidebar-header">
-              <button
-                className="sidebar-titlebar-toggle"
-                onClick={() => setCollapsed(true)}
-                aria-label="Collapse sidebar"
+        <div
+          className="workbench"
+          style={{ ['--sidebar-width' as string]: collapsed ? '0px' : '264px' }}
+        >
+          {!collapsed ? (
+            <div className="production-sidebar-host">
+              <SidebarFrame
                 title="Collapse sidebar"
+                onCollapse={() => setCollapsed(true)}
+                footer={
+                  <>
+                    <SidebarCommandRow
+                      icon={
+                        theme === 'dark' ? (
+                          <Sun className="h-4 w-4" strokeWidth={1.75} />
+                        ) : (
+                          <Moon className="h-4 w-4" strokeWidth={1.75} />
+                        )
+                      }
+                      label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                      onClick={toggleTheme}
+                      variant="footer"
+                    />
+                    <SidebarCommandRow
+                      icon={<Settings className="h-4 w-4" strokeWidth={1.75} />}
+                      label="Settings"
+                      onClick={toggleSettings}
+                      active={settingsOpen}
+                      variant="footer"
+                    />
+                  </>
+                }
               >
-                <PanelLeft />
-              </button>
+                {workspaceModeTabsPreviewMode ? (
+                  <div className="ds-no-drag flex flex-col px-1">
+                    <WorkspaceModeTabs
+                      activeView={workspaceModeTabsPreviewView}
+                      onCodeOpen={() => setWorkspaceModeTabsPreviewView('chat')}
+                      onWriteOpen={() => setWorkspaceModeTabsPreviewView('write')}
+                    />
+                  </div>
+                ) : null}
+
+                <div className="ds-no-drag flex flex-col px-1">
+                  <SidebarCommandRow
+                    icon={<Plus className="h-4 w-4" strokeWidth={2} />}
+                    label="New conversation"
+                    onClick={handleNew}
+                    variant="accent"
+                  />
+                </div>
+
+                <SidebarProjects />
+              </SidebarFrame>
             </div>
+          ) : null}
 
-            <div className="sidebar-body">
-              {workspaceModeTabsPreviewMode ? (
-                <WorkspaceModeTabs
-                  activeView={workspaceModeTabsPreviewView}
-                  onCodeOpen={() => setWorkspaceModeTabsPreviewView('chat')}
-                  onWriteOpen={() => setWorkspaceModeTabsPreviewView('write')}
-                />
-              ) : null}
-
-              <button className="cmd-row is-accent" onClick={handleNew}>
-                <Plus />
-                <span className="cmd-label">New conversation</span>
-              </button>
-
-              <SidebarProjects />
-            </div>
-
-            <div className="sidebar-footer">
-              <button className="cmd-row" onClick={toggleTheme} title="Toggle theme">
-                {theme === 'dark' ? <Sun /> : <Moon />}
-                <span className="cmd-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
-              </button>
-              <button
-                className={settingsOpen ? 'cmd-row is-active' : 'cmd-row'}
-                onClick={toggleSettings}
-                title="Settings"
-              >
-                <Settings />
-                <span className="cmd-label">Settings</span>
-              </button>
-            </div>
-          </aside>
-        ) : null}
-
-        <main className="stage">
-          <Outlet />
-        </main>
-      </div>
+          <main className="stage">
+            <Outlet />
+          </main>
+        </div>
       </SettingsContext.Provider>
     </SidebarContext.Provider>
   )

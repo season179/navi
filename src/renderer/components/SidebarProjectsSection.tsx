@@ -50,6 +50,7 @@ export type SidebarDraftHistorySnapshot = {
 
 export type SidebarWorkspaceGroup = {
   workspacePath: string
+  projectId?: string
   threads: SidebarThreadSnapshot[]
   draftHistory?: SidebarDraftHistorySnapshot[]
 }
@@ -235,12 +236,16 @@ function ThreadRow({
   locale,
   showRunning,
   showUnread,
+  onSelect,
+  onDelete,
 }: {
   thread: SidebarThreadSnapshot
   active: boolean
   locale: string
   showRunning: boolean
   showUnread: boolean
+  onSelect?: () => void
+  onDelete?: () => void
 }): ReactElement {
   const forked = Boolean(thread.forkedFromThreadId)
   const forkLabel = forked
@@ -254,6 +259,7 @@ function ThreadRow({
   return (
     <SidebarTreeRow
       active={active}
+      onClick={onSelect}
       actionsVisibility="hidden"
       actionsLayout="overlay"
       actions={
@@ -271,6 +277,7 @@ function ThreadRow({
             title={COPY.sidebarThreadDelete}
             ariaLabel={COPY.sidebarThreadDelete}
             stopPropagation
+            onClick={onDelete}
           >
             <Trash2 className="h-3 w-3" strokeWidth={1.9} />
           </SidebarIconButton>
@@ -482,6 +489,13 @@ export function SidebarProjectsSection({
   showRenameDialog = false,
   showContextMenu = false,
   onSearchQueryChange,
+  onCreateProject,
+  onProjectClick,
+  onDeleteProject,
+  onSelectThread,
+  onDeleteThread,
+  onNewThreadInProject,
+  deletableProjectIds,
 }: {
   groups: SidebarWorkspaceGroup[]
   activeThreadId: string | null
@@ -493,6 +507,13 @@ export function SidebarProjectsSection({
   showRenameDialog?: boolean
   showContextMenu?: boolean
   onSearchQueryChange?: (value: string) => void
+  onCreateProject?: () => void
+  onProjectClick?: (projectId: string) => void
+  onDeleteProject?: (projectId: string) => void
+  onSelectThread?: (threadId: string) => void
+  onDeleteThread?: (threadId: string) => void
+  onNewThreadInProject?: (projectId: string) => void
+  deletableProjectIds?: ReadonlySet<string>
 }): ReactElement {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
   const [searchOpen, setSearchOpen] = useState(searchVisible)
@@ -545,6 +566,7 @@ export function SidebarProjectsSection({
             className="h-7 w-7"
             title={COPY.changeWorkspace}
             ariaLabel={COPY.changeWorkspace}
+            onClick={onCreateProject}
           >
             <FolderPlus className="h-3.5 w-3.5" strokeWidth={1.75} />
           </SidebarIconButton>
@@ -592,35 +614,63 @@ export function SidebarProjectsSection({
             <div key={group.workspacePath} className="mb-2">
               <SidebarTreeRow
                 title={group.workspacePath}
-                onClick={() =>
+                onClick={() => {
+                  if (group.projectId) onProjectClick?.(group.projectId)
                   setCollapsed((current) => ({
                     ...current,
                     [group.workspacePath]: !current[group.workspacePath],
                   }))
-                }
+                }}
                 className="min-h-[36px] text-[13.5px]"
                 buttonClassName="items-center gap-2 px-2.5 py-2"
                 actionsVisibility="hidden"
                 actionsLayout="overlay"
                 actions={
                   <>
-                    <SidebarIconButton
-                      title={COPY.sidebarWorkspaceNewThread}
-                      ariaLabel={COPY.sidebarWorkspaceNewThread}
-                      className="h-6 w-6"
-                      stopPropagation
-                    >
-                      <Plus className="h-3.5 w-3.5" strokeWidth={1.9} />
-                    </SidebarIconButton>
-                    <SidebarIconButton
-                      title={COPY.sidebarWorkspaceRemove}
-                      ariaLabel={COPY.sidebarWorkspaceRemove}
-                      tone="danger"
-                      className="h-6 w-6"
-                      stopPropagation
-                    >
-                      <Trash2 className="h-3.5 w-3.5" strokeWidth={1.9} />
-                    </SidebarIconButton>
+                    {group.projectId && onNewThreadInProject ? (
+                      <SidebarIconButton
+                        title={COPY.sidebarWorkspaceNewThread}
+                        ariaLabel={COPY.sidebarWorkspaceNewThread}
+                        className="h-6 w-6"
+                        stopPropagation
+                        onClick={() => onNewThreadInProject(group.projectId!)}
+                      >
+                        <Plus className="h-3.5 w-3.5" strokeWidth={1.9} />
+                      </SidebarIconButton>
+                    ) : (
+                      <SidebarIconButton
+                        title={COPY.sidebarWorkspaceNewThread}
+                        ariaLabel={COPY.sidebarWorkspaceNewThread}
+                        className="h-6 w-6"
+                        stopPropagation
+                      >
+                        <Plus className="h-3.5 w-3.5" strokeWidth={1.9} />
+                      </SidebarIconButton>
+                    )}
+                    {group.projectId &&
+                    onDeleteProject &&
+                    deletableProjectIds?.has(group.projectId) ? (
+                      <SidebarIconButton
+                        title={COPY.sidebarWorkspaceRemove}
+                        ariaLabel={COPY.sidebarWorkspaceRemove}
+                        tone="danger"
+                        className="h-6 w-6"
+                        stopPropagation
+                        onClick={() => onDeleteProject(group.projectId!)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" strokeWidth={1.9} />
+                      </SidebarIconButton>
+                    ) : onDeleteProject ? null : (
+                      <SidebarIconButton
+                        title={COPY.sidebarWorkspaceRemove}
+                        ariaLabel={COPY.sidebarWorkspaceRemove}
+                        tone="danger"
+                        className="h-6 w-6"
+                        stopPropagation
+                      >
+                        <Trash2 className="h-3.5 w-3.5" strokeWidth={1.9} />
+                      </SidebarIconButton>
+                    )}
                   </>
                 }
               >
@@ -650,7 +700,9 @@ export function SidebarProjectsSection({
                       active={activeThreadId === thread.id}
                       locale={locale}
                       showRunning={thread.status?.trim().toLowerCase() === 'running'}
-                      showUnread={thread.id === 'thread-2'}
+                      showUnread={onSelectThread ? false : thread.id === 'thread-2'}
+                      onSelect={onSelectThread ? () => onSelectThread(thread.id) : undefined}
+                      onDelete={onDeleteThread ? () => onDeleteThread(thread.id) : undefined}
                     />
                   ))}
                 </div>
