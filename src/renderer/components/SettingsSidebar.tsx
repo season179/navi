@@ -11,6 +11,7 @@ import { ArchivedThreadsSettingsSectionPreview } from './ArchivedThreadsSettings
 import { UpdatesSettingsSectionPreview } from './UpdatesSettingsSection'
 import { LlmDebugSettingsSectionPreview } from './LlmDebugSettingsSection'
 import { MemorySettingsSectionPreview } from './MemorySettingsSection'
+import { SpeechToTextSettingsSectionPreview } from './SpeechToTextSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -203,6 +204,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'memory' ? (
         <div className="memory-preview-stack">
           <MemorySettingsSectionPreview />
+        </div>
+      ) : category === 'speechToText' ? (
+        <div className="speech-to-text-preview-stack">
+          <SpeechToTextSettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">

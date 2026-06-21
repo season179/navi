@@ -234,13 +234,15 @@ export function AdvancedSettingsDisclosure({
   title,
   description,
   children,
+  defaultOpen = false,
 }: {
   title: string
   description?: string
   children: ReactNode
+  defaultOpen?: boolean
 }): ReactElement {
   return (
-    <details className="settings-advanced-disclosure">
+    <details className="settings-advanced-disclosure" open={defaultOpen || undefined}>
       <summary className="settings-advanced-disclosure-summary">
         <span className="settings-advanced-disclosure-copy">
           <span className="settings-advanced-disclosure-title">{title}</span>

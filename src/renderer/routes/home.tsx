@@ -264,6 +264,10 @@ import {
   type MemoryPreviewMode,
 } from '../components/MemorySettingsSection'
 import {
+  SpeechToTextSettingsSectionPreview,
+  type SpeechToTextPreviewMode,
+} from '../components/SpeechToTextSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1305,6 +1309,16 @@ function HomePage() {
     return mode as MemoryPreviewMode
   }, [])
 
+  // Visual preview for the ported SpeechToTextSettingsSection (?speechToTextPreview=1|disabled|custom|…).
+  const speechToTextPreviewMode = useMemo((): SpeechToTextPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('speechToTextPreview')) return null
+    const mode = params.get('speechToTextPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as SpeechToTextPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1523,6 +1537,22 @@ function HomePage() {
           </p>
           <div className="memory-preview-stack">
             <MemorySettingsSectionPreview mode={memoryPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (speechToTextPreviewMode) {
+    return (
+      <div className="speech-to-text-preview">
+        <div className="speech-to-text-preview-inner">
+          <h1 className="speech-to-text-preview-title">Speech to text</h1>
+          <p className="speech-to-text-preview-subtitle">
+            Speech to text category from Kun settings-section-speech-to-text.tsx.
+          </p>
+          <div className="speech-to-text-preview-stack">
+            <SpeechToTextSettingsSectionPreview mode={speechToTextPreviewMode} />
           </div>
         </div>
       </div>
