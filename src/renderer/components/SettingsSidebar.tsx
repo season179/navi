@@ -15,6 +15,7 @@ import { SpeechToTextSettingsSectionPreview } from './SpeechToTextSettingsSectio
 import { ImageGenerationSettingsSectionPreview } from './ImageGenerationSettingsSection'
 import { MediaGenerationSettingsSectionPreview } from './MediaGenerationSettingsSection'
 import { WorktreeSettingsSectionPreview } from './WorktreeSettingsSection'
+import { ClawSettingsSectionPreview } from './ClawSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -223,6 +224,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'worktree' ? (
         <div className="worktree-settings-preview-stack">
           <WorktreeSettingsSectionPreview />
+        </div>
+      ) : category === 'claw' ? (
+        <div className="claw-settings-preview-stack">
+          <ClawSettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">

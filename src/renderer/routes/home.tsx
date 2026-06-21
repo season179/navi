@@ -280,6 +280,10 @@ import {
   type WorktreePreviewMode,
 } from '../components/WorktreeSettingsSection'
 import {
+  ClawSettingsSectionPreview,
+  type ClawPreviewMode,
+} from '../components/ClawSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1361,6 +1365,16 @@ function HomePage() {
     return mode as WorktreePreviewMode
   }, [])
 
+  // Visual preview for the ported ClawSettingsSection (?clawPreview=1|empty|disabled|workspaceError|multi).
+  const clawPreviewMode = useMemo((): ClawPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('clawPreview')) return null
+    const mode = params.get('clawPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as ClawPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1643,6 +1657,22 @@ function HomePage() {
           </p>
           <div className="worktree-preview-stack">
             <WorktreeSettingsSectionPreview mode={worktreePreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (clawPreviewMode) {
+    return (
+      <div className="claw-preview">
+        <div className="claw-preview-inner">
+          <h1 className="claw-preview-title">Connect phone</h1>
+          <p className="claw-preview-subtitle">
+            Claw category from Kun settings-section-claw.tsx.
+          </p>
+          <div className="claw-preview-stack">
+            <ClawSettingsSectionPreview mode={clawPreviewMode} />
           </div>
         </div>
       </div>
