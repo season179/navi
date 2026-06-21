@@ -171,6 +171,12 @@ import {
   type ChangeInspectorPreviewMode,
 } from '../components/ChangeInspector'
 import {
+  DevBrowserPanel,
+  DEV_BROWSER_PANEL_PREVIEW,
+  type DevBrowserPanelPreviewState,
+  type DevBrowserPreviewMode,
+} from '../components/DevBrowserPanel'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -716,6 +722,54 @@ function HomePage() {
     }
   }, [changeInspectorPreviewMode])
 
+  // Visual preview for the ported DevBrowserPanel (?devBrowserPanelPreview=1|empty|loading|error).
+  const devBrowserPanelPreviewMode = useMemo((): DevBrowserPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('devBrowserPanelPreview')) return null
+    const mode = params.get('devBrowserPanelPreview')
+    if (mode === 'empty') return 'empty'
+    if (mode === 'loading') return 'loading'
+    if (mode === 'error') return 'error'
+    return 'default'
+  }, [])
+  const [devBrowserPanelPreview, setDevBrowserPanelPreview] = useState<DevBrowserPanelPreviewState>(
+    () => ({ ...DEV_BROWSER_PANEL_PREVIEW }),
+  )
+  useEffect(() => {
+    if (devBrowserPanelPreviewMode === 'empty') {
+      setDevBrowserPanelPreview({
+        activeUrl: null,
+        draftUrl: '',
+        pageTitle: '',
+        loading: false,
+        loadError: null,
+        autoFollow: true,
+        canGoBack: false,
+        canGoForward: false,
+        detectedUrls: DEV_BROWSER_PANEL_PREVIEW.detectedUrls,
+      })
+      return
+    }
+    if (devBrowserPanelPreviewMode === 'loading') {
+      setDevBrowserPanelPreview({
+        ...DEV_BROWSER_PANEL_PREVIEW,
+        loading: true,
+      })
+      return
+    }
+    if (devBrowserPanelPreviewMode === 'error') {
+      setDevBrowserPanelPreview({
+        ...DEV_BROWSER_PANEL_PREVIEW,
+        loadError: 'Page failed to load',
+      })
+      return
+    }
+    if (devBrowserPanelPreviewMode) {
+      setDevBrowserPanelPreview({ ...DEV_BROWSER_PANEL_PREVIEW })
+    }
+  }, [devBrowserPanelPreviewMode])
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -920,6 +974,81 @@ function HomePage() {
             selectedId={changeInspectorPreviewSelectedId}
             onSelect={setChangeInspectorPreviewSelectedId}
             onCollapse={() => setChangeInspectorPreviewItems([])}
+          />
+        </div>
+      ) : null}
+
+      {devBrowserPanelPreviewMode ? (
+        <div className="dev-browser-panel-preview-wrap">
+          <DevBrowserPanel
+            activeUrl={devBrowserPanelPreview.activeUrl}
+            draftUrl={devBrowserPanelPreview.draftUrl}
+            pageTitle={devBrowserPanelPreview.pageTitle}
+            loading={devBrowserPanelPreview.loading}
+            loadError={devBrowserPanelPreview.loadError}
+            autoFollow={devBrowserPanelPreview.autoFollow}
+            canGoBack={devBrowserPanelPreview.canGoBack}
+            canGoForward={devBrowserPanelPreview.canGoForward}
+            detectedUrls={devBrowserPanelPreview.detectedUrls}
+            onCollapse={() =>
+              setDevBrowserPanelPreview((current) => ({ ...current, activeUrl: null }))
+            }
+            onDraftUrlChange={(value) =>
+              setDevBrowserPanelPreview((current) => ({ ...current, draftUrl: value }))
+            }
+            onSubmitUrl={(value) =>
+              setDevBrowserPanelPreview((current) => ({
+                ...current,
+                activeUrl: value.startsWith('http') ? value : `http://${value}`,
+                draftUrl: value,
+                loadError: null,
+                loading: false,
+              }))
+            }
+            onGoBack={() =>
+              setDevBrowserPanelPreview((current) => ({
+                ...current,
+                canGoBack: false,
+                canGoForward: true,
+              }))
+            }
+            onGoForward={() =>
+              setDevBrowserPanelPreview((current) => ({
+                ...current,
+                canGoBack: true,
+                canGoForward: false,
+              }))
+            }
+            onReload={() =>
+              setDevBrowserPanelPreview((current) => ({ ...current, loading: true, loadError: null }))
+            }
+            onReset={() =>
+              setDevBrowserPanelPreview({
+                activeUrl: null,
+                draftUrl: '',
+                pageTitle: '',
+                loading: false,
+                loadError: null,
+                autoFollow: true,
+                canGoBack: false,
+                canGoForward: false,
+                detectedUrls: DEV_BROWSER_PANEL_PREVIEW.detectedUrls,
+              })
+            }
+            onToggleAutoFollow={() =>
+              setDevBrowserPanelPreview((current) => ({ ...current, autoFollow: !current.autoFollow }))
+            }
+            onOpenExternal={() => undefined}
+            onSelectDetectedUrl={(url) =>
+              setDevBrowserPanelPreview((current) => ({
+                ...current,
+                activeUrl: url,
+                draftUrl: url.replace(/^https?:\/\//, ''),
+                pageTitle: url.includes('5173') ? 'Vite + React' : '',
+                loadError: null,
+                loading: false,
+              }))
+            }
           />
         </div>
       ) : null}
