@@ -3562,6 +3562,60 @@ a.runtime-meta-chip:hover {
 
 
 /* =====================================================
+   Workspace select empty hero (Kun MessageTimelineEmptyHero)
+   ===================================================== */
+.workspace-select-empty-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 96px 24px;
+  text-align: center;
+}
+
+.workspace-select-empty-hero-mascot {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+}
+
+.workspace-select-empty-hero-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+}
+
+.workspace-select-empty-hero-sub {
+  margin: 8px 0 0;
+  max-width: 24rem;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ds-text-muted);
+}
+
+.workspace-select-empty-hero-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--ds-chip-border);
+  background: var(--ds-chip-bg);
+  box-shadow: var(--ds-shadow-chip);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text);
+  transition: color 0.15s ease;
+}
+
+.workspace-select-empty-hero-chip:hover {
+  color: var(--ds-text);
+}
+
+
+/* =====================================================
    Runtime wake hero (Kun RuntimeWakeHero / KunHeroStage)
    ===================================================== */
 .runtime-wake-hero {

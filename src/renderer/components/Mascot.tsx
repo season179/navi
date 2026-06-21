@@ -70,6 +70,32 @@ export function GreetingMascot({ className, style }: MascotProps) {
 }
 
 /**
+ * Sitting Kun whale — upright pose with folded flippers, matching Kun's
+ * ds-kun-state-sit figure in the workspace-select empty hero.
+ */
+export function SitMascot({ className, style }: MascotProps) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} style={style} aria-hidden="true">
+      <ellipse cx="32" cy="56" rx="18" ry="3" fill="var(--mascot-water)" opacity="0.55" />
+      <path
+        d="M18 44 C18 30 24 22 34 22 C44 22 50 28 50 38 C50 44 46 48 40 48 L24 48 C20 48 18 46 18 44 Z"
+        fill="var(--mascot-body)"
+      />
+      <path
+        d="M22 44 C24 36 28 34 34 34 C40 34 44 36 46 44 L22 44 Z"
+        fill="var(--mascot-belly)"
+        opacity="0.85"
+      />
+      <circle cx="28" cy="32" r="10" fill="var(--mascot-body)" />
+      <circle cx="31" cy="31" r="1.6" fill="#14305f" />
+      <path d="M36 31 l6 -1 l-6 3 z" fill="var(--mascot-beak)" />
+      <path d="M20 38 C14 36 12 32 14 28 C17 30 19 34 21 38 Z" fill="var(--mascot-body)" />
+      <path d="M48 38 C54 36 56 32 54 28 C51 30 49 34 47 38 Z" fill="var(--mascot-body)" />
+    </svg>
+  )
+}
+
+/**
  * A small bird figure (Kun's companion) perched near the whale.
  */
 export function CompanionBird({ className, style }: MascotProps) {

@@ -130,6 +130,7 @@ import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
+import { WorkspaceSelectEmptyHero } from '../components/WorkspaceSelectEmptyHero'
 import { PencilLine } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -467,6 +468,14 @@ function HomePage() {
     return params.get('clawEmptyHero') === 'needsInbound' ? 'needsInbound' : 'ready'
   }, [])
 
+  // Visual preview for the ported WorkspaceSelectEmptyHero
+  // (?workspaceSelectEmptyHero=1).
+  const workspaceSelectEmptyHeroPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    const params = new URLSearchParams(window.location.search)
+    return params.has('workspaceSelectEmptyHero')
+  }, [])
+
   // Visual preview for the ported ToolEntry (?toolEntry=1|running|error|command).
   const toolEntryPreview = useMemo((): {
     block: ToolBlockSnapshot
@@ -585,6 +594,8 @@ function HomePage() {
               agentName={CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME}
               hasInboundConversation={clawEmptyHeroPreviewMode !== 'needsInbound'}
             />
+          ) : workspaceSelectEmptyHeroPreview ? (
+            <WorkspaceSelectEmptyHero />
           ) : (
             <div className="hero">
               <HeroStage />
