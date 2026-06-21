@@ -345,6 +345,10 @@ import {
   WritePdfViewerPreview,
   type WritePdfViewerPreviewMode,
 } from '../components/WritePdfViewer'
+import {
+  WriteMarkdownEditorPreview,
+  type WriteMarkdownEditorPreviewMode,
+} from '../components/WriteMarkdownEditor'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -856,6 +860,19 @@ function HomePage() {
     const value = params.get('writeMarkdownPreview')
     if (value === 'plain') return 'plain'
     if (value === 'error') return 'error'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported WriteMarkdownEditor
+  // (?writeMarkdownEditor=1|source|readonly|diffReview).
+  const writeMarkdownEditorPreviewMode = useMemo((): WriteMarkdownEditorPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writeMarkdownEditor')) return null
+    const value = params.get('writeMarkdownEditor')
+    if (value === 'source') return 'source'
+    if (value === 'readonly') return 'readonly'
+    if (value === 'diffReview') return 'diffReview'
     return 'default'
   }, [])
 
@@ -1770,6 +1787,10 @@ function HomePage() {
 
   if (writeMarkdownPreviewPreviewMode) {
     return <WriteMarkdownPreviewPreview mode={writeMarkdownPreviewPreviewMode} />
+  }
+
+  if (writeMarkdownEditorPreviewMode) {
+    return <WriteMarkdownEditorPreview mode={writeMarkdownEditorPreviewMode} />
   }
 
   if (writePdfViewerPreviewMode) {
