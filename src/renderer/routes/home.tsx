@@ -329,6 +329,10 @@ import {
   type MessageTimelinePreviewMode,
 } from '../components/MessageTimeline'
 import {
+  WorkbenchPreview,
+  type WorkbenchPreviewMode,
+} from '../components/Workbench'
+import {
   WriteWorkspaceEmptyState,
   WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
   type WriteWorkspaceEmptyStatePreviewMode,
@@ -912,6 +916,30 @@ function HomePage() {
     if (typeof window === 'undefined') return false
     const params = new URLSearchParams(window.location.search)
     return params.has('workspaceSelectEmptyHero')
+  }, [])
+
+  // Visual preview for the ported Workbench orchestrator
+  // (?workbenchPreview=default|empty|busy|multi|rich|collapsedSidebar|todo|changes|browser|plan|file|terminal|fileTree|sidechat|runtimeError).
+  const workbenchPreviewMode = useMemo((): WorkbenchPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('workbenchPreview')) return null
+    const value = params.get('workbenchPreview')
+    if (value === 'empty') return 'empty'
+    if (value === 'busy') return 'busy'
+    if (value === 'multi') return 'multi'
+    if (value === 'rich') return 'rich'
+    if (value === 'collapsedSidebar') return 'collapsedSidebar'
+    if (value === 'todo') return 'todo'
+    if (value === 'changes') return 'changes'
+    if (value === 'browser') return 'browser'
+    if (value === 'plan') return 'plan'
+    if (value === 'file') return 'file'
+    if (value === 'terminal') return 'terminal'
+    if (value === 'fileTree') return 'fileTree'
+    if (value === 'sidechat') return 'sidechat'
+    if (value === 'runtimeError') return 'runtimeError'
+    return 'default'
   }, [])
 
   // Visual preview for the ported MessageTimeline orchestrator
@@ -2374,6 +2402,10 @@ function HomePage() {
 
   if (sddDraftEditorViewPreviewMode) {
     return <SddDraftEditorViewPreview mode={sddDraftEditorViewPreviewMode} />
+  }
+
+  if (workbenchPreviewMode) {
+    return <WorkbenchPreview mode={workbenchPreviewMode} />
   }
 
   if (messageTimelinePreviewMode) {

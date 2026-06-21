@@ -33980,3 +33980,259 @@ button.usage-heatmap-cell:focus {
   height: 100%;
   width: 100%;
 }
+
+/* =====================================================
+   Workbench (Kun Workbench port)
+   ===================================================== */
+.workbench-preview-wrap {
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--ds-bg-main);
+}
+
+.ds-workbench-shell {
+  display: flex;
+  height: 100%;
+  min-height: 100vh;
+  width: 100%;
+  min-width: 0;
+  background: var(--ds-bg-main);
+}
+
+.workbench-left-sidebar,
+.workbench-right-panel {
+  display: flex;
+  min-height: 0;
+  flex-shrink: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.workbench-main {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.workbench-main-row {
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+}
+
+.workbench-chat-column {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+}
+
+.workbench-chat-stage {
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.workbench-chat-stage-inset {
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.workbench-chat-topbar {
+  margin-top: 0.75rem;
+  flex-shrink: 0;
+}
+
+.workbench-session-header {
+  min-width: 0;
+  flex: 1;
+}
+
+.workbench-running-pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.16);
+  padding: 0.25rem 0.625rem;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #92400e;
+}
+
+:root[data-theme='dark'] .workbench-running-pill {
+  color: #fef3c7;
+}
+
+.workbench-timeline-wrap {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.workbench-timeline-wrap .message-timeline {
+  min-height: 0;
+  flex: 1;
+}
+
+.workbench-composer-wrap {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  padding: 0 0.5rem 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .workbench-composer-wrap {
+    padding-inline: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .workbench-composer-wrap {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .workbench-composer-wrap {
+    padding-inline: 2rem;
+  }
+}
+
+.workbench-composer-shell {
+  width: min(100%, 48rem);
+}
+
+.workbench-composer-footer {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.workbench-terminal-wrap {
+  display: flex;
+  width: 100%;
+  flex-shrink: 0;
+  flex-direction: column;
+}
+
+.workbench-terminal-divider {
+  position: relative;
+  z-index: 20;
+  height: 4px;
+  flex-shrink: 0;
+  cursor: row-resize;
+  background: transparent;
+  transition: background 160ms ease;
+}
+
+.workbench-terminal-divider:hover {
+  background: var(--ds-border-muted);
+}
+
+.workbench-file-tree-panel {
+  height: 100%;
+  min-height: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-left: 1px solid var(--ds-border-muted);
+  background: var(--ds-bg-sidebar);
+}
+
+/* Workbench-specific dark tuning from Kun base-shell.css */
+:root[data-theme='dark'] .ds-workbench-shell {
+  --bg-app: #0f1422;
+  --bg-sidebar: #121829;
+  --bg-canvas: #161d30;
+  --surface-1: rgba(22, 29, 47, 0.92);
+  --surface-2: #1b2338;
+  --surface-3: #212b44;
+  --border-soft: rgba(151, 192, 235, 0.13);
+  --border-strong: rgba(151, 192, 235, 0.2);
+  --text-primary: #f0f5fc;
+  --text-secondary: #bdc9de;
+  --text-tertiary: #8593b1;
+  --text-placeholder: #76839e;
+
+  --ds-bg-main: var(--bg-app);
+  --ds-bg-sidebar: var(--bg-sidebar);
+  --ds-bg-canvas: var(--bg-canvas);
+  --ds-surface-card: var(--surface-1);
+  --ds-surface-elevated: var(--surface-2);
+  --ds-surface-subtle: #1b2338;
+  --ds-surface-hover: rgba(151, 192, 235, 0.1);
+  --ds-border: var(--border-soft);
+  --ds-border-muted: rgba(151, 192, 235, 0.07);
+  --ds-border-strong: var(--border-strong);
+  --ds-text: var(--text-primary);
+  --ds-text-muted: var(--text-secondary);
+  --ds-text-faint: var(--text-tertiary);
+  --ds-bubble-user: rgba(151, 192, 235, 0.08);
+  --ds-bubble-user-fg: #ffffff;
+  --ds-accent-soft: rgba(111, 176, 232, 0.16);
+  --ds-selection: rgba(111, 176, 232, 0.22);
+  --ds-shadow-shell: 0 38px 96px rgba(2, 6, 16, 0.52);
+  --ds-shadow-panel: 0 22px 58px rgba(2, 6, 16, 0.3);
+  --ds-shadow-composer: 0 28px 78px rgba(2, 6, 16, 0.4),
+    0 0 0 1px rgba(151, 192, 235, 0.05);
+  --ds-stage-gradient: linear-gradient(180deg, #1c2440 0%, #151c2e 100%);
+  --ds-topbar-bg:
+    linear-gradient(180deg, rgba(27, 35, 56, 0.8) 0%, rgba(22, 29, 47, 0.64) 58%, rgba(15, 20, 34, 0.34) 100%);
+  --ds-topbar-shadow:
+    0 18px 42px rgba(2, 6, 16, 0.2),
+    inset 0 1px 0 rgba(151, 192, 235, 0.06);
+  --ds-sidebar-gradient:
+    linear-gradient(180deg, rgba(24, 31, 50, 0.96) 0%, rgba(19, 25, 42, 0.94) 48%, rgba(14, 19, 32, 0.96) 100%);
+  --ds-sidebar-haze:
+    radial-gradient(circle at 58% -12%, rgba(111, 176, 232, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(151, 192, 235, 0.035), rgba(151, 192, 235, 0) 28%);
+  --ds-sidebar-border: rgba(151, 192, 235, 0.1);
+  --ds-sidebar-shadow:
+    0 24px 64px rgba(2, 6, 16, 0.42),
+    0 4px 18px rgba(2, 6, 16, 0.28);
+  --ds-sidebar-row-hover: rgba(151, 192, 235, 0.08);
+  --ds-sidebar-row-active: rgba(151, 192, 235, 0.11);
+  --ds-sidebar-field-bg: rgba(151, 192, 235, 0.055);
+  --ds-sidebar-field-focus: rgba(151, 192, 235, 0.085);
+  --ds-sidebar-divider: rgba(151, 192, 235, 0.1);
+  --ds-card-soft: rgba(22, 29, 47, 0.88);
+  --ds-card-strong: rgba(27, 35, 56, 0.96);
+  --ds-card-muted: rgba(27, 35, 56, 0.82);
+  --ds-card-ghost: rgba(15, 20, 34, 0.62);
+  --ds-card-hover: rgba(36, 47, 73, 0.98);
+  --ds-chip-bg: rgba(27, 35, 56, 0.94);
+  --ds-chip-muted-bg: #1b2338;
+  --ds-chip-hover: rgba(36, 47, 73, 0.98);
+  --ds-chip-border: rgba(151, 192, 235, 0.1);
+  --ds-chip-active: linear-gradient(180deg, rgba(111, 176, 232, 0.16), rgba(111, 176, 232, 0.08));
+  --ds-kbd-bg: rgba(27, 35, 56, 0.94);
+  --ds-code-bg: #1b2338;
+  --ds-inline-code-bg: rgba(151, 192, 235, 0.075);
+  --ds-inline-code-hover-bg: rgba(111, 176, 232, 0.18);
+  --ds-pre-bg: #151c2e;
+  --ds-code-block-bg: #101827;
+  --ds-table-head-bg: rgba(27, 35, 56, 0.94);
+  --ds-scrollbar-thumb: rgba(170, 170, 170, 0.26);
+  --ds-scrollbar-thumb-hover: rgba(200, 200, 200, 0.36);
+  --ds-shadow-card-soft: 0 16px 42px rgba(2, 6, 16, 0.2);
+  --ds-shadow-card-strong: 0 22px 56px rgba(2, 6, 16, 0.28);
+  --ds-shadow-chip: inset 0 1px 0 rgba(151, 192, 235, 0.06);
+}

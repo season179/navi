@@ -431,6 +431,12 @@ export type MessageTimelinePreviewMode =
   | 'rich'
   | 'withGoal'
 
+export function resolveMessageTimelinePreviewSnapshot(
+  mode: MessageTimelinePreviewMode,
+): MessageTimelineSnapshot {
+  return resolvePreviewSnapshot(mode)
+}
+
 function resolvePreviewSnapshot(mode: MessageTimelinePreviewMode): MessageTimelineSnapshot {
   switch (mode) {
     case 'empty':
