@@ -42,6 +42,8 @@ type Props = {
   value: ComposerModelPickerSettings
   groups: ComposerModelProviderGroup[]
   compact?: boolean
+  /** Compact write sidebar: model picker grows to fill toolbar space. */
+  stretch?: boolean
   disabled?: boolean
   needsProviderSetup?: boolean
   /** Preview-only: force menu open */
@@ -137,6 +139,7 @@ export function FloatingComposerModelPicker({
   value,
   groups,
   compact = false,
+  stretch = false,
   disabled = false,
   needsProviderSetup = false,
   menuOpen: menuOpenProp,
@@ -459,8 +462,8 @@ export function FloatingComposerModelPicker({
     <div
       ref={rootRef}
       className={`ds-composer-model-picker composer-model-picker${compact ? ' is-compact' : ''}${
-        canOpen ? '' : ' is-disabled'
-      }`}
+        stretch ? ' is-stretch' : ''
+      }${canOpen ? '' : ' is-disabled'}`}
       title={controlsTitle}
     >
       <button

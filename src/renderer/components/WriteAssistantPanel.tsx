@@ -7,11 +7,9 @@ import {
   useEffect,
   useMemo,
   useState,
-  type KeyboardEvent as ReactKeyboardEvent,
   type ReactElement,
 } from 'react'
 import {
-  ArrowUp,
   FileText,
   FolderOpen,
   ListTodo,
@@ -19,9 +17,15 @@ import {
   PanelRightClose,
   Plus,
   Sparkles,
-  Square,
   X,
 } from 'lucide-react'
+import { Composer } from './Composer'
+import {
+  COMPOSER_MODEL_PICKER_GROUPS_PREVIEW,
+  COMPOSER_MODEL_PICKER_PREVIEW,
+  FloatingComposerModelPicker,
+  type ComposerModelPickerSettings,
+} from './FloatingComposerModelPicker'
 import { MessageTimeline } from './MessageTimeline'
 import { type MessageTurnSnapshot } from './MessageTurn'
 
@@ -197,6 +201,8 @@ function WriteAssistantCompactComposer({
   onInterrupt,
   busy = false,
   disabled = false,
+  modelPicker,
+  onModelPickerChange,
 }: {
   value: string
   onChange: (value: string) => void
@@ -204,55 +210,30 @@ function WriteAssistantCompactComposer({
   onInterrupt: () => void
   busy?: boolean
   disabled?: boolean
+  modelPicker: ComposerModelPickerSettings
+  onModelPickerChange: (patch: Partial<ComposerModelPickerSettings>) => void
 }): ReactElement {
-  const sendDisabled = disabled || (!busy && value.trim().length === 0)
-
-  const handleKeyDown = (event: ReactKeyboardEvent<HTMLTextAreaElement>): void => {
-    if (event.key !== 'Enter' || event.shiftKey || event.metaKey || event.ctrlKey) return
-    event.preventDefault()
-    if (busy) {
-      onInterrupt()
-      return
-    }
-    if (!sendDisabled) onSend()
-  }
-
   return (
-    <div className="write-assistant-composer">
-      <div className="write-assistant-composer-shell">
-        <textarea
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          onKeyDown={handleKeyDown}
+    <Composer
+      variant="compact"
+      value={value}
+      onChange={onChange}
+      onSend={onSend}
+      onCancel={onInterrupt}
+      busy={busy}
+      disabled={disabled}
+      placeholder={COPY.writeAssistantComposerPlaceholder}
+      modelChip={
+        <FloatingComposerModelPicker
+          compact
+          stretch
+          value={modelPicker}
+          groups={COMPOSER_MODEL_PICKER_GROUPS_PREVIEW}
           disabled={disabled}
-          rows={1}
-          placeholder={COPY.writeAssistantComposerPlaceholder}
-          className="write-assistant-composer-input"
+          onChange={onModelPickerChange}
         />
-        <div className="write-assistant-composer-toolbar">
-          <div className="write-assistant-composer-toolbar-left">
-            <button type="button" className="write-assistant-composer-plus" aria-label="Add">
-              <Plus strokeWidth={2} />
-            </button>
-            <button type="button" className="write-assistant-composer-model" aria-label="Model">
-              <span className="write-assistant-composer-model-label">claude-sonnet-4</span>
-            </button>
-          </div>
-          <div className="write-assistant-composer-toolbar-right">
-            <button
-              type="button"
-              className={`write-assistant-composer-send${busy ? ' is-stop' : ''}`}
-              disabled={sendDisabled && !busy}
-              onClick={busy ? onInterrupt : onSend}
-              aria-label={busy ? 'Stop' : 'Send'}
-              title={busy ? 'Stop' : 'Send'}
-            >
-              {busy ? <Square strokeWidth={2.4} /> : <ArrowUp strokeWidth={2.2} />}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      }
+    />
   )
 }
 
@@ -458,6 +439,14 @@ export function WriteAssistantPanel({
     )
   }, [onInputChange, onPolishSelection, selectionCharCount, selectionIsPdf])
 
+  const [modelPicker, setModelPicker] = useState<ComposerModelPickerSettings>(
+    COMPOSER_MODEL_PICKER_PREVIEW,
+  )
+
+  const handleModelPickerChange = useCallback((patch: Partial<ComposerModelPickerSettings>) => {
+    setModelPicker((current) => ({ ...current, ...patch }))
+  }, [])
+
   return (
     <aside className={`write-assistant-panel ds-no-drag ${className}`.trim()}>
       <div className="write-assistant-header">
@@ -549,6 +538,8 @@ export function WriteAssistantPanel({
           onInterrupt={() => onInterrupt?.()}
           busy={busy}
           disabled={!canCreateConversation && !busy}
+          modelPicker={modelPicker}
+          onModelPickerChange={handleModelPickerChange}
         />
       </div>
     </aside>

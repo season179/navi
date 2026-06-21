@@ -12355,6 +12355,12 @@ button.usage-heatmap-cell:focus {
   max-width: 220px;
 }
 
+.composer-model-picker.is-stretch {
+  min-width: 0;
+  flex: 1 1 auto;
+  max-width: 284px;
+}
+
 .composer-model-picker.is-disabled {
   color: var(--ds-text-faint);
 }
@@ -34904,6 +34910,33 @@ button.usage-heatmap-cell:focus {
   width: 100%;
   max-width: 56rem;
   padding-bottom: 0.75rem;
+}
+
+.floating-composer-root.is-compact {
+  max-width: none;
+  padding-bottom: 0;
+}
+
+.floating-composer-shell.is-compact {
+  box-shadow: none;
+}
+
+.floating-composer-textarea.is-compact {
+  min-height: 0;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 14px;
+}
+
+.floating-composer-toolbar.is-compact {
+  justify-content: flex-end;
+  border-top: none;
+  padding-top: 0;
+}
+
+.floating-composer-toolbar-end.is-compact-stretch {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .floating-composer-relative {

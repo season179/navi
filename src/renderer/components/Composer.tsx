@@ -33,6 +33,8 @@ interface ComposerProps {
   onCancel?: () => void
   busy?: boolean
   disabled?: boolean
+  /** Kun FloatingComposer variant — compact omits footer, plus menu, and context controls. */
+  variant?: 'default' | 'compact'
   placeholder?: string
   /** Context window occupancy chip shown before the model picker when set. */
   contextCapacity?: ContextCapacity | null
@@ -75,6 +77,7 @@ export function Composer({
   onCancel,
   busy = false,
   disabled = false,
+  variant = 'default',
   placeholder = 'Send a message to Navi…',
   contextCapacity,
   modelChip,
@@ -85,6 +88,7 @@ export function Composer({
   executionPicker,
   footerLeft,
 }: ComposerProps) {
+  const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const contextCapacityRef = useRef<HTMLDivElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -124,7 +128,18 @@ export function Composer({
     'ds-frosted',
     'ds-no-drag',
     'floating-composer-shell',
+    compact ? 'is-compact' : '',
     focused ? 'ds-chat-composer-focus' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const rootClass = [
+    'composer-stack',
+    'ds-floating-composer',
+    'ds-no-drag',
+    'floating-composer-root',
+    compact ? 'is-compact' : '',
   ]
     .filter(Boolean)
     .join(' ')
@@ -161,50 +176,69 @@ export function Composer({
     }
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault()
-      if (busy) return
+      if (busy) {
+        if (compact) onCancel?.()
+        return
+      }
       if (canSend) onSend()
     }
   }
 
-  return (
-    <div className="composer-wrap">
-      <div className="composer-stack ds-floating-composer ds-no-drag floating-composer-root">
-        {queuedMessages && queuedMessages.length > 0 ? (
-          <FloatingComposerQueuedMessages
-            messages={queuedMessages}
-            onRemove={onRemoveQueuedMessage}
+  const toolbarEndClass = [
+    'floating-composer-toolbar-end',
+    voiceRecording ? 'is-recording' : '',
+    compact && modelChip ? 'is-compact-stretch' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const toolbarClass = [
+    'ds-composer-toolbar',
+    'floating-composer-toolbar',
+    compact ? 'is-compact' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const composerBody = (
+    <div className={rootClass}>
+      {!compact && queuedMessages && queuedMessages.length > 0 ? (
+        <FloatingComposerQueuedMessages
+          messages={queuedMessages}
+          onRemove={onRemoveQueuedMessage}
+        />
+      ) : null}
+      <div className="floating-composer-relative">
+        {!compact && pickerOpen && query !== null ? (
+          <SkillPicker
+            skills={skills ?? []}
+            query={query}
+            onPick={injectSkillHint}
+            onClose={() => {
+              // Closing the picker without a pick: drop the leading slash so the
+              // draft doesn't keep re-triggering it. Leave the rest of the text.
+              if (value.startsWith('/')) onChange(value.slice(1))
+              setPickerOpen(false)
+              textareaRef.current?.focus()
+            }}
           />
         ) : null}
-        <div className="floating-composer-relative">
-          {pickerOpen && query !== null ? (
-            <SkillPicker
-              skills={skills ?? []}
-              query={query}
-              onPick={injectSkillHint}
-              onClose={() => {
-                // Closing the picker without a pick: drop the leading slash so the
-                // draft doesn't keep re-triggering it. Leave the rest of the text.
-                if (value.startsWith('/')) onChange(value.slice(1))
-                setPickerOpen(false)
-                textareaRef.current?.focus()
-              }}
-            />
-          ) : null}
-          <div className={shellClass}>
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              className="floating-composer-textarea"
-              placeholder={placeholder}
-              value={value}
-              disabled={disabled}
-              aria-label="Message"
-              onChange={(e) => onChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-            />
-            <div className="ds-composer-toolbar floating-composer-toolbar">
+        <div className={shellClass}>
+          <textarea
+            ref={textareaRef}
+            rows={1}
+            className={`floating-composer-textarea${compact ? ' is-compact' : ''}`}
+            placeholder={placeholder}
+            value={value}
+            disabled={disabled}
+            aria-label="Message"
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+          />
+          <div className={toolbarClass}>
+            {!compact ? (
               <div className="floating-composer-toolbar-start">
                 <button
                   type="button"
@@ -215,74 +249,70 @@ export function Composer({
                   <Plus strokeWidth={1.8} />
                 </button>
               </div>
-              <div
-                className={
-                  voiceRecording
-                    ? 'floating-composer-toolbar-end is-recording'
-                    : 'floating-composer-toolbar-end'
-                }
-              >
-                {voiceRecording ? (
-                  <>
-                    <VoiceRecordingStrip
-                      getLevel={voiceRecording.getLevel}
-                      startedAtMs={voiceRecording.startedAtMs}
-                    />
-                    <button
-                      type="button"
-                      className="floating-composer-voice-stop"
-                      onClick={voiceRecording.onStop}
-                      aria-label="Stop recording"
-                      title="Stop recording"
-                    >
-                      <Square strokeWidth={2.4} />
-                    </button>
-                    <button
-                      type="button"
-                      className="floating-composer-send-btn"
-                      onClick={voiceRecording.onSend}
-                      aria-label="Send recording"
-                      title="Send recording"
-                    >
-                      <Send strokeWidth={2.2} />
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    {contextCapacity ? (
-                      <div className="floating-composer-context-wrap" ref={contextCapacityRef}>
-                        <button
-                          type="button"
-                          className="floating-composer-context-chip"
-                          aria-expanded={contextCapacityOpen}
-                          aria-label={`Context capacity ${formatContextPercent(contextCapacity.usedRatio)}`}
-                          title="Context capacity"
-                          onClick={() => setContextCapacityOpen((open) => !open)}
-                        >
-                          <span className="floating-composer-context-bar" aria-hidden>
-                            <span
-                              style={{
-                                width: `${Math.min(100, contextCapacity.usedRatio * 100)}%`,
-                                background:
-                                  contextCapacity.usedRatio >= 0.9
-                                    ? '#d9544e'
-                                    : contextCapacity.usedRatio >= 0.75
-                                      ? '#d9920f'
-                                      : 'var(--ds-accent)',
-                              }}
-                            />
-                          </span>
-                          <span>{formatContextPercent(contextCapacity.usedRatio)}</span>
-                        </button>
-                        {contextCapacityOpen ? (
-                          <div className="floating-composer-context-popover">
-                            <ContextCapacityPopover capacity={contextCapacity} />
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
-                    {modelChip}
-                    {executionPicker}
+            ) : null}
+            <div className={toolbarEndClass}>
+              {voiceRecording ? (
+                <>
+                  <VoiceRecordingStrip
+                    getLevel={voiceRecording.getLevel}
+                    startedAtMs={voiceRecording.startedAtMs}
+                  />
+                  <button
+                    type="button"
+                    className="floating-composer-voice-stop"
+                    onClick={voiceRecording.onStop}
+                    aria-label="Stop recording"
+                    title="Stop recording"
+                  >
+                    <Square strokeWidth={2.4} />
+                  </button>
+                  <button
+                    type="button"
+                    className="floating-composer-send-btn"
+                    onClick={voiceRecording.onSend}
+                    aria-label="Send recording"
+                    title="Send recording"
+                  >
+                    <Send strokeWidth={2.2} />
+                  </button>
+                </>
+              ) : (
+                <>
+                  {!compact && contextCapacity ? (
+                    <div className="floating-composer-context-wrap" ref={contextCapacityRef}>
+                      <button
+                        type="button"
+                        className="floating-composer-context-chip"
+                        aria-expanded={contextCapacityOpen}
+                        aria-label={`Context capacity ${formatContextPercent(contextCapacity.usedRatio)}`}
+                        title="Context capacity"
+                        onClick={() => setContextCapacityOpen((open) => !open)}
+                      >
+                        <span className="floating-composer-context-bar" aria-hidden>
+                          <span
+                            style={{
+                              width: `${Math.min(100, contextCapacity.usedRatio * 100)}%`,
+                              background:
+                                contextCapacity.usedRatio >= 0.9
+                                  ? '#d9544e'
+                                  : contextCapacity.usedRatio >= 0.75
+                                    ? '#d9920f'
+                                    : 'var(--ds-accent)',
+                            }}
+                          />
+                        </span>
+                        <span>{formatContextPercent(contextCapacity.usedRatio)}</span>
+                      </button>
+                      {contextCapacityOpen ? (
+                        <div className="floating-composer-context-popover">
+                          <ContextCapacityPopover capacity={contextCapacity} />
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  {modelChip}
+                  {!compact ? executionPicker : null}
+                  {!compact ? (
                     <button
                       type="button"
                       className="floating-composer-mic-btn"
@@ -291,40 +321,43 @@ export function Composer({
                     >
                       <Mic strokeWidth={2} />
                     </button>
-                    {busy ? (
-                      <button
-                        type="button"
-                        className="floating-composer-stop-btn"
-                        onClick={onCancel}
-                        aria-label="Stop"
-                        title="Stop"
-                      >
-                        <Square strokeWidth={2.4} />
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="floating-composer-send-btn"
-                        disabled={!canSend}
-                        onClick={onSend}
-                        aria-label="Send"
-                        title="Send"
-                      >
-                        <Send strokeWidth={2.2} />
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
+                  ) : null}
+                  {busy ? (
+                    <button
+                      type="button"
+                      className="floating-composer-stop-btn"
+                      onClick={onCancel}
+                      aria-label="Stop"
+                      title="Stop"
+                    >
+                      <Square strokeWidth={2.4} />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="floating-composer-send-btn"
+                      disabled={!canSend}
+                      onClick={onSend}
+                      aria-label="Send"
+                      title="Send"
+                    >
+                      <Send strokeWidth={2.2} />
+                    </button>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
-        {footerLeft ? (
-          <div className="ds-composer-footer floating-composer-footer">
-            <div className="ds-composer-footer-left">{footerLeft}</div>
-          </div>
-        ) : null}
       </div>
+      {!compact && footerLeft ? (
+        <div className="ds-composer-footer floating-composer-footer">
+          <div className="ds-composer-footer-left">{footerLeft}</div>
+        </div>
+      ) : null}
     </div>
   )
+
+  if (compact) return composerBody
+  return <div className="composer-wrap">{composerBody}</div>
 }
