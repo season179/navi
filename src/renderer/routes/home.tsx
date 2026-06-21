@@ -473,7 +473,11 @@ import {
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
-import { FloatingModelPicker } from '../components/FloatingModelPicker'
+import {
+  FloatingModelPicker,
+  FloatingModelPickerPreview,
+  type FloatingModelPickerPreviewMode,
+} from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
 import {
   ModelChipsInputPreview,
@@ -1015,6 +1019,19 @@ function HomePage() {
     const params = new URLSearchParams(window.location.search)
     if (!params.has('floatingComposerModelPickerPreview')) return null
     const value = params.get('floatingComposerModelPickerPreview')
+    if (value === 'menu') return 'menu'
+    if (value === 'submenu') return 'submenu'
+    if (value === 'noProviders') return 'noProviders'
+    return 'default'
+  }, [])
+
+  // Visual preview for the production FloatingModelPicker
+  // (?floatingModelPickerPreview=default|menu|submenu|noProviders).
+  const floatingModelPickerPreviewMode = useMemo((): FloatingModelPickerPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('floatingModelPickerPreview')) return null
+    const value = params.get('floatingModelPickerPreview')
     if (value === 'menu') return 'menu'
     if (value === 'submenu') return 'submenu'
     if (value === 'noProviders') return 'noProviders'
@@ -2555,6 +2572,10 @@ function HomePage() {
 
   if (floatingComposerModelPickerPreviewMode) {
     return <FloatingComposerModelPickerPreview mode={floatingComposerModelPickerPreviewMode} />
+  }
+
+  if (floatingModelPickerPreviewMode) {
+    return <FloatingModelPickerPreview mode={floatingModelPickerPreviewMode} />
   }
 
   if (appShellPreviewMode) {
