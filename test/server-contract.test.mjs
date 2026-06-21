@@ -15,9 +15,16 @@ import { existsSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 
 const require = createRequire(import.meta.url)
-const ELECTRON = require('electron') // path to the Electron binary under plain node
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const SERVER = join(ROOT, 'dist', 'server.mjs')
+
+function resolveNodeRunner() {
+  try {
+    return require('electron')
+  } catch {
+    return process.execPath
+  }
+}
 
 function waitForReady(child, getStdout, timeoutMs = 20_000) {
   return new Promise((resolve, reject) => {
@@ -46,7 +53,8 @@ test('spawned Flue server honors the main-process contract', async (t) => {
   const token = 'contract-token-0123456789abcdef'
 
   let stdout = ''
-  const child = spawn(ELECTRON, ['--no-warnings', SERVER], {
+  const runner = resolveNodeRunner()
+  const child = spawn(runner, ['--no-warnings', SERVER], {
     env: {
       ...process.env,
       ELECTRON_RUN_AS_NODE: '1',

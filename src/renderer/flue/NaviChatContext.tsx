@@ -17,7 +17,16 @@ type ThreadValue = Pick<
 >
 type ListValue = Pick<
   NaviChat,
-  'conversations' | 'currentId' | 'newConversation' | 'selectConversation' | 'deleteConversation'
+  | 'conversations'
+  | 'projects'
+  | 'currentId'
+  | 'currentProjectId'
+  | 'newConversation'
+  | 'selectConversation'
+  | 'deleteConversation'
+  | 'createProject'
+  | 'selectProject'
+  | 'deleteProject'
 >
 
 const ThreadContext = createContext<ThreadValue | null>(null)
@@ -42,17 +51,27 @@ export function NaviChatProvider({ children }: { children: ReactNode }) {
   const list = useMemo<ListValue>(
     () => ({
       conversations: chat.conversations,
+      projects: chat.projects,
       currentId: chat.currentId,
+      currentProjectId: chat.currentProjectId,
       newConversation: chat.newConversation,
       selectConversation: chat.selectConversation,
       deleteConversation: chat.deleteConversation,
+      createProject: chat.createProject,
+      selectProject: chat.selectProject,
+      deleteProject: chat.deleteProject,
     }),
     [
       chat.conversations,
+      chat.projects,
       chat.currentId,
+      chat.currentProjectId,
       chat.newConversation,
       chat.selectConversation,
       chat.deleteConversation,
+      chat.createProject,
+      chat.selectProject,
+      chat.deleteProject,
     ],
   )
 

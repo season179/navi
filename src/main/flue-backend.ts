@@ -13,9 +13,12 @@ import { spawn, type ChildProcessByStdio } from 'child_process'
 import type { Readable } from 'stream'
 import { randomBytes, randomUUID } from 'crypto'
 import { EventEmitter } from 'events'
+import { existsSync, readFileSync } from 'fs'
 import path from 'path'
 import { createFlueClient, type FlueClient } from '@flue/sdk'
 import { AGENT_NAME, type FlueStatus, type FlueStreamMessage } from '../shared/flue'
+import { resolveProjectCwd } from '../shared/projects'
+import { storePath } from './conversations'
 import { getApiKey, getBaseUrl } from './settings'
 
 /** How long to wait for the child to print FLUE_READY before giving up. */
@@ -95,6 +98,7 @@ class FlueBackend extends EventEmitter {
       PORT: port,
       FLUE_TOKEN: token,
       FLUE_DB_PATH: dbPath,
+      NAVI_CONVERSATIONS_PATH: storePath(),
     }
     if (apiKey) env.OPENAI_API_KEY = apiKey
     else delete env.OPENAI_API_KEY
@@ -214,6 +218,22 @@ class FlueBackend extends EventEmitter {
     }
     if (!this.hasKey) {
       throw new Error('No OpenAI API key configured. Add one in Settings.')
+    }
+
+    // Resolve the bound project folder up front. A missing/corrupt store must
+    // not block the turn (fall through to plain chat), but a project whose
+    // folder was deleted should fail loudly before we spend a request on it.
+    let projectCwd: string | undefined
+    try {
+      const store = JSON.parse(readFileSync(storePath(), 'utf8'))
+      projectCwd = resolveProjectCwd(store, conversationId)
+    } catch {
+      // store unreadable/corrupt → don't over-block; let the turn proceed
+    }
+    if (projectCwd && !existsSync(projectCwd)) {
+      throw new Error(
+        `Project folder no longer exists: ${projectCwd}. Re-create the project or pick a new folder.`,
+      )
     }
 
     const requestId = randomUUID()

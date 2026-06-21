@@ -1133,3 +1133,97 @@ textarea {
     transform: rotate(360deg);
   }
 }
+
+/* =====================================================
+   Projects sidebar tree
+   ===================================================== */
+.projects-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ds-text-faint);
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.projects-title svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.sidebar-section-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sidebar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 10px 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--ds-sidebar-field-bg);
+  transition: background 0.14s ease;
+}
+
+.sidebar-search:focus-within {
+  background: var(--ds-sidebar-field-focus);
+}
+
+.sidebar-search svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--ds-text-faint);
+}
+
+.sidebar-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12.5px;
+  color: var(--ds-text);
+}
+
+.sidebar-search input::placeholder {
+  color: var(--ds-text-placeholder);
+}
+
+.project-row .project-context {
+  margin-left: auto;
+  max-width: 42%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--ds-text-faint);
+}
+
+.project-children {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 14px;
+}
+
+.conv-open .conv-time {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-faint);
+  transition: opacity 0.14s ease;
+}
+
+.conv-item:hover .conv-time {
+  opacity: 0;
+}

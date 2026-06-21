@@ -19,8 +19,11 @@ const flue: FlueBridge = {
   },
   listConversations: () => ipcRenderer.invoke('conversations:list'),
   getConversation: (id) => ipcRenderer.invoke('conversations:get', id),
-  saveConversation: (id, title, messages) =>
-    ipcRenderer.invoke('conversations:save', id, title, messages),
+  listProjects: () => ipcRenderer.invoke('projects:list'),
+  createProject: () => ipcRenderer.invoke('projects:create'),
+  deleteProject: (id) => ipcRenderer.invoke('projects:delete', id),
+  saveConversation: (id, projectId, title, messages) =>
+    ipcRenderer.invoke('conversations:save', id, projectId, title, messages),
   deleteConversation: (id) => ipcRenderer.invoke('conversations:delete', id),
 }
 

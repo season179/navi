@@ -61,7 +61,18 @@ export interface PersistedMessage {
 /** Lightweight conversation descriptor for the sidebar list (no message bodies). */
 export interface ConversationMeta {
   id: string
+  projectId: string
   title: string
+  createdAt: number
+  updatedAt: number
+}
+
+/** Directory-backed project shown in the sidebar tree. */
+export interface ProjectMeta {
+  id: string
+  path: string
+  name: string
+  label: string
   createdAt: number
   updatedAt: number
 }
@@ -78,12 +89,23 @@ export interface FlueBridge {
   onEvent(listener: (message: FlueStreamMessage) => void): () => void
   /** Subscribe to backend status changes. Returns an unsubscribe function. */
   onStatus(listener: (status: FlueStatus) => void): () => void
+  /** List stored projects, most-recently-updated first. */
+  listProjects(): Promise<ProjectMeta[]>
+  /** Open a native folder picker and register the chosen directory as a project. */
+  createProject(): Promise<ProjectMeta | null>
+  /** Delete a project and cascade-delete its conversations. */
+  deleteProject(id: string): Promise<void>
   /** List stored conversations, most-recently-updated first. */
   listConversations(): Promise<ConversationMeta[]>
   /** Load the persisted message thread for one conversation (empty if unknown). */
   getConversation(id: string): Promise<PersistedMessage[]>
   /** Upsert a conversation's title + thread (bumps its updatedAt). */
-  saveConversation(id: string, title: string, messages: PersistedMessage[]): Promise<void>
+  saveConversation(
+    id: string,
+    projectId: string,
+    title: string,
+    messages: PersistedMessage[],
+  ): Promise<void>
   /** Delete a stored conversation thread. */
   deleteConversation(id: string): Promise<void>
 }
