@@ -61,6 +61,13 @@ import {
   WorkspaceProjectPicker,
   WORKSPACE_PROJECT_PICKER_PREVIEW,
 } from './WorkspaceProjectPicker'
+import {
+  COMPOSER_CHANGE_SUMMARY_PREVIEW,
+  type ComposerChangedFile,
+} from '../lib/composerChangeSummary'
+
+export type { ComposerChangedFile } from '../lib/composerChangeSummary'
+export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
 
 const SAMPLE_IMAGE =
   'data:image/svg+xml,' +
@@ -119,9 +126,8 @@ type AttachmentPreview = {
   previewUrl: string
 }
 
-type ChangedFilePreview = {
-  path: string
-}
+
+type ChangedFilePreview = ComposerChangedFile
 
 type GoalPreview = {
   objective: string
@@ -224,11 +230,8 @@ const ATTACHMENTS_PREVIEW: AttachmentPreview[] = [
   { id: 'img-2', name: 'wireframe.png', previewUrl: SAMPLE_IMAGE },
 ]
 
-const CHANGED_FILES_PREVIEW: ChangedFilePreview[] = [
-  { path: 'src/renderer/components/FloatingComposer.tsx' },
-  { path: 'src/renderer/styles/app.css' },
-  { path: 'src/renderer/routes/home.tsx' },
-]
+
+const CHANGED_FILES_PREVIEW: ChangedFilePreview[] = COMPOSER_CHANGE_SUMMARY_PREVIEW.files
 
 const GOAL_PREVIEW: GoalPreview = {
   objective: 'Port Kun FloatingComposer visuals into navi',
@@ -485,11 +488,11 @@ function ComposerGoalPanel({ goal }: { goal: GoalPreview | null }): ReactElement
   )
 }
 
-function ComposerChangeSummary({
+export function ComposerChangeSummary({
   files,
   stats,
 }: {
-  files: ChangedFilePreview[]
+  files: ComposerChangedFile[]
   stats: { added: number; removed: number }
 }): ReactElement {
   return (

@@ -18,6 +18,7 @@ import {
   replaceFileMentionInInput,
   type ComposerFileReference,
 } from '../lib/composerFileReferences'
+import type { ComposerChangedFile } from '../lib/composerChangeSummary'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import {
   FloatingComposerQueuedMessages,
@@ -27,6 +28,7 @@ import {
   ComposerPlusMenu,
   ComposerSlashMenu,
   ComposerFileMentionMenu,
+  ComposerChangeSummary,
   type ComposerSlashCommandItem,
   type ComposerFileMentionItem,
 } from './FloatingComposer'
@@ -72,6 +74,10 @@ interface ComposerProps {
   executionPicker?: ReactNode
   /** Footer row below the composer shell (e.g. git branch picker). */
   footerLeft?: ReactNode
+  /** Changed files shown above the textarea in Kun's change-summary card. */
+  changedFiles?: ComposerChangedFile[]
+  /** Diff stats for the change-summary card; defaults to zeros when omitted. */
+  changedStats?: { added: number; removed: number }
 }
 
 /**
@@ -104,6 +110,8 @@ export function Composer({
   onRemoveQueuedMessage,
   executionPicker,
   footerLeft,
+  changedFiles,
+  changedStats,
 }: ComposerProps) {
   const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -454,6 +462,12 @@ export function Composer({
           </div>
         ) : null}
         <div className={shellClass}>
+          {!compact && changedFiles && changedFiles.length > 0 ? (
+            <ComposerChangeSummary
+              files={changedFiles}
+              stats={changedStats ?? { added: 0, removed: 0 }}
+            />
+          ) : null}
           <textarea
             ref={textareaRef}
             rows={1}

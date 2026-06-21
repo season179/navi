@@ -345,6 +345,7 @@ import {
   AppPreview,
   type AppPreviewMode,
 } from '../components/App'
+import { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
 import {
   FloatingComposerPreview,
   type FloatingComposerPreviewMode,
@@ -679,6 +680,15 @@ function HomePage() {
       return undefined
     }
     return COMPOSER_FILE_MENTION_PREVIEW
+  }, [])
+
+  // Visual preview for the ported ComposerChangeSummary (?composerChangeSummaryPreview=1).
+  const composerChangeSummaryPreview = useMemo(() => {
+    if (typeof window === 'undefined') return undefined
+    if (!new URLSearchParams(window.location.search).has('composerChangeSummaryPreview')) {
+      return undefined
+    }
+    return COMPOSER_CHANGE_SUMMARY_PREVIEW
   }, [])
 
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
@@ -3722,6 +3732,8 @@ function HomePage() {
       }
       skills={skills}
       fileMentionCandidates={composerFileMentionPreview}
+      changedFiles={composerChangeSummaryPreview?.files}
+      changedStats={composerChangeSummaryPreview?.stats}
       modelChip={
         <FloatingModelPicker
           providers={providerProfiles}
