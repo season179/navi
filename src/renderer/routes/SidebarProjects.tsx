@@ -69,7 +69,15 @@ export function SidebarProjects() {
   }
 
   const handleProjectClick = (id: string) => {
-    setExpanded((prev) => ({ ...prev, [id]: !isExpanded(id) }))
+    if (allCollapsed) {
+      // Leaving "collapse all" via a project click should open *that* project
+      // and keep the rest collapsed — otherwise the click is a visual no-op
+      // (the allCollapsed override would keep every folder shut).
+      setExpanded(Object.fromEntries(projects.map((p) => [p.id, p.id === id])))
+      setAllCollapsed(false)
+    } else {
+      setExpanded((prev) => ({ ...prev, [id]: !isExpanded(id) }))
+    }
     void selectProject(id)
   }
 
@@ -152,6 +160,7 @@ export function SidebarProjects() {
                   }
                   onClick={() => handleProjectClick(p.id)}
                   title={p.path || p.name}
+                  aria-expanded={open}
                 >
                   {open ? <FolderOpen /> : <Folder />}
                   <span className="cmd-label">{p.name}</span>

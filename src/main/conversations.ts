@@ -36,8 +36,10 @@ export function storePath(): string {
   return override ? override : path.join(app.getPath('userData'), 'navi-conversations.json')
 }
 
-function migrate(store: Store): { store: Store; changed: boolean } {
-  let changed = false
+// Bring a loaded store up to the current shape in memory: guarantee the default
+// project exists and back-fill projectId on legacy conversations. Idempotent, so
+// it's safe (and cheap) to run on every read.
+function migrate(store: Store): Store {
   if (!store.projects?.some((p) => p.id === DEFAULT_PROJECT_ID)) {
     const now = Date.now()
     store.projects = [
@@ -51,15 +53,11 @@ function migrate(store: Store): { store: Store; changed: boolean } {
       },
       ...(store.projects ?? []),
     ]
-    changed = true
   }
   for (const c of store.conversations) {
-    if (!c.projectId) {
-      c.projectId = DEFAULT_PROJECT_ID
-      changed = true
-    }
+    if (!c.projectId) c.projectId = DEFAULT_PROJECT_ID
   }
-  return { store, changed }
+  return store
 }
 
 async function read(): Promise<Store> {
@@ -68,32 +66,20 @@ async function read(): Promise<Store> {
   try {
     raw = await fs.readFile(file, 'utf8')
   } catch {
-    const store: Store = { projects: [], conversations: [] }
-    const { store: migrated, changed } = migrate(store)
-    if (changed) {
-      try {
-        await write(migrated)
-      } catch {
-        // best effort — first read may write once
-      }
-    }
-    return migrated
+    return migrate({ projects: [], conversations: [] }) // no file yet — fresh start
   }
   try {
     const parsed = JSON.parse(raw) as Partial<Store>
-    const store: Store = {
+    // Migrate in memory only — never write from read(). Reads run unqueued, so
+    // persisting here could interleave with a queued mutation's write and clobber
+    // it (a lost update). Migration is idempotent; the next queued mutation
+    // (save/create/delete) persists the upgraded shape. Until then disk stays in
+    // its legacy form, which all readers already tolerate (missing projectId →
+    // default → plain chat).
+    return migrate({
       projects: Array.isArray(parsed.projects) ? parsed.projects : [],
       conversations: Array.isArray(parsed.conversations) ? parsed.conversations : [],
-    }
-    const { store: migrated, changed } = migrate(store)
-    if (changed) {
-      try {
-        await write(migrated)
-      } catch {
-        // best effort — first read may write once
-      }
-    }
-    return migrated
+    })
   } catch {
     // The file exists but is corrupt. Preserve it instead of silently
     // overwriting (the next save would otherwise destroy recoverable data),
@@ -103,25 +89,25 @@ async function read(): Promise<Store> {
     } catch {
       // best effort — if we can't move it aside, still avoid throwing here
     }
-    const store: Store = { projects: [], conversations: [] }
-    const { store: migrated, changed } = migrate(store)
-    if (changed) {
-      try {
-        await write(migrated)
-      } catch {
-        // best effort
-      }
-    }
-    return migrated
+    return migrate({ projects: [], conversations: [] })
   }
 }
 
 async function write(store: Store): Promise<void> {
   const file = storePath()
   await fs.mkdir(path.dirname(file), { recursive: true })
-  const tmp = `${file}.tmp`
-  await fs.writeFile(tmp, JSON.stringify(store, null, 2), { mode: 0o600 })
-  await fs.rename(tmp, file) // atomic: readers never see a torn file
+  // Unique temp per write: read() persists migrations outside the mutation
+  // queue, so two writes can be in flight at once. A shared temp path would let
+  // them clobber each other's bytes before the rename; a per-write name keeps
+  // every rename an atomic promotion of one fully-written file.
+  const tmp = `${file}.${randomUUID()}.tmp`
+  try {
+    await fs.writeFile(tmp, JSON.stringify(store, null, 2), { mode: 0o600 })
+    await fs.rename(tmp, file) // atomic: readers never see a torn file
+  } catch (e) {
+    await fs.rm(tmp, { force: true }).catch(() => {}) // don't leak a temp on failure
+    throw e
+  }
 }
 
 // Serialize read-modify-write cycles so two overlapping saves can't clobber

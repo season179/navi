@@ -94,9 +94,15 @@ test('upsert replaces the thread and bumps recency without duplicating', async (
   assert.equal(a[1].text, 'hello!', 'new assistant turn persisted')
 })
 
-test('writes atomically — no leftover temp file', () => {
+test('writes atomically — no leftover temp file', async () => {
+  const { readdirSync } = await import('node:fs')
+  const { basename } = await import('node:path')
   assert.ok(existsSync(storeFile), 'store file exists after writes')
-  assert.ok(!existsSync(`${storeFile}.tmp`), 'temp file renamed away')
+  // write() uses a unique per-write temp name (file.<uuid>.tmp) and cleans it
+  // up; assert none survived the renames rather than just the legacy fixed name.
+  const base = basename(storeFile)
+  const leftovers = readdirSync(tmp).filter((f) => f.startsWith(base) && f.endsWith('.tmp'))
+  assert.deepEqual(leftovers, [], 'no temp files left behind')
 })
 
 test('serializes concurrent saves without losing writes', async () => {
@@ -115,27 +121,37 @@ test('delete removes the conversation and its thread', async () => {
   assert.deepEqual(await store.getConversation('A'), [], 'deleted thread reads empty')
 })
 
-test('migration creates default project and back-fills projectId on read', async () => {
+test('migration surfaces default project + back-filled projectId on read without mutating disk', async () => {
   const legacyFile = join(tmp, 'legacy-migrate.json')
-  const { writeFileSync } = await import('node:fs')
-  writeFileSync(
-    legacyFile,
-    JSON.stringify({
-      conversations: [
-        { id: 'old1', title: 'Legacy', createdAt: 1, updatedAt: 2, messages: [] },
-      ],
-    }),
-  )
+  const { writeFileSync, readFileSync } = await import('node:fs')
+  const legacyRaw = JSON.stringify({
+    conversations: [{ id: 'old1', title: 'Legacy', createdAt: 1, updatedAt: 2, messages: [] }],
+  })
+  writeFileSync(legacyFile, legacyRaw)
   const prevPath = process.env.NAVI_CONVERSATIONS_PATH
   process.env.NAVI_CONVERSATIONS_PATH = legacyFile
-  const migrated = require(storeBundlePath)
+  try {
+    // Reads migrate in memory: callers see the default project + back-filled id…
+    const projects = await store.listProjects()
+    assert.ok(projects.some((p) => p.id === DEFAULT_PROJECT_ID && p.name === 'navi'))
+    const list = await store.listConversations()
+    assert.equal(list[0].projectId, DEFAULT_PROJECT_ID)
+    // …but an unqueued read must never write, or it could clobber a concurrent
+    // queued mutation. The legacy file stays byte-for-byte untouched.
+    assert.equal(readFileSync(legacyFile, 'utf8'), legacyRaw, 'read must not mutate the store on disk')
 
-  const projects = await migrated.listProjects()
-  assert.ok(projects.some((p) => p.id === DEFAULT_PROJECT_ID && p.name === 'navi'))
-  const list = await migrated.listConversations()
-  assert.equal(list[0].projectId, DEFAULT_PROJECT_ID)
-  assert.ok(existsSync(legacyFile), 'write-through migration persisted to disk')
-  process.env.NAVI_CONVERSATIONS_PATH = prevPath
+    // The next queued mutation is what persists the migrated shape.
+    await store.saveConversation('old1', DEFAULT_PROJECT_ID, 'Legacy', [])
+    const persisted = JSON.parse(readFileSync(legacyFile, 'utf8'))
+    assert.ok(persisted.projects.some((p) => p.id === DEFAULT_PROJECT_ID), 'mutation persists default project')
+    assert.equal(
+      persisted.conversations.find((c) => c.id === 'old1').projectId,
+      DEFAULT_PROJECT_ID,
+      'mutation persists back-filled projectId',
+    )
+  } finally {
+    process.env.NAVI_CONVERSATIONS_PATH = prevPath
+  }
 })
 
 test('migration is idempotent on second read', async () => {

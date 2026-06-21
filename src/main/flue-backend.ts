@@ -220,17 +220,20 @@ class FlueBackend extends EventEmitter {
       throw new Error('No OpenAI API key configured. Add one in Settings.')
     }
 
+    // Resolve the bound project folder up front. A missing/corrupt store must
+    // not block the turn (fall through to plain chat), but a project whose
+    // folder was deleted should fail loudly before we spend a request on it.
+    let projectCwd: string | undefined
     try {
       const store = JSON.parse(readFileSync(storePath(), 'utf8'))
-      const cwd = resolveProjectCwd(store, conversationId)
-      if (cwd && !existsSync(cwd)) {
-        throw new Error(
-          `Project folder no longer exists: ${cwd}. Re-create the project or pick a new folder.`,
-        )
-      }
-    } catch (e) {
-      if (e instanceof Error && e.message.startsWith('Project folder')) throw e
+      projectCwd = resolveProjectCwd(store, conversationId)
+    } catch {
       // store unreadable/corrupt → don't over-block; let the turn proceed
+    }
+    if (projectCwd && !existsSync(projectCwd)) {
+      throw new Error(
+        `Project folder no longer exists: ${projectCwd}. Re-create the project or pick a new folder.`,
+      )
     }
 
     const requestId = randomUUID()

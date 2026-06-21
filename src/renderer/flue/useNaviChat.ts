@@ -307,13 +307,18 @@ export function useNaviChat(): NaviChat {
 
   const newConversation = useCallback(
     (projectId?: string) => {
+      // Persist the outgoing conversation under its *current* project binding
+      // before switching: persistCurrent reads both refs synchronously, so the
+      // project ref must not flip until after it has snapshotted the old one.
+      // (startBlank persists too, but only after we'd already changed the ref.)
+      void persistCurrent()
       if (projectId && projectId !== currentProjectIdRef.current) {
         currentProjectIdRef.current = projectId
         setCurrentProjectId(projectId)
       }
-      startBlank(true)
+      startBlank(false)
     },
-    [startBlank],
+    [persistCurrent, startBlank],
   )
 
   const selectConversation = useCallback(
