@@ -16,7 +16,7 @@ import {
   type ComposerAttachmentsPreviewMode,
   resolveComposerAttachmentErrorPreview,
 } from '../lib/composerAttachments'
-import { COMPOSER_GOAL_PREVIEW } from '../lib/composerGoal'
+import { resolveComposerGoalPreview } from '../lib/composerGoal'
 import { resolveComposerThreadUsagePreview } from '../lib/composerThreadUsage'
 import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 import {
@@ -761,20 +761,23 @@ function HomePage() {
     return resolveComposerAttachmentErrorPreview(params.get('composerAttachmentErrorPreview'))
   }, [])
 
-  // Visual preview for the ported ComposerGoalFloater (?composerGoalFloaterPreview=1).
+  // Visual preview for the ported ComposerGoalFloater (?composerGoalFloaterPreview=1|paused).
   const composerGoalFloaterPreview = useMemo(() => {
-    if (typeof window === 'undefined') return false
-    return new URLSearchParams(window.location.search).has('composerGoalFloaterPreview')
+    if (typeof window === 'undefined') return undefined
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerGoalFloaterPreview')) return undefined
+    return resolveComposerGoalPreview(params.get('composerGoalFloaterPreview'))
   }, [])
 
-  // Visual preview for the ported ComposerGoalPanel (?composerGoalPanelPreview=1).
+  // Visual preview for the ported ComposerGoalPanel (?composerGoalPanelPreview=1|paused).
   const composerGoalPanelPreview = useMemo(() => {
-    if (typeof window === 'undefined') return false
-    return new URLSearchParams(window.location.search).has('composerGoalPanelPreview')
+    if (typeof window === 'undefined') return undefined
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerGoalPanelPreview')) return undefined
+    return resolveComposerGoalPreview(params.get('composerGoalPanelPreview'))
   }, [])
 
-  const composerGoalPreview =
-    composerGoalFloaterPreview || composerGoalPanelPreview ? COMPOSER_GOAL_PREVIEW : undefined
+  const composerGoalPreview = composerGoalFloaterPreview ?? composerGoalPanelPreview
 
   // Visual preview for the ported plan-mode badge (?composerPlanModePreview=1).
   const composerPlanModePreview = useMemo(() => {
@@ -1328,7 +1331,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalPanel|attachments|attachmentsNoPreview|changeSummary|changeSummaryReviewDisabled|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
+  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalFloaterPaused|goalPanel|goalPanelPaused|attachments|attachmentsNoPreview|changeSummary|changeSummaryReviewDisabled|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -3917,9 +3920,9 @@ function HomePage() {
       attachments={composerAttachmentsPreview}
       attachmentUploadError={composerAttachmentErrorPreview}
       goal={composerGoalPreview}
-      showGoalFloater={composerGoalFloaterPreview}
-      showGoalPanel={composerGoalPanelPreview}
-      goalBadge={composerGoalFloaterPreview || composerGoalPanelPreview}
+      showGoalFloater={Boolean(composerGoalFloaterPreview)}
+      showGoalPanel={Boolean(composerGoalPanelPreview)}
+      goalBadge={Boolean(composerGoalPreview)}
       planBadge={composerPlanModePreview}
       threadUsage={composerThreadUsagePreview?.usage}
       threadUsageLoading={composerThreadUsagePreview?.loading}

@@ -86,7 +86,19 @@ import {
   COMPOSER_REMOVE_ATTACHMENT_LABEL,
   type ComposerImageAttachment,
 } from '../lib/composerAttachments'
-import { COMPOSER_GOAL_PREVIEW, type ComposerGoal } from '../lib/composerGoal'
+import {
+  COMPOSER_GOAL_ACTION_CLEAR,
+  COMPOSER_GOAL_ACTION_EDIT,
+  COMPOSER_GOAL_ACTION_PAUSE,
+  COMPOSER_GOAL_ACTION_RESUME,
+  COMPOSER_GOAL_NO_ACTIVE_TITLE,
+  COMPOSER_GOAL_PAUSED_PREVIEW,
+  COMPOSER_GOAL_PREVIEW,
+  COMPOSER_GOAL_SET_CURRENT_INPUT,
+  formatComposerGoalBannerLabel,
+  formatComposerGoalStatusShort,
+  type ComposerGoal,
+} from '../lib/composerGoal'
 import {
   COMPOSER_QUEUE_MESSAGE_LABEL,
   COMPOSER_QUEUE_PLACEHOLDER,
@@ -158,7 +170,9 @@ export type FloatingComposerPreviewMode =
   | 'fileMentionLoading'
   | 'fileMentionEmpty'
   | 'goalFloater'
+  | 'goalFloaterPaused'
   | 'goalPanel'
+  | 'goalPanelPaused'
   | 'attachments'
   | 'attachmentsNoPreview'
   | 'changeSummary'
@@ -557,22 +571,32 @@ export function ComposerGoalFloater({ goal }: { goal: ComposerGoal }): ReactElem
       <div className="floating-composer-goal-floater-card">
         <Target strokeWidth={1.9} />
         <div className="floating-composer-goal-floater-copy">
-          <span className="floating-composer-goal-floater-label">Goal</span>
+          <span className="floating-composer-goal-floater-label">
+            {formatComposerGoalBannerLabel(goal.status)}
+          </span>
           <span className="floating-composer-goal-floater-objective">{goal.objective}</span>
           <span className="floating-composer-goal-floater-elapsed">· {goal.elapsedLabel}</span>
         </div>
         <div className="floating-composer-goal-floater-actions">
-          <button type="button" aria-label="Edit goal">
+          <button type="button" aria-label={COMPOSER_GOAL_ACTION_EDIT} title={COMPOSER_GOAL_ACTION_EDIT}>
             <Pencil strokeWidth={1.9} />
           </button>
-          <button type="button" aria-label={goal.status === 'active' ? 'Pause goal' : 'Resume goal'}>
+          <button
+            type="button"
+            aria-label={
+              goal.status === 'active' ? COMPOSER_GOAL_ACTION_PAUSE : COMPOSER_GOAL_ACTION_RESUME
+            }
+            title={
+              goal.status === 'active' ? COMPOSER_GOAL_ACTION_PAUSE : COMPOSER_GOAL_ACTION_RESUME
+            }
+          >
             {goal.status === 'active' ? (
               <PauseCircle strokeWidth={1.9} />
             ) : (
               <PlayCircle strokeWidth={1.9} />
             )}
           </button>
-          <button type="button" aria-label="Clear goal">
+          <button type="button" aria-label={COMPOSER_GOAL_ACTION_CLEAR} title={COMPOSER_GOAL_ACTION_CLEAR}>
             <Trash2 strokeWidth={1.9} />
           </button>
         </div>
@@ -591,29 +615,44 @@ export function ComposerGoalPanel({ goal }: { goal: ComposerGoal | null }): Reac
         <div className="floating-composer-goal-panel-copy">
           <div className="floating-composer-goal-panel-title-row">
             <div className="floating-composer-goal-panel-title">
-              {goal ? goal.objective : 'No active goal'}
+              {goal ? goal.objective : COMPOSER_GOAL_NO_ACTIVE_TITLE}
             </div>
             {goal ? (
               <span className="floating-composer-goal-panel-status">
-                {goal.status === 'active' ? 'Active' : 'Paused'}
+                {formatComposerGoalStatusShort(goal.status)}
               </span>
             ) : null}
           </div>
           <div className="floating-composer-goal-panel-actions">
             <button type="button" className="floating-composer-goal-panel-set">
-              Set current input as goal
+              {COMPOSER_GOAL_SET_CURRENT_INPUT}
             </button>
             {goal?.status === 'active' ? (
-              <button type="button" className="floating-composer-goal-panel-icon-btn" aria-label="Pause goal">
+              <button
+                type="button"
+                className="floating-composer-goal-panel-icon-btn"
+                aria-label={COMPOSER_GOAL_ACTION_PAUSE}
+                title={COMPOSER_GOAL_ACTION_PAUSE}
+              >
                 <PauseCircle strokeWidth={1.9} />
               </button>
             ) : goal ? (
-              <button type="button" className="floating-composer-goal-panel-icon-btn" aria-label="Resume goal">
+              <button
+                type="button"
+                className="floating-composer-goal-panel-icon-btn"
+                aria-label={COMPOSER_GOAL_ACTION_RESUME}
+                title={COMPOSER_GOAL_ACTION_RESUME}
+              >
                 <PlayCircle strokeWidth={1.9} />
               </button>
             ) : null}
             {goal ? (
-              <button type="button" className="floating-composer-goal-panel-icon-btn" aria-label="Clear goal">
+              <button
+                type="button"
+                className="floating-composer-goal-panel-icon-btn"
+                aria-label={COMPOSER_GOAL_ACTION_CLEAR}
+                title={COMPOSER_GOAL_ACTION_CLEAR}
+              >
                 <Trash2 strokeWidth={1.9} />
               </button>
             ) : null}
@@ -897,8 +936,22 @@ export function resolveFloatingComposerSnapshot(
       }
     case 'goalFloater':
       return { ...base, showGoalFloater: true, goal: COMPOSER_GOAL_PREVIEW, goalBadge: true }
+    case 'goalFloaterPaused':
+      return {
+        ...base,
+        showGoalFloater: true,
+        goal: COMPOSER_GOAL_PAUSED_PREVIEW,
+        goalBadge: true,
+      }
     case 'goalPanel':
       return { ...base, showGoalPanel: true, goal: COMPOSER_GOAL_PREVIEW, goalBadge: true }
+    case 'goalPanelPaused':
+      return {
+        ...base,
+        showGoalPanel: true,
+        goal: COMPOSER_GOAL_PAUSED_PREVIEW,
+        goalBadge: true,
+      }
     case 'attachments':
       return {
         ...base,

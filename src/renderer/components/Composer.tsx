@@ -20,7 +20,7 @@ import {
 } from '../lib/composerFileReferences'
 import type { ComposerChangedFile } from '../lib/composerChangeSummary'
 import type { ComposerImageAttachment } from '../lib/composerAttachments'
-import type { ComposerGoal } from '../lib/composerGoal'
+import { COMPOSER_GOAL_MODE_BADGE_LABEL, type ComposerGoal } from '../lib/composerGoal'
 import type { ComposerThreadUsage } from '../lib/composerThreadUsage'
 import type { ComposerPlusMenuToggles } from '../lib/composerPlusMenu'
 import { COMPOSER_PLUS_MENU_TITLE } from '../lib/composerPlusMenu'
@@ -664,7 +664,7 @@ export function Composer({
                 {goalBadge ? (
                   <span className="floating-composer-mode-badge">
                     <Target strokeWidth={1.9} />
-                    <span>Goal</span>
+                    <span>{COMPOSER_GOAL_MODE_BADGE_LABEL}</span>
                   </span>
                 ) : null}
               </div>
