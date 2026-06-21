@@ -177,6 +177,13 @@ import {
   type DevBrowserPreviewMode,
 } from '../components/DevBrowserPanel'
 import {
+  PlanPanel,
+  PLAN_PANEL_PREVIEW,
+  PREVIEW_COVERAGE,
+  PREVIEW_DRIFT,
+  type PlanPanelPreviewMode,
+} from '../components/PlanPanel'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -770,6 +777,80 @@ function HomePage() {
     }
   }, [devBrowserPanelPreviewMode])
 
+  // Visual preview for the ported PlanPanel (?planPanelPreview=1|empty|noworkspace|dirty|saving|coverage|drift|error).
+  const planPanelPreviewMode = useMemo((): PlanPanelPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('planPanelPreview')) return null
+    const mode = params.get('planPanelPreview')
+    if (
+      mode === 'empty' ||
+      mode === 'noworkspace' ||
+      mode === 'dirty' ||
+      mode === 'saving' ||
+      mode === 'coverage' ||
+      mode === 'drift' ||
+      mode === 'error'
+    ) {
+      return mode
+    }
+    return 'default'
+  }, [])
+  const planPanelPreviewProps = useMemo(() => {
+    if (!planPanelPreviewMode) return null
+    if (planPanelPreviewMode === 'noworkspace') {
+      return {
+        workspaceRoot: '',
+        activePlan: null,
+        saveStatus: 'saved' as const,
+        operationStatus: 'idle' as const,
+        error: null,
+        coverage: null,
+      }
+    }
+    if (planPanelPreviewMode === 'empty') {
+      return {
+        workspaceRoot: PLAN_PANEL_PREVIEW.workspaceRoot,
+        activePlan: null,
+        saveStatus: 'saved' as const,
+        operationStatus: 'idle' as const,
+        error: null,
+        coverage: null,
+      }
+    }
+    if (planPanelPreviewMode === 'dirty') {
+      return {
+        ...PLAN_PANEL_PREVIEW,
+        saveStatus: 'dirty' as const,
+      }
+    }
+    if (planPanelPreviewMode === 'saving') {
+      return {
+        ...PLAN_PANEL_PREVIEW,
+        saveStatus: 'saving' as const,
+      }
+    }
+    if (planPanelPreviewMode === 'coverage') {
+      return {
+        ...PLAN_PANEL_PREVIEW,
+        coverage: PREVIEW_COVERAGE,
+      }
+    }
+    if (planPanelPreviewMode === 'drift') {
+      return {
+        ...PLAN_PANEL_PREVIEW,
+        coverage: PREVIEW_DRIFT,
+      }
+    }
+    if (planPanelPreviewMode === 'error') {
+      return {
+        ...PLAN_PANEL_PREVIEW,
+        error: 'Could not start the agent turn for this plan.',
+      }
+    }
+    return { ...PLAN_PANEL_PREVIEW }
+  }, [planPanelPreviewMode])
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -1048,6 +1129,28 @@ function HomePage() {
                 loadError: null,
                 loading: false,
               }))
+            }
+          />
+        </div>
+      ) : null}
+
+      {planPanelPreviewMode && planPanelPreviewProps ? (
+        <div className="plan-panel-preview-wrap">
+          <PlanPanel
+            workspaceRoot={planPanelPreviewProps.workspaceRoot}
+            activePlan={planPanelPreviewProps.activePlan}
+            saveStatus={planPanelPreviewProps.saveStatus}
+            operationStatus={planPanelPreviewProps.operationStatus}
+            error={planPanelPreviewProps.error}
+            coverage={planPanelPreviewProps.coverage}
+            onCollapse={() => undefined}
+            onOpenPlanFile={() => undefined}
+            onBuildPlan={() => undefined}
+            onVerifyPlan={planPanelPreviewProps.coverage ? () => undefined : undefined}
+            onReplanChanged={
+              planPanelPreviewProps.coverage?.driftIds.length
+                ? () => undefined
+                : undefined
             }
           />
         </div>
