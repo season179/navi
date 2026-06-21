@@ -432,6 +432,7 @@ import {
   WriteWorkspaceProductionView,
   type WriteWorkspaceViewPreviewMode,
 } from '../components/WriteWorkspaceView'
+import { resolveWriteWorkspaceViewPreviewMode } from '../lib/writeWorkspacePreviewModes'
 import {
   WriteDebugLogModalPreview,
   type WriteDebugLogModalPreviewMode,
@@ -1521,32 +1522,10 @@ function HomePage() {
     }, [])
 
   // Visual preview for the ported WriteWorkspaceView
-  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|rich|preview|pdf|image|inlineAgent|assistant|assistantTimeline|assistantQuoted|runtimeBanner|error|exportSuccess|exportError|dirty|saving).
+  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|rich|preview|pdf|image|largeFile|truncated|inlineAgent|assistant|assistantTimeline|assistantQuoted|runtimeBanner|error|exportSuccess|exportError|dirty|saving).
   const writeWorkspaceViewPreviewMode = useMemo((): WriteWorkspaceViewPreviewMode | null => {
     if (typeof window === 'undefined') return null
-    const params = new URLSearchParams(window.location.search)
-    if (!params.has('writeWorkspaceView')) return null
-    const value = params.get('writeWorkspaceView')
-    if (value === 'empty') return 'empty'
-    if (value === 'emptyError') return 'emptyError'
-    if (value === 'start') return 'start'
-    if (value === 'live') return 'live'
-    if (value === 'source') return 'source'
-    if (value === 'rich') return 'rich'
-    if (value === 'preview') return 'preview'
-    if (value === 'pdf') return 'pdf'
-    if (value === 'image') return 'image'
-    if (value === 'inlineAgent') return 'inlineAgent'
-    if (value === 'assistant') return 'assistant'
-    if (value === 'assistantTimeline') return 'assistantTimeline'
-    if (value === 'assistantQuoted') return 'assistantQuoted'
-    if (value === 'runtimeBanner') return 'runtimeBanner'
-    if (value === 'error') return 'error'
-    if (value === 'exportSuccess') return 'exportSuccess'
-    if (value === 'exportError') return 'exportError'
-    if (value === 'dirty') return 'dirty'
-    if (value === 'saving') return 'saving'
-    return 'split'
+    return resolveWriteWorkspaceViewPreviewMode(new URLSearchParams(window.location.search))
   }, [])
 
   // Visual preview for the ported ClawSidebar

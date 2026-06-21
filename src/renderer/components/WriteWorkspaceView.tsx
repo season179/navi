@@ -29,6 +29,7 @@ import { WRITE_WORKSPACE_START_PREVIEW } from './WriteWorkspaceStart'
 import { WRITE_PDF_VIEWER_PREVIEW_SAMPLE } from './WritePdfViewer'
 import { WRITE_IMAGE_PREVIEW_SAMPLE } from './WriteImagePreview'
 import { WRITE_MARKDOWN_PREVIEW_SAMPLE } from './WriteMarkdownPreview'
+import { WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE } from './WriteMarkdownEditor'
 import {
   WriteInlineAgent,
   type WriteBlockType,
@@ -79,6 +80,15 @@ type WorkspaceSnapshot = {
 }
 
 const SAMPLE_PATH = '/Users/season/writing/docs/launch-plan.md'
+
+const FILE_GUARD_COPY = {
+  writeLargeFileSafeMode:
+    'This file is large, so Markdown live rendering has been turned off to avoid a blank Write screen.',
+  writeLargeFileSafeModeSub:
+    'You can still edit and save normally; the preview pane falls back to plain text.',
+  writeLargeFileTruncated:
+    'This file is too large for Write to load fully right now. To avoid overwriting missing content, it has been opened read-only with Markdown rendering turned off.',
+}
 
 function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot {
   const baseText: Omit<
@@ -251,6 +261,76 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
       exportNotice: null,
       runtimeBanner: null,
       ...baseText,
+    }
+  }
+
+  if (mode === 'largeFile') {
+    return {
+      workspaceReady: true,
+      workspaceError: null,
+      activeFilePath: SAMPLE_PATH,
+      activeFileIsImage: false,
+      activeFileIsPdf: false,
+      activeFileIsText: true,
+      fileLoading: false,
+      previewMode: 'split',
+      renderSafety: {
+        livePreviewEnabled: false,
+        markdownPreviewEnabled: false,
+        readOnly: false,
+        notice: 'large-file',
+      },
+      fileGuardMessage: FILE_GUARD_COPY.writeLargeFileSafeMode,
+      fileGuardDetail: FILE_GUARD_COPY.writeLargeFileSafeModeSub,
+      imageSrc: WRITE_IMAGE_PREVIEW_SAMPLE.src,
+      imageMimeType: WRITE_IMAGE_PREVIEW_SAMPLE.mimeType,
+      activeFileName: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileName,
+      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
+      activeFilePathLabel: SAMPLE_PATH,
+      documentStatsLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.documentStatsLabel,
+      saveStatus: 'saved',
+      readOnly: false,
+      showInlineAgent: false,
+      fileError: null,
+      exportNotice: null,
+      runtimeBanner: null,
+      fileContent: WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE,
+      fileSize: 420_000,
+    }
+  }
+
+  if (mode === 'truncated') {
+    return {
+      workspaceReady: true,
+      workspaceError: null,
+      activeFilePath: SAMPLE_PATH,
+      activeFileIsImage: false,
+      activeFileIsPdf: false,
+      activeFileIsText: true,
+      fileLoading: false,
+      previewMode: 'source',
+      renderSafety: {
+        livePreviewEnabled: false,
+        markdownPreviewEnabled: false,
+        readOnly: true,
+        notice: 'truncated',
+      },
+      fileGuardMessage: FILE_GUARD_COPY.writeLargeFileTruncated,
+      fileGuardDetail: '',
+      imageSrc: WRITE_IMAGE_PREVIEW_SAMPLE.src,
+      imageMimeType: WRITE_IMAGE_PREVIEW_SAMPLE.mimeType,
+      activeFileName: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileName,
+      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
+      activeFilePathLabel: SAMPLE_PATH,
+      documentStatsLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.documentStatsLabel,
+      saveStatus: 'saved',
+      readOnly: true,
+      showInlineAgent: false,
+      fileError: null,
+      exportNotice: null,
+      runtimeBanner: null,
+      fileContent: WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE,
+      fileSize: 900_000,
     }
   }
 

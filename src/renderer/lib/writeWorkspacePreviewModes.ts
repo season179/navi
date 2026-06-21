@@ -11,6 +11,8 @@ export type WriteWorkspaceViewPreviewMode =
   | 'preview'
   | 'pdf'
   | 'image'
+  | 'largeFile'
+  | 'truncated'
   | 'inlineAgent'
   | 'assistant'
   | 'assistantTimeline'
@@ -21,6 +23,35 @@ export type WriteWorkspaceViewPreviewMode =
   | 'exportError'
   | 'dirty'
   | 'saving'
+
+export function resolveWriteWorkspaceViewPreviewMode(
+  params: URLSearchParams,
+): WriteWorkspaceViewPreviewMode | null {
+  if (!params.has('writeWorkspaceView')) return null
+  const value = params.get('writeWorkspaceView')
+  if (value === 'empty') return 'empty'
+  if (value === 'emptyError') return 'emptyError'
+  if (value === 'start') return 'start'
+  if (value === 'live') return 'live'
+  if (value === 'source') return 'source'
+  if (value === 'rich') return 'rich'
+  if (value === 'preview') return 'preview'
+  if (value === 'pdf') return 'pdf'
+  if (value === 'image') return 'image'
+  if (value === 'largeFile') return 'largeFile'
+  if (value === 'truncated') return 'truncated'
+  if (value === 'inlineAgent') return 'inlineAgent'
+  if (value === 'assistant') return 'assistant'
+  if (value === 'assistantTimeline') return 'assistantTimeline'
+  if (value === 'assistantQuoted') return 'assistantQuoted'
+  if (value === 'runtimeBanner') return 'runtimeBanner'
+  if (value === 'error') return 'error'
+  if (value === 'exportSuccess') return 'exportSuccess'
+  if (value === 'exportError') return 'exportError'
+  if (value === 'dirty') return 'dirty'
+  if (value === 'saving') return 'saving'
+  return 'split'
+}
 
 /** Snapshot modes exposed via ?productionWriteWorkspace for live write-tab verification. */
 export const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceViewPreviewMode>([
@@ -34,6 +65,8 @@ export const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceV
   'preview',
   'pdf',
   'image',
+  'largeFile',
+  'truncated',
   'inlineAgent',
   'error',
   'exportSuccess',

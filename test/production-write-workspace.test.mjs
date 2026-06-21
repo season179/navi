@@ -35,6 +35,8 @@ test('maps document-pane and toolbar snapshot modes', () => {
     'preview',
     'pdf',
     'image',
+    'largeFile',
+    'truncated',
     'inlineAgent',
     'error',
     'exportSuccess',
