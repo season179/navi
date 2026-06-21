@@ -109,6 +109,14 @@ import {
   GENERATED_FILES_PANEL_PREVIEW_MIXED,
   GENERATED_FILES_PANEL_PREVIEW_SINGLE,
 } from '../components/GeneratedFilesPanel'
+import {
+  ToolEntry,
+  TOOL_ENTRY_PREVIEW,
+  TOOL_ENTRY_PREVIEW_COMMAND,
+  TOOL_ENTRY_PREVIEW_ERROR,
+  TOOL_ENTRY_PREVIEW_RUNNING,
+  type ToolBlockSnapshot,
+} from '../components/ToolEntry'
 import { PencilLine } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -407,6 +415,27 @@ function HomePage() {
     if (mode === 'single') return GENERATED_FILES_PANEL_PREVIEW_SINGLE
     if (mode === 'mixed') return GENERATED_FILES_PANEL_PREVIEW_MIXED
     return GENERATED_FILES_PANEL_PREVIEW
+  }, [])
+
+  // Visual preview for the ported ToolEntry (?toolEntry=1|running|error|command).
+  const toolEntryPreview = useMemo((): {
+    block: ToolBlockSnapshot
+    defaultExpanded: boolean
+  } | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('toolEntry')) return null
+    const mode = params.get('toolEntry')
+    if (mode === 'running') {
+      return { block: TOOL_ENTRY_PREVIEW_RUNNING, defaultExpanded: true }
+    }
+    if (mode === 'error') {
+      return { block: TOOL_ENTRY_PREVIEW_ERROR, defaultExpanded: true }
+    }
+    if (mode === 'command') {
+      return { block: TOOL_ENTRY_PREVIEW_COMMAND, defaultExpanded: false }
+    }
+    return { block: TOOL_ENTRY_PREVIEW, defaultExpanded: true }
   }, [])
 
   const composerFooterPreview =
@@ -878,6 +907,15 @@ function HomePage() {
       {generatedFilesPanelPreviewMedia ? (
         <div className="generated-files-panel-preview">
           <GeneratedFilesPanel media={generatedFilesPanelPreviewMedia} />
+        </div>
+      ) : null}
+
+      {toolEntryPreview ? (
+        <div className="tool-entry-preview">
+          <ToolEntry
+            block={toolEntryPreview.block}
+            defaultExpanded={toolEntryPreview.defaultExpanded}
+          />
         </div>
       ) : null}
     </>
