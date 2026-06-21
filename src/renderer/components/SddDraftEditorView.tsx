@@ -1,17 +1,25 @@
 // SDD requirement draft editor echoing Kun's SddDraftEditorView
 // (../Kun/src/renderer/src/components/sdd/SddDraftEditorView.tsx).
-// Visual only: mock draft snapshots, WriteMarkdownEditor stand-in, and preview hooks.
+// Visual only: mock draft snapshots, WriteRichEditor surface, and preview hooks.
 
 import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactElement,
 } from 'react'
 import { ArrowRight, FileText, Loader2, Save, Sparkles, X } from 'lucide-react'
 import { SidebarTitlebarToggleButton } from './SidebarPrimitives'
 import { WriteMarkdownEditor } from './WriteMarkdownEditor'
+import { WriteRichEditor } from './WriteRichEditor'
+import {
+  WriteInlineAgent,
+  type WriteBlockType,
+  type WriteInlineAgentPosition,
+} from './WriteInlineAgent'
+import { WRITE_SETTINGS_PREVIEW_DEFAULT } from './WriteSettingsSection'
 import { SddAssistantPanel } from './SddAssistantPanel'
 
 type SddSaveStatus = 'saved' | 'dirty' | 'saving' | 'error'
@@ -51,6 +59,8 @@ export type SddDraftEditorViewPreviewMode =
   | 'assistantOpen'
   | 'leftCollapsed'
   | 'withNotice'
+  | 'inlineAgent'
+  | 'richFallback'
 
 const SDD_DESIGN_TONE_OPTIONS = [
   'Editorial',
@@ -168,9 +178,17 @@ function previewSnapshot(mode: SddDraftEditorViewPreviewMode): {
   draft: SddDraftSnapshot | null
   leftSidebarCollapsed: boolean
   assistantOpen: boolean
+  showInlineAgent: boolean
+  showRichFallback: boolean
 } {
   if (mode === 'noDraft') {
-    return { draft: null, leftSidebarCollapsed: false, assistantOpen: false }
+    return {
+      draft: null,
+      leftSidebarCollapsed: false,
+      assistantOpen: false,
+      showInlineAgent: false,
+      showRichFallback: false,
+    }
   }
 
   const base: SddDraftSnapshot = {
@@ -186,8 +204,24 @@ function previewSnapshot(mode: SddDraftEditorViewPreviewMode): {
     },
   }
 
-  if (mode === 'dirty') return { draft: { ...base, saveStatus: 'dirty' }, leftSidebarCollapsed: false, assistantOpen: false }
-  if (mode === 'saving') return { draft: { ...base, saveStatus: 'saving' }, leftSidebarCollapsed: false, assistantOpen: false }
+  if (mode === 'dirty') {
+    return {
+      draft: { ...base, saveStatus: 'dirty' },
+      leftSidebarCollapsed: false,
+      assistantOpen: false,
+      showInlineAgent: false,
+      showRichFallback: false,
+    }
+  }
+  if (mode === 'saving') {
+    return {
+      draft: { ...base, saveStatus: 'saving' },
+      leftSidebarCollapsed: false,
+      assistantOpen: false,
+      showInlineAgent: false,
+      showRichFallback: false,
+    }
+  }
   if (mode === 'error') {
     return {
       draft: {
@@ -197,6 +231,8 @@ function previewSnapshot(mode: SddDraftEditorViewPreviewMode): {
       },
       leftSidebarCollapsed: false,
       assistantOpen: false,
+      showInlineAgent: false,
+      showRichFallback: false,
     }
   }
   if (mode === 'upgrading') {
@@ -204,6 +240,8 @@ function previewSnapshot(mode: SddDraftEditorViewPreviewMode): {
       draft: { ...base, operationStatus: 'upgrading', saveStatus: 'saved' },
       leftSidebarCollapsed: false,
       assistantOpen: false,
+      showInlineAgent: false,
+      showRichFallback: false,
     }
   }
   if (mode === 'designContext') {
@@ -211,13 +249,27 @@ function previewSnapshot(mode: SddDraftEditorViewPreviewMode): {
       draft: { ...base, designContextOpen: true },
       leftSidebarCollapsed: false,
       assistantOpen: false,
+      showInlineAgent: false,
+      showRichFallback: false,
     }
   }
   if (mode === 'assistantOpen') {
-    return { draft: base, leftSidebarCollapsed: false, assistantOpen: true }
+    return {
+      draft: base,
+      leftSidebarCollapsed: false,
+      assistantOpen: true,
+      showInlineAgent: false,
+      showRichFallback: false,
+    }
   }
   if (mode === 'leftCollapsed') {
-    return { draft: base, leftSidebarCollapsed: true, assistantOpen: false }
+    return {
+      draft: base,
+      leftSidebarCollapsed: true,
+      assistantOpen: false,
+      showInlineAgent: false,
+      showRichFallback: false,
+    }
   }
   if (mode === 'withNotice') {
     return {
@@ -227,10 +279,45 @@ function previewSnapshot(mode: SddDraftEditorViewPreviewMode): {
       },
       leftSidebarCollapsed: false,
       assistantOpen: false,
+      showInlineAgent: false,
+      showRichFallback: false,
+    }
+  }
+  if (mode === 'inlineAgent') {
+    return {
+      draft: base,
+      leftSidebarCollapsed: false,
+      assistantOpen: false,
+      showInlineAgent: true,
+      showRichFallback: false,
+    }
+  }
+  if (mode === 'richFallback') {
+    return {
+      draft: base,
+      leftSidebarCollapsed: false,
+      assistantOpen: false,
+      showInlineAgent: false,
+      showRichFallback: true,
     }
   }
 
-  return { draft: base, leftSidebarCollapsed: false, assistantOpen: false }
+  return {
+    draft: base,
+    leftSidebarCollapsed: false,
+    assistantOpen: false,
+    showInlineAgent: false,
+    showRichFallback: false,
+  }
+}
+
+function inlineAgentPosition(): WriteInlineAgentPosition {
+  if (typeof window === 'undefined') {
+    return { left: 120, width: 420, anchorTop: 360, anchorBottom: 388 }
+  }
+  const width = Math.min(420, Math.max(280, window.innerWidth - 96))
+  const left = Math.max(48, (window.innerWidth - width) / 2)
+  return { left, width, anchorTop: 360, anchorBottom: 388 }
 }
 
 function SddRequirementProgress({ content }: { content: string }): ReactElement | null {
@@ -420,6 +507,8 @@ type Props = {
   leftSidebarCollapsed?: boolean
   assistantOpen?: boolean
   designContextOpen?: boolean
+  showInlineAgent?: boolean
+  showRichFallback?: boolean
   nextDisabled?: boolean
   onToggleLeftSidebar?: () => void
   onToggleAssistant?: () => void
@@ -436,6 +525,8 @@ export function SddDraftEditorView({
   leftSidebarCollapsed = false,
   assistantOpen = false,
   designContextOpen = false,
+  showInlineAgent = false,
+  showRichFallback = false,
   nextDisabled = false,
   onToggleLeftSidebar,
   onToggleAssistant,
@@ -446,6 +537,12 @@ export function SddDraftEditorView({
   onClose,
   onSave,
 }: Props): ReactElement {
+  const inlineAgentTextareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const [inlineAgentValue, setInlineAgentValue] = useState('')
+  const [blockType, setBlockType] = useState<WriteBlockType>('paragraph')
+  const [activeAgentId, setActiveAgentId] = useState('')
+  const inlinePosition = useMemo(() => inlineAgentPosition(), [])
+
   if (!draft) {
     return (
       <div className="sdd-draft-empty-state">
@@ -557,14 +654,49 @@ export function SddDraftEditorView({
       <div className="sdd-draft-editor-pane">
         <div className={`sdd-editor-card${upgrading ? ' is-upgrading' : ''}`}>
           {upgrading ? <div className="sdd-editor-progress" aria-hidden="true" /> : null}
-          <WriteMarkdownEditor
-            value={draft.content}
-            appearance="live"
+          <WriteRichEditor
             readOnly={readOnly}
-            onChange={(value) => onContentChange?.(value)}
+            showFallback={showRichFallback}
+            fallback={
+              <WriteMarkdownEditor
+                value={draft.content}
+                appearance="live"
+                readOnly={readOnly}
+                onChange={(value) => onContentChange?.(value)}
+              />
+            }
           />
         </div>
       </div>
+
+      {showInlineAgent && !readOnly ? (
+        <WriteInlineAgent
+          action={inlinePosition}
+          value={inlineAgentValue}
+          inFlight={false}
+          textareaRef={inlineAgentTextareaRef}
+          onValueChange={setInlineAgentValue}
+          onSubmitPrompt={() => undefined}
+          onApplyEdit={() => undefined}
+          formattingEnabled
+          onApplyFormat={() => undefined}
+          blockType={blockType}
+          onSetBlockType={setBlockType}
+          quickActions={WRITE_SETTINGS_PREVIEW_DEFAULT.selectionAssist.quickActions}
+          onQuickAction={() => undefined}
+          agentPresets={WRITE_SETTINGS_PREVIEW_DEFAULT.agentPresets}
+          activeAgentId={activeAgentId}
+          onSelectAgent={setActiveAgentId}
+          onOpenAgentSettings={() => undefined}
+          onQuoteSelection={() => undefined}
+          infographicEnabled
+          onGenerateInfographic={() => undefined}
+          designDraftEnabled
+          onGenerateDesignDraft={() => undefined}
+          prototypeEnabled
+          onGeneratePrototype={() => undefined}
+        />
+      ) : null}
 
       {draft.error ? <div className="sdd-error-toast">{draft.error}</div> : null}
       {draft.notice ? (
@@ -592,6 +724,8 @@ export function SddDraftEditorViewPreview({ mode }: PreviewProps): ReactElement 
   const [designContextOpen, setDesignContextOpen] = useState(
     initial.draft?.designContextOpen ?? mode === 'designContext',
   )
+  const [showInlineAgent, setShowInlineAgent] = useState(initial.showInlineAgent)
+  const [showRichFallback, setShowRichFallback] = useState(initial.showRichFallback)
 
   useEffect(() => {
     const next = previewSnapshot(mode)
@@ -599,6 +733,8 @@ export function SddDraftEditorViewPreview({ mode }: PreviewProps): ReactElement 
     setLeftSidebarCollapsed(next.leftSidebarCollapsed)
     setAssistantOpen(next.assistantOpen)
     setDesignContextOpen(next.draft?.designContextOpen ?? mode === 'designContext')
+    setShowInlineAgent(next.showInlineAgent)
+    setShowRichFallback(next.showRichFallback)
   }, [mode])
 
   const handleContentChange = useCallback((value: string) => {
@@ -632,6 +768,8 @@ export function SddDraftEditorViewPreview({ mode }: PreviewProps): ReactElement 
         leftSidebarCollapsed={leftSidebarCollapsed}
         assistantOpen={assistantOpen}
         designContextOpen={designContextOpen}
+        showInlineAgent={showInlineAgent}
+        showRichFallback={showRichFallback}
         onToggleLeftSidebar={() => setLeftSidebarCollapsed((open) => !open)}
         onToggleAssistant={() => setAssistantOpen((open) => !open)}
         onToggleDesignContext={() => setDesignContextOpen((open) => !open)}

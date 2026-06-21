@@ -1367,7 +1367,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported SddDraftEditorView
-  // (?sddDraftEditorViewPreview=1|dirty|saving|error|upgrading|designContext|noDraft|assistantOpen|leftCollapsed|withNotice).
+  // (?sddDraftEditorViewPreview=1|dirty|saving|error|upgrading|designContext|noDraft|assistantOpen|leftCollapsed|withNotice|inlineAgent|richFallback).
   const sddDraftEditorViewPreviewMode = useMemo((): SddDraftEditorViewPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1382,6 +1382,8 @@ function HomePage() {
     if (value === 'assistantOpen') return 'assistantOpen'
     if (value === 'leftCollapsed') return 'leftCollapsed'
     if (value === 'withNotice') return 'withNotice'
+    if (value === 'inlineAgent') return 'inlineAgent'
+    if (value === 'richFallback') return 'richFallback'
     return 'default'
   }, [])
 
