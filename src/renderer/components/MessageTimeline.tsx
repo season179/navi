@@ -544,3 +544,9 @@ export {
   stableTurnKey,
 } from '../lib/messageTimelineTurns'
 export type { TimelineChatBlock, Turn } from '../lib/messageTimelineTurns'
+export { deriveTurnSections } from '../lib/deriveTurnSections'
+export type {
+  TurnAssistantBlock,
+  TurnSections,
+  TurnToolBlock,
+} from '../lib/deriveTurnSections'
