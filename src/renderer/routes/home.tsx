@@ -325,6 +325,10 @@ import {
   WriteFileTreePreview,
   type WriteFileTreePreviewMode,
 } from '../components/WriteFileTree'
+import {
+  WriteSidebarPreview,
+  type WriteSidebarPreviewMode,
+} from '../components/WriteSidebar'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -778,6 +782,21 @@ function HomePage() {
     if (value === 'empty') return 'empty'
     if (value === 'loading') return 'loading'
     if (value === 'error') return 'error'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported WriteSidebar
+  // (?writeSidebarPreview=1|empty|multi|error|createFile|deleteFile).
+  const writeSidebarPreviewMode = useMemo((): WriteSidebarPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writeSidebarPreview')) return null
+    const value = params.get('writeSidebarPreview')
+    if (value === 'empty') return 'empty'
+    if (value === 'multi') return 'multi'
+    if (value === 'error') return 'error'
+    if (value === 'createFile') return 'createFile'
+    if (value === 'deleteFile') return 'deleteFile'
     return 'default'
   }, [])
 
@@ -1666,6 +1685,10 @@ function HomePage() {
 
   if (writeImagePreviewPreviewMode) {
     return <WriteImagePreviewPreview mode={writeImagePreviewPreviewMode} />
+  }
+
+  if (writeSidebarPreviewMode) {
+    return <WriteSidebarPreview mode={writeSidebarPreviewMode} />
   }
 
   if (writeFileTreePreviewMode) {
