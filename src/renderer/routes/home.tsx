@@ -333,6 +333,10 @@ import {
   WriteInlineAgentPreview,
   type WriteInlineAgentPreviewMode,
 } from '../components/WriteInlineAgent'
+import {
+  WriteAssistantPanelPreview,
+  type WriteAssistantPanelPreviewMode,
+} from '../components/WriteAssistantPanel'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -817,6 +821,21 @@ function HomePage() {
     if (value === 'inFlight') return 'inFlight'
     if (value === 'skills') return 'skills'
     if (value === 'imageMode') return 'imageMode'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported WriteAssistantPanel
+  // (?writeAssistantPanelPreview=1|timeline|quoted|pdf|noFile|streaming).
+  const writeAssistantPanelPreviewMode = useMemo((): WriteAssistantPanelPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writeAssistantPanelPreview')) return null
+    const value = params.get('writeAssistantPanelPreview')
+    if (value === 'timeline') return 'timeline'
+    if (value === 'quoted') return 'quoted'
+    if (value === 'pdf') return 'pdf'
+    if (value === 'noFile') return 'noFile'
+    if (value === 'streaming') return 'streaming'
     return 'default'
   }, [])
 
@@ -1709,6 +1728,10 @@ function HomePage() {
 
   if (writeSidebarPreviewMode) {
     return <WriteSidebarPreview mode={writeSidebarPreviewMode} />
+  }
+
+  if (writeAssistantPanelPreviewMode) {
+    return <WriteAssistantPanelPreview mode={writeAssistantPanelPreviewMode} />
   }
 
   if (writeInlineAgentPreviewMode) {
