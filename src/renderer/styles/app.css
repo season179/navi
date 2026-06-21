@@ -36778,6 +36778,14 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
   color: var(--ds-text-faint);
 }
 
+.floating-composer-slash-empty {
+  border-radius: 12px;
+  border: 1px dashed var(--ds-border-muted);
+  padding: 0.75rem;
+  font-size: 12px;
+  color: var(--ds-text-faint);
+}
+
 @media (min-width: 640px) {
   .floating-composer-slash-badge {
     display: inline-block;

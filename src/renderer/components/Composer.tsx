@@ -8,15 +8,15 @@
 // live. Picking one replaces the token with a "use the X skill" hint — a
 // front-end shortcut only, never a backend trigger.
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { Mic, Plus, Send, Square } from 'lucide-react'
-import { SkillPicker } from './SkillPicker'
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
+import { Mic, Plus, Send, Sparkles, Square } from 'lucide-react'
+import { filterSkillSlashCommands } from '../lib/composerSlashCommands'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import {
   FloatingComposerQueuedMessages,
   type QueuedComposerMessage,
 } from './FloatingComposerQueuedMessages'
-import { ComposerPlusMenu } from './FloatingComposer'
+import { ComposerPlusMenu, ComposerSlashMenu, type ComposerSlashCommandItem } from './FloatingComposer'
 import {
   ContextCapacityPopover,
   type ContextCapacity,
@@ -96,7 +96,9 @@ export function Composer({
   const [focused, setFocused] = useState(false)
   const [plusMenuOpen, setPlusMenuOpen] = useState(false)
   const [contextCapacityOpen, setContextCapacityOpen] = useState(false)
+  const [slashActiveIndex, setSlashActiveIndex] = useState(0)
   const plusMenuRef = useRef<HTMLDivElement>(null)
+  const slashMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!contextCapacityOpen) return
@@ -124,6 +126,19 @@ export function Composer({
     if (pickerOpen) setPlusMenuOpen(false)
   }, [pickerOpen])
 
+  useEffect(() => {
+    if (!pickerOpen) return
+    const onPointerDown = (event: PointerEvent): void => {
+      const target = event.target
+      if (target instanceof Node && slashMenuRef.current?.contains(target)) return
+      if (value.startsWith('/')) onChange(value.slice(1))
+      setPickerOpen(false)
+      textareaRef.current?.focus()
+    }
+    window.addEventListener('pointerdown', onPointerDown)
+    return () => window.removeEventListener('pointerdown', onPointerDown)
+  }, [pickerOpen, value, onChange])
+
   // Auto-grow the textarea up to its CSS max-height.
   useEffect(() => {
     const el = textareaRef.current
@@ -136,9 +151,22 @@ export function Composer({
 
   // The picker is active when there's a leading /query and skills are provided.
   const query = useMemo(() => (skills && skills.length > 0 ? skillQuery(value) : null), [value, skills])
+  const slashCommands = useMemo((): ComposerSlashCommandItem[] => {
+    if (query === null || !skills) return []
+    return filterSkillSlashCommands(skills, query).map((command, index) => ({
+      ...command,
+      icon: <Sparkles strokeWidth={1.9} />,
+      active: index === slashActiveIndex,
+    }))
+  }, [query, skills, slashActiveIndex])
+
   useEffect(() => {
     setPickerOpen(query !== null)
   }, [query])
+
+  useEffect(() => {
+    setSlashActiveIndex(0)
+  }, [slashCommands.length, query])
 
   const shellClass = [
     'ds-composer-shell',
@@ -184,11 +212,52 @@ export function Composer({
     })
   }
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    // Let the SkillPicker handle Arrow/Enter/Escape while it's open.
-    if (pickerOpen && (e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Escape')) {
-      // The picker listens on window with capture; just block the textarea's
-      // own Enter-send here so the picker's Enter-pick wins.
+  const closeSlashMenu = () => {
+    if (value.startsWith('/')) onChange(value.slice(1))
+    setPickerOpen(false)
+    textareaRef.current?.focus()
+  }
+
+  const pickSlashCommand = (command: ComposerSlashCommandItem) => {
+    if (!command.skillName || !skills) {
+      closeSlashMenu()
+      return
+    }
+    const skill = skills.find((entry) => entry.name === command.skillName)
+    if (skill) injectSkillHint(skill)
+    else closeSlashMenu()
+  }
+
+  useEffect(() => {
+    if (!pickerOpen) return
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        closeSlashMenu()
+        return
+      }
+      if (slashCommands.length === 0) return
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        setSlashActiveIndex((index) => Math.min(index + 1, slashCommands.length - 1))
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        setSlashActiveIndex((index) => Math.max(index - 1, 0))
+      } else if (event.key === 'Enter' && slashCommands[slashActiveIndex]) {
+        event.preventDefault()
+        pickSlashCommand(slashCommands[slashActiveIndex])
+      }
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [pickerOpen, slashCommands, slashActiveIndex, value, skills, onChange])
+
+  const handleKeyDown = (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+    // Let the slash menu handle Arrow/Enter/Escape while it's open.
+    if (
+      pickerOpen &&
+      (e.key === 'Escape' || (slashCommands.length > 0 && (e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'ArrowUp')))
+    ) {
       if (e.key === 'Enter') e.preventDefault()
       return
     }
@@ -233,18 +302,16 @@ export function Composer({
           </div>
         ) : null}
         {!compact && pickerOpen && query !== null ? (
-          <SkillPicker
-            skills={skills ?? []}
-            query={query}
-            onPick={injectSkillHint}
-            onClose={() => {
-              // Closing the picker without a pick: drop the leading slash so the
-              // draft doesn't keep re-triggering it. Leave the rest of the text.
-              if (value.startsWith('/')) onChange(value.slice(1))
-              setPickerOpen(false)
-              textareaRef.current?.focus()
-            }}
-          />
+          <div ref={slashMenuRef}>
+            <ComposerSlashMenu
+              commands={slashCommands}
+              onPick={pickSlashCommand}
+              onHover={setSlashActiveIndex}
+              emptyMessage={
+                query.trim() ? `No skills match “${query.trim()}”.` : 'No skills available.'
+              }
+            />
+          </div>
         ) : null}
         <div className={shellClass}>
           <textarea

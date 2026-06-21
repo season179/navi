@@ -86,15 +86,19 @@ export type FloatingComposerPreviewMode =
   | 'modelPickerSubmenu'
   | 'modelPickerNoProviders'
 
-type SlashCommandPreview = {
+export type ComposerSlashCommandItem = {
   id: string
   title: string
   description: string
   badge: string
+  scopeLabel?: string
   icon: ReactNode
   active?: boolean
   disabled?: boolean
+  skillName?: string
 }
+
+type SlashCommandPreview = ComposerSlashCommandItem
 
 type FileMentionPreview = {
   relativePath: string
@@ -303,31 +307,50 @@ export function ComposerPlusMenu(): ReactElement {
   )
 }
 
-function ComposerSlashMenu({ commands }: { commands: SlashCommandPreview[] }): ReactElement {
+export function ComposerSlashMenu({
+  commands,
+  onPick,
+  onHover,
+  emptyMessage = 'No commands match.',
+}: {
+  commands: ComposerSlashCommandItem[]
+  onPick?: (command: ComposerSlashCommandItem) => void
+  onHover?: (index: number) => void
+  emptyMessage?: string
+}): ReactElement {
   return (
     <div className="floating-composer-slash-menu">
       <div className="floating-composer-slash-menu-title">Slash commands</div>
-      <div className="floating-composer-slash-menu-list">
-        {commands.map((command) => (
-          <button
-            key={command.id}
-            type="button"
-            disabled={command.disabled}
-            className={
-              command.active && !command.disabled
-                ? 'floating-composer-slash-item is-active'
-                : 'floating-composer-slash-item'
-            }
-          >
-            <span className="floating-composer-slash-icon">{command.icon}</span>
-            <span className="floating-composer-slash-copy">
-              <span className="floating-composer-slash-title">{command.title}</span>
-              <span className="floating-composer-slash-desc">{command.description}</span>
-            </span>
-            <span className="floating-composer-slash-badge">{command.badge}</span>
-          </button>
-        ))}
-      </div>
+      {commands.length > 0 ? (
+        <div className="floating-composer-slash-menu-list">
+          {commands.map((command, index) => (
+            <button
+              key={command.id}
+              type="button"
+              disabled={command.disabled}
+              className={
+                command.active && !command.disabled
+                  ? 'floating-composer-slash-item is-active'
+                  : 'floating-composer-slash-item'
+              }
+              onMouseEnter={() => onHover?.(index)}
+              onClick={() => {
+                if (command.disabled) return
+                onPick?.(command)
+              }}
+            >
+              <span className="floating-composer-slash-icon">{command.icon}</span>
+              <span className="floating-composer-slash-copy">
+                <span className="floating-composer-slash-title">{command.title}</span>
+                <span className="floating-composer-slash-desc">{command.description}</span>
+              </span>
+              <span className="floating-composer-slash-badge">{command.badge}</span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="floating-composer-slash-empty">{emptyMessage}</div>
+      )}
     </div>
   )
 }
