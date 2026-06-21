@@ -102,6 +102,8 @@ interface ComposerProps {
   /** Image attachment previews shown below file-reference chips in Kun's composer shell. */
   attachments?: ComposerImageAttachment[]
   onRemoveAttachment?: (id: string) => void
+  /** Attachment upload error shown in the attachment row, matching Kun's attachmentUploadError. */
+  attachmentUploadError?: string | null
   /** Active thread goal shown in Kun's goal floater and panel overlays. */
   goal?: ComposerGoal | null
   /** When true, shows the goal floater banner above the composer shell. */
@@ -160,6 +162,7 @@ export function Composer({
   onRemoveFileReference,
   attachments,
   onRemoveAttachment,
+  attachmentUploadError,
   goal,
   showGoalFloater = false,
   showGoalPanel = false,
@@ -560,15 +563,21 @@ export function Composer({
               onRemove={onRemoveFileReference}
             />
           ) : null}
-          {!compact && attachments && attachments.length > 0 ? (
+          {!compact &&
+          ((attachments && attachments.length > 0) || attachmentUploadError) ? (
             <div className="floating-composer-attachment-row">
-              {attachments.map((attachment) => (
+              {attachments?.map((attachment) => (
                 <ComposerImageAttachmentPreview
                   key={attachment.id}
                   attachment={attachment}
                   onRemoveAttachment={onRemoveAttachment}
                 />
               ))}
+              {attachmentUploadError ? (
+                <span className="floating-composer-attachment-error">
+                  {attachmentUploadError}
+                </span>
+              ) : null}
             </div>
           ) : null}
           {!compact && dictationError ? (

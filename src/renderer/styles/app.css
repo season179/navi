@@ -36412,6 +36412,18 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
   color: #dc2626;
 }
 
+.floating-composer-attachment-error {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  font-weight: 500;
+  color: #dc2626;
+}
+
+[data-theme='dark'] .floating-composer-attachment-error {
+  color: #fca5a5;
+}
+
 [data-theme='dark'] .floating-composer-dictation-error span {
   color: #fca5a5;
 }

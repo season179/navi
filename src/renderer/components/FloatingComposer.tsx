@@ -71,6 +71,8 @@ import {
 } from '../lib/composerFileReferences'
 import {
   COMPOSER_ATTACHMENTS_PREVIEW,
+  COMPOSER_ATTACHMENT_MODEL_UNSUPPORTED_PREVIEW,
+  COMPOSER_ATTACHMENT_UNAVAILABLE_PREVIEW,
   type ComposerImageAttachment,
 } from '../lib/composerAttachments'
 import { COMPOSER_GOAL_PREVIEW, type ComposerGoal } from '../lib/composerGoal'
@@ -118,6 +120,8 @@ export type FloatingComposerPreviewMode =
   | 'worktreeHint'
   | 'dictationError'
   | 'voiceTranscribing'
+  | 'attachmentError'
+  | 'attachmentErrorUnsupported'
 
 export type ComposerSlashCommandItem = {
   id: string
@@ -180,6 +184,7 @@ export type FloatingComposerSnapshot = {
   footerHint: string | null
   dictationError: string | null
   voiceTranscribing: boolean
+  attachmentUploadError: string | null
 }
 
 const SLASH_COMMANDS_PREVIEW: SlashCommandPreview[] = [
@@ -651,6 +656,7 @@ export function resolveFloatingComposerSnapshot(
     footerHint: COMPOSER_FOOTER_HINT_SLASH,
     dictationError: null,
     voiceTranscribing: false,
+    attachmentUploadError: null,
   }
 
   switch (mode) {
@@ -708,6 +714,14 @@ export function resolveFloatingComposerSnapshot(
       return { ...base, dictationError: COMPOSER_DICTATION_ERROR_PREVIEW }
     case 'voiceTranscribing':
       return { ...base, voiceTranscribing: true }
+    case 'attachmentError':
+      return { ...base, attachmentUploadError: COMPOSER_ATTACHMENT_UNAVAILABLE_PREVIEW }
+    case 'attachmentErrorUnsupported':
+      return {
+        ...base,
+        attachments: ATTACHMENTS_PREVIEW.slice(0, 1),
+        attachmentUploadError: COMPOSER_ATTACHMENT_MODEL_UNSUPPORTED_PREVIEW,
+      }
     default:
       return base
   }
@@ -779,11 +793,16 @@ export function FloatingComposer({
             <ComposerFileReferenceChips references={snapshot.fileReferences} />
           ) : null}
 
-          {snapshot.attachments.length > 0 ? (
+          {snapshot.attachments.length > 0 || snapshot.attachmentUploadError ? (
             <div className="floating-composer-attachment-row">
               {snapshot.attachments.map((attachment) => (
                 <ComposerImageAttachmentPreview key={attachment.id} attachment={attachment} />
               ))}
+              {snapshot.attachmentUploadError ? (
+                <span className="floating-composer-attachment-error">
+                  {snapshot.attachmentUploadError}
+                </span>
+              ) : null}
             </div>
           ) : null}
 

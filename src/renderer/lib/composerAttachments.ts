@@ -16,3 +16,21 @@ export const COMPOSER_ATTACHMENTS_PREVIEW = [
   { id: 'img-1', name: 'mock-screenshot.png', previewUrl: SAMPLE_IMAGE },
   { id: 'img-2', name: 'wireframe.png', previewUrl: SAMPLE_IMAGE },
 ] satisfies ComposerImageAttachment[]
+
+/** English copy matching Kun's composerAttachmentUnavailable locale string. */
+export const COMPOSER_ATTACHMENT_UNAVAILABLE_PREVIEW = 'Attachment upload is unavailable.'
+
+/** English copy matching Kun's composerAttachmentModelUnsupported locale string. */
+export const COMPOSER_ATTACHMENT_MODEL_UNSUPPORTED_PREVIEW =
+  'The selected model cannot read images. Switch to a vision model or remove the attachment.'
+
+/** Resolves attachment error preview copy from ?composerAttachmentErrorPreview query values. */
+export function resolveComposerAttachmentErrorPreview(
+  value: string | null,
+): string | undefined {
+  if (value === 'unsupported') return COMPOSER_ATTACHMENT_MODEL_UNSUPPORTED_PREVIEW
+  if (value === '1' || value === 'true' || value === 'unavailable') {
+    return COMPOSER_ATTACHMENT_UNAVAILABLE_PREVIEW
+  }
+  return undefined
+}
