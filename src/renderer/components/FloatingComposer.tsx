@@ -1127,6 +1127,7 @@ export function FloatingComposer({
             className="floating-composer-textarea"
             placeholder={resolveComposerPlaceholder({
               busy: snapshot.busy,
+              goalPanelOpen: snapshot.showGoalPanel,
               planMode: snapshot.mode === 'plan',
               startsThread: snapshot.startsThread,
             })}

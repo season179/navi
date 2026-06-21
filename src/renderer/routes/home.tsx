@@ -21,6 +21,7 @@ import { resolveComposerThreadUsagePreview } from '../lib/composerThreadUsage'
 import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 import {
   COMPOSER_DEFAULT_PLACEHOLDER,
+  resolveComposerPlaceholder,
   resolveComposerPlaceholderPreview,
   type ComposerPlaceholderPreviewMode,
 } from '../lib/composerPlaceholder'
@@ -831,14 +832,14 @@ function HomePage() {
     return resolveComposerFooterHintPreview(mode)
   }, [])
 
-  // Visual preview for Kun composer placeholder copy (?composerPlaceholderPreview=startsThread|plan).
+  // Visual preview for Kun composer placeholder copy (?composerPlaceholderPreview=startsThread|plan|goal).
   const composerPlaceholderPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
     const params = new URLSearchParams(window.location.search)
     if (!params.has('composerPlaceholderPreview')) return undefined
     const value = params.get('composerPlaceholderPreview')
     const mode: ComposerPlaceholderPreviewMode =
-      value === 'startsThread' || value === 'plan' ? value : 'default'
+      value === 'startsThread' || value === 'plan' || value === 'goal' ? value : 'default'
     return resolveComposerPlaceholderPreview(mode)
   }, [])
 
@@ -3924,15 +3925,17 @@ function HomePage() {
       disabled={composerDisabled}
       placeholder={
         composerPlaceholderPreview ??
-        (composerPlanModePreview
-          ? COMPOSER_PLAN_MODE_PLACEHOLDER
-          : composerBusyPreview || queuedMessagesPreview || busy
-            ? COMPOSER_QUEUE_PLACEHOLDER
-            : !hasProvider
-              ? 'Add a provider to start chatting…'
-              : !status.ready
-                ? 'Connecting to Navi…'
-                : COMPOSER_DEFAULT_PLACEHOLDER)
+        (composerGoalPanelPreview
+          ? resolveComposerPlaceholder({ goalPanelOpen: true })
+          : composerPlanModePreview
+            ? COMPOSER_PLAN_MODE_PLACEHOLDER
+            : composerBusyPreview || queuedMessagesPreview || busy
+              ? COMPOSER_QUEUE_PLACEHOLDER
+              : !hasProvider
+                ? 'Add a provider to start chatting…'
+                : !status.ready
+                  ? 'Connecting to Navi…'
+                  : COMPOSER_DEFAULT_PLACEHOLDER)
       }
       skills={skills}
       fileMentionCandidates={composerFileMentionPreview?.candidates}
