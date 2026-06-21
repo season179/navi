@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
-import { Plus, Settings, Sun, Moon } from 'lucide-react'
+import { Plus, Settings, Sun, Moon, Smartphone } from 'lucide-react'
 import { FocusModeToggle, SidebarMascot } from '../components/Sidebar'
 import { useTheme } from '../theme'
 import { SidebarContext } from '../sidebar'
@@ -23,6 +23,12 @@ import {
   WindowsTitleBar,
   supportsDesktopTitleBar,
 } from '../components/WindowsTitleBar'
+import {
+  ConnectPhoneSidebarPanel,
+  CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS,
+  type ConnectPhoneQrStatus,
+} from '../components/ConnectPhoneView'
+import { type ClawInstallTarget } from '../components/ClawAddImDialog'
 
 function resolveProductionPlatform(): string {
   if (typeof window === 'undefined') return 'darwin'
@@ -56,6 +62,20 @@ function RootLayoutInner() {
     useState<WorkspaceModeView>(() => workspaceModeTabsPreviewMode ?? 'chat')
   const [productionWorkspaceMode, setProductionWorkspaceMode] =
     useState<WorkspaceModeView>('chat')
+  const connectPhoneSidebarPreviewOpen = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    const params = new URLSearchParams(window.location.search)
+    return params.has('connectPhoneSidebarPreview')
+  }, [])
+  const [connectPhoneSidebarOpen, setConnectPhoneSidebarOpen] = useState(
+    () => connectPhoneSidebarPreviewOpen,
+  )
+  const [connectPhoneTarget, setConnectPhoneTarget] = useState<ClawInstallTarget>('feishu')
+  const [connectPhoneQrStatus, setConnectPhoneQrStatus] = useState<ConnectPhoneQrStatus>('idle')
+
+  const toggleConnectPhoneSidebar = useCallback(() => {
+    setConnectPhoneSidebarOpen((open) => !open)
+  }, [])
 
   const platform = useMemo(() => resolveProductionPlatform(), [])
   const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
@@ -131,6 +151,13 @@ function RootLayoutInner() {
                       />
                     </div>
                     <SidebarCommandRow
+                      icon={<Smartphone className="h-4 w-4" strokeWidth={1.75} />}
+                      label="Claw"
+                      onClick={toggleConnectPhoneSidebar}
+                      active={connectPhoneSidebarOpen || connectPhoneSidebarPreviewOpen}
+                      variant="footer"
+                    />
+                    <SidebarCommandRow
                       icon={
                         theme === 'dark' ? (
                           <Sun className="h-4 w-4" strokeWidth={1.75} />
@@ -185,7 +212,25 @@ function RootLayoutInner() {
                   />
                 </div>
 
-                <SidebarProjects />
+                {connectPhoneSidebarOpen || connectPhoneSidebarPreviewOpen ? (
+                  <ConnectPhoneSidebarPanel
+                    channels={CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS}
+                    target={connectPhoneTarget}
+                    qrStatus={connectPhoneQrStatus}
+                    qrTimeLeft={0}
+                    userCode=""
+                    qrError=""
+                    saving={false}
+                    disconnecting={false}
+                    disconnectError=""
+                    onTargetChange={(target) => {
+                      setConnectPhoneTarget(target)
+                      setConnectPhoneQrStatus('idle')
+                    }}
+                  />
+                ) : (
+                  <SidebarProjects />
+                )}
               </SidebarFrame>
             </div>
           ) : null}

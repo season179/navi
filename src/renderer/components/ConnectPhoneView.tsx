@@ -142,7 +142,8 @@ function MockQrCode({ className }: { className?: string }): ReactElement {
   )
 }
 
-const PREVIEW_CHANNELS: ClawImChannelSidebarSnapshot[] = [
+/** Mock channel list for production sidebar visual parity until Flue exposes claw channels. */
+export const CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS: ClawImChannelSidebarSnapshot[] = [
   {
     id: 'feishu-team',
     provider: 'feishu',
@@ -734,7 +735,7 @@ function viewPreviewState(mode: ConnectPhoneViewPreviewMode): {
       userCode: '',
       qrError: '',
       saving: false,
-      channels: PREVIEW_CHANNELS.filter((channel) => channel.provider === 'feishu'),
+      channels: CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS.filter((channel) => channel.provider === 'feishu'),
       leftSidebarCollapsed: false,
     }
   }
@@ -788,7 +789,7 @@ function sidebarPreviewState(mode: ConnectPhoneSidebarPreviewMode): {
   }
   if (mode === 'connected') {
     return {
-      channels: PREVIEW_CHANNELS.filter((channel) => channel.provider === 'feishu'),
+      channels: CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS.filter((channel) => channel.provider === 'feishu'),
       target: 'feishu',
       qrStatus: 'idle',
       qrTimeLeft: 0,
@@ -801,7 +802,7 @@ function sidebarPreviewState(mode: ConnectPhoneSidebarPreviewMode): {
   }
   if (mode === 'disabled') {
     return {
-      channels: PREVIEW_CHANNELS,
+      channels: CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS,
       target: 'weixin',
       qrStatus: 'idle',
       qrTimeLeft: 0,
@@ -853,7 +854,7 @@ function sidebarPreviewState(mode: ConnectPhoneSidebarPreviewMode): {
   }
   if (mode === 'disconnecting') {
     return {
-      channels: PREVIEW_CHANNELS.filter((channel) => channel.provider === 'feishu'),
+      channels: CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS.filter((channel) => channel.provider === 'feishu'),
       target: 'feishu',
       qrStatus: 'idle',
       qrTimeLeft: 0,
@@ -865,7 +866,7 @@ function sidebarPreviewState(mode: ConnectPhoneSidebarPreviewMode): {
     }
   }
   return {
-    channels: PREVIEW_CHANNELS,
+    channels: CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS,
     target: 'feishu',
     qrStatus: 'idle',
     qrTimeLeft: 0,
