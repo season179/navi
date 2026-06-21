@@ -133,6 +133,14 @@ import {
   THREAD_FORK_BANNER_PREVIEW_TITLE,
 } from '../components/ThreadForkBanner'
 import {
+  CompactionDividerPreview,
+  type CompactionDividerPreviewMode,
+} from '../components/CompactionDivider'
+import {
+  LiveTurnProgressRowPreview,
+  type LiveTurnProgressRowPreviewMode,
+} from '../components/LiveTurnProgressRow'
+import {
   RuntimeWakeHero,
   RUNTIME_WAKE_HERO_PREVIEW_ERROR,
 } from '../components/RuntimeWakeHero'
@@ -775,6 +783,37 @@ function HomePage() {
     const params = new URLSearchParams(window.location.search)
     if (!params.has('threadForkPoint')) return null
     return params.get('threadForkPoint') === 'unknown' ? 'unknown' : 'title'
+  }, [])
+
+  // Visual preview for the ported CompactionDivider
+  // (?compactionDividerPreview=running|autoCompleted|manualCompleted|error|errorWithSummary).
+  const compactionDividerPreviewMode = useMemo((): CompactionDividerPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('compactionDividerPreview')) return null
+    const mode = params.get('compactionDividerPreview')
+    if (mode === 'running') return 'running'
+    if (mode === 'autoCompleted') return 'autoCompleted'
+    if (mode === 'manualCompleted') return 'manualCompleted'
+    if (mode === 'errorWithSummary') return 'errorWithSummary'
+    if (mode === 'error') return 'error'
+    return 'running'
+  }, [])
+
+  // Visual preview for the ported LiveTurnProgressRow
+  // (?liveTurnProgressRowPreview=default|withGoal|surf|sprint|dive|ikun|ikunMode).
+  const liveTurnProgressRowPreviewMode = useMemo((): LiveTurnProgressRowPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('liveTurnProgressRowPreview')) return null
+    const mode = params.get('liveTurnProgressRowPreview')
+    if (mode === 'withGoal') return 'withGoal'
+    if (mode === 'surf') return 'surf'
+    if (mode === 'sprint') return 'sprint'
+    if (mode === 'dive') return 'dive'
+    if (mode === 'ikun') return 'ikun'
+    if (mode === 'ikunMode') return 'ikunMode'
+    return 'default'
   }, [])
 
   // Visual preview for the ported RuntimeWakeHero
@@ -2250,6 +2289,14 @@ function HomePage() {
 
   if (messageTimelineEmptyHeroPreviewMode) {
     return <MessageTimelineEmptyHeroPreview mode={messageTimelineEmptyHeroPreviewMode} />
+  }
+
+  if (compactionDividerPreviewMode) {
+    return <CompactionDividerPreview mode={compactionDividerPreviewMode} />
+  }
+
+  if (liveTurnProgressRowPreviewMode) {
+    return <LiveTurnProgressRowPreview mode={liveTurnProgressRowPreviewMode} />
   }
 
   if (writeMarkdownPreviewPreviewMode) {

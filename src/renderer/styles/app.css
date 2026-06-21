@@ -3869,6 +3869,110 @@ a.runtime-meta-chip:hover {
   gap: 16px;
 }
 
+/* =====================================================
+   Compaction divider (Kun MessageTimeline CompactionDivider)
+   ===================================================== */
+.compaction-divider {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.compaction-divider-line {
+  height: 1px;
+  min-width: 32px;
+  flex: 1;
+  background: color-mix(in srgb, var(--ds-border-muted) 80%, transparent);
+}
+
+.compaction-divider-line.is-error {
+  background: rgba(254, 202, 202, 0.8);
+}
+
+[data-theme='dark'] .compaction-divider-line.is-error {
+  background: rgba(127, 29, 29, 0.5);
+}
+
+.compaction-divider-label {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ds-text-faint);
+}
+
+.compaction-divider-label.is-error {
+  color: #dc2626;
+}
+
+[data-theme='dark'] .compaction-divider-label.is-error {
+  color: #fca5a5;
+}
+
+.compaction-divider-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  bottom: calc(var(--composer-offset, 120px) + 24px);
+  width: min(calc(100vw - 48px), 640px);
+  transform: translateX(-50%);
+  padding: 24px 16px;
+}
+
+/* =====================================================
+   Live turn progress row (Kun MessageTimeline LiveTurnProgressRow)
+   ===================================================== */
+.live-turn-progress-row {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+}
+
+.live-turn-progress-row.has-active-goal {
+  margin-bottom: 64px;
+}
+
+@media (min-width: 768px) {
+  .live-turn-progress-row.has-active-goal {
+    margin-bottom: 80px;
+  }
+}
+
+.live-turn-progress-logo {
+  margin-right: 2px;
+}
+
+.live-turn-progress-row-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  bottom: calc(var(--composer-offset, 120px) + 24px);
+  transform: translateX(-50%);
+  padding: 24px 16px;
+}
+
+.message-timeline-padding {
+  padding-bottom: 40px;
+}
+
+.message-timeline-padding.has-active-goal {
+  padding-bottom: 128px;
+}
+
+@media (min-width: 768px) {
+  .message-timeline-padding.has-active-goal {
+    padding-bottom: 160px;
+  }
+}
+
 
 /* =====================================================
    Claw empty hero (Kun ClawEmptyHero)
