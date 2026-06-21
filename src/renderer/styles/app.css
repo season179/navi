@@ -723,6 +723,102 @@ textarea {
   flex-shrink: 0;
 }
 
+.composer-toolbar-right.is-recording {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* Voice dictation waveform strip (Kun VoiceRecordingStrip) */
+.voice-recording-strip {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-recording-canvas {
+  height: 32px;
+  min-width: 0;
+  flex: 1;
+  color: var(--ds-text-muted);
+}
+
+.voice-recording-timer {
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-muted);
+}
+
+/* Stop / send controls shown beside the strip during recording */
+.voice-stop-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface-elevated);
+  color: var(--ds-text);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(20, 47, 95, 0.06);
+  transition: background 0.14s ease;
+}
+
+.voice-stop-btn:hover {
+  background: var(--ds-surface-hover);
+}
+
+.voice-stop-btn svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+.voice-send-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: none;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(20, 47, 95, 0.22);
+  transition: background 0.14s ease, transform 0.1s ease;
+}
+
+.voice-send-btn:hover {
+  background: #1f2937;
+}
+
+.voice-send-btn:active {
+  transform: scale(0.96);
+}
+
+.voice-send-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+[data-theme='dark'] .voice-send-btn {
+  background: #fff;
+  color: #18181b;
+}
+
+[data-theme='dark'] .voice-send-btn:hover {
+  background: #e4e4e7;
+}
+
 /* Round tool button (plus menu, etc.) */
 .tool-btn {
   display: inline-flex;

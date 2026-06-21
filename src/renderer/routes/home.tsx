@@ -47,6 +47,19 @@ function HomePage() {
   const hasProvider = hasUsableProvider(status, providerProfiles)
   const composerDisabled = !status.ready || !hasProvider
 
+  // Visual preview for the ported VoiceRecordingStrip (?voicePreview=1).
+  const voiceRecording = useMemo(() => {
+    if (typeof window === 'undefined') return undefined
+    if (!new URLSearchParams(window.location.search).has('voicePreview')) return undefined
+    const startedAtMs = Date.now() - 12_500
+    return {
+      getLevel: () => 0.12 + 0.68 * Math.abs(Math.sin(Date.now() / 160)),
+      startedAtMs,
+      onStop: () => undefined,
+      onSend: () => undefined,
+    }
+  }, [])
+
   // The active project's cwd, for scoping project skills in the Skills panel.
   // A no-project chat (navi-default) has no path → project skills aren't listed.
   const projectPath = useMemo(() => {
@@ -172,6 +185,7 @@ function HomePage() {
             onConfigure={() => openSettingsTab('providers')}
           />
         }
+        voiceRecording={voiceRecording}
       />
     </>
   )

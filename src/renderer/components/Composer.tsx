@@ -9,8 +9,9 @@
 // front-end shortcut only, never a backend trigger.
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { Plus, ArrowUp, Square } from 'lucide-react'
+import { Plus, ArrowUp, Send, Square } from 'lucide-react'
 import { SkillPicker } from './SkillPicker'
+import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import type { SkillSummary } from '../../shared/flue'
 
 interface ComposerProps {
@@ -25,6 +26,13 @@ interface ComposerProps {
   modelChip?: ReactNode
   /** Available skills for the `/skill` picker (scoped to active project). */
   skills?: SkillSummary[]
+  /** When set, shows Kun's dictation recording strip instead of the send button. */
+  voiceRecording?: {
+    getLevel: () => number
+    startedAtMs: number
+    onStop?: () => void
+    onSend?: () => void
+  }
 }
 
 /**
@@ -49,6 +57,7 @@ export function Composer({
   placeholder = 'Send a message to Navi…',
   modelChip,
   skills,
+  voiceRecording,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -139,8 +148,33 @@ export function Composer({
             </button>
             {modelChip}
           </div>
-          <div className="composer-toolbar-right">
-            {busy ? (
+          <div className={voiceRecording ? 'composer-toolbar-right is-recording' : 'composer-toolbar-right'}>
+            {voiceRecording ? (
+              <>
+                <VoiceRecordingStrip
+                  getLevel={voiceRecording.getLevel}
+                  startedAtMs={voiceRecording.startedAtMs}
+                />
+                <button
+                  type="button"
+                  className="voice-stop-btn"
+                  onClick={voiceRecording.onStop}
+                  aria-label="Stop recording"
+                  title="Stop recording"
+                >
+                  <Square strokeWidth={2.4} />
+                </button>
+                <button
+                  type="button"
+                  className="voice-send-btn"
+                  onClick={voiceRecording.onSend}
+                  aria-label="Send recording"
+                  title="Send recording"
+                >
+                  <Send strokeWidth={2.2} />
+                </button>
+              </>
+            ) : busy ? (
               <button
                 className="send-btn is-stop"
                 onClick={onCancel}
