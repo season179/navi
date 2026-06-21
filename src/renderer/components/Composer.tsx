@@ -1,7 +1,7 @@
-// Floating composer echoing Kun's chat composer: a rounded frosted shell with
-// a textarea, a plus menu + model chip on the left, and a circular send button
-// on the right. Controlled by the parent; sends on Enter (Shift+Enter for a
-// newline) and turns into a stop button while a reply is streaming.
+// Production chat composer using Kun's ds-composer-shell chrome from
+// FloatingComposer (../Kun/src/renderer/src/components/chat/FloatingComposer.tsx).
+// Controlled by the parent; sends on Enter (Shift+Enter for a newline) and turns
+// into a stop button while a reply is streaming.
 //
 // Also hosts the `/skill` picker (plan §D4 / §D6): when the draft is a single
 // leading `/`-token (e.g. "/com"), a floating menu of available skills filters
@@ -9,7 +9,7 @@
 // front-end shortcut only, never a backend trigger.
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { Plus, ArrowUp, Send, Square } from 'lucide-react'
+import { Mic, Plus, Send, Square } from 'lucide-react'
 import { SkillPicker } from './SkillPicker'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import {
@@ -26,7 +26,7 @@ interface ComposerProps {
   busy?: boolean
   disabled?: boolean
   placeholder?: string
-  /** Model picker rendered in the toolbar (replaces the old static model chip). */
+  /** Model picker rendered in the toolbar end row after context controls. */
   modelChip?: ReactNode
   /** Available skills for the `/skill` picker (scoped to active project). */
   skills?: SkillSummary[]
@@ -40,7 +40,7 @@ interface ComposerProps {
   /** Queued messages shown above the composer shell while a reply is streaming. */
   queuedMessages?: QueuedComposerMessage[]
   onRemoveQueuedMessage?: (id: string) => void
-  /** Execution picker (approval + sandbox) rendered in the toolbar after the model chip. */
+  /** Execution picker (approval + sandbox) rendered in the toolbar end row. */
   executionPicker?: ReactNode
   /** Footer row below the composer shell (e.g. git branch picker). */
   footerLeft?: ReactNode
@@ -76,6 +76,7 @@ export function Composer({
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [focused, setFocused] = useState(false)
 
   // Auto-grow the textarea up to its CSS max-height.
   useEffect(() => {
@@ -92,6 +93,17 @@ export function Composer({
   useEffect(() => {
     setPickerOpen(query !== null)
   }, [query])
+
+  const shellClass = [
+    'ds-composer-shell',
+    'ds-chat-composer',
+    'ds-frosted',
+    'ds-no-drag',
+    'floating-composer-shell',
+    focused ? 'ds-chat-composer-focus' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const injectSkillHint = (skill: SkillSummary) => {
     // Replace the entire leading `/query` with a natural-language hint. Per
@@ -132,97 +144,128 @@ export function Composer({
 
   return (
     <div className="composer-wrap">
-      <div className="composer-stack">
+      <div className="composer-stack ds-floating-composer ds-no-drag floating-composer-root">
         {queuedMessages && queuedMessages.length > 0 ? (
           <FloatingComposerQueuedMessages
             messages={queuedMessages}
             onRemove={onRemoveQueuedMessage}
           />
         ) : null}
-        {pickerOpen && query !== null ? (
-          <SkillPicker
-            skills={skills ?? []}
-            query={query}
-            onPick={injectSkillHint}
-            onClose={() => {
-              // Closing the picker without a pick: drop the leading slash so the
-              // draft doesn't keep re-triggering it. Leave the rest of the text.
-              if (value.startsWith('/')) onChange(value.slice(1))
-              setPickerOpen(false)
-              textareaRef.current?.focus()
-            }}
-          />
-        ) : null}
-        <div className="composer">
-        <textarea
-          ref={textareaRef}
-          rows={1}
-          placeholder={placeholder}
-          value={value}
-          disabled={disabled}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <div className="composer-toolbar">
-          <div className="composer-toolbar-left">
-            <button className="tool-btn" aria-label="Add" title="Add">
-              <Plus />
-            </button>
-            {modelChip}
-            {executionPicker}
-          </div>
-          <div className={voiceRecording ? 'composer-toolbar-right is-recording' : 'composer-toolbar-right'}>
-            {voiceRecording ? (
-              <>
-                <VoiceRecordingStrip
-                  getLevel={voiceRecording.getLevel}
-                  startedAtMs={voiceRecording.startedAtMs}
-                />
+        <div className="floating-composer-relative">
+          {pickerOpen && query !== null ? (
+            <SkillPicker
+              skills={skills ?? []}
+              query={query}
+              onPick={injectSkillHint}
+              onClose={() => {
+                // Closing the picker without a pick: drop the leading slash so the
+                // draft doesn't keep re-triggering it. Leave the rest of the text.
+                if (value.startsWith('/')) onChange(value.slice(1))
+                setPickerOpen(false)
+                textareaRef.current?.focus()
+              }}
+            />
+          ) : null}
+          <div className={shellClass}>
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              className="floating-composer-textarea"
+              placeholder={placeholder}
+              value={value}
+              disabled={disabled}
+              aria-label="Message"
+              onChange={(e) => onChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+            />
+            <div className="ds-composer-toolbar floating-composer-toolbar">
+              <div className="floating-composer-toolbar-start">
                 <button
                   type="button"
-                  className="voice-stop-btn"
-                  onClick={voiceRecording.onStop}
-                  aria-label="Stop recording"
-                  title="Stop recording"
+                  className="floating-composer-plus-btn"
+                  aria-label="Composer menu"
+                  disabled={disabled}
                 >
-                  <Square strokeWidth={2.4} />
+                  <Plus strokeWidth={1.8} />
                 </button>
-                <button
-                  type="button"
-                  className="voice-send-btn"
-                  onClick={voiceRecording.onSend}
-                  aria-label="Send recording"
-                  title="Send recording"
-                >
-                  <Send strokeWidth={2.2} />
-                </button>
-              </>
-            ) : busy ? (
-              <button
-                className="send-btn is-stop"
-                onClick={onCancel}
-                aria-label="Stop"
-                title="Stop"
+              </div>
+              <div
+                className={
+                  voiceRecording
+                    ? 'floating-composer-toolbar-end is-recording'
+                    : 'floating-composer-toolbar-end'
+                }
               >
-                <Square />
-              </button>
-            ) : (
-              <button
-                className="send-btn"
-                disabled={!canSend}
-                onClick={onSend}
-                aria-label="Send"
-                title="Send"
-              >
-                <ArrowUp />
-              </button>
-            )}
+                {voiceRecording ? (
+                  <>
+                    <VoiceRecordingStrip
+                      getLevel={voiceRecording.getLevel}
+                      startedAtMs={voiceRecording.startedAtMs}
+                    />
+                    <button
+                      type="button"
+                      className="floating-composer-voice-stop"
+                      onClick={voiceRecording.onStop}
+                      aria-label="Stop recording"
+                      title="Stop recording"
+                    >
+                      <Square strokeWidth={2.4} />
+                    </button>
+                    <button
+                      type="button"
+                      className="floating-composer-send-btn"
+                      onClick={voiceRecording.onSend}
+                      aria-label="Send recording"
+                      title="Send recording"
+                    >
+                      <Send strokeWidth={2.2} />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {modelChip}
+                    {executionPicker}
+                    <button
+                      type="button"
+                      className="floating-composer-mic-btn"
+                      aria-label="Start voice input"
+                      disabled={disabled}
+                    >
+                      <Mic strokeWidth={2} />
+                    </button>
+                    {busy ? (
+                      <button
+                        type="button"
+                        className="floating-composer-stop-btn"
+                        onClick={onCancel}
+                        aria-label="Stop"
+                        title="Stop"
+                      >
+                        <Square strokeWidth={2.4} />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="floating-composer-send-btn"
+                        disabled={!canSend}
+                        onClick={onSend}
+                        aria-label="Send"
+                        title="Send"
+                      >
+                        <Send strokeWidth={2.2} />
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
         </div>
         {footerLeft ? (
-          <div className="composer-footer">
-            <div className="composer-footer-left">{footerLeft}</div>
+          <div className="ds-composer-footer floating-composer-footer">
+            <div className="ds-composer-footer-left">{footerLeft}</div>
           </div>
         ) : null}
       </div>
