@@ -534,3 +534,13 @@ export type {
   GroupProcessBlock,
   GroupedProcessSection,
 } from '../lib/groupProcessSections'
+export {
+  blockHasPendingRuntimeWork,
+  findTrailingAssistantContentStart,
+  groupTurns,
+  isProcessBlock,
+  sameTurnContent,
+  splitThink,
+  stableTurnKey,
+} from '../lib/messageTimelineTurns'
+export type { TimelineChatBlock, Turn } from '../lib/messageTimelineTurns'
