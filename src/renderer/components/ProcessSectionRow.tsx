@@ -48,6 +48,8 @@ export type ProcessStackEntrySnapshot = {
   pendingApproval?: boolean
   /** Pending user_input block — auto force-opens during processing like Kun. */
   pendingUserInput?: boolean
+  /** Running tool block during processing — drives row shimmer like Kun. */
+  runningTool?: boolean
   /** Wrap summary text instead of truncating — used for assistant/system rows. */
   wrapSummary?: boolean
 }
@@ -222,10 +224,27 @@ function entryAutoForceOpen(
   processing?: boolean,
 ): boolean {
   if (entry.pendingApproval === true) return true
-  if (processing === true && entry.requestUserInput === true) return true
-  if (entry.active !== true) return false
-  if (processing === true && entry.pendingUserInput === true) return true
-  return processing === true && entry.showCompactionIcon === true
+  if (processing !== true) return false
+  if (entry.requestUserInput === true) return true
+  if (entry.pendingUserInput === true) return true
+  return entry.showCompactionIcon === true
+}
+
+/** Kun processBlockIsActive — row shimmer during running/pending process blocks. */
+function stackEntryIsActive(
+  entry: ProcessStackEntrySnapshot,
+  processing?: boolean,
+): boolean {
+  if (processing !== true) return entry.active === true
+  if (entry.runningTool === true) return true
+  if (entry.pendingApproval === true) return true
+  if (entry.pendingUserInput === true) return true
+  if (entry.requestUserInput === true) return true
+  if (entry.showCompactionIcon === true) return true
+  if (entry.detailKind === 'assistant' && entry.id === 'live-assistant') {
+    return true
+  }
+  return entry.active === true
 }
 
 function sectionHasPendingApproval(section: ProcessSectionSnapshot): boolean {
@@ -593,6 +612,28 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
       },
     ],
   },
+  executionPendingShimmer: {
+    kind: 'execution',
+    title: 'Waiting for approval',
+    processing: true,
+    active: true,
+    collapsible: true,
+    expanded: true,
+    stackEntries: [
+      {
+        id: 'approval',
+        summary: 'Approve deploy to staging',
+        pendingApproval: true,
+        detailKind: 'approval',
+        nestedBubble: MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
+      },
+      {
+        id: 'read',
+        summary: 'Read package.json',
+        filePath: 'package.json',
+      },
+    ],
+  },
   output: {
     kind: 'output',
     title: '',
@@ -700,6 +741,8 @@ function stackEntryToProcessEntry(
     verb,
     rest: rest || undefined,
     filePath: entry.filePath,
+    blockId: entry.id,
+    runningTool: entry.runningTool,
     active: entry.active ?? section.active,
     error: entry.error ?? section.hasError,
     collapsible: entry.collapsible,
@@ -759,8 +802,10 @@ function ProcessSummaryLine({
 
 function ProcessStackEntryDetail({
   entry,
+  processing,
 }: {
   entry: ProcessStackEntrySnapshot
+  processing?: boolean
 }): ReactElement | null {
   if (entry.detailKind === 'approval' || entry.detailKind === 'user_input') {
     if (!entry.nestedBubble) return null
@@ -790,7 +835,12 @@ function ProcessStackEntryDetail({
   if (entry.detailKind === 'assistant') {
     return (
       <div className="process-entry-row-assistant ds-markdown">
-        <Markdown text={entry.detailText} streaming={entry.active === true} />
+        <Markdown
+          text={entry.detailText}
+          streaming={
+            processing === true && entry.id === 'live-assistant'
+          }
+        />
       </div>
     )
   }
@@ -805,15 +855,17 @@ function ProcessStackEntryRow({
   open,
   canToggle,
   onToggle,
+  processing,
 }: {
   entry: ProcessStackEntrySnapshot
   open: boolean
   canToggle: boolean
   onToggle: () => void
+  processing?: boolean
 }): ReactElement {
   const canExpand =
     stackEntryHasExpandableDetail(entry) && entry.collapsible !== false
-  const rowActive = entry.active === true
+  const rowActive = stackEntryIsActive(entry, processing)
 
   const handleToggleButton = (event: MouseEvent<HTMLButtonElement>): void => {
     event.stopPropagation()
@@ -872,11 +924,11 @@ function ProcessStackEntryRow({
       {open && (entry.detailText || entry.nestedBubble) ? (
         entry.detailKind === 'assistant' ? (
           <div className="process-stack-entry-assistant">
-            <ProcessStackEntryDetail entry={entry} />
+            <ProcessStackEntryDetail entry={entry} processing={processing} />
           </div>
         ) : (
           <div className="process-stack-entry-detail ds-work-timeline-detail">
-            <ProcessStackEntryDetail entry={entry} />
+            <ProcessStackEntryDetail entry={entry} processing={processing} />
           </div>
         )
       ) : null}
@@ -953,6 +1005,7 @@ function ProcessStackRows({
             open={open}
             canToggle={canToggle}
             onToggle={handleToggle}
+            processing={processing}
           />
         )
       })}
@@ -990,7 +1043,12 @@ export function ProcessSectionRow({
   if (singleExecutionEntry) {
     const entrySnapshot = stackEntryToProcessEntry(singleExecutionEntry, section)
     return (
-      <ProcessEntryRow entry={entrySnapshot} expanded={expanded} onToggle={onToggle} />
+      <ProcessEntryRow
+        entry={entrySnapshot}
+        processing={section.processing}
+        expanded={expanded}
+        onToggle={onToggle}
+      />
     )
   }
 

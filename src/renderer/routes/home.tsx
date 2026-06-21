@@ -764,6 +764,7 @@ function HomePage() {
     if (mode === 'executionApprovalResolved') return 'executionApprovalResolved'
     if (mode === 'executionUserInput') return 'executionUserInput'
     if (mode === 'executionRequestInput') return 'executionRequestInput'
+    if (mode === 'executionPendingShimmer') return 'executionPendingShimmer'
     if (mode === 'executionRedundantDetail') return 'executionRedundantDetail'
     if (mode === 'executionSystemMessages') return 'executionSystemMessages'
     if (mode === 'error') return 'error'
@@ -792,7 +793,10 @@ function HomePage() {
     if (mode === 'systemExplicitDetail') return 'systemExplicitDetail'
     if (mode === 'assistant') return 'assistant'
     if (mode === 'approval') return 'approval'
+    if (mode === 'approvalPendingShimmer') return 'approvalPendingShimmer'
     if (mode === 'approvalResolved') return 'approvalResolved'
+    if (mode === 'compactionProcessing') return 'compactionProcessing'
+    if (mode === 'streamingAssistant') return 'streamingAssistant'
     if (mode === 'userInput') return 'userInput'
     return 'default'
   }, [])
@@ -4271,6 +4275,7 @@ function HomePage() {
               processSectionRowPreviewMode === 'executionApproval' ||
               processSectionRowPreviewMode === 'executionUserInput' ||
               processSectionRowPreviewMode === 'executionRequestInput' ||
+              processSectionRowPreviewMode === 'executionPendingShimmer' ||
               processSectionRowPreviewMode === 'error'
                 ? true
                 : processSectionRowExpanded
@@ -4284,12 +4289,24 @@ function HomePage() {
         <div className="process-entry-row-preview">
           <ProcessEntryRow
             entry={PROCESS_ENTRY_ROW_PREVIEW[processEntryRowPreviewMode]}
+            processing={
+              processEntryRowPreviewMode === 'active' ||
+              processEntryRowPreviewMode === 'compactionRunning' ||
+              processEntryRowPreviewMode === 'compactionProcessing' ||
+              processEntryRowPreviewMode === 'streamingAssistant' ||
+              processEntryRowPreviewMode === 'userInput'
+                ? true
+                : undefined
+            }
             expanded={
               processEntryRowPreviewMode === 'expanded' ||
               processEntryRowPreviewMode === 'active' ||
               processEntryRowPreviewMode === 'error' ||
               processEntryRowPreviewMode === 'assistant' ||
               processEntryRowPreviewMode === 'approval' ||
+              processEntryRowPreviewMode === 'approvalPendingShimmer' ||
+              processEntryRowPreviewMode === 'compactionProcessing' ||
+              processEntryRowPreviewMode === 'streamingAssistant' ||
               processEntryRowPreviewMode === 'userInput'
                 ? true
                 : processEntryRowExpanded

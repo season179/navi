@@ -23,7 +23,11 @@ export type ProcessEntrySnapshot = {
   verb: string
   rest?: string
   filePath?: string
+  /** Block id — used for live-assistant streaming shimmer like Kun. */
+  blockId?: string
   active?: boolean
+  /** Running tool block during processing — drives row shimmer like Kun. */
+  runningTool?: boolean
   error?: boolean
   showCompactionIcon?: boolean
   wrapSummary?: boolean
@@ -101,6 +105,22 @@ function processEntryHasExpandableDetail(entry: ProcessEntrySnapshot): boolean {
     )
   }
   return normalizeProcessText(detailText) !== normalizeProcessText(summary)
+}
+
+/** Kun ProcessEntryRow rowActive — pending approval shimmers even when not processing. */
+function processEntryIsActive(
+  entry: ProcessEntrySnapshot,
+  processing?: boolean,
+): boolean {
+  if (entry.pendingApproval === true) return true
+  if (processing !== true) return entry.active === true
+  if (entry.runningTool === true) return true
+  if (entry.pendingUserInput === true) return true
+  if (entry.showCompactionIcon === true) return true
+  if (entry.detailKind === 'assistant' && entry.blockId === 'live-assistant') {
+    return true
+  }
+  return entry.active === true
 }
 
 const PREVIEW_PATCH = `--- a/src/auth/middleware.ts
@@ -216,6 +236,34 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
     detailKind: 'approval',
     nestedBubble: MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
   },
+  approvalPendingShimmer: {
+    verb: 'Approve',
+    rest: 'deploy to staging',
+    pendingApproval: true,
+    expanded: true,
+    detailKind: 'approval',
+    nestedBubble: MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
+  },
+  compactionProcessing: {
+    verb: 'Compacting',
+    rest: 'context window',
+    showCompactionIcon: true,
+    wrapSummary: true,
+    collapsible: true,
+    expanded: true,
+    detailText: 'Summarizing older turns to free context space…',
+    detailKind: 'text',
+  },
+  streamingAssistant: {
+    verb: 'Text',
+    rest: '',
+    blockId: 'live-assistant',
+    wrapSummary: true,
+    forceOpen: true,
+    expanded: true,
+    detailText: 'I will normalize Bearer token extraction and call verifyToken before next().',
+    detailKind: 'assistant',
+  },
   approvalResolved: {
     verb: 'Approved',
     rest: 'deploy to staging',
@@ -267,6 +315,7 @@ export type ProcessEntryRowPreviewMode = keyof typeof PROCESS_ENTRY_ROW_PREVIEW
 
 type Props = {
   entry: ProcessEntrySnapshot
+  processing?: boolean
   expanded?: boolean
   onToggle?: () => void
 }
@@ -299,8 +348,10 @@ function ProcessSummaryLine({
 
 function ProcessEntryDetail({
   entry,
+  processing,
 }: {
   entry: ProcessEntrySnapshot
+  processing?: boolean
 }): ReactElement | null {
   if (entry.detailKind === 'approval' || entry.detailKind === 'user_input') {
     if (!entry.nestedBubble) return null
@@ -330,7 +381,13 @@ function ProcessEntryDetail({
   if (entry.detailKind === 'assistant') {
     return (
       <div className="process-entry-row-assistant ds-markdown">
-        <Markdown text={entry.detailText} streaming={entry.active === true} />
+        <Markdown
+          text={entry.detailText}
+          streaming={
+            processing === true &&
+            entry.blockId === 'live-assistant'
+          }
+        />
       </div>
     )
   }
@@ -340,14 +397,19 @@ function ProcessEntryDetail({
   return <p className="process-stack-entry-muted-text">{entry.detailText}</p>
 }
 
-export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElement {
+export function ProcessEntryRow({
+  entry,
+  processing,
+  expanded,
+  onToggle,
+}: Props): ReactElement {
   const [userOpen, setUserOpen] = useState<boolean | null>(null)
   const canExpand =
     entry.collapsible !== false && processEntryHasExpandableDetail(entry)
   const defaultOpen = entry.error === true
   const autoOpenPending =
     entry.pendingApproval === true ||
-    (entry.active === true &&
+    (processing === true &&
       (entry.pendingUserInput === true || entry.showCompactionIcon === true))
   const forceOpen =
     entry.forceOpen === true ||
@@ -355,7 +417,7 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
     autoOpenPending
   const isOpen = canExpand && (forceOpen || (expanded ?? (userOpen ?? defaultOpen)))
   const canToggle = canExpand && !forceOpen
-  const rowActive = entry.active === true
+  const rowActive = processEntryIsActive(entry, processing)
   const showCompactionIcon = entry.showCompactionIcon === true && !rowActive
   const summaryText = entryFullSummary(entry)
   const wrapSummary =
@@ -456,7 +518,7 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
               : 'process-entry-row-detail'
           }
         >
-          <ProcessEntryDetail entry={entry} />
+          <ProcessEntryDetail entry={entry} processing={processing} />
         </div>
       ) : null}
     </div>
