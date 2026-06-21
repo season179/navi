@@ -6,6 +6,9 @@ import { useCallback, useMemo, useRef, useState, type ReactElement } from 'react
 import { WriteWorkspaceEmptyState } from './WriteWorkspaceEmptyState'
 import {
   WriteAssistantPanel,
+  WRITE_ASSISTANT_PANEL_PREVIEW_DEFAULT,
+  WRITE_ASSISTANT_PANEL_PREVIEW_QUOTED,
+  WRITE_ASSISTANT_PANEL_PREVIEW_TIMELINE,
   type WriteAssistantPanelSnapshot,
 } from './WriteAssistantPanel'
 import {
@@ -44,6 +47,9 @@ export type WriteWorkspaceViewPreviewMode =
   | 'pdf'
   | 'image'
   | 'inlineAgent'
+  | 'assistant'
+  | 'assistantTimeline'
+  | 'assistantQuoted'
   | 'error'
   | 'exportSuccess'
   | 'exportError'
@@ -600,10 +606,40 @@ export function WriteWorkspaceProductionView({
   )
 }
 
+function assistantPanelPreviewSnapshot(
+  mode: WriteWorkspaceViewPreviewMode,
+): Partial<WriteAssistantPanelSnapshot> | undefined {
+  if (mode === 'assistantTimeline') {
+    return {
+      ...WRITE_ASSISTANT_PANEL_PREVIEW_TIMELINE,
+      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
+    }
+  }
+  if (mode === 'assistantQuoted') {
+    return {
+      ...WRITE_ASSISTANT_PANEL_PREVIEW_QUOTED,
+      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
+    }
+  }
+  if (mode === 'assistant') {
+    return {
+      ...WRITE_ASSISTANT_PANEL_PREVIEW_DEFAULT,
+      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
+    }
+  }
+  return undefined
+}
+
+function assistantPanelPreviewOpen(mode: WriteWorkspaceViewPreviewMode): boolean {
+  return mode === 'assistant' || mode === 'assistantTimeline' || mode === 'assistantQuoted'
+}
+
 /** Full-page preview shell for ?writeWorkspaceView URL hooks. */
 export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement {
   const snapshot = useMemo(() => previewSnapshot(mode), [mode])
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(false)
+  const [assistantOpen, setAssistantOpen] = useState(() => assistantPanelPreviewOpen(mode))
+  const assistantPanelSnapshot = useMemo(() => assistantPanelPreviewSnapshot(mode), [mode])
 
   return (
     <div className="write-workspace-view-preview">
@@ -634,6 +670,9 @@ export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement 
         leftSidebarCollapsed={leftSidebarCollapsed}
         onToggleLeftSidebar={() => setLeftSidebarCollapsed((open) => !open)}
         onPickWorkspace={() => undefined}
+        assistantOpen={assistantOpen}
+        onAssistantOpenChange={setAssistantOpen}
+        assistantPanelSnapshot={assistantPanelSnapshot}
       />
     </div>
   )
