@@ -22,6 +22,7 @@ import type { ComposerChangedFile } from '../lib/composerChangeSummary'
 import type { ComposerImageAttachment } from '../lib/composerAttachments'
 import type { ComposerGoal } from '../lib/composerGoal'
 import type { ComposerThreadUsage } from '../lib/composerThreadUsage'
+import type { ComposerPlusMenuToggles } from '../lib/composerPlusMenu'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import {
   FloatingComposerQueuedMessages,
@@ -105,6 +106,10 @@ interface ComposerProps {
   planBadge?: boolean
   /** Session usage chip shown in the composer footer beside project/branch pickers. */
   threadUsage?: ComposerThreadUsage | null
+  /** Opens the plus menu on mount for visual verification hooks. */
+  defaultPlusMenuOpen?: boolean
+  /** Toggle states for Kun's composer plus menu rows. */
+  plusMenuToggles?: ComposerPlusMenuToggles
 }
 
 /**
@@ -149,13 +154,15 @@ export function Composer({
   goalBadge = false,
   planBadge = false,
   threadUsage,
+  defaultPlusMenuOpen = false,
+  plusMenuToggles,
 }: ComposerProps) {
   const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const contextCapacityRef = useRef<HTMLDivElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [focused, setFocused] = useState(false)
-  const [plusMenuOpen, setPlusMenuOpen] = useState(false)
+  const [plusMenuOpen, setPlusMenuOpen] = useState(defaultPlusMenuOpen)
   const [contextCapacityOpen, setContextCapacityOpen] = useState(false)
   const [slashActiveIndex, setSlashActiveIndex] = useState(0)
   const [fileMentionActiveIndex, setFileMentionActiveIndex] = useState(0)
@@ -472,7 +479,11 @@ export function Composer({
         ) : null}
         {!compact && plusMenuOpen && query === null && !showGoalPanel ? (
           <div ref={plusMenuRef}>
-            <ComposerPlusMenu />
+            <ComposerPlusMenu
+              planMode={plusMenuToggles?.planMode}
+              goalActive={plusMenuToggles?.goalActive}
+              worktreeMode={plusMenuToggles?.worktreeMode}
+            />
           </div>
         ) : null}
         {!compact && pickerOpen && query !== null ? (

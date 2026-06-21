@@ -13,6 +13,10 @@ import { COMPOSER_GOAL_PREVIEW } from '../lib/composerGoal'
 import { COMPOSER_THREAD_USAGE_PREVIEW } from '../lib/composerThreadUsage'
 import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 import {
+  resolveComposerPlusMenuPreview,
+  type ComposerPlusMenuPreviewMode,
+} from '../lib/composerPlusMenu'
+import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
 import {
@@ -745,6 +749,17 @@ function HomePage() {
       return undefined
     }
     return COMPOSER_THREAD_USAGE_PREVIEW
+  }, [])
+
+  // Visual preview for the ported ComposerPlusMenu (?composerPlusMenuPreview=1|plan|goal|worktree).
+  const composerPlusMenuPreview = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerPlusMenuPreview')) return null
+    const value = params.get('composerPlusMenuPreview')
+    const mode: ComposerPlusMenuPreviewMode =
+      value === 'plan' || value === 'goal' || value === 'worktree' ? value : 'default'
+    return resolveComposerPlusMenuPreview(mode)
   }, [])
 
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
@@ -3800,6 +3815,8 @@ function HomePage() {
       goalBadge={composerGoalFloaterPreview || composerGoalPanelPreview}
       planBadge={composerPlanModePreview}
       threadUsage={composerThreadUsagePreview}
+      defaultPlusMenuOpen={composerPlusMenuPreview?.open}
+      plusMenuToggles={composerPlusMenuPreview?.toggles}
       modelChip={
         <FloatingModelPicker
           providers={providerProfiles}

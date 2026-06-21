@@ -15,7 +15,7 @@ import {
   FileEdit,
   FileText,
   Folder,
-  GitFork,
+  GitBranch,
   ImagePlus,
   ListTodo,
   Loader2,
@@ -265,28 +265,57 @@ export function ComposerImageAttachmentPreview({
   )
 }
 
-export function ComposerPlusMenu(): ReactElement {
+export function ComposerPlusMenu({
+  planMode = false,
+  goalActive = true,
+  worktreeMode = false,
+  showAddImage = true,
+}: {
+  planMode?: boolean
+  goalActive?: boolean
+  worktreeMode?: boolean
+  showAddImage?: boolean
+} = {}): ReactElement {
   return (
     <div className="floating-composer-plus-menu" role="menu" aria-label="Composer menu">
-      <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
-        <ImagePlus strokeWidth={1.9} />
-        <span>Add image</span>
-      </button>
-      <div className="floating-composer-plus-menu-divider" aria-hidden />
+      {showAddImage ? (
+        <>
+          <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
+            <ImagePlus strokeWidth={1.9} />
+            <span>Add image</span>
+          </button>
+          <div className="floating-composer-plus-menu-divider" aria-hidden />
+        </>
+      ) : null}
       <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
         <ListTodo strokeWidth={1.9} />
         <span>Plan mode</span>
-        <span className="floating-composer-toggle-switch" data-checked="false" aria-hidden />
+        <span
+          className="floating-composer-toggle-switch"
+          role="switch"
+          aria-checked={planMode}
+          data-checked={planMode ? 'true' : 'false'}
+        />
       </button>
       <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
         <Target strokeWidth={1.9} />
         <span>Pursue a goal</span>
-        <span className="floating-composer-toggle-switch" data-checked="true" aria-hidden />
+        <span
+          className="floating-composer-toggle-switch"
+          role="switch"
+          aria-checked={goalActive}
+          data-checked={goalActive ? 'true' : 'false'}
+        />
       </button>
       <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
-        <GitFork strokeWidth={1.9} />
+        <GitBranch strokeWidth={1.9} />
         <span>Worktree mode</span>
-        <span className="floating-composer-toggle-switch" data-checked="false" aria-hidden />
+        <span
+          className="floating-composer-toggle-switch"
+          role="switch"
+          aria-checked={worktreeMode}
+          data-checked={worktreeMode ? 'true' : 'false'}
+        />
       </button>
     </div>
   )
