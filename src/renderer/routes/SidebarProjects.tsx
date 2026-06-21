@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import type { ProjectMeta } from '../../shared/flue'
 import { useNaviList } from '../flue/NaviChatContext'
+import { useSettings } from '../settings'
 import { formatRelativeTime } from '../lib/format-relative-time'
 
 const DEFAULT_PROJECT_ID = 'navi-default'
@@ -27,6 +28,22 @@ export function SidebarProjects() {
     deleteConversation,
     deleteProject,
   } = useNaviList()
+  const { closeSettings } = useSettings()
+
+  // Opening a conversation returns to the chat view if settings were showing
+  // (mirrors Kun, where selecting a session flips route back to chat).
+  const handleSelectConversation = (id: string) => {
+    closeSettings()
+    void selectConversation(id)
+  }
+
+  // Selecting or creating a project starts a fresh blank conversation
+  // (selectProject → startBlank), so leave the settings view too — otherwise
+  // the new chat is hidden behind the still-open providers panel.
+  const handleCreateProject = () => {
+    closeSettings()
+    void createProject()
+  }
 
   const [allCollapsed, setAllCollapsed] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -69,6 +86,9 @@ export function SidebarProjects() {
   }
 
   const handleProjectClick = (id: string) => {
+    // selectProject (below) resets to a fresh blank conversation, so return to
+    // the chat view if settings were showing.
+    closeSettings()
     if (allCollapsed) {
       // Leaving "collapse all" via a project click should open *that* project
       // and keep the rest collapsed — otherwise the click is a visual no-op
@@ -120,7 +140,7 @@ export function SidebarProjects() {
           <button
             type="button"
             className="icon-btn"
-            onClick={() => void createProject()}
+            onClick={handleCreateProject}
             aria-label="New project"
             title="New project"
           >
@@ -193,7 +213,7 @@ export function SidebarProjects() {
                               ? 'cmd-row conv-open is-active'
                               : 'cmd-row conv-open'
                           }
-                          onClick={() => void selectConversation(c.id)}
+                          onClick={() => handleSelectConversation(c.id)}
                           title={c.title}
                         >
                           <MessageSquare />

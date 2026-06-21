@@ -1,7 +1,17 @@
 // Provider settings: a master/detail surface replicating Kun's provider flow.
-// Left: provider cards with a key-state dot + model count. Top: an "Add
-// provider" dropdown listing presets + Custom. Right: a draft-before-commit
-// detail pane (name / id / base URL / key / Test connection / models).
+// Left: provider cards with model count + Kun-style status pills ("In use" /
+// "No API key" / "Key unreadable" / "Unsaved"). Top: an "Add provider" dropdown
+// listing presets + Custom. Right: a draft-before-commit detail pane (name / id
+// / base URL / key / Test connection / models).
+//
+// Status pills mirror Kun's badge semantics (settings-section-providers.tsx):
+// green "In use" = this is the app's active/default provider — NOT a
+// connection-verified or key-stored signal; amber "No API key" flags what's
+// actually missing. A provider that simply has a stored key but isn't the
+// default shows no pill (so nothing reads as a misleading "ready" green).
+// Connection results live only in the detail pane (Test connection), never as a
+// list badge — again matching Kun. (navi adds "Key unreadable" for its
+// encrypted key-store, which Kun has no equivalent for.)
 //
 // Secrets never live in renderer state beyond the transient key field; the key
 // is sent to main, encrypted, and never echoed back. Saving a provider restarts
@@ -64,6 +74,21 @@ function effectiveBaseUrl(form: ProviderProfile): string | undefined {
 function fingerprint(form: ProviderProfile, hasKeyInput: boolean): ProviderFingerprint {
   const modelsHash = form.models.map((m) => m.id).join(',')
   return [form.id, form.baseUrl ?? '', form.api, modelsHash, hasKeyInput ? '1' : '0'].join('\0')
+}
+
+type Badge = { label: string; tone: 'success' | 'warning' }
+
+/**
+ * Status pills for a saved provider, mirroring Kun's independent-conditional
+ * badges. "In use" = it's the app's default provider; the key-state warnings
+ * flag missing/unreadable keys. A keyed, non-default provider yields none.
+ */
+function providerBadges(keyState: ProviderStatus['keyState'], inUse: boolean): Badge[] {
+  const badges: Badge[] = []
+  if (inUse) badges.push({ label: 'In use', tone: 'success' })
+  if (keyState === 'absent') badges.push({ label: 'No API key', tone: 'warning' })
+  if (keyState === 'unreadable') badges.push({ label: 'Key unreadable', tone: 'warning' })
+  return badges
 }
 
 export function ProvidersSettings({
@@ -269,24 +294,38 @@ export function ProvidersSettings({
             <div className="providers-list-empty">No providers yet. Add one to start.</div>
           ) : null}
           {providers.map((p) => {
-            const st = statusFor(p.id)
+            const keyState = statusFor(p.id)?.keyState ?? 'absent'
+            const badges = providerBadges(keyState, defaultSelection?.providerId === p.id)
             return (
               <button
                 key={p.id}
                 className={selected === p.id ? 'provider-card is-active' : 'provider-card'}
                 onClick={() => editExisting(p)}
               >
-                <span className={`key-dot key-${st?.keyState ?? 'absent'}`} />
-                <span className="provider-card-name">{p.name}</span>
-                <span className="provider-card-count">{p.models.length}</span>
+                <div className="provider-card-head">
+                  <span className="provider-card-name">{p.name}</span>
+                  <span className="provider-card-count">{p.models.length}</span>
+                </div>
+                {badges.length > 0 ? (
+                  <div className="provider-card-badges">
+                    {badges.map((b) => (
+                      <span key={b.label} className={`provider-badge badge-${b.tone}`}>
+                        {b.label}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </button>
             )
           })}
           {isDraft && form ? (
             <div className="provider-card is-active is-draft">
-              <span className="key-dot key-absent" />
-              <span className="provider-card-name">{form.name || 'New provider'}</span>
-              <span className="provider-card-count">new</span>
+              <div className="provider-card-head">
+                <span className="provider-card-name">{form.name || 'New provider'}</span>
+              </div>
+              <div className="provider-card-badges">
+                <span className="provider-badge badge-warning">Unsaved</span>
+              </div>
             </div>
           ) : null}
         </aside>
