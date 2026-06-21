@@ -510,7 +510,7 @@ function previewState(mode: WriteWorkspaceToolbarPreviewMode): {
           ? 'split'
           : mode === 'preview'
             ? 'preview'
-            : mode === 'exportMenu'
+            : mode === 'live' || mode === 'exportMenu'
               ? 'live'
               : 'live'
 

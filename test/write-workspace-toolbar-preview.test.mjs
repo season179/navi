@@ -62,3 +62,10 @@ test('routes preview toolbar mode preview without opening mode menu', () => {
     'preview',
   )
 })
+
+test('routes live toolbar mode preview without opening mode menu', () => {
+  assert.equal(
+    resolveWriteWorkspaceToolbarPreviewMode(new URLSearchParams('writeWorkspaceToolbar=live')),
+    'live',
+  )
+})
