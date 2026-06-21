@@ -71,6 +71,11 @@ import {
   CLAW_INBOUND_MESSAGE_CARD_PREVIEW,
   CLAW_INBOUND_MESSAGE_CARD_PREVIEW_MINIMAL,
 } from '../components/ClawInboundMessageCard'
+import {
+  UserFileReferenceChips,
+  USER_FILE_REFERENCE_CHIPS_PREVIEW,
+  USER_FILE_REFERENCE_CHIPS_PREVIEW_DIRECTORY,
+} from '../components/UserFileReferenceChips'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -290,6 +295,14 @@ function HomePage() {
     const params = new URLSearchParams(window.location.search)
     if (!params.has('clawInboundMessageCard')) return null
     return params.get('clawInboundMessageCard') === 'minimal' ? 'minimal' : 'full'
+  }, [])
+
+  // Visual preview for the ported UserFileReferenceChips (?userFileReferenceChips=1).
+  const userFileReferenceChipsPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('userFileReferenceChips')) return null
+    return params.get('userFileReferenceChips') === 'directory' ? 'directory' : 'full'
   }, [])
 
   const composerFooterPreview =
@@ -593,6 +606,23 @@ function HomePage() {
               ? CLAW_INBOUND_MESSAGE_CARD_PREVIEW_MINIMAL
               : CLAW_INBOUND_MESSAGE_CARD_PREVIEW)}
           />
+        </div>
+      ) : null}
+
+      {userFileReferenceChipsPreviewMode ? (
+        <div className="user-file-reference-chips-preview">
+          <div className="user-file-reference-chips-preview-bubble">
+            <div className="user-file-reference-chips-preview-text">
+              Refactor these files to use the shared JWT validation helper.
+            </div>
+            <UserFileReferenceChips
+              references={
+                userFileReferenceChipsPreviewMode === 'directory'
+                  ? USER_FILE_REFERENCE_CHIPS_PREVIEW_DIRECTORY
+                  : USER_FILE_REFERENCE_CHIPS_PREVIEW
+              }
+            />
+          </div>
         </div>
       ) : null}
     </>
