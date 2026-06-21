@@ -2743,6 +2743,33 @@ function HomePage() {
     }
   }, [])
 
+  // Production ChatThread review plan card via ?productionReviewPlanCard=…
+  const productionChatPlan = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {
+        planAtTurnIndex: undefined,
+        planTitle: undefined,
+        planRelativePath: undefined,
+      }
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionReviewPlanCard')) {
+      return {
+        planAtTurnIndex: undefined,
+        planTitle: undefined,
+        planRelativePath: undefined,
+      }
+    }
+    const turnParam = params.get('productionReviewPlanTurnIndex')
+    const parsedTurnIndex = turnParam ? Number.parseInt(turnParam, 10) : 0
+    const planAtTurnIndex = Number.isFinite(parsedTurnIndex) ? parsedTurnIndex : 0
+    return {
+      planAtTurnIndex,
+      planTitle: REVIEW_PLAN_CARD_PREVIEW.title,
+      planRelativePath: REVIEW_PLAN_CARD_PREVIEW.relativePath,
+    }
+  }, [])
+
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
   // toggles (a create/enable/disable in the Skills tab may have changed the set).
@@ -3377,6 +3404,9 @@ function HomePage() {
         forkBoundaryTurnIndex={productionChatFork.forkBoundaryTurnIndex}
         compactionAtTurnIndex={productionChatCompaction.compactionAtTurnIndex}
         compactionBlock={productionChatCompaction.compactionBlock}
+        planAtTurnIndex={productionChatPlan.planAtTurnIndex}
+        planTitle={productionChatPlan.planTitle}
+        planRelativePath={productionChatPlan.planRelativePath}
         changesAtTurnIndex={productionChatTurnChanges.changesAtTurnIndex}
         turnChanges={productionChatTurnChanges.turnChanges}
         turnChangesCompact={productionChatTurnChanges.turnChangesCompact}

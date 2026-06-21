@@ -12,6 +12,7 @@ import {
   TimelineShowEarlierButton,
 } from './TimelinePaginationControls'
 import { CompactionDivider, type CompactionDividerSnapshot } from './CompactionDivider'
+import { ReviewPlanCard } from './ReviewPlanCard'
 import { ThreadForkBanner, ThreadForkPoint } from './ThreadForkBanner'
 import {
   TurnChangeSummary,
@@ -105,6 +106,10 @@ type ChatThreadProps = {
   /** When set with compactionBlock, renders Kun's compaction divider at this turn. */
   compactionAtTurnIndex?: number
   compactionBlock?: CompactionDividerSnapshot
+  /** When set with planTitle/planRelativePath, renders Kun's review plan card at this turn. */
+  planAtTurnIndex?: number
+  planTitle?: string
+  planRelativePath?: string
   /** When set with turnChanges, renders Kun's turn change summary at this turn. */
   changesAtTurnIndex?: number
   turnChanges?: TurnChangeSnapshot[]
@@ -119,6 +124,9 @@ export function ChatThread({
   forkBoundaryTurnIndex,
   compactionAtTurnIndex,
   compactionBlock,
+  planAtTurnIndex,
+  planTitle,
+  planRelativePath,
   changesAtTurnIndex,
   turnChanges,
   turnChangesCompact = false,
@@ -211,6 +219,11 @@ export function ChatThread({
             compactionBlock != null &&
             typeof compactionAtTurnIndex === 'number' &&
             compactionAtTurnIndex === absoluteTurnIndex
+          const showPlan =
+            planTitle != null &&
+            planRelativePath != null &&
+            typeof planAtTurnIndex === 'number' &&
+            planAtTurnIndex === absoluteTurnIndex
           const showTurnChanges =
             turnChanges != null &&
             turnChanges.length > 0 &&
@@ -245,6 +258,9 @@ export function ChatThread({
                     </div>
                   )
                 })}
+                {showPlan ? (
+                  <ReviewPlanCard title={planTitle} relativePath={planRelativePath} />
+                ) : null}
                 {showTurnChanges ? (
                   <TurnChangeSummary
                     changes={turnChanges}
