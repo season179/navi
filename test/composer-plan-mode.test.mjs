@@ -17,9 +17,9 @@ buildSync({
 
 const { COMPOSER_PLAN_MODE_PLACEHOLDER } = await import(out)
 
-test('COMPOSER_PLAN_MODE_PLACEHOLDER matches Kun planMode snapshot text', () => {
+test('COMPOSER_PLAN_MODE_PLACEHOLDER matches Kun composerPlanPlaceholder English copy', () => {
   assert.equal(
     COMPOSER_PLAN_MODE_PLACEHOLDER,
-    'Draft a plan for the remaining composer overlays.',
+    'Break the goal down, outline steps, and scope changes before execution…',
   )
 })

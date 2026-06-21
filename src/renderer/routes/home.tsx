@@ -20,6 +20,11 @@ import { resolveComposerGoalPreview } from '../lib/composerGoal'
 import { resolveComposerThreadUsagePreview } from '../lib/composerThreadUsage'
 import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 import {
+  COMPOSER_DEFAULT_PLACEHOLDER,
+  resolveComposerPlaceholderPreview,
+  type ComposerPlaceholderPreviewMode,
+} from '../lib/composerPlaceholder'
+import {
   resolveComposerPlusMenuPreview,
   type ComposerPlusMenuPreviewMode,
 } from '../lib/composerPlusMenu'
@@ -811,14 +816,30 @@ function HomePage() {
     return resolveComposerPlusMenuPreview(mode)
   }, [])
 
-  // Visual preview for the ported composer footer hint (?composerFooterHintPreview=1|worktree).
+  // Visual preview for the ported composer footer hint (?composerFooterHintPreview=1|worktree|offline|workspace).
   const composerFooterHintPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
     const params = new URLSearchParams(window.location.search)
     if (!params.has('composerFooterHintPreview')) return undefined
     const value = params.get('composerFooterHintPreview')
-    const mode: ComposerFooterHintPreviewMode = value === 'worktree' ? 'worktree' : 'default'
+    const mode: ComposerFooterHintPreviewMode =
+      value === 'worktree' ||
+      value === 'offline' ||
+      value === 'workspace'
+        ? value
+        : 'default'
     return resolveComposerFooterHintPreview(mode)
+  }, [])
+
+  // Visual preview for Kun composer placeholder copy (?composerPlaceholderPreview=startsThread|plan).
+  const composerPlaceholderPreview = useMemo(() => {
+    if (typeof window === 'undefined') return undefined
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerPlaceholderPreview')) return undefined
+    const value = params.get('composerPlaceholderPreview')
+    const mode: ComposerPlaceholderPreviewMode =
+      value === 'startsThread' || value === 'plan' ? value : 'default'
+    return resolveComposerPlaceholderPreview(mode)
   }, [])
 
   // Visual preview for dictation error row (?composerDictationErrorPreview=1|micDenied|tooShort|failed).
@@ -1330,7 +1351,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalFloaterPaused|goalPanel|goalPanelPaused|attachments|attachmentsNoPreview|changeSummary|changeSummaryReviewDisabled|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|dictationErrorTooShort|dictationErrorFailed|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
+  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalFloaterPaused|goalPanel|goalPanelPaused|attachments|attachmentsNoPreview|changeSummary|changeSummaryReviewDisabled|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|offlineHint|workspaceHint|startsThread|dictationError|dictationErrorTooShort|dictationErrorFailed|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1359,6 +1380,9 @@ function HomePage() {
     if (value === 'modelPickerSubmenu') return 'modelPickerSubmenu'
     if (value === 'modelPickerNoProviders') return 'modelPickerNoProviders'
     if (value === 'worktreeHint') return 'worktreeHint'
+    if (value === 'offlineHint') return 'offlineHint'
+    if (value === 'workspaceHint') return 'workspaceHint'
+    if (value === 'startsThread') return 'startsThread'
     if (value === 'dictationError') return 'dictationError'
     if (value === 'dictationErrorTooShort') return 'dictationErrorTooShort'
     if (value === 'dictationErrorFailed') return 'dictationErrorFailed'
@@ -3899,7 +3923,8 @@ function HomePage() {
       busy={composerBusyPreview || Boolean(queuedMessagesPreview) || busy}
       disabled={composerDisabled}
       placeholder={
-        composerPlanModePreview
+        composerPlaceholderPreview ??
+        (composerPlanModePreview
           ? COMPOSER_PLAN_MODE_PLACEHOLDER
           : composerBusyPreview || queuedMessagesPreview || busy
             ? COMPOSER_QUEUE_PLACEHOLDER
@@ -3907,7 +3932,7 @@ function HomePage() {
               ? 'Add a provider to start chatting…'
               : !status.ready
                 ? 'Connecting to Navi…'
-                : 'Send a message to Navi…'
+                : COMPOSER_DEFAULT_PLACEHOLDER)
       }
       skills={skills}
       fileMentionCandidates={composerFileMentionPreview?.candidates}

@@ -4,6 +4,4 @@
 /** English copy matching Kun's slashCommandPlanTitle locale string. */
 export const COMPOSER_PLAN_MODE_BADGE_LABEL = 'Plan'
 
-/** Placeholder text for ?composerPlanModePreview visual verification. */
-export const COMPOSER_PLAN_MODE_PLACEHOLDER =
-  'Draft a plan for the remaining composer overlays.'
+export { COMPOSER_PLAN_MODE_PLACEHOLDER } from './composerPlaceholder'

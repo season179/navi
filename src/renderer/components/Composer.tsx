@@ -25,6 +25,7 @@ import type { ComposerThreadUsage } from '../lib/composerThreadUsage'
 import type { ComposerPlusMenuToggles } from '../lib/composerPlusMenu'
 import { COMPOSER_PLUS_MENU_TITLE } from '../lib/composerPlusMenu'
 import { COMPOSER_PLAN_MODE_BADGE_LABEL } from '../lib/composerPlanMode'
+import { COMPOSER_DEFAULT_PLACEHOLDER } from '../lib/composerPlaceholder'
 import {
   COMPOSER_QUEUE_MESSAGE_LABEL,
   COMPOSER_STOP_LABEL,
@@ -172,7 +173,7 @@ export function Composer({
   busy = false,
   disabled = false,
   variant = 'default',
-  placeholder = 'Send a message to Navi…',
+  placeholder = COMPOSER_DEFAULT_PLACEHOLDER,
   contextCapacity,
   defaultContextCapacityOpen = false,
   modelChip,

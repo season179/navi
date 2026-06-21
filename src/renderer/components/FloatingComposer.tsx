@@ -106,7 +106,8 @@ import {
   COMPOSER_QUEUE_PLACEHOLDER,
   COMPOSER_STOP_LABEL,
 } from '../lib/composerBusyState'
-import { COMPOSER_PLAN_MODE_BADGE_LABEL, COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
+import { COMPOSER_PLAN_MODE_BADGE_LABEL } from '../lib/composerPlanMode'
+import { resolveComposerPlaceholder } from '../lib/composerPlaceholder'
 import {
   COMPOSER_SESSION_USAGE_LOADING,
   COMPOSER_SESSION_USAGE_UNAVAILABLE,
@@ -127,6 +128,8 @@ import {
 import {
   COMPOSER_FOOTER_HINT_SLASH,
   COMPOSER_FOOTER_HINT_WORKTREE,
+  COMPOSER_FOOTER_HINT_OFFLINE,
+  COMPOSER_FOOTER_HINT_WORKSPACE,
 } from '../lib/composerFooterHint'
 import {
   COMPOSER_VOICE_MIC_DENIED_LABEL,
@@ -192,6 +195,9 @@ export type FloatingComposerPreviewMode =
   | 'modelPickerSubmenu'
   | 'modelPickerNoProviders'
   | 'worktreeHint'
+  | 'offlineHint'
+  | 'workspaceHint'
+  | 'startsThread'
   | 'dictationError'
   | 'dictationErrorTooShort'
   | 'dictationErrorFailed'
@@ -269,6 +275,7 @@ export type FloatingComposerSnapshot = {
   attachmentUploadBusy: boolean
   plusMenuShowAddImage: boolean
   plusMenuShowWorktreeMode: boolean
+  startsThread: boolean
 }
 
 const SLASH_COMMAND_PREVIEW_ICONS: Record<ComposerSlashCommandPreviewIcon, ReactNode> = {
@@ -908,6 +915,7 @@ export function resolveFloatingComposerSnapshot(
     attachmentUploadBusy: false,
     plusMenuShowAddImage: true,
     plusMenuShowWorktreeMode: true,
+    startsThread: false,
   }
 
   switch (mode) {
@@ -997,7 +1005,7 @@ export function resolveFloatingComposerSnapshot(
         ...base,
         mode: 'plan',
         planBadge: true,
-        input: COMPOSER_PLAN_MODE_PLACEHOLDER,
+        input: '',
       }
     case 'modelPicker':
       return { ...base, showModelPickerMenu: true }
@@ -1016,6 +1024,12 @@ export function resolveFloatingComposerSnapshot(
       }
     case 'worktreeHint':
       return { ...base, footerHint: COMPOSER_FOOTER_HINT_WORKTREE }
+    case 'offlineHint':
+      return { ...base, footerHint: COMPOSER_FOOTER_HINT_OFFLINE }
+    case 'workspaceHint':
+      return { ...base, footerHint: COMPOSER_FOOTER_HINT_WORKSPACE }
+    case 'startsThread':
+      return { ...base, startsThread: true }
     case 'dictationError':
       return { ...base, dictationError: COMPOSER_VOICE_MIC_DENIED_LABEL }
     case 'dictationErrorTooShort':
@@ -1111,9 +1125,11 @@ export function FloatingComposer({
           <textarea
             rows={1}
             className="floating-composer-textarea"
-            placeholder={
-              snapshot.busy ? COMPOSER_QUEUE_PLACEHOLDER : 'Send a message…'
-            }
+            placeholder={resolveComposerPlaceholder({
+              busy: snapshot.busy,
+              planMode: snapshot.mode === 'plan',
+              startsThread: snapshot.startsThread,
+            })}
             value={snapshot.input}
             readOnly
             aria-label="Message"
