@@ -55,3 +55,10 @@ test('routes split toolbar mode preview without opening mode menu', () => {
     'split',
   )
 })
+
+test('routes preview toolbar mode preview without opening mode menu', () => {
+  assert.equal(
+    resolveWriteWorkspaceToolbarPreviewMode(new URLSearchParams('writeWorkspaceToolbar=preview')),
+    'preview',
+  )
+})

@@ -16,6 +16,7 @@ export type WriteWorkspaceToolbarPreviewMode =
   | 'rich'
   | 'source'
   | 'split'
+  | 'preview'
 
 export function resolveWriteWorkspaceToolbarPreviewMode(
   params: URLSearchParams,
@@ -36,5 +37,6 @@ export function resolveWriteWorkspaceToolbarPreviewMode(
   if (value === 'rich') return 'rich'
   if (value === 'source') return 'source'
   if (value === 'split') return 'split'
+  if (value === 'preview') return 'preview'
   return 'default'
 }

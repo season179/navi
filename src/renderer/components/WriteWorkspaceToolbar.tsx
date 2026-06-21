@@ -508,9 +508,11 @@ function previewState(mode: WriteWorkspaceToolbarPreviewMode): {
         ? 'source'
         : mode === 'split'
           ? 'split'
-          : mode === 'exportMenu'
-            ? 'live'
-            : 'live'
+          : mode === 'preview'
+            ? 'preview'
+            : mode === 'exportMenu'
+              ? 'live'
+              : 'live'
 
   return {
     activeFileIsPdf: false,

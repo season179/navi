@@ -1300,7 +1300,7 @@ function HomePage() {
     }, [])
 
   // Visual preview for the ported WriteWorkspaceToolbar
-  // (?writeWorkspaceToolbar=1|pdf|dirty|saving|error|readonly|exportMenu|modeMenu|assistant|review|image|exporting|rich|source|split).
+  // (?writeWorkspaceToolbar=1|pdf|dirty|saving|error|readonly|exportMenu|modeMenu|assistant|review|image|exporting|rich|source|split|preview).
   const writeWorkspaceToolbarPreviewMode =
     useMemo((): WriteWorkspaceToolbarPreviewMode | null => {
       if (typeof window === 'undefined') return null
