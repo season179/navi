@@ -124,6 +124,8 @@ interface ComposerProps {
   planBadge?: boolean
   /** Session usage chip shown in the composer footer beside project/branch pickers. */
   threadUsage?: ComposerThreadUsage | null
+  /** When true, shows Kun's loading usage copy in the session-usage footer chip. */
+  threadUsageLoading?: boolean
   /** Opens the plus menu on mount for visual verification hooks. */
   defaultPlusMenuOpen?: boolean
   /** Toggle states for Kun's composer plus menu rows. */
@@ -181,6 +183,7 @@ export function Composer({
   goalBadge = false,
   planBadge = false,
   threadUsage,
+  threadUsageLoading = false,
   defaultPlusMenuOpen = false,
   plusMenuToggles,
   footerHint,
@@ -750,11 +753,13 @@ export function Composer({
           </div>
         </div>
       </div>
-      {!compact && (footerLeft || threadUsage || footerHint) ? (
+      {!compact && (footerLeft || threadUsage !== undefined || threadUsageLoading || footerHint) ? (
         <div className="ds-composer-footer floating-composer-footer">
           <div className="ds-composer-footer-left">
             {footerLeft}
-            {threadUsage ? <ComposerThreadUsageFooter usage={threadUsage} /> : null}
+            {threadUsage !== undefined || threadUsageLoading ? (
+              <ComposerThreadUsageFooter usage={threadUsage ?? null} loading={threadUsageLoading} />
+            ) : null}
           </div>
           {footerHint ? (
             <div className="ds-composer-footer-hint">

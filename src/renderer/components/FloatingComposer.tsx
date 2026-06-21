@@ -88,7 +88,20 @@ import {
 } from '../lib/composerBusyState'
 import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 import {
+  COMPOSER_SESSION_USAGE_LOADING,
+  COMPOSER_SESSION_USAGE_UNAVAILABLE,
   COMPOSER_THREAD_USAGE_PREVIEW,
+  formatComposerCompactNumber,
+  formatComposerCost,
+  formatComposerPercent,
+  formatComposerSessionUsageCache,
+  formatComposerSessionUsageContextSavings,
+  formatComposerSessionUsageContextSavingsTitle,
+  formatComposerSessionUsageCost,
+  formatComposerSessionUsageTokens,
+  formatComposerSessionUsageTurns,
+  formatComposerThreadUsageTitle,
+  primaryComposerCacheHitRate,
   type ComposerThreadUsage,
 } from '../lib/composerThreadUsage'
 import {
@@ -632,21 +645,66 @@ export function ComposerChangeSummary({
 
 export function ComposerThreadUsageFooter({
   usage,
+  loading = false,
 }: {
-  usage: ComposerThreadUsage
+  usage: ComposerThreadUsage | null
+  loading?: boolean
 }): ReactElement {
+  const title = usage
+    ? formatComposerThreadUsageTitle(usage)
+    : loading
+      ? COMPOSER_SESSION_USAGE_LOADING
+      : COMPOSER_SESSION_USAGE_UNAVAILABLE
+
   return (
-    <div className="ds-composer-usage floating-composer-usage" title="Session usage">
+    <div className="ds-composer-usage ds-no-drag floating-composer-usage" title={title}>
       <BarChart3 strokeWidth={1.9} />
-      <span className="ds-composer-usage-tokens">{usage.tokens} tokens</span>
-      <span className="floating-composer-usage-sep">·</span>
-      <span>{usage.cost}</span>
-      <span className="floating-composer-usage-sep">·</span>
-      <span className="floating-composer-usage-savings">{usage.savings}</span>
-      <span className="floating-composer-usage-sep">·</span>
-      <span>{usage.cache} cache</span>
-      <span className="floating-composer-usage-sep">·</span>
-      <span>{usage.turns} turns</span>
+      {usage ? (
+        <>
+          <span className="ds-composer-usage-tokens">
+            {formatComposerSessionUsageTokens(formatComposerCompactNumber(usage.totalTokens))}
+          </span>
+          <span className="ds-composer-usage-cost-separator floating-composer-usage-sep">·</span>
+          <span className="ds-composer-usage-cost">
+            {formatComposerSessionUsageCost(formatComposerCost(usage.costUsd, usage.costCny))}
+          </span>
+          {usage.tokenEconomySavingsTokens > 0 ? (
+            <>
+              <span className="ds-composer-usage-context-savings-separator floating-composer-usage-sep">
+                ·
+              </span>
+              <span
+                className="ds-composer-usage-context-savings floating-composer-usage-savings"
+                title={formatComposerSessionUsageContextSavingsTitle(
+                  formatComposerCompactNumber(usage.tokenEconomySavingsTokens),
+                )}
+              >
+                {formatComposerSessionUsageContextSavings(
+                  formatComposerCompactNumber(usage.tokenEconomySavingsTokens),
+                )}
+              </span>
+            </>
+          ) : null}
+          {usage.turns > 1 ? (
+            <>
+              <span className="ds-composer-usage-cache-separator floating-composer-usage-sep">
+                ·
+              </span>
+              <span className="ds-composer-usage-cache">
+                {formatComposerSessionUsageCache(
+                  formatComposerPercent(primaryComposerCacheHitRate(usage)),
+                )}
+              </span>
+            </>
+          ) : null}
+          <span className="ds-composer-usage-turns-separator floating-composer-usage-sep">·</span>
+          <span className="ds-composer-usage-turns">
+            {formatComposerSessionUsageTurns(usage.turns)}
+          </span>
+        </>
+      ) : (
+        <span>{loading ? COMPOSER_SESSION_USAGE_LOADING : COMPOSER_SESSION_USAGE_UNAVAILABLE}</span>
+      )}
     </div>
   )
 }
@@ -1010,7 +1068,9 @@ export function FloatingComposer({
         <div className="ds-composer-footer-left">
           <WorkspaceProjectPicker snapshot={WORKSPACE_PROJECT_PICKER_PREVIEW} />
           <GitBranchPicker snapshot={GIT_BRANCH_PICKER_PREVIEW} />
-          {snapshot.threadUsage ? <ComposerThreadUsageFooter usage={snapshot.threadUsage} /> : null}
+          {snapshot.threadUsage ? (
+            <ComposerThreadUsageFooter usage={snapshot.threadUsage} />
+          ) : null}
         </div>
         {snapshot.footerHint ? (
           <div className="ds-composer-footer-hint">

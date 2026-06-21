@@ -16,7 +16,7 @@ import {
   resolveComposerAttachmentErrorPreview,
 } from '../lib/composerAttachments'
 import { COMPOSER_GOAL_PREVIEW } from '../lib/composerGoal'
-import { COMPOSER_THREAD_USAGE_PREVIEW } from '../lib/composerThreadUsage'
+import { resolveComposerThreadUsagePreview } from '../lib/composerThreadUsage'
 import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 import {
   resolveComposerPlusMenuPreview,
@@ -778,13 +778,12 @@ function HomePage() {
     return new URLSearchParams(window.location.search).has('composerPlanModePreview')
   }, [])
 
-  // Visual preview for the ported session-usage footer chip (?composerThreadUsagePreview=1).
+  // Visual preview for the ported session-usage footer chip (?composerThreadUsagePreview=1|loading|unavailable|noSavings|singleTurn).
   const composerThreadUsagePreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
-    if (!new URLSearchParams(window.location.search).has('composerThreadUsagePreview')) {
-      return undefined
-    }
-    return COMPOSER_THREAD_USAGE_PREVIEW
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerThreadUsagePreview')) return undefined
+    return resolveComposerThreadUsagePreview(params.get('composerThreadUsagePreview'))
   }, [])
 
   // Visual preview for the ported ComposerPlusMenu (?composerPlusMenuPreview=1|plan|goal|worktree).
@@ -3901,7 +3900,8 @@ function HomePage() {
       showGoalPanel={composerGoalPanelPreview}
       goalBadge={composerGoalFloaterPreview || composerGoalPanelPreview}
       planBadge={composerPlanModePreview}
-      threadUsage={composerThreadUsagePreview}
+      threadUsage={composerThreadUsagePreview?.usage}
+      threadUsageLoading={composerThreadUsagePreview?.loading}
       defaultPlusMenuOpen={composerPlusMenuPreview?.open}
       plusMenuToggles={composerPlusMenuPreview?.toggles}
       footerHint={composerFooterHintPreview}
