@@ -110,6 +110,8 @@ interface ComposerProps {
   defaultPlusMenuOpen?: boolean
   /** Toggle states for Kun's composer plus menu rows. */
   plusMenuToggles?: ComposerPlusMenuToggles
+  /** Footer hint shown beside project/branch pickers (e.g. slash or worktree copy). */
+  footerHint?: string | null
 }
 
 /**
@@ -156,6 +158,7 @@ export function Composer({
   threadUsage,
   defaultPlusMenuOpen = false,
   plusMenuToggles,
+  footerHint,
 }: ComposerProps) {
   const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -685,12 +688,17 @@ export function Composer({
           </div>
         </div>
       </div>
-      {!compact && (footerLeft || threadUsage) ? (
+      {!compact && (footerLeft || threadUsage || footerHint) ? (
         <div className="ds-composer-footer floating-composer-footer">
           <div className="ds-composer-footer-left">
             {footerLeft}
             {threadUsage ? <ComposerThreadUsageFooter usage={threadUsage} /> : null}
           </div>
+          {footerHint ? (
+            <div className="ds-composer-footer-hint">
+              <span>{footerHint}</span>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

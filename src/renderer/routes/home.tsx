@@ -17,6 +17,10 @@ import {
   type ComposerPlusMenuPreviewMode,
 } from '../lib/composerPlusMenu'
 import {
+  resolveComposerFooterHintPreview,
+  type ComposerFooterHintPreviewMode,
+} from '../lib/composerFooterHint'
+import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
 import {
@@ -762,6 +766,16 @@ function HomePage() {
     return resolveComposerPlusMenuPreview(mode)
   }, [])
 
+  // Visual preview for the ported composer footer hint (?composerFooterHintPreview=1|worktree).
+  const composerFooterHintPreview = useMemo(() => {
+    if (typeof window === 'undefined') return undefined
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerFooterHintPreview')) return undefined
+    const value = params.get('composerFooterHintPreview')
+    const mode: ComposerFooterHintPreviewMode = value === 'worktree' ? 'worktree' : 'default'
+    return resolveComposerFooterHintPreview(mode)
+  }, [])
+
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
   const queuedMessagesPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
@@ -1240,7 +1254,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders).
+  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1261,6 +1275,7 @@ function HomePage() {
     if (value === 'modelPicker') return 'modelPicker'
     if (value === 'modelPickerSubmenu') return 'modelPickerSubmenu'
     if (value === 'modelPickerNoProviders') return 'modelPickerNoProviders'
+    if (value === 'worktreeHint') return 'worktreeHint'
     return 'default'
   }, [])
 
@@ -3817,6 +3832,7 @@ function HomePage() {
       threadUsage={composerThreadUsagePreview}
       defaultPlusMenuOpen={composerPlusMenuPreview?.open}
       plusMenuToggles={composerPlusMenuPreview?.toggles}
+      footerHint={composerFooterHintPreview}
       modelChip={
         <FloatingModelPicker
           providers={providerProfiles}

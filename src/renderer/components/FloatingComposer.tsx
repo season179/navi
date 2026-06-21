@@ -79,6 +79,10 @@ import {
   COMPOSER_THREAD_USAGE_PREVIEW,
   type ComposerThreadUsage,
 } from '../lib/composerThreadUsage'
+import {
+  COMPOSER_FOOTER_HINT_SLASH,
+  COMPOSER_FOOTER_HINT_WORKTREE,
+} from '../lib/composerFooterHint'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
@@ -106,6 +110,7 @@ export type FloatingComposerPreviewMode =
   | 'modelPicker'
   | 'modelPickerSubmenu'
   | 'modelPickerNoProviders'
+  | 'worktreeHint'
 
 export type ComposerSlashCommandItem = {
   id: string
@@ -165,6 +170,7 @@ export type FloatingComposerSnapshot = {
   modelPickerActiveProviderId: string | null
   modelPickerNoProviders: boolean
   threadUsage: ComposerThreadUsage | null
+  footerHint: string | null
 }
 
 const SLASH_COMMANDS_PREVIEW: SlashCommandPreview[] = [
@@ -633,6 +639,7 @@ export function resolveFloatingComposerSnapshot(
     modelPickerActiveProviderId: null,
     modelPickerNoProviders: false,
     threadUsage: COMPOSER_THREAD_USAGE_PREVIEW,
+    footerHint: COMPOSER_FOOTER_HINT_SLASH,
   }
 
   switch (mode) {
@@ -684,6 +691,8 @@ export function resolveFloatingComposerSnapshot(
         showModelPickerMenu: true,
         modelPickerGroups: [],
       }
+    case 'worktreeHint':
+      return { ...base, footerHint: COMPOSER_FOOTER_HINT_WORKTREE }
     default:
       return base
   }
@@ -880,6 +889,11 @@ export function FloatingComposer({
           <GitBranchPicker snapshot={GIT_BRANCH_PICKER_PREVIEW} />
           {snapshot.threadUsage ? <ComposerThreadUsageFooter usage={snapshot.threadUsage} /> : null}
         </div>
+        {snapshot.footerHint ? (
+          <div className="ds-composer-footer-hint">
+            <span>{snapshot.footerHint}</span>
+          </div>
+        ) : null}
       </div>
     </div>
   )

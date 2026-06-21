@@ -34389,11 +34389,15 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
 }
 
 .ds-composer-footer-hint {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-width: min(160px, 100%);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: right;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ds-text-faint);
 }
 
 @container (max-width: 640px) {
