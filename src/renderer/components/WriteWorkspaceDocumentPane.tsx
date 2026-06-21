@@ -15,6 +15,9 @@ import {
   WriteMarkdownPreview,
   WRITE_MARKDOWN_PREVIEW_SAMPLE,
 } from './WriteMarkdownPreview'
+import type { WriteWorkspaceDocumentPanePreviewMode } from '../lib/writeWorkspaceDocumentPanePreviewModes'
+
+export type { WriteWorkspaceDocumentPanePreviewMode } from '../lib/writeWorkspaceDocumentPanePreviewModes'
 
 const COPY = {
   filePreviewLoading: 'Reading file…',
@@ -39,20 +42,6 @@ export type WriteRenderSafety = {
 }
 
 export type WriteDocumentPreviewMode = 'source' | 'live' | 'split' | 'preview'
-
-export type WriteWorkspaceDocumentPanePreviewMode =
-  | 'start'
-  | 'loading'
-  | 'image'
-  | 'pdf'
-  | 'unsupported'
-  | 'source'
-  | 'live'
-  | 'rich'
-  | 'split'
-  | 'preview'
-  | 'largeFile'
-  | 'truncated'
 
 type Props = {
   activeFilePath: string | null
@@ -417,6 +406,27 @@ function previewSnapshot(mode: WriteWorkspaceDocumentPanePreviewMode): {
         notice: 'truncated',
       },
       fileGuardMessage: COPY.writeLargeFileTruncated,
+      fileGuardDetail: '',
+    }
+  }
+
+  if (mode === 'liveDisabled') {
+    return {
+      activeFilePath: samplePath,
+      activeFileIsImage: false,
+      activeFileIsPdf: false,
+      activeFileIsText: true,
+      fileLoading: false,
+      fileContent: WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE,
+      fileSize: 12_480,
+      previewMode: 'live',
+      renderSafety: {
+        livePreviewEnabled: false,
+        markdownPreviewEnabled: true,
+        readOnly: false,
+        notice: 'none',
+      },
+      fileGuardMessage: '',
       fileGuardDetail: '',
     }
   }

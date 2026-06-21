@@ -433,6 +433,7 @@ import {
   type WriteWorkspaceViewPreviewMode,
 } from '../components/WriteWorkspaceView'
 import { resolveWriteWorkspaceViewPreviewMode } from '../lib/writeWorkspacePreviewModes'
+import { resolveWriteWorkspaceDocumentPanePreviewMode } from '../lib/writeWorkspaceDocumentPanePreviewModes'
 import { resolveWriteWorkspaceToolbarPreviewMode } from '../lib/writeWorkspaceToolbarPreviewModes'
 import {
   WriteDebugLogModalPreview,
@@ -1487,26 +1488,11 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported WriteWorkspaceDocumentPane
-  // (?writeWorkspaceDocumentPane=start|loading|image|pdf|unsupported|source|live|rich|split|preview|largeFile|truncated).
+  // (?writeWorkspaceDocumentPane=start|loading|image|pdf|unsupported|source|live|rich|split|preview|largeFile|truncated|liveDisabled).
   const writeWorkspaceDocumentPanePreviewMode =
     useMemo((): WriteWorkspaceDocumentPanePreviewMode | null => {
       if (typeof window === 'undefined') return null
-      const params = new URLSearchParams(window.location.search)
-      if (!params.has('writeWorkspaceDocumentPane')) return null
-      const value = params.get('writeWorkspaceDocumentPane')
-      if (value === 'start') return 'start'
-      if (value === 'loading') return 'loading'
-      if (value === 'image') return 'image'
-      if (value === 'pdf') return 'pdf'
-      if (value === 'unsupported') return 'unsupported'
-      if (value === 'source') return 'source'
-      if (value === 'live') return 'live'
-      if (value === 'rich') return 'rich'
-      if (value === 'split') return 'split'
-      if (value === 'preview') return 'preview'
-      if (value === 'largeFile') return 'largeFile'
-      if (value === 'truncated') return 'truncated'
-      return 'split'
+      return resolveWriteWorkspaceDocumentPanePreviewMode(new URLSearchParams(window.location.search))
     }, [])
 
   // Visual preview for the ported WriteWorkspaceView
