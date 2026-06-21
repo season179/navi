@@ -831,3 +831,103 @@ export function SddDraftEditorViewPreview({ mode }: PreviewProps): ReactElement 
     </div>
   )
 }
+
+const PRODUCTION_SDD_RIGHT_PANEL_WIDTH = 360
+
+function resolveProductionSddAssistantPreviewOpen(): boolean {
+  if (typeof window === 'undefined') return false
+  const params = new URLSearchParams(window.location.search)
+  const value = params.get('productionSddDraft')
+  return value === 'assistant' || value === 'assistantTimeline' || value === 'assistantBusy'
+}
+
+function resolveProductionSddAssistantSnapshot(): SddAssistantPanelSnapshot {
+  if (typeof window === 'undefined') {
+    return { ...SDD_ASSISTANT_PANEL_PREVIEW_DEFAULT, draftPath: SDD_DRAFT_EDITOR_PREVIEW_PATH }
+  }
+  const value = new URLSearchParams(window.location.search).get('productionSddDraft')
+  const draftPath = SDD_DRAFT_EDITOR_PREVIEW_PATH
+  if (value === 'assistantTimeline') {
+    return { ...SDD_ASSISTANT_PANEL_PREVIEW_TIMELINE, draftPath }
+  }
+  if (value === 'assistantBusy') {
+    return { ...SDD_ASSISTANT_PANEL_PREVIEW_BUSY, draftPath }
+  }
+  return { ...SDD_ASSISTANT_PANEL_PREVIEW_DEFAULT, draftPath }
+}
+
+/** Production shell for SDD requirement draft — mock snapshots for visual parity. */
+export function SddDraftProductionView({
+  leftSidebarCollapsed,
+  onToggleLeftSidebar,
+  onClose,
+}: {
+  leftSidebarCollapsed: boolean
+  onToggleLeftSidebar: () => void
+  onClose: () => void
+}): ReactElement {
+  const [draft, setDraft] = useState<SddDraftSnapshot>(WORKBENCH_SDD_DRAFT_PREVIEW_SNAPSHOT)
+  const [assistantOpen, setAssistantOpen] = useState(() => resolveProductionSddAssistantPreviewOpen())
+  const [assistantInput, setAssistantInput] = useState('')
+  const assistantPanelSnapshot = useMemo(() => resolveProductionSddAssistantSnapshot(), [])
+
+  const handleContentChange = useCallback((value: string) => {
+    setDraft((current) => ({
+      ...current,
+      content: value,
+      saveStatus: current.saveStatus === 'saved' ? 'dirty' : current.saveStatus,
+    }))
+  }, [])
+
+  const handleDesignContextChange = useCallback((patch: Partial<SddDesignContext>) => {
+    setDraft((current) => ({
+      ...current,
+      designContext: { ...current.designContext, ...patch },
+      saveStatus: current.saveStatus === 'saved' ? 'dirty' : current.saveStatus,
+    }))
+  }, [])
+
+  return (
+    <div className="production-sdd-stage">
+      <div className="workbench-main-row production-workbench-main-row">
+        <div className="workbench-chat-column production-sdd-column">
+          <SddDraftEditorView
+            draft={draft}
+            leftSidebarCollapsed={leftSidebarCollapsed}
+            assistantOpen={assistantOpen}
+            onToggleLeftSidebar={onToggleLeftSidebar}
+            onToggleAssistant={() => setAssistantOpen((open) => !open)}
+            onDesignContextChange={handleDesignContextChange}
+            onContentChange={handleContentChange}
+            onSave={() => setDraft((current) => ({ ...current, saveStatus: 'saved' }))}
+            onClose={onClose}
+          />
+        </div>
+
+        {assistantOpen ? (
+          <>
+            <div
+              role="separator"
+              aria-orientation="vertical"
+              className="ds-workbench-divider ds-no-drag"
+            />
+            <div
+              className="workbench-right-panel production-sdd-assistant-panel"
+              style={{ width: PRODUCTION_SDD_RIGHT_PANEL_WIDTH }}
+            >
+              <SddAssistantPanel
+                className="h-full max-h-full w-full"
+                snapshot={{
+                  ...assistantPanelSnapshot,
+                  input: assistantInput || assistantPanelSnapshot.input,
+                }}
+                onCollapse={() => setAssistantOpen(false)}
+                onInputChange={setAssistantInput}
+              />
+            </div>
+          </>
+        ) : null}
+      </div>
+    </div>
+  )
+}

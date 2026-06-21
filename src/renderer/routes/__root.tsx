@@ -17,6 +17,7 @@ import { SidebarRouteProvider, useSidebarRoute } from '../sidebar-route'
 import { SettingsContext } from '../settings'
 import { FocusModeProvider, useFocusMode } from '../focus-mode'
 import { WorkspaceModeProvider, useWorkspaceMode } from '../workspace-mode'
+import { SddDraftModeProvider, useSddDraftMode } from '../sdd-draft-mode'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import {
   RuntimeStatusBanner,
@@ -55,9 +56,11 @@ function RootLayoutInner() {
   const { scheduleActive, clawActive } = useSidebarRoute()
 
   return (
-    <WorkspaceModeProvider scheduleActive={scheduleActive} clawActive={clawActive}>
-      <RootLayoutContent />
-    </WorkspaceModeProvider>
+    <SddDraftModeProvider>
+      <WorkspaceModeProvider scheduleActive={scheduleActive} clawActive={clawActive}>
+        <RootLayoutContent />
+      </WorkspaceModeProvider>
+    </SddDraftModeProvider>
   )
 }
 
@@ -107,6 +110,7 @@ function RootLayoutContent() {
     workspaceModeTabsPreviewActive,
     setWorkspaceModeTabsPreviewView,
   } = useWorkspaceMode()
+  const { sddDraftActive, openSddDraft } = useSddDraftMode()
   const showWriteSidebar =
     sidebarRoute === 'chat' && workspaceModeActiveView === 'write'
   const connectPhoneSidebarPreviewOpen = useMemo(() => {
@@ -147,14 +151,24 @@ function RootLayoutContent() {
     setClawImDialogMode(null)
   }, [])
 
+  const handleOpenNewRequirement = useCallback(() => {
+    closeSettings()
+    setConnectPhoneSidebarOpen(false)
+    openChatRoute()
+    setProductionWorkspaceMode('chat')
+    openSddDraft()
+  }, [closeSettings, openChatRoute, openSddDraft, setProductionWorkspaceMode])
+
   const mainStageClass =
     sidebarRoute === 'plugins'
       ? 'stage ds-stage-surface workbench-chat-stage production-main-stage production-main-stage--plugins'
       : sidebarRoute === 'claw'
         ? 'stage ds-stage-surface ds-chat-stage workbench-chat-stage production-main-stage production-main-stage--claw'
-        : workspaceModeActiveView === 'write'
-          ? 'stage ds-stage-surface production-main-stage production-main-stage--write'
-          : 'stage ds-stage-surface ds-chat-stage workbench-chat-stage production-main-stage'
+        : sddDraftActive && sidebarRoute === 'chat'
+          ? 'stage ds-stage-surface production-main-stage production-main-stage--sdd'
+          : workspaceModeActiveView === 'write'
+            ? 'stage ds-stage-surface production-main-stage production-main-stage--write'
+            : 'stage ds-stage-surface ds-chat-stage workbench-chat-stage production-main-stage'
 
   const platform = useMemo(() => resolveProductionPlatform(), [])
   const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
@@ -336,6 +350,7 @@ function RootLayoutContent() {
                       <SidebarCommandRow
                         icon={<FileQuestion className="h-4 w-4" strokeWidth={1.9} />}
                         label="New requirement"
+                        onClick={handleOpenNewRequirement}
                         disabled={!status.ready}
                         disabledHint="Connect a provider first"
                         variant="accent"

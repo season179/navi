@@ -180,6 +180,11 @@ textarea {
   padding-right: 0;
 }
 
+.production-main-stage--sdd {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .production-main-stage--claw {
   padding-left: 0;
   padding-right: 0;
@@ -210,6 +215,29 @@ textarea {
   flex: 1;
   flex-direction: column;
   overflow: hidden;
+}
+
+.production-sdd-stage {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.production-sdd-column {
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.production-sdd-assistant-panel {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
 }
 
 /* Sidebar haze overlay (sits above gradient, below content) */

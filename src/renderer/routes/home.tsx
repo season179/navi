@@ -391,6 +391,7 @@ import {
 } from '../components/SddAssistantPanel'
 import {
   SddDraftEditorViewPreview,
+  SddDraftProductionView,
   type SddDraftEditorViewPreviewMode,
 } from '../components/SddDraftEditorView'
 import {
@@ -515,6 +516,7 @@ import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
 import { useSidebarRoute } from '../sidebar-route'
 import { useWorkspaceMode } from '../workspace-mode'
+import { useSddDraftMode } from '../sdd-draft-mode'
 import { useSettings } from '../settings'
 import { useFocusMode } from '../focus-mode'
 
@@ -589,6 +591,7 @@ function HomePage() {
   const { collapsed, toggle } = useSidebar()
   const { route: sidebarRoute } = useSidebarRoute()
   const { workspaceMode } = useWorkspaceMode()
+  const { sddDraftActive, closeSddDraft } = useSddDraftMode()
   const { settingsOpen, openSettings, closeSettings } = useSettings()
   const { focusModeEnabled } = useFocusMode()
   const [draft, setDraft] = useState('')
@@ -3865,6 +3868,16 @@ function HomePage() {
           hasInboundConversation
         />
       </div>
+    )
+  }
+
+  if (sddDraftActive && sidebarRoute === 'chat' && workspaceMode === 'chat') {
+    return (
+      <SddDraftProductionView
+        leftSidebarCollapsed={collapsed}
+        onToggleLeftSidebar={toggle}
+        onClose={closeSddDraft}
+      />
     )
   }
 
