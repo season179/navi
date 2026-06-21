@@ -82,6 +82,14 @@ import {
   RUNTIME_META_CHIPS_PREVIEW_MINIMAL,
   RUNTIME_META_CHIPS_PREVIEW_TOOL,
 } from '../components/RuntimeMetaChips'
+import {
+  MediaPreviewTile,
+  MediaAttachmentGallery,
+  MEDIA_PREVIEW_TILE_PREVIEW_IMAGE,
+  MEDIA_PREVIEW_TILE_PREVIEW_VIDEO,
+  MEDIA_PREVIEW_TILE_PREVIEW_FILE,
+  MEDIA_ATTACHMENT_GALLERY_PREVIEW,
+} from '../components/MediaPreviewTile'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -320,6 +328,28 @@ function HomePage() {
     if (mode === 'tool') return 'tool'
     if (mode === 'minimal') return 'minimal'
     return 'full'
+  }, [])
+
+  // Visual preview for the ported MediaPreviewTile (?mediaPreviewTile=image|video|file).
+  const mediaPreviewTilePreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('mediaPreviewTile')) return null
+    const mode = params.get('mediaPreviewTile')
+    if (mode === 'video') return 'video'
+    if (mode === 'file') return 'file'
+    return 'image'
+  }, [])
+
+  // Visual preview for the ported MediaAttachmentGallery (?mediaAttachmentGallery=user|tool|conversation).
+  const mediaAttachmentGalleryPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('mediaAttachmentGallery')) return null
+    const mode = params.get('mediaAttachmentGallery')
+    if (mode === 'tool') return 'tool'
+    if (mode === 'conversation') return 'conversation'
+    return 'user'
   }, [])
 
   const composerFooterPreview =
@@ -673,6 +703,68 @@ function HomePage() {
               hideAttachments
             />
           </div>
+        </div>
+      ) : null}
+
+      {mediaPreviewTilePreviewMode ? (
+        <div className="media-preview-tile-preview">
+          <div className="media-preview-tile-preview-bubble">
+            <MediaPreviewTile
+              media={
+                mediaPreviewTilePreviewMode === 'video'
+                  ? MEDIA_PREVIEW_TILE_PREVIEW_VIDEO
+                  : mediaPreviewTilePreviewMode === 'file'
+                    ? MEDIA_PREVIEW_TILE_PREVIEW_FILE
+                    : MEDIA_PREVIEW_TILE_PREVIEW_IMAGE
+              }
+              previewUrl={
+                mediaPreviewTilePreviewMode === 'file'
+                  ? undefined
+                  : mediaPreviewTilePreviewMode === 'video'
+                    ? MEDIA_PREVIEW_TILE_PREVIEW_VIDEO.previewUrl
+                    : MEDIA_PREVIEW_TILE_PREVIEW_IMAGE.previewUrl
+              }
+              variant={mediaPreviewTilePreviewMode === 'file' ? 'conversation' : 'tool'}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {mediaAttachmentGalleryPreviewMode === 'tool' ? (
+        <div className="media-attachment-gallery-preview">
+          <div className="media-attachment-gallery-preview-tool-card">
+            <div className="media-attachment-gallery-preview-tool-header">
+              Generated a screenshot and diagram for the auth flow.
+            </div>
+            <MediaAttachmentGallery
+              media={MEDIA_ATTACHMENT_GALLERY_PREVIEW}
+              variant="tool"
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {mediaAttachmentGalleryPreviewMode &&
+      mediaAttachmentGalleryPreviewMode !== 'tool' ? (
+        <div className="media-attachment-gallery-preview">
+          {mediaAttachmentGalleryPreviewMode === 'conversation' ? (
+            <>
+              <div className="media-attachment-gallery-preview-label">
+                Generated files
+              </div>
+              <MediaAttachmentGallery
+                media={MEDIA_ATTACHMENT_GALLERY_PREVIEW}
+                variant="conversation"
+              />
+            </>
+          ) : (
+            <div className="media-preview-tile-preview-bubble">
+              <MediaAttachmentGallery
+                media={MEDIA_ATTACHMENT_GALLERY_PREVIEW.slice(0, 1)}
+                variant="user"
+              />
+            </div>
+          )}
         </div>
       ) : null}
     </>

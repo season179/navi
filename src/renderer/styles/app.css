@@ -2487,6 +2487,347 @@ a.runtime-meta-chip:hover {
 }
 
 /* =====================================================
+   Media preview tile (Kun MediaPreviewTile)
+   ===================================================== */
+.media-preview-tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--ds-border-muted);
+  background: var(--ds-card);
+  box-shadow: var(--ds-shadow-card);
+}
+
+.media-preview-tile.is-user {
+  display: block;
+  width: 9rem;
+  height: 7rem;
+}
+
+.media-preview-tile.is-tool {
+  display: block;
+  width: 10rem;
+  height: 8rem;
+}
+
+.media-preview-tile.is-conversation.is-rich {
+  width: 100%;
+  height: 18rem;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .media-preview-tile.is-conversation.is-rich {
+    height: 20rem;
+  }
+}
+
+.media-preview-tile.is-conversation.is-file,
+.media-preview-tile.is-conversation.is-file-card {
+  width: 100%;
+  min-height: 11rem;
+}
+
+.media-preview-tile-zoom-trigger {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: zoom-in;
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.media-preview-tile-media {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.media-preview-tile-save-icon-btn {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-card) 92%, transparent);
+  color: var(--ds-text-muted);
+  box-shadow: var(--ds-shadow-card);
+  backdrop-filter: blur(8px);
+  transition: background 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+}
+
+.media-preview-tile-save-icon-btn:hover:not(:disabled) {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.media-preview-tile-save-icon-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.media-preview-tile-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.media-preview-tile-icon.is-spinning {
+  animation: media-preview-tile-spin 1s linear infinite;
+}
+
+@keyframes media-preview-tile-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.media-preview-tile.is-file-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.media-preview-tile-file-row {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.media-preview-tile-file-icon {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--ds-border-muted);
+  background: var(--ds-surface-subtle);
+  color: var(--ds-text-muted);
+}
+
+.media-preview-tile-file-icon-svg {
+  width: 16px;
+  height: 16px;
+}
+
+.media-preview-tile-file-copy {
+  min-width: 0;
+}
+
+.media-preview-tile-file-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-break: break-word;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ds-text);
+}
+
+.media-preview-tile-file-meta {
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--ds-text-faint);
+}
+
+.media-preview-tile-file-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.media-preview-tile-save-btn {
+  display: inline-flex;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-card) 90%, transparent);
+  padding: 0 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  box-shadow: var(--ds-shadow-card);
+  transition: background 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+}
+
+.media-preview-tile-save-btn:hover:not(:disabled) {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.media-preview-tile-save-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.media-preview-tile-save-btn-icon {
+  margin-right: 6px;
+  display: inline-flex;
+}
+
+.media-attachment-gallery.is-user {
+  display: flex;
+  max-width: 80%;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.media-attachment-gallery.is-tool {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--ds-border-muted) 60%, transparent);
+  padding: 12px 16px;
+}
+
+.media-attachment-gallery.is-conversation {
+  display: grid;
+  width: 100%;
+  max-width: 42rem;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.media-attachment-gallery.is-conversation:has(.media-preview-tile:nth-child(2)) {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .media-attachment-gallery.is-conversation:has(.media-preview-tile:nth-child(2)) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.media-preview-tile-preview,
+.media-attachment-gallery-preview {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--composer-height, 120px) + 24px);
+  z-index: 40;
+  transform: translateX(-50%);
+  width: min(calc(100vw - 48px), 760px);
+}
+
+.media-preview-tile-preview-bubble {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px;
+}
+
+.media-attachment-gallery-preview-label {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-text-faint);
+}
+
+.media-attachment-gallery-preview-tool-card {
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--ds-border-muted);
+  background: var(--ds-card);
+  box-shadow: var(--ds-shadow-card);
+}
+
+.media-attachment-gallery-preview-tool-header {
+  padding: 12px 16px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ds-text);
+}
+
+.ds-media-printer-reveal {
+  animation: ds-media-printer-reveal 1.15s cubic-bezier(0.2, 0.72, 0.16, 1) both;
+  clip-path: inset(0 0 100% 0 round 8px);
+  opacity: 0;
+  position: relative;
+}
+
+.ds-media-printer-reveal::after {
+  animation: ds-media-printer-scan 1.15s cubic-bezier(0.2, 0.72, 0.16, 1) both;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--ds-accent) 36%, white), transparent),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.56), transparent);
+  content: '';
+  height: 3px;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 2;
+}
+
+@keyframes ds-media-printer-reveal {
+  0% {
+    clip-path: inset(0 0 100% 0 round 8px);
+    filter: saturate(0.82) contrast(0.96);
+    opacity: 0.72;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0 0 0 round 8px);
+    filter: none;
+    opacity: 1;
+  }
+}
+
+@keyframes ds-media-printer-scan {
+  0% {
+    opacity: 0;
+    top: 0;
+  }
+  12% {
+    opacity: 0.76;
+  }
+  82% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    top: calc(100% - 3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-media-printer-reveal {
+    animation: none;
+    clip-path: none;
+    filter: none;
+    opacity: 1;
+  }
+
+  .ds-media-printer-reveal::after {
+    animation: none;
+    display: none;
+  }
+}
+
+/* =====================================================
    Diff view (Kun DiffView)
    ===================================================== */
 .diff-view {
