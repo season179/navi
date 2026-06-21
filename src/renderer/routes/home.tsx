@@ -1178,7 +1178,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported MessageTimeline orchestrator
-  // (?messageTimelinePreview=empty|emptyWaking|emptyNoWorkspace|emptyClaw|single|processing|multi|paginated|forked|rich|withGoal|derivedIntermediate|emptyLiveStream|emptyLiveReasoning|emptyLiveContent).
+  // (?messageTimelinePreview=empty|emptyWaking|emptyNoWorkspace|emptyClaw|single|processing|multi|paginated|forked|rich|withGoal|derivedIntermediate|emptyLiveStream|emptyLiveReasoning|emptyLiveContent|latestTurnLiveStream|latestTurnLiveReasoning|latestTurnLiveContent).
   const messageTimelinePreviewMode = useMemo((): MessageTimelinePreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1198,6 +1198,9 @@ function HomePage() {
     if (value === 'emptyLiveStream') return 'emptyLiveStream'
     if (value === 'emptyLiveReasoning') return 'emptyLiveReasoning'
     if (value === 'emptyLiveContent') return 'emptyLiveContent'
+    if (value === 'latestTurnLiveStream') return 'latestTurnLiveStream'
+    if (value === 'latestTurnLiveReasoning') return 'latestTurnLiveReasoning'
+    if (value === 'latestTurnLiveContent') return 'latestTurnLiveContent'
     return 'empty'
   }, [])
 

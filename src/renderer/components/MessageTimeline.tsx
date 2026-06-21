@@ -48,6 +48,7 @@ import {
 import { WORK_META_ROW_PREVIEW } from './WorkMetaRow'
 import type { MediaReference } from './MediaPreviewTile'
 import { buildDerivedIntermediateTurnPreview } from '../lib/buildMessageTurnSnapshot'
+import { applyTimelineLiveStreamToTurn } from '../lib/applyTimelineLiveStream'
 
 const TURN_PAGE_SIZE = 18
 const AUTO_COLLAPSE_THRESHOLD = 24
@@ -85,6 +86,8 @@ function turnPreviewLabel(turn: MessageTurnSnapshot, index: number): string {
   const oneLine = text.replace(/\s+/g, ' ')
   return oneLine.length > 48 ? `${oneLine.slice(0, 47).trimEnd()}…` : oneLine
 }
+
+export { applyTimelineLiveStreamToTurn } from '../lib/applyTimelineLiveStream'
 
 export function MessageTimeline({
   route = 'chat',
@@ -157,9 +160,16 @@ export function MessageTimeline({
         />
 
         {turns.map((turn, index) => {
+          const isLatestTurn = index === turns.length - 1
           const showForkPoint =
             typeof forkBoundaryTurnIndex === 'number' &&
             forkBoundaryTurnIndex === index + hiddenTurnCount
+          const resolvedTurn = applyTimelineLiveStreamToTurn(turn, {
+            isLatestTurn,
+            liveReasoning,
+            liveContent,
+            busy,
+          })
 
           return (
             <div
@@ -175,7 +185,7 @@ export function MessageTimeline({
             >
               {showForkPoint ? <ThreadForkPoint parentTitle={forkTitle} /> : null}
               <MessageTurn
-                turn={turn}
+                turn={resolvedTurn}
                 viewportRef={containerRef}
                 hasActiveGoal={hasActiveGoal}
               />
@@ -212,6 +222,16 @@ export function MessageTimeline({
       </div>
     </div>
   )
+}
+
+const PREVIEW_TURN_LIVE_LATEST: MessageTurnSnapshot = {
+  key: 'turn-live-latest',
+  user: {
+    kind: 'user',
+    id: 'preview-user-live-latest',
+    text: 'Fix the auth middleware token validation bug.',
+    modelLabel: 'Claude Sonnet 4',
+  },
 }
 
 const PREVIEW_TURN_SIMPLE: MessageTurnSnapshot = {
@@ -339,6 +359,9 @@ export type MessageTimelinePreviewMode =
   | 'emptyLiveStream'
   | 'emptyLiveReasoning'
   | 'emptyLiveContent'
+  | 'latestTurnLiveStream'
+  | 'latestTurnLiveReasoning'
+  | 'latestTurnLiveContent'
 
 export function resolveMessageTimelinePreviewSnapshot(
   mode: MessageTimelinePreviewMode,
@@ -423,6 +446,31 @@ function resolvePreviewSnapshot(mode: MessageTimelinePreviewMode): MessageTimeli
         busy: true,
         turns: [],
         liveContent: 'Updating the middleware now — normalizing the Authorization header…',
+      }
+    case 'latestTurnLiveStream':
+      return {
+        hasContent: true,
+        activeThreadId: 'preview-thread',
+        busy: true,
+        turns: [PREVIEW_TURN_LIVE_LATEST],
+        liveReasoning: 'Tracing token validation through the middleware stack…',
+        liveContent: 'The Bearer prefix check is failing before verifyToken runs.',
+      }
+    case 'latestTurnLiveReasoning':
+      return {
+        hasContent: true,
+        activeThreadId: 'preview-thread',
+        busy: true,
+        turns: [PREVIEW_TURN_LIVE_LATEST],
+        liveReasoning: 'Reading auth.ts and following the verifyToken call chain…',
+      }
+    case 'latestTurnLiveContent':
+      return {
+        hasContent: true,
+        activeThreadId: 'preview-thread',
+        busy: true,
+        turns: [PREVIEW_TURN_LIVE_LATEST],
+        liveContent: 'Normalizing the Authorization header before the JWT check…',
       }
   }
 }
