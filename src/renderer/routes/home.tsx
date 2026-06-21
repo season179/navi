@@ -2978,6 +2978,22 @@ function HomePage() {
     }
   }, [])
 
+  // Production ChatThread deriveTurnSections turn via ?productionDerivedTurn=1
+  const productionChatDerivedTurn = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return { derivedTurnAtIndex: undefined as number | undefined }
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionDerivedTurn')) {
+      return { derivedTurnAtIndex: undefined as number | undefined }
+    }
+    const turnParam = params.get('productionDerivedTurnTurnIndex')
+    const parsedTurnIndex = turnParam ? Number.parseInt(turnParam, 10) : 0
+    return {
+      derivedTurnAtIndex: Number.isFinite(parsedTurnIndex) ? parsedTurnIndex : 0,
+    }
+  }, [])
+
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
   // toggles (a create/enable/disable in the Skills tab may have changed the set).
@@ -3629,6 +3645,7 @@ function HomePage() {
         turnChangesDefaultExpanded={productionChatTurnChanges.turnChangesDefaultExpanded}
         workProcessAtTurnIndex={productionChatWorkProcess.workProcessAtTurnIndex}
         workProcess={productionChatWorkProcess.workProcess}
+        derivedTurnAtIndex={productionChatDerivedTurn.derivedTurnAtIndex}
       />
     </>
   )
