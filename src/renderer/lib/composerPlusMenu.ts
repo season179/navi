@@ -1,3 +1,6 @@
+/** English copy matching Kun's composerMenuTitle locale string. */
+export const COMPOSER_PLUS_MENU_TITLE = 'More actions'
+
 /** English copy matching Kun's composerAddImage locale string. */
 export const COMPOSER_PLUS_MENU_ADD_IMAGE_LABEL = 'Attach image'
 
@@ -23,6 +26,8 @@ export type ComposerPlusMenuPreviewMode =
   | 'goal'
   | 'worktree'
   | 'uploading'
+  | 'noAttach'
+  | 'noWorktree'
 
 /** Default toggle states matching Kun's FloatingComposer plusMenu snapshot. */
 export const COMPOSER_PLUS_MENU_PREVIEW_DEFAULT: ComposerPlusMenuToggles = {
@@ -35,6 +40,10 @@ export type ComposerPlusMenuPreviewState = {
   open: true
   toggles: ComposerPlusMenuToggles
   attachmentUploadBusy?: boolean
+  /** When false, hides the Attach image row like Kun when attachmentUploadEnabled is false. */
+  showAddImage?: boolean
+  /** When false, hides the Worktree mode row like Kun when canToggleWorktreeMode is false. */
+  showWorktreeMode?: boolean
 }
 
 export function resolveComposerPlusMenuPreview(
@@ -50,6 +59,10 @@ export function resolveComposerPlusMenuPreview(
       return { open: true, toggles: { ...base, worktreeMode: true, goalActive: false } }
     case 'uploading':
       return { open: true, toggles: base, attachmentUploadBusy: true }
+    case 'noAttach':
+      return { open: true, toggles: base, showAddImage: false }
+    case 'noWorktree':
+      return { open: true, toggles: base, showWorktreeMode: false }
     default:
       return { open: true, toggles: base }
   }

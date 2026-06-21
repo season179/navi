@@ -86,7 +86,7 @@ import {
   COMPOSER_QUEUE_PLACEHOLDER,
   COMPOSER_STOP_LABEL,
 } from '../lib/composerBusyState'
-import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
+import { COMPOSER_PLAN_MODE_BADGE_LABEL, COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 import {
   COMPOSER_SESSION_USAGE_LOADING,
   COMPOSER_SESSION_USAGE_UNAVAILABLE,
@@ -125,6 +125,7 @@ import {
   COMPOSER_PLUS_MENU_PURSUE_GOAL_LABEL,
   COMPOSER_PLUS_MENU_WORKTREE_MODE_LABEL,
   COMPOSER_PLUS_MENU_PREVIEW_DEFAULT,
+  COMPOSER_PLUS_MENU_TITLE,
 } from '../lib/composerPlusMenu'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
@@ -141,6 +142,8 @@ export type FloatingComposerPreviewMode =
   | 'queued'
   | 'plusMenu'
   | 'plusMenuUploading'
+  | 'plusMenuNoAttach'
+  | 'plusMenuNoWorktree'
   | 'slashCommands'
   | 'fileMention'
   | 'fileMentionLoading'
@@ -226,6 +229,8 @@ export type FloatingComposerSnapshot = {
   voiceTranscribing: boolean
   attachmentUploadError: string | null
   attachmentUploadBusy: boolean
+  plusMenuShowAddImage: boolean
+  plusMenuShowWorktreeMode: boolean
 }
 
 const SLASH_COMMAND_PREVIEW_ICONS: Record<ComposerSlashCommandPreviewIcon, ReactNode> = {
@@ -330,12 +335,14 @@ export function ComposerPlusMenu({
   goalActive = true,
   worktreeMode = false,
   showAddImage = true,
+  showWorktreeMode = true,
   attachmentUploadBusy = false,
 }: {
   planMode?: boolean
   goalActive?: boolean
   worktreeMode?: boolean
   showAddImage?: boolean
+  showWorktreeMode?: boolean
   attachmentUploadBusy?: boolean
 } = {}): ReactElement {
   return (
@@ -373,16 +380,18 @@ export function ComposerPlusMenu({
           data-checked={goalActive ? 'true' : 'false'}
         />
       </button>
-      <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
-        <GitBranch strokeWidth={1.9} />
-        <span>{COMPOSER_PLUS_MENU_WORKTREE_MODE_LABEL}</span>
-        <span
-          className="floating-composer-toggle-switch"
-          role="switch"
-          aria-checked={worktreeMode}
-          data-checked={worktreeMode ? 'true' : 'false'}
-        />
-      </button>
+      {showWorktreeMode ? (
+        <button type="button" className="floating-composer-plus-menu-item" role="menuitem">
+          <GitBranch strokeWidth={1.9} />
+          <span>{COMPOSER_PLUS_MENU_WORKTREE_MODE_LABEL}</span>
+          <span
+            className="floating-composer-toggle-switch"
+            role="switch"
+            aria-checked={worktreeMode}
+            data-checked={worktreeMode ? 'true' : 'false'}
+          />
+        </button>
+      ) : null}
     </div>
   )
 }
@@ -765,6 +774,8 @@ export function resolveFloatingComposerSnapshot(
     voiceTranscribing: false,
     attachmentUploadError: null,
     attachmentUploadBusy: false,
+    plusMenuShowAddImage: true,
+    plusMenuShowWorktreeMode: true,
   }
 
   switch (mode) {
@@ -774,6 +785,10 @@ export function resolveFloatingComposerSnapshot(
       return { ...base, showPlusMenu: true }
     case 'plusMenuUploading':
       return { ...base, showPlusMenu: true, attachmentUploadBusy: true }
+    case 'plusMenuNoAttach':
+      return { ...base, showPlusMenu: true, plusMenuShowAddImage: false }
+    case 'plusMenuNoWorktree':
+      return { ...base, showPlusMenu: true, plusMenuShowWorktreeMode: false }
     case 'slashCommands':
       return { ...base, input: '/res', showSlashMenu: true }
     case 'fileMention':
@@ -888,6 +903,8 @@ export function FloatingComposer({
             planMode={COMPOSER_PLUS_MENU_PREVIEW_DEFAULT.planMode}
             goalActive={COMPOSER_PLUS_MENU_PREVIEW_DEFAULT.goalActive}
             worktreeMode={COMPOSER_PLUS_MENU_PREVIEW_DEFAULT.worktreeMode}
+            showAddImage={snapshot.plusMenuShowAddImage}
+            showWorktreeMode={snapshot.plusMenuShowWorktreeMode}
             attachmentUploadBusy={snapshot.attachmentUploadBusy}
           />
         ) : null}
@@ -955,7 +972,8 @@ export function FloatingComposer({
                 <button
                   type="button"
                   className={`floating-composer-plus-btn${menuOpen ? ' is-open' : ''}`}
-                  aria-label="Composer menu"
+                  aria-label={COMPOSER_PLUS_MENU_TITLE}
+                  title={COMPOSER_PLUS_MENU_TITLE}
                   aria-expanded={menuOpen}
                   onClick={() => setMenuOpen((open) => !open)}
                 >
@@ -964,7 +982,7 @@ export function FloatingComposer({
                 {snapshot.planBadge ? (
                   <span className="floating-composer-mode-badge">
                     <ListTodo strokeWidth={1.9} />
-                    <span>Plan mode</span>
+                    <span>{COMPOSER_PLAN_MODE_BADGE_LABEL}</span>
                   </span>
                 ) : null}
                 {snapshot.goalBadge ? (

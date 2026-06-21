@@ -23,6 +23,8 @@ import type { ComposerImageAttachment } from '../lib/composerAttachments'
 import type { ComposerGoal } from '../lib/composerGoal'
 import type { ComposerThreadUsage } from '../lib/composerThreadUsage'
 import type { ComposerPlusMenuToggles } from '../lib/composerPlusMenu'
+import { COMPOSER_PLUS_MENU_TITLE } from '../lib/composerPlusMenu'
+import { COMPOSER_PLAN_MODE_BADGE_LABEL } from '../lib/composerPlanMode'
 import {
   COMPOSER_QUEUE_MESSAGE_LABEL,
   COMPOSER_STOP_LABEL,
@@ -132,6 +134,10 @@ interface ComposerProps {
   plusMenuToggles?: ComposerPlusMenuToggles
   /** When true, shows Loader2 on the plus menu Attach image row. */
   plusMenuAttachmentUploadBusy?: boolean
+  /** When false, hides the Attach image row like Kun when attachmentUploadEnabled is false. */
+  plusMenuShowAddImage?: boolean
+  /** When false, hides the Worktree mode row like Kun when canToggleWorktreeMode is false. */
+  plusMenuShowWorktreeMode?: boolean
   /** Footer hint shown beside project/branch pickers (e.g. slash or worktree copy). */
   footerHint?: string | null
   /** When set, shows Kun's slash-command overlay with these rows instead of skill filtering. */
@@ -189,6 +195,8 @@ export function Composer({
   defaultPlusMenuOpen = false,
   plusMenuToggles,
   plusMenuAttachmentUploadBusy = false,
+  plusMenuShowAddImage = true,
+  plusMenuShowWorktreeMode = true,
   footerHint,
   slashCommandsOverride,
 }: ComposerProps) {
@@ -531,6 +539,8 @@ export function Composer({
               planMode={plusMenuToggles?.planMode}
               goalActive={plusMenuToggles?.goalActive}
               worktreeMode={plusMenuToggles?.worktreeMode}
+              showAddImage={plusMenuShowAddImage}
+              showWorktreeMode={plusMenuShowWorktreeMode}
               attachmentUploadBusy={plusMenuAttachmentUploadBusy}
             />
           </div>
@@ -624,7 +634,8 @@ export function Composer({
                 <button
                   type="button"
                   className={`floating-composer-plus-btn${plusMenuOpen ? ' is-open' : ''}`}
-                  aria-label="Composer menu"
+                  aria-label={COMPOSER_PLUS_MENU_TITLE}
+                  title={COMPOSER_PLUS_MENU_TITLE}
                   aria-expanded={plusMenuOpen}
                   disabled={disabled}
                   onClick={() => setPlusMenuOpen((open) => !open)}
@@ -634,7 +645,7 @@ export function Composer({
                 {planBadge ? (
                   <span className="floating-composer-mode-badge">
                     <ListTodo strokeWidth={1.9} />
-                    <span>Plan mode</span>
+                    <span>{COMPOSER_PLAN_MODE_BADGE_LABEL}</span>
                   </span>
                 ) : null}
                 {goalBadge ? (
