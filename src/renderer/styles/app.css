@@ -17546,9 +17546,12 @@ button.usage-heatmap-cell:focus {
 }
 
 .plan-panel-editor-shell {
+  display: flex;
   height: 100%;
   min-height: 0;
   min-width: 0;
+  flex: 1;
+  flex-direction: column;
   background: #fff;
 }
 
@@ -17556,42 +17559,12 @@ button.usage-heatmap-cell:focus {
   background: var(--ds-bg-canvas);
 }
 
-.plan-panel-editor-preview {
+.plan-panel-editor-shell .write-rich-host {
   height: 100%;
-  overflow: auto;
-  padding: 20px 24px 32px;
-  font-size: 14px;
-  line-height: 1.65;
-  color: var(--ds-text-ink);
 }
 
-.plan-panel-editor-preview h1 {
-  margin: 0 0 16px;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.plan-panel-editor-preview h2 {
-  margin: 24px 0 8px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.plan-panel-editor-preview p {
-  margin: 0 0 12px;
-  color: var(--ds-text-muted);
-}
-
-.plan-panel-editor-preview ul,
-.plan-panel-editor-preview ol {
-  margin: 0 0 12px;
-  padding-left: 1.25rem;
-  color: var(--ds-text-muted);
-}
-
-.plan-panel-editor-preview li + li {
-  margin-top: 4px;
+.plan-panel-editor-shell .write-rich-fallback-shell {
+  height: 100%;
 }
 
 .plan-panel-footer {

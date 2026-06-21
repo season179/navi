@@ -25,6 +25,8 @@ type Props = {
   /** Static preview: show the amber fidelity fallback with a source editor beneath. */
   showFallback?: boolean
   fallback?: ReactNode
+  /** Override the default TipTap-shaped sample document body. */
+  sampleContent?: ReactNode
   onChange?: (value: string) => void
 }
 
@@ -143,6 +145,7 @@ export function WriteRichEditor({
   readOnly = false,
   showFallback = false,
   fallback,
+  sampleContent,
 }: Props): ReactElement {
   const fallbackSurface =
     fallback ?? (
@@ -174,7 +177,7 @@ export function WriteRichEditor({
         spellCheck={!readOnly}
         data-write-editor-mode="rich"
       >
-        <WriteRichEditorSampleContent />
+        {sampleContent ?? <WriteRichEditorSampleContent />}
       </div>
     </div>
   )

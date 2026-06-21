@@ -14,6 +14,8 @@ import {
   ShieldCheck,
   TriangleAlert,
 } from 'lucide-react'
+import { WriteMarkdownEditor } from './WriteMarkdownEditor'
+import { WriteRichEditor } from './WriteRichEditor'
 
 export type PlanSaveStatus = 'saved' | 'dirty' | 'saving' | 'error'
 
@@ -40,6 +42,7 @@ export type PlanPanelPreviewMode =
   | 'coverage'
   | 'drift'
   | 'error'
+  | 'richFallback'
 
 type Props = {
   workspaceRoot?: string
@@ -48,6 +51,9 @@ type Props = {
   operationStatus?: PlanOperationStatus
   error?: string | null
   coverage?: PlanCoverageTrace | null
+  readOnly?: boolean
+  /** Static preview: show WriteRichEditor amber fallback with source editor beneath. */
+  showRichFallback?: boolean
   className?: string
   onCollapse?: () => void
   onOpenPlanFile?: () => void
@@ -134,9 +140,32 @@ function isStatusBusy(saveStatus: PlanSaveStatus, operationStatus: PlanOperation
   )
 }
 
-function PlanEditorPreview(): ReactElement {
+/** Sample markdown backing the plan panel rich editor fallback surface. */
+export const PLAN_PANEL_RICH_SAMPLE = `# Refactor auth middleware
+
+## Goal
+
+Consolidate token validation and refresh handling into a single middleware module with clearer error surfaces for the chat composer.
+
+## Requirements
+
+- R-1: Preserve existing bearer-token header parsing
+- R-2: Add refresh-token rotation for long sessions
+- R-3: Surface auth failures as structured tool errors
+- R-4: Audit middleware call sites in the runtime bridge
+- R-5: Add regression tests for expired and malformed tokens
+
+## Steps
+
+1. Inventory current auth middleware and session store touch points
+2. Extract shared token parsing helpers
+3. Wire refresh flow through the session store
+4. Update runtime error mapping and add tests
+`
+
+function PlanRichEditorSampleContent(): ReactElement {
   return (
-    <div className="plan-panel-editor-preview">
+    <>
       <h1>Refactor auth middleware</h1>
       <h2>Goal</h2>
       <p>
@@ -145,20 +174,38 @@ function PlanEditorPreview(): ReactElement {
       </p>
       <h2>Requirements</h2>
       <ul>
-        <li>R-1: Preserve existing bearer-token header parsing</li>
-        <li>R-2: Add refresh-token rotation for long sessions</li>
-        <li>R-3: Surface auth failures as structured tool errors</li>
-        <li>R-4: Audit middleware call sites in the runtime bridge</li>
-        <li>R-5: Add regression tests for expired and malformed tokens</li>
+        <li>
+          <p>R-1: Preserve existing bearer-token header parsing</p>
+        </li>
+        <li>
+          <p>R-2: Add refresh-token rotation for long sessions</p>
+        </li>
+        <li>
+          <p>R-3: Surface auth failures as structured tool errors</p>
+        </li>
+        <li>
+          <p>R-4: Audit middleware call sites in the runtime bridge</p>
+        </li>
+        <li>
+          <p>R-5: Add regression tests for expired and malformed tokens</p>
+        </li>
       </ul>
       <h2>Steps</h2>
       <ol>
-        <li>Inventory current auth middleware and session store touch points</li>
-        <li>Extract shared token parsing helpers</li>
-        <li>Wire refresh flow through the session store</li>
-        <li>Update runtime error mapping and add tests</li>
+        <li>
+          <p>Inventory current auth middleware and session store touch points</p>
+        </li>
+        <li>
+          <p>Extract shared token parsing helpers</p>
+        </li>
+        <li>
+          <p>Wire refresh flow through the session store</p>
+        </li>
+        <li>
+          <p>Update runtime error mapping and add tests</p>
+        </li>
       </ol>
-    </div>
+    </>
   )
 }
 
@@ -169,6 +216,8 @@ export function PlanPanel({
   operationStatus = 'idle',
   error = null,
   coverage = null,
+  readOnly = false,
+  showRichFallback = false,
   className = '',
   onCollapse,
   onOpenPlanFile,
@@ -276,7 +325,18 @@ export function PlanPanel({
           </div>
         ) : (
           <div className="plan-panel-editor-shell">
-            <PlanEditorPreview />
+            <WriteRichEditor
+              readOnly={readOnly}
+              showFallback={showRichFallback}
+              sampleContent={<PlanRichEditorSampleContent />}
+              fallback={
+                <WriteMarkdownEditor
+                  value={PLAN_PANEL_RICH_SAMPLE}
+                  appearance="live"
+                  readOnly={readOnly}
+                />
+              }
+            />
           </div>
         )}
       </div>

@@ -2037,7 +2037,7 @@ function HomePage() {
     }
   }, [devBrowserPanelPreviewMode])
 
-  // Visual preview for the ported PlanPanel (?planPanelPreview=1|empty|noworkspace|dirty|saving|coverage|drift|error).
+  // Visual preview for the ported PlanPanel (?planPanelPreview=1|empty|noworkspace|dirty|saving|coverage|drift|error|richFallback).
   const planPanelPreviewMode = useMemo((): PlanPanelPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -2050,7 +2050,8 @@ function HomePage() {
       mode === 'saving' ||
       mode === 'coverage' ||
       mode === 'drift' ||
-      mode === 'error'
+      mode === 'error' ||
+      mode === 'richFallback'
     ) {
       return mode
     }
@@ -4285,6 +4286,7 @@ function HomePage() {
             operationStatus={planPanelPreviewProps.operationStatus}
             error={planPanelPreviewProps.error}
             coverage={planPanelPreviewProps.coverage}
+            showRichFallback={planPanelPreviewMode === 'richFallback'}
             onCollapse={() => undefined}
             onOpenPlanFile={() => undefined}
             onBuildPlan={() => undefined}
