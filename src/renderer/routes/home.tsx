@@ -341,6 +341,10 @@ import {
   type AppPreviewMode,
 } from '../components/App'
 import {
+  FloatingComposerPreview,
+  type FloatingComposerPreviewMode,
+} from '../components/FloatingComposer'
+import {
   WriteWorkspaceEmptyState,
   WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
   type WriteWorkspaceEmptyStatePreviewMode,
@@ -961,6 +965,28 @@ function HomePage() {
     if (value === 'windows') return 'windows'
     if (value === 'settings') return 'settings'
     if (value === 'loading') return 'loading'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported FloatingComposer
+  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode).
+  const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('floatingComposerPreview')) return null
+    const value = params.get('floatingComposerPreview')
+    if (value === 'queued') return 'queued'
+    if (value === 'plusMenu') return 'plusMenu'
+    if (value === 'slashCommands') return 'slashCommands'
+    if (value === 'fileMention') return 'fileMention'
+    if (value === 'goalFloater') return 'goalFloater'
+    if (value === 'goalPanel') return 'goalPanel'
+    if (value === 'attachments') return 'attachments'
+    if (value === 'changeSummary') return 'changeSummary'
+    if (value === 'recording') return 'recording'
+    if (value === 'busy') return 'busy'
+    if (value === 'contextCapacity') return 'contextCapacity'
+    if (value === 'planMode') return 'planMode'
     return 'default'
   }, [])
 
@@ -2447,6 +2473,10 @@ function HomePage() {
 
   if (appPreviewMode) {
     return <AppPreview mode={appPreviewMode} />
+  }
+
+  if (floatingComposerPreviewMode) {
+    return <FloatingComposerPreview mode={floatingComposerPreviewMode} />
   }
 
   if (appShellPreviewMode) {
