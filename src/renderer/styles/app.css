@@ -1893,6 +1893,18 @@ html[data-theme='dark'] .process-stack-entry-row.is-error {
   color: var(--ds-text-muted);
 }
 
+.process-stack-entry-command-text {
+  max-height: 18rem;
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ds-text);
+}
+
 .process-stack-entry-error-panel {
   overflow: hidden;
   border-radius: 10px;
@@ -1937,14 +1949,14 @@ html[data-theme='dark'] .process-stack-entry-error-text {
   color: #fecaca;
 }
 
-.process-file-reference {
+.ds-process-file-reference {
   appearance: none;
   display: inline;
   margin: 0;
   border: 0;
   border-radius: 5px;
   background: transparent;
-  padding: 0 2px;
+  padding: 0 0.12rem;
   color: var(--ds-accent);
   font: inherit;
   text-align: left;
@@ -1955,7 +1967,7 @@ html[data-theme='dark'] .process-stack-entry-error-text {
     color 0.15s ease;
 }
 
-.process-file-reference:hover {
+.ds-process-file-reference:hover {
   background: var(--ds-accent-soft);
   text-decoration: underline;
   text-underline-offset: 3px;

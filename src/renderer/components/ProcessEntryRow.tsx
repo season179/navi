@@ -30,7 +30,7 @@ export type ProcessEntrySnapshot = {
   forceOpen?: boolean
   expanded?: boolean
   detailText?: string
-  detailKind?: 'text' | 'patch' | 'error' | 'assistant' | 'approval' | 'user_input'
+  detailKind?: 'text' | 'command' | 'patch' | 'error' | 'assistant' | 'approval' | 'user_input'
   detailFilePath?: string
   nestedBubble?: MessageBubbleSnapshot
   meta?: RuntimeMetaChipsSnapshot
@@ -77,7 +77,7 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
     collapsible: true,
     expanded: true,
     detailText: 'npm test\n\nRunning auth middleware tests…',
-    detailKind: 'text',
+    detailKind: 'command',
   },
   compaction: {
     verb: 'Compacted',
@@ -108,7 +108,7 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
     collapsible: true,
     expanded: false,
     detailText: 'Opened middleware.ts to inspect current token handling.',
-    detailKind: 'text',
+    detailKind: 'command',
     meta: RUNTIME_META_CHIPS_PREVIEW,
   },
   assistant: {
@@ -161,7 +161,7 @@ function ProcessSummaryLine({
   return (
     <>
       {summary.slice(0, index)}
-      <button type="button" className="process-file-reference" title="Preview file">
+      <button type="button" className="ds-process-file-reference" title="Preview file">
         {filePath}
       </button>
       {summary.slice(index + filePath.length)}
@@ -202,20 +202,24 @@ function ProcessEntryDetail({
   if (entry.detailKind === 'assistant') {
     return (
       <div className="process-entry-row-assistant ds-markdown">
-        <Markdown text={entry.detailText} streaming={false} />
+        <Markdown text={entry.detailText} streaming={entry.active === true} />
       </div>
     )
+  }
+  if (entry.detailKind === 'command') {
+    return <pre className="process-stack-entry-command-text">{entry.detailText}</pre>
   }
   return <p className="process-stack-entry-muted-text">{entry.detailText}</p>
 }
 
 export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElement {
-  const [internalExpanded, setInternalExpanded] = useState(entry.expanded === true)
+  const [userOpen, setUserOpen] = useState<boolean | null>(null)
   const canExpand =
     entry.collapsible !== false &&
     (Boolean(entry.detailText) || Boolean(entry.nestedBubble))
-  const forceOpen = entry.forceOpen === true
-  const isOpen = canExpand && (forceOpen || (expanded ?? internalExpanded))
+  const defaultOpen = entry.error === true
+  const forceOpen = entry.forceOpen === true || entry.detailKind === 'assistant'
+  const isOpen = canExpand && (forceOpen || (expanded ?? (userOpen ?? defaultOpen)))
   const canToggle = canExpand && !forceOpen
   const rowActive = entry.active === true
   const showCompactionIcon = entry.showCompactionIcon === true && !rowActive
@@ -226,7 +230,7 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
       onToggle()
       return
     }
-    setInternalExpanded((value) => !value)
+    setUserOpen(!isOpen)
   }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {

@@ -27,7 +27,7 @@ export type ProcessStackEntrySnapshot = {
   collapsible?: boolean
   forceOpen?: boolean
   detailText?: string
-  detailKind?: 'text' | 'patch' | 'error' | 'assistant' | 'approval' | 'user_input'
+  detailKind?: 'text' | 'command' | 'patch' | 'error' | 'assistant' | 'approval' | 'user_input'
   detailFilePath?: string
   nestedBubble?: MessageBubbleSnapshot
 }
@@ -146,6 +146,7 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         collapsible: true,
         expanded: false,
         detailText: 'Opened middleware.ts to inspect current token handling.',
+        detailKind: 'command',
       },
       {
         id: 'edit',
@@ -163,6 +164,7 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         collapsible: true,
         expanded: false,
         detailText: 'npm test\n\n✓ auth middleware tests passed',
+        detailKind: 'command',
       },
     ],
   },
@@ -339,7 +341,10 @@ function stackEntryToProcessEntry(
     active: entry.active ?? section.active,
     error: entry.error ?? section.hasError,
     collapsible: entry.collapsible,
-    forceOpen: entry.forceOpen === true || section.forceExpanded === true,
+    forceOpen:
+      entry.forceOpen === true ||
+      section.forceExpanded === true ||
+      entry.detailKind === 'assistant',
     expanded: entry.expanded ?? section.expanded,
     detailText: entry.detailText,
     detailKind: entry.detailKind,
@@ -361,7 +366,7 @@ function ProcessSummaryLine({
   return (
     <>
       {summary.slice(0, index)}
-      <button type="button" className="process-file-reference" title="Preview file">
+      <button type="button" className="ds-process-file-reference" title="Preview file">
         {filePath}
       </button>
       {summary.slice(index + filePath.length)}
@@ -405,6 +410,9 @@ function ProcessStackEntryDetail({
         <Markdown text={entry.detailText} streaming={entry.active === true} />
       </div>
     )
+  }
+  if (entry.detailKind === 'command') {
+    return <pre className="process-stack-entry-command-text">{entry.detailText}</pre>
   }
   return <p className="process-stack-entry-muted-text">{entry.detailText}</p>
 }
