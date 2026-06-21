@@ -61,6 +61,11 @@ import {
   type TurnChangeSummaryPreviewMode,
 } from '../components/TurnChangeSummary'
 import { ModelMetaTag, MODEL_META_TAG_PREVIEW } from '../components/ModelMetaTag'
+import {
+  WritePromptMetaDisclosure,
+  WRITE_PROMPT_META_DISCLOSURE_PREVIEW,
+  WRITE_PROMPT_META_DISCLOSURE_PREVIEW_QUOTES,
+} from '../components/WritePromptMetaDisclosure'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -257,6 +262,22 @@ function HomePage() {
     if (!params.has('modelMetaTag')) return null
     return params.get('modelMetaTag') === 'right' ? 'right' : 'left'
   }, [])
+
+  // Visual preview for the ported WritePromptMetaDisclosure (?writePromptMetaDisclosure=1).
+  const writePromptMetaDisclosurePreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writePromptMetaDisclosure')) return null
+    return params.get('writePromptMetaDisclosure') === 'quotes' ? 'quotes' : 'full'
+  }, [])
+  const writePromptMetaDisclosureDefaultExpanded = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    const params = new URLSearchParams(window.location.search)
+    return params.get('writePromptMetaDisclosure') === 'expanded'
+  }, [])
+  const [writePromptMetaExpanded, setWritePromptMetaExpanded] = useState(
+    writePromptMetaDisclosureDefaultExpanded,
+  )
 
   const composerFooterPreview =
     gitBranchPickerPreviewMode != null || workspaceProjectPickerPreviewMode != null
@@ -527,6 +548,27 @@ function HomePage() {
                 <div className="model-meta-tag-preview-actions">Copy · Edit</div>
               </div>
             )}
+          </div>
+        </div>
+      ) : null}
+
+      {writePromptMetaDisclosurePreviewMode ? (
+        <div className="write-prompt-meta-disclosure-preview">
+          <div className="write-prompt-meta-disclosure-preview-bubble">
+            <div className="write-prompt-meta-disclosure-preview-text">
+              {writePromptMetaDisclosurePreviewMode === 'quotes'
+                ? 'Explain how this helper clamps values.'
+                : WRITE_PROMPT_META_DISCLOSURE_PREVIEW.userInput}
+            </div>
+            <WritePromptMetaDisclosure
+              display={
+                writePromptMetaDisclosurePreviewMode === 'quotes'
+                  ? WRITE_PROMPT_META_DISCLOSURE_PREVIEW_QUOTES
+                  : WRITE_PROMPT_META_DISCLOSURE_PREVIEW
+              }
+              expanded={writePromptMetaExpanded}
+              onToggle={() => setWritePromptMetaExpanded((value) => !value)}
+            />
           </div>
         </div>
       ) : null}
