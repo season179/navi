@@ -1,7 +1,7 @@
 // Production chat composer using Kun's ds-composer-shell chrome from
 // FloatingComposer (../Kun/src/renderer/src/components/chat/FloatingComposer.tsx).
-// Controlled by the parent; sends on Enter (Shift+Enter for a newline) and turns
-// into a stop button while a reply is streaming.
+// Controlled by the parent; sends on Enter (Shift+Enter for a newline). While a
+// reply is streaming, Kun shows both a stop button and a queue-send button.
 //
 // Also hosts the `/skill` picker (plan §D4 / §D6): when the draft is a single
 // leading `/`-token (e.g. "/com"), a floating menu of available skills filters
@@ -23,6 +23,10 @@ import type { ComposerImageAttachment } from '../lib/composerAttachments'
 import type { ComposerGoal } from '../lib/composerGoal'
 import type { ComposerThreadUsage } from '../lib/composerThreadUsage'
 import type { ComposerPlusMenuToggles } from '../lib/composerPlusMenu'
+import {
+  COMPOSER_QUEUE_MESSAGE_LABEL,
+  COMPOSER_STOP_LABEL,
+} from '../lib/composerBusyState'
 import {
   COMPOSER_VOICE_START_LABEL,
   COMPOSER_VOICE_TRANSCRIBING_LABEL,
@@ -699,23 +703,22 @@ export function Composer({
                       type="button"
                       className="floating-composer-stop-btn"
                       onClick={onCancel}
-                      aria-label="Stop"
-                      title="Stop"
+                      aria-label={COMPOSER_STOP_LABEL}
+                      title={COMPOSER_STOP_LABEL}
                     >
                       <Square strokeWidth={2.4} />
                     </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="floating-composer-send-btn"
-                      disabled={!canSend}
-                      onClick={onSend}
-                      aria-label="Send"
-                      title="Send"
-                    >
-                      <Send strokeWidth={2.2} />
-                    </button>
-                  )}
+                  ) : null}
+                  <button
+                    type="button"
+                    className="floating-composer-send-btn"
+                    disabled={!canSend}
+                    onClick={onSend}
+                    aria-label={busy ? COMPOSER_QUEUE_MESSAGE_LABEL : 'Send'}
+                    title={busy ? COMPOSER_QUEUE_MESSAGE_LABEL : 'Send'}
+                  >
+                    <Send strokeWidth={2.2} />
+                  </button>
                 </>
               )}
             </div>

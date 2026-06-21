@@ -79,6 +79,11 @@ import {
   type ComposerImageAttachment,
 } from '../lib/composerAttachments'
 import { COMPOSER_GOAL_PREVIEW, type ComposerGoal } from '../lib/composerGoal'
+import {
+  COMPOSER_QUEUE_MESSAGE_LABEL,
+  COMPOSER_QUEUE_PLACEHOLDER,
+  COMPOSER_STOP_LABEL,
+} from '../lib/composerBusyState'
 import { COMPOSER_PLAN_MODE_PLACEHOLDER } from '../lib/composerPlanMode'
 import {
   COMPOSER_THREAD_USAGE_PREVIEW,
@@ -815,7 +820,9 @@ export function FloatingComposer({
           <textarea
             rows={1}
             className="floating-composer-textarea"
-            placeholder="Send a message…"
+            placeholder={
+              snapshot.busy ? COMPOSER_QUEUE_PLACEHOLDER : 'Send a message…'
+            }
             value={snapshot.input}
             readOnly
             aria-label="Message"
@@ -958,14 +965,25 @@ export function FloatingComposer({
                   </button>
 
                   {snapshot.busy ? (
-                    <button type="button" className="floating-composer-stop-btn" aria-label="Stop">
+                    <button
+                      type="button"
+                      className="floating-composer-stop-btn"
+                      aria-label={COMPOSER_STOP_LABEL}
+                      title={COMPOSER_STOP_LABEL}
+                    >
                       <Square strokeWidth={2.4} />
                     </button>
-                  ) : (
-                    <button type="button" className="floating-composer-send-btn" aria-label="Send">
-                      <Send strokeWidth={2.2} />
-                    </button>
-                  )}
+                  ) : null}
+                  <button
+                    type="button"
+                    className="floating-composer-send-btn"
+                    aria-label={
+                      snapshot.busy ? COMPOSER_QUEUE_MESSAGE_LABEL : 'Send'
+                    }
+                    title={snapshot.busy ? COMPOSER_QUEUE_MESSAGE_LABEL : 'Send'}
+                  >
+                    <Send strokeWidth={2.2} />
+                  </button>
                 </>
               )}
             </div>

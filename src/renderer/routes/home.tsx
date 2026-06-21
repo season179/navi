@@ -27,6 +27,7 @@ import {
   type ComposerFooterHintPreviewMode,
 } from '../lib/composerFooterHint'
 import { COMPOSER_DICTATION_ERROR_PREVIEW } from '../lib/composerVoiceDictation'
+import { COMPOSER_QUEUE_PLACEHOLDER } from '../lib/composerBusyState'
 import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
@@ -805,6 +806,12 @@ function HomePage() {
   const composerVoiceTranscribingPreview = useMemo(() => {
     if (typeof window === 'undefined') return false
     return new URLSearchParams(window.location.search).has('composerVoiceTranscribingPreview')
+  }, [])
+
+  // Visual preview for busy toolbar with stop + queue send (?composerBusyPreview=1).
+  const composerBusyPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return new URLSearchParams(window.location.search).has('composerBusyPreview')
   }, [])
 
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
@@ -3844,16 +3851,18 @@ function HomePage() {
       onChange={setDraft}
       onSend={handleSend}
       onCancel={cancel}
-      busy={busy}
+      busy={composerBusyPreview || Boolean(queuedMessagesPreview) || busy}
       disabled={composerDisabled}
       placeholder={
         composerPlanModePreview
           ? COMPOSER_PLAN_MODE_PLACEHOLDER
-          : !hasProvider
-            ? 'Add a provider to start chatting…'
-            : !status.ready
-              ? 'Connecting to Navi…'
-              : 'Send a message to Navi…'
+          : composerBusyPreview || queuedMessagesPreview || busy
+            ? COMPOSER_QUEUE_PLACEHOLDER
+            : !hasProvider
+              ? 'Add a provider to start chatting…'
+              : !status.ready
+                ? 'Connecting to Navi…'
+                : 'Send a message to Navi…'
       }
       skills={skills}
       fileMentionCandidates={composerFileMentionPreview?.candidates}
