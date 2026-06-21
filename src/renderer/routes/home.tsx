@@ -361,6 +361,10 @@ import {
   WriteDebugLogModalPreview,
   type WriteDebugLogModalPreviewMode,
 } from '../components/WriteDebugLogModal'
+import {
+  ClawSidebarPreview,
+  type ClawSidebarPreviewMode,
+} from '../components/ClawSidebar'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -946,6 +950,19 @@ function HomePage() {
     if (value === 'dirty') return 'dirty'
     if (value === 'saving') return 'saving'
     return 'split'
+  }, [])
+
+  // Visual preview for the ported ClawSidebar
+  // (?clawSidebarPreview=1|empty|disabled|running).
+  const clawSidebarPreviewMode = useMemo((): ClawSidebarPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('clawSidebarPreview')) return null
+    const value = params.get('clawSidebarPreview')
+    if (value === 'empty') return 'empty'
+    if (value === 'disabled') return 'disabled'
+    if (value === 'running') return 'running'
+    return 'default'
   }, [])
 
   // Visual preview for the ported WriteDebugLogModal
@@ -1867,6 +1884,10 @@ function HomePage() {
 
   if (writePdfViewerPreviewMode) {
     return <WritePdfViewerPreview mode={writePdfViewerPreviewMode} />
+  }
+
+  if (clawSidebarPreviewMode) {
+    return <ClawSidebarPreview mode={clawSidebarPreviewMode} />
   }
 
   if (writeDebugLogPreviewMode) {
