@@ -3452,6 +3452,778 @@ a.runtime-meta-chip:hover {
   gap: 16px;
 }
 
+
+/* =====================================================
+   Runtime wake hero (Kun RuntimeWakeHero / KunHeroStage)
+   ===================================================== */
+.runtime-wake-hero {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  min-height: min(560px, calc(100vh - 240px));
+}
+
+.runtime-wake-stage {
+  display: grid;
+  height: 236px;
+  margin-bottom: 1.35rem;
+  place-items: center;
+  width: min(560px, 100%);
+}
+
+.runtime-wake-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 254, 0.9)),
+    linear-gradient(120deg, rgba(59, 130, 216, 0.08), transparent 42%, rgba(240, 196, 110, 0.1));
+  border: 1px solid color-mix(in srgb, var(--ds-border) 78%, transparent);
+  border-radius: 28px;
+  box-shadow:
+    0 24px 70px rgba(20, 47, 95, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  height: 206px;
+  overflow: hidden;
+  position: relative;
+  width: min(500px, calc(100vw - 56px));
+}
+
+.runtime-wake-shell::before {
+  animation: runtime-wake-sweep 3.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  background: linear-gradient(
+    112deg,
+    transparent 0%,
+    transparent 34%,
+    rgba(59, 130, 216, 0.16) 45%,
+    rgba(18, 138, 74, 0.14) 53%,
+    transparent 66%,
+    transparent 100%
+  );
+  content: '';
+  inset: 0;
+  position: absolute;
+  transform: translateX(-100%);
+  z-index: 1;
+}
+
+.runtime-wake-shell::after {
+  background-image:
+    linear-gradient(rgba(59, 130, 216, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 138, 74, 0.08) 1px, transparent 1px);
+  background-size: 34px 34px;
+  content: '';
+  inset: 44px 0 0 116px;
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 76%, transparent);
+  opacity: 0.55;
+  position: absolute;
+}
+
+.runtime-wake-titlebar {
+  align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--ds-border-muted) 78%, transparent);
+  display: flex;
+  gap: 0.45rem;
+  height: 38px;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 3;
+}
+
+.runtime-wake-dot {
+  border-radius: 999px;
+  height: 0.55rem;
+  opacity: 0.85;
+  width: 0.55rem;
+}
+
+.runtime-wake-dot.is-red {
+  background: #ff5f57;
+}
+
+.runtime-wake-dot.is-yellow {
+  background: #ffbd2e;
+}
+
+.runtime-wake-dot.is-green {
+  background: #28c840;
+}
+
+.runtime-wake-body {
+  display: flex;
+  height: calc(100% - 38px);
+  position: relative;
+  z-index: 2;
+}
+
+.runtime-wake-nav {
+  border-right: 1px solid color-mix(in srgb, var(--ds-border-muted) 74%, transparent);
+  display: grid;
+  gap: 0.7rem;
+  grid-auto-rows: 12px;
+  padding: 1.25rem 1rem;
+  width: 112px;
+}
+
+.runtime-wake-nav span,
+.runtime-wake-thread,
+.runtime-wake-composer span {
+  background: color-mix(in srgb, var(--ds-text-faint) 18%, transparent);
+  border-radius: 999px;
+  display: block;
+}
+
+.runtime-wake-nav span {
+  width: 68px;
+}
+
+.runtime-wake-nav span:nth-child(2) {
+  width: 52px;
+}
+
+.runtime-wake-nav span:nth-child(3) {
+  width: 62px;
+}
+
+.runtime-wake-nav span:nth-child(4) {
+  width: 44px;
+}
+
+.runtime-wake-nav .is-active {
+  animation: runtime-wake-soft-pulse 2.4s ease-in-out infinite;
+  background: color-mix(in srgb, var(--ds-accent) 18%, transparent);
+}
+
+.runtime-wake-canvas {
+  flex: 1;
+  padding: 1.35rem 1.5rem;
+  position: relative;
+}
+
+.runtime-wake-thread {
+  animation: runtime-wake-thread 2.8s ease-in-out infinite;
+  height: 10px;
+  position: absolute;
+}
+
+.runtime-wake-thread.is-one {
+  left: 58px;
+  top: 32px;
+  width: 160px;
+}
+
+.runtime-wake-thread.is-two {
+  animation-delay: 0.36s;
+  left: 92px;
+  top: 62px;
+  width: 198px;
+}
+
+.runtime-wake-thread.is-three {
+  animation-delay: 0.72s;
+  left: 52px;
+  top: 92px;
+  width: 128px;
+}
+
+.runtime-wake-flow {
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 216, 0.24), transparent);
+  height: 1px;
+  left: 134px;
+  overflow: hidden;
+  position: absolute;
+  right: 70px;
+  top: 105px;
+  z-index: 3;
+}
+
+.runtime-wake-flow::after {
+  animation: runtime-wake-flow 1.9s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, #3b82d8, #128a4a, transparent);
+  content: '';
+  inset: 0;
+  position: absolute;
+  transform: translateX(-100%);
+}
+
+.runtime-wake-flow.is-right {
+  left: 230px;
+  right: 36px;
+  top: 126px;
+}
+
+.runtime-wake-flow.is-right::after {
+  animation-delay: 0.42s;
+}
+
+.runtime-wake-composer {
+  align-items: center;
+  background: color-mix(in srgb, var(--ds-bg-canvas) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ds-border) 70%, transparent);
+  border-radius: 18px;
+  bottom: 20px;
+  box-shadow: 0 10px 28px rgba(20, 47, 95, 0.06);
+  display: flex;
+  gap: 0.55rem;
+  height: 36px;
+  left: 132px;
+  padding: 0 0.9rem;
+  position: absolute;
+  right: 26px;
+  z-index: 4;
+}
+
+.runtime-wake-composer span:first-child {
+  background: color-mix(in srgb, var(--ds-accent) 22%, transparent);
+  height: 8px;
+  width: 72px;
+}
+
+.runtime-wake-composer span:last-child {
+  height: 8px;
+  width: 124px;
+}
+
+.runtime-wake-core {
+  animation: runtime-wake-core 3s ease-in-out infinite;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--ds-bg-canvas) 98%, transparent), color-mix(in srgb, var(--ds-bg-canvas) 84%, var(--ds-accent))),
+    linear-gradient(135deg, rgba(59, 130, 216, 0.18), rgba(18, 138, 74, 0.16));
+  border: 1px solid color-mix(in srgb, var(--ds-accent) 28%, var(--ds-border));
+  border-radius: 24px;
+  box-shadow:
+    0 18px 46px rgba(59, 130, 216, 0.14),
+    0 8px 22px rgba(18, 138, 74, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  color: var(--ds-accent);
+  display: grid;
+  height: 76px;
+  left: 50%;
+  place-items: center;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 76px;
+  z-index: 5;
+}
+
+.runtime-wake-core::before {
+  animation: runtime-wake-breathe 2.4s ease-in-out infinite;
+  border: 1px solid color-mix(in srgb, var(--ds-accent) 24%, transparent);
+  border-radius: 32px;
+  content: '';
+  inset: -15px;
+  position: absolute;
+}
+
+.runtime-wake-ring {
+  animation: runtime-wake-spin 3.2s linear infinite;
+  border-radius: 30px;
+  inset: -8px;
+  padding: 1px;
+  position: absolute;
+}
+
+.runtime-wake-ring::before {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 25%,
+    rgba(59, 130, 216, 0.58) 36%,
+    rgba(18, 138, 74, 0.55) 52%,
+    transparent 68% 100%
+  );
+  border-radius: inherit;
+  content: '';
+  inset: 0;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  padding: 1px;
+  position: absolute;
+}
+
+/* ---------- 唤醒加载特效(.is-waking):睡息 Zzz、声纳涟漪、气泡上浮、草稿打字 ---------- */
+/* 仅运行时连接页启用;就绪后的空状态与报错态沿用安静版舞台(#78:错误不该像还在加载) */
+
+.runtime-wake-mascot-bob {
+  display: inline-flex;
+  line-height: 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* 小 Kun 每隔几秒翻个身,其余时间交给形象自带的呼吸动画 */
+.runtime-wake-stage.is-waking .runtime-wake-mascot-bob {
+  animation: runtime-wake-stir 8.4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+/* Zzz 从头顶冒出,边升边飘散;锚点在小 Kun 头部上方 */
+.runtime-wake-zzz {
+  pointer-events: none;
+  position: absolute;
+  left: 14px;
+  top: -4px;
+  z-index: 3;
+}
+
+.runtime-wake-zzz i {
+  animation: runtime-wake-zzz 3.6s ease-out infinite;
+  color: var(--ds-accent);
+  display: block;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  left: 0;
+  line-height: 1;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+}
+
+.runtime-wake-zzz i:nth-child(2) {
+  animation-delay: 1.2s;
+  font-size: 10px;
+  left: 7px;
+}
+
+.runtime-wake-zzz i:nth-child(3) {
+  animation-delay: 2.4s;
+  font-size: 11px;
+  left: -8px;
+}
+
+/* 声纳涟漪:沿核心卡片轮廓向外扩散,像在一遍遍探测运行时 */
+.runtime-wake-sonar {
+  border: 1.5px solid color-mix(in srgb, var(--ds-accent) 52%, transparent);
+  border-radius: 28px;
+  inset: -4px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.runtime-wake-sonar.is-one {
+  animation: runtime-wake-sonar 2.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+.runtime-wake-sonar.is-two {
+  animation: runtime-wake-sonar 2.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.45s infinite;
+}
+
+/* 深海气泡:从画布底部(模拟输入框后)缓缓上浮 */
+.runtime-wake-bubbles {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.runtime-wake-bubbles i {
+  animation: runtime-wake-bubble 5.2s ease-in infinite;
+  background: color-mix(in srgb, var(--ds-accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ds-accent) 30%, transparent);
+  border-radius: 999px;
+  bottom: 16px;
+  height: 7px;
+  opacity: 0;
+  position: absolute;
+  width: 7px;
+}
+
+.runtime-wake-bubbles i:nth-child(1) {
+  left: 18%;
+}
+
+.runtime-wake-bubbles i:nth-child(2) {
+  animation-delay: 1.6s;
+  height: 5px;
+  left: 44%;
+  width: 5px;
+}
+
+.runtime-wake-bubbles i:nth-child(3) {
+  animation-delay: 2.7s;
+  left: 66%;
+}
+
+.runtime-wake-bubbles i:nth-child(4) {
+  animation-delay: 3.9s;
+  height: 4px;
+  left: 85%;
+  width: 4px;
+}
+
+/* 模拟输入框:小 Kun 梦里打草稿,写一段、停一停、清掉重来;光标常亮闪烁 */
+.runtime-wake-caret {
+  animation: runtime-wake-caret-blink 1.05s step-end infinite;
+  background: var(--ds-accent);
+  border-radius: 1px;
+  display: block;
+  flex: none;
+  height: 13px;
+  margin-left: -1px;
+  width: 2px;
+}
+
+.runtime-wake-stage.is-waking .runtime-wake-composer span:first-child {
+  animation: runtime-wake-typing 4.4s ease-in-out infinite;
+}
+
+@keyframes runtime-wake-stir {
+  0%,
+  78%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  84% {
+    transform: rotate(-2.4deg) translateY(-1px);
+  }
+
+  90% {
+    transform: rotate(1.8deg) translateY(0);
+  }
+
+  95% {
+    transform: rotate(-0.8deg) translateY(-0.4px);
+  }
+}
+
+@keyframes runtime-wake-zzz {
+  0% {
+    opacity: 0;
+    transform: translate(0, 3px) rotate(-10deg) scale(0.6);
+  }
+
+  16% {
+    opacity: 0.92;
+  }
+
+  58% {
+    opacity: 0.66;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(8px, -26px) rotate(12deg) scale(1.12);
+  }
+}
+
+@keyframes runtime-wake-sonar {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  14% {
+    opacity: 0.62;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.62);
+  }
+}
+
+@keyframes runtime-wake-bubble {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.7);
+  }
+
+  14% {
+    opacity: 0.5;
+  }
+
+  78% {
+    opacity: 0.34;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-7px, -58px) scale(1.08);
+  }
+}
+
+@keyframes runtime-wake-caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  55% {
+    opacity: 0.12;
+  }
+}
+
+@keyframes runtime-wake-typing {
+  0%,
+  6% {
+    width: 14px;
+  }
+
+  20%,
+  30% {
+    width: 36px;
+  }
+
+  48%,
+  58% {
+    width: 56px;
+  }
+
+  74%,
+  86% {
+    width: 72px;
+  }
+
+  94%,
+  100% {
+    width: 14px;
+  }
+}
+.runtime-wake-mascot {
+  z-index: 2;
+  height: 46px;
+  width: 60px;
+}
+@keyframes runtime-wake-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  62%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes runtime-wake-soft-pulse {
+  0%,
+  100% {
+    opacity: 0.58;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes runtime-wake-thread {
+  0%,
+  100% {
+    opacity: 0.34;
+    transform: translateX(0);
+  }
+
+  50% {
+    opacity: 0.86;
+    transform: translateX(8px);
+  }
+}
+
+@keyframes runtime-wake-flow {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes runtime-wake-core {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+  }
+
+  50% {
+    transform: translate(-50%, calc(-50% - 5px));
+  }
+}
+
+@keyframes runtime-wake-breathe {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(0.96);
+  }
+
+  50% {
+    opacity: 0.86;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes runtime-wake-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@container (max-width: 640px) {
+  .runtime-wake-hero {
+    min-height: min(520px, calc(100vh - 210px));
+  }
+
+  .runtime-wake-stage {
+    height: 212px;
+  }
+
+  .runtime-wake-shell {
+    border-radius: 24px;
+    height: 186px;
+    width: min(440px, calc(100vw - 44px));
+  }
+
+  .runtime-wake-nav {
+    width: 92px;
+  }
+
+  .runtime-wake-shell::after {
+    left: 96px;
+  }
+
+  .runtime-wake-composer {
+    left: 110px;
+    right: 20px;
+  }
+
+  .runtime-wake-thread.is-one {
+    left: 42px;
+    width: 132px;
+  }
+
+  .runtime-wake-thread.is-two {
+    left: 72px;
+    width: 150px;
+  }
+
+  .runtime-wake-thread.is-three {
+    left: 44px;
+    width: 108px;
+  }
+}
+
+[data-theme="dark"] .runtime-wake-shell {
+  background:
+    linear-gradient(180deg, rgba(27, 35, 56, 0.94), rgba(20, 27, 44, 0.9)),
+    linear-gradient(120deg, rgba(111, 176, 232, 0.12), transparent 42%, rgba(240, 196, 110, 0.08));
+  box-shadow:
+    0 24px 70px rgba(2, 6, 16, 0.36),
+    inset 0 1px 0 rgba(151, 192, 235, 0.08);
+}
+
+[data-theme="dark"] .runtime-wake-composer {
+  box-shadow: 0 14px 34px rgba(2, 6, 16, 0.3);
+}
+
+[data-theme="dark"] .runtime-wake-core {
+  box-shadow:
+    0 20px 54px rgba(111, 176, 232, 0.18),
+    0 8px 24px rgba(240, 196, 110, 0.1),
+    inset 0 1px 0 rgba(151, 192, 235, 0.09);
+}
+
+
+
+.runtime-wake-titlebar-icon {
+  margin-left: auto;
+  width: 14px;
+  height: 14px;
+  color: var(--ds-text-faint);
+}
+
+.runtime-wake-hero-kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  color: var(--ds-accent);
+}
+
+.runtime-wake-hero-title {
+  margin: 8px 0 0;
+  max-width: 620px;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
+  text-align: center;
+  color: var(--ds-text);
+}
+
+.runtime-wake-hero-detail {
+  margin: 12px 0 0;
+  max-width: 620px;
+  font-size: 15px;
+  line-height: 1.75;
+  text-align: center;
+  color: var(--ds-text-muted);
+}
+
+.runtime-wake-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.runtime-wake-hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--ds-chip-border);
+  background: var(--ds-chip-bg);
+  box-shadow: var(--ds-shadow-chip);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ds-text);
+  transition: color 0.15s ease;
+}
+
+.runtime-wake-hero-chip:hover {
+  color: var(--ds-text);
+}
+
+.runtime-wake-hero-chip-muted {
+  background: var(--ds-chip-muted-bg);
+  color: var(--ds-text-muted);
+}
+
+.runtime-wake-hero-chip-muted:hover {
+  color: var(--ds-text);
+}
+
+.runtime-wake-hero-chip-icon {
+  width: 14px;
+  height: 14px;
+}
+
+@media (min-width: 768px) {
+  .runtime-wake-hero {
+    padding-top: 64px;
+  }
+
+  .runtime-wake-hero-title {
+    font-size: 32px;
+  }
+}
+
+.runtime-wake-hero-preview-wrap {
+  padding: 48px 24px 32px;
+  text-align: center;
+}
+
+
 .generated-files-panel {
   display: flex;
   min-width: 0;

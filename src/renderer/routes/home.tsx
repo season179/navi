@@ -122,6 +122,10 @@ import {
   ThreadForkPoint,
   THREAD_FORK_BANNER_PREVIEW_TITLE,
 } from '../components/ThreadForkBanner'
+import {
+  RuntimeWakeHero,
+  RUNTIME_WAKE_HERO_PREVIEW_ERROR,
+} from '../components/RuntimeWakeHero'
 import { PencilLine } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -438,6 +442,18 @@ function HomePage() {
     return params.get('threadForkPoint') === 'unknown' ? 'unknown' : 'title'
   }, [])
 
+  // Visual preview for the ported RuntimeWakeHero
+  // (?runtimeWakeHero=1|waking|error|quiet).
+  const runtimeWakeHeroPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('runtimeWakeHero')) return null
+    const mode = params.get('runtimeWakeHero')
+    if (mode === 'error') return 'error'
+    if (mode === 'quiet') return 'quiet'
+    return 'waking'
+  }, [])
+
   // Visual preview for the ported ToolEntry (?toolEntry=1|running|error|command).
   const toolEntryPreview = useMemo((): {
     block: ToolBlockSnapshot
@@ -540,23 +556,36 @@ function HomePage() {
         </div>
       ) : empty ? (
         <div className="stage-scroll">
-          <div className="hero">
-            <HeroStage />
-            <h1 className="hero-greeting">Good to see you</h1>
-            <p className="hero-sub">
-              Navi is your local-first companion. Start a conversation below.
-            </p>
-            {!hasProvider ? (
-              <button
-                className="btn btn-primary connect-provider"
-                onClick={() => openSettingsTab('providers')}
-              >
-                Connect a provider
-              </button>
-            ) : (
-              <ChatStarterGrid onSelectSuggestion={setDraft} />
-            )}
-          </div>
+          {runtimeWakeHeroPreviewMode ? (
+            <div className="runtime-wake-hero-preview-wrap">
+              <RuntimeWakeHero
+                runtimeError={
+                  runtimeWakeHeroPreviewMode === 'error'
+                    ? RUNTIME_WAKE_HERO_PREVIEW_ERROR
+                    : null
+                }
+                waking={runtimeWakeHeroPreviewMode === 'waking' ? true : false}
+              />
+            </div>
+          ) : (
+            <div className="hero">
+              <HeroStage />
+              <h1 className="hero-greeting">Good to see you</h1>
+              <p className="hero-sub">
+                Navi is your local-first companion. Start a conversation below.
+              </p>
+              {!hasProvider ? (
+                <button
+                  className="btn btn-primary connect-provider"
+                  onClick={() => openSettingsTab('providers')}
+                >
+                  Connect a provider
+                </button>
+              ) : (
+                <ChatStarterGrid onSelectSuggestion={setDraft} />
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <ChatThread messages={messages} />
