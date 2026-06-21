@@ -60,6 +60,7 @@ import {
   TURN_CHANGE_SUMMARY_PREVIEW_SINGLE,
   type TurnChangeSummaryPreviewMode,
 } from '../components/TurnChangeSummary'
+import { ModelMetaTag, MODEL_META_TAG_PREVIEW } from '../components/ModelMetaTag'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -247,6 +248,14 @@ function HomePage() {
     if (typeof window === 'undefined') return false
     const params = new URLSearchParams(window.location.search)
     return params.get('turnChangeSummary') === 'expanded'
+  }, [])
+
+  // Visual preview for the ported ModelMetaTag (?modelMetaTag=1|right).
+  const modelMetaTagPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('modelMetaTag')) return null
+    return params.get('modelMetaTag') === 'right' ? 'right' : 'left'
   }, [])
 
   const composerFooterPreview =
@@ -499,6 +508,26 @@ function HomePage() {
             compact={turnChangeSummaryPreviewMode === 'compact'}
             defaultExpanded={turnChangeSummaryDefaultExpanded}
           />
+        </div>
+      ) : null}
+
+      {modelMetaTagPreviewMode ? (
+        <div className="model-meta-tag-preview">
+          <div className="model-meta-tag-preview-bubble">
+            <div className="model-meta-tag-preview-text">
+              Can you refactor the auth middleware to use JWT validation?
+            </div>
+            {modelMetaTagPreviewMode === 'right' ? (
+              <div className="model-meta-tag-preview-footer is-right-only">
+                <ModelMetaTag label={MODEL_META_TAG_PREVIEW} align="right" />
+              </div>
+            ) : (
+              <div className="model-meta-tag-preview-footer">
+                <ModelMetaTag label={MODEL_META_TAG_PREVIEW} align="left" />
+                <div className="model-meta-tag-preview-actions">Copy · Edit</div>
+              </div>
+            )}
+          </div>
         </div>
       ) : null}
     </>

@@ -1823,6 +1823,89 @@ textarea {
 }
 
 /* =====================================================
+   Model meta tag (Kun ModelMetaTag)
+   ===================================================== */
+.model-meta-tag {
+  display: flex;
+  min-width: 0;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.model-meta-tag.is-left {
+  flex: 1;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.model-meta-tag-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  letter-spacing: -0.025em;
+  color: color-mix(in srgb, var(--ds-text-faint) 85%, transparent);
+}
+
+.model-meta-tag-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  width: min(calc(100% - 32px), 420px);
+  transform: translateX(-50%);
+  bottom: calc(var(--composer-height, 120px) + 24px);
+}
+
+.model-meta-tag-preview-bubble {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-bg-main) 78%, transparent);
+  box-shadow: 0 12px 34px rgba(20, 47, 95, 0.07);
+  backdrop-filter: blur(24px);
+}
+
+[data-theme='dark'] .model-meta-tag-preview-bubble {
+  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.model-meta-tag-preview-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-align: left;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ds-text);
+}
+
+.model-meta-tag-preview-footer {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  color: color-mix(in srgb, var(--ds-text-faint) 90%, transparent);
+  opacity: 0.9;
+}
+
+.model-meta-tag-preview-footer.is-right-only {
+  justify-content: flex-end;
+}
+
+.model-meta-tag-preview-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--ds-text-faint);
+}
+
+/* =====================================================
    Diff view (Kun DiffView)
    ===================================================== */
 .diff-view {
