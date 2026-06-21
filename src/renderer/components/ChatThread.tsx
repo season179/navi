@@ -4,19 +4,10 @@
 
 import { useEffect, useRef, type ReactElement } from 'react'
 import type { ChatMessage } from '../flue/useNaviChat'
+import { LiveTurnProgressRow } from './LiveTurnProgressRow'
 import { MessageBubble, type MessageBubbleSnapshot } from './MessageBubble'
 
-function TypingDots(): ReactElement {
-  return (
-    <span className="typing" aria-label="Navi is thinking">
-      <span />
-      <span />
-      <span />
-    </span>
-  )
-}
-
-function chatMessageToSnapshot(message: ChatMessage): MessageBubbleSnapshot | 'typing' {
+function chatMessageToSnapshot(message: ChatMessage): MessageBubbleSnapshot | null {
   if (message.role === 'user') {
     return {
       kind: 'user',
@@ -33,10 +24,6 @@ function chatMessageToSnapshot(message: ChatMessage): MessageBubbleSnapshot | 't
       text: message.text,
       severity: 'error',
     }
-  }
-
-  if (message.status === 'streaming' && message.text === '') {
-    return 'typing'
   }
 
   return {
@@ -59,20 +46,15 @@ export function ChatThread({ messages }: { messages: ChatMessage[] }): ReactElem
       <div className="message-timeline-content chat-thread-inner">
         {messages.map((message) => {
           const snapshot = chatMessageToSnapshot(message)
-
-          if (snapshot === 'typing') {
-            return (
-              <div key={message.id} className="message-timeline-turn">
-                <div className="message-bubble-assistant">
-                  <TypingDots />
-                </div>
-              </div>
-            )
-          }
+          const streaming = message.status === 'streaming'
+          const showBubble =
+            snapshot &&
+            !(streaming && snapshot.kind === 'assistant' && snapshot.text.trim() === '')
 
           return (
             <div key={message.id} className="message-timeline-turn">
-              <MessageBubble block={snapshot} />
+              {showBubble ? <MessageBubble block={snapshot} /> : null}
+              {streaming ? <LiveTurnProgressRow /> : null}
             </div>
           )
         })}
