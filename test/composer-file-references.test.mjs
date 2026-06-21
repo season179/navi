@@ -21,7 +21,34 @@ const {
   filterWorkspaceFileMentionSuggestions,
   replaceFileMentionInInput,
   COMPOSER_FILE_REFERENCES_PREVIEW,
+  COMPOSER_FILE_MENTION_MENU_TITLE,
+  COMPOSER_FILE_MENTION_LOADING,
+  COMPOSER_FILE_MENTION_EMPTY,
+  resolveComposerFileMentionPreview,
 } = await import(out)
+
+test('file mention menu copy matches Kun composerFileMention locale strings', () => {
+  assert.equal(COMPOSER_FILE_MENTION_MENU_TITLE, 'Files & folders')
+  assert.equal(COMPOSER_FILE_MENTION_LOADING, 'Loading files…')
+  assert.equal(COMPOSER_FILE_MENTION_EMPTY, 'No files or folders found.')
+})
+
+test('resolveComposerFileMentionPreview routes preview query values', () => {
+  const loading = resolveComposerFileMentionPreview('loading')
+  assert.equal(loading.loading, true)
+  assert.equal(loading.candidates.length, 0)
+  assert.match(loading.draft, /@src\/ren$/)
+
+  const empty = resolveComposerFileMentionPreview('empty')
+  assert.equal(empty.loading, false)
+  assert.ok(empty.candidates.length > 0)
+  assert.match(empty.draft, /@zzz-no-match$/)
+
+  const defaults = resolveComposerFileMentionPreview('1')
+  assert.equal(defaults.loading, false)
+  assert.ok(defaults.candidates.length > 0)
+  assert.match(defaults.draft, /@src\/ren$/)
+})
 
 test('COMPOSER_FILE_REFERENCES_PREVIEW matches Kun file-reference chip mock data', () => {
   assert.equal(COMPOSER_FILE_REFERENCES_PREVIEW.length, 2)

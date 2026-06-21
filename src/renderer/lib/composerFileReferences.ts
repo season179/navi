@@ -144,6 +144,48 @@ export const COMPOSER_FILE_REFERENCES_PREVIEW: ComposerFileReferenceChip[] = [
   { relativePath: 'src/renderer/components', isDirectory: true },
 ]
 
+/** English copy matching Kun's composerFileMentionMenuTitle locale string. */
+export const COMPOSER_FILE_MENTION_MENU_TITLE = 'Files & folders'
+
+/** English copy matching Kun's composerFileMentionLoading locale string. */
+export const COMPOSER_FILE_MENTION_LOADING = 'Loading files…'
+
+/** English copy matching Kun's composerFileMentionEmpty locale string. */
+export const COMPOSER_FILE_MENTION_EMPTY = 'No files or folders found.'
+
+export type ComposerFileMentionPreviewMode = 'default' | 'loading' | 'empty'
+
+export type ComposerFileMentionPreviewState = {
+  candidates: ComposerFileReference[]
+  loading: boolean
+  draft: string
+}
+
+/** Routes ?composerFileMentionPreview=1|loading|empty production preview hooks. */
+export function resolveComposerFileMentionPreview(
+  mode: string | null = 'default',
+): ComposerFileMentionPreviewState {
+  if (mode === 'loading') {
+    return {
+      candidates: [],
+      loading: true,
+      draft: 'Please review @src/ren',
+    }
+  }
+  if (mode === 'empty') {
+    return {
+      candidates: COMPOSER_FILE_MENTION_PREVIEW,
+      loading: false,
+      draft: 'Please review @zzz-no-match',
+    }
+  }
+  return {
+    candidates: COMPOSER_FILE_MENTION_PREVIEW,
+    loading: false,
+    draft: 'Please review @src/ren',
+  }
+}
+
 /** Mock workspace files for ?composerFileMentionPreview visual verification. */
 export const COMPOSER_FILE_MENTION_PREVIEW: ComposerFileReference[] = [
   {

@@ -74,6 +74,8 @@ interface ComposerProps {
   skills?: SkillSummary[]
   /** Workspace files for the `@` mention picker. */
   fileMentionCandidates?: ComposerFileReference[]
+  /** When true, shows the loading spinner in the file-mention menu title row. */
+  fileMentionLoading?: boolean
   /** When set, shows Kun's dictation recording strip instead of the send button. */
   voiceRecording?: {
     getLevel: () => number
@@ -149,6 +151,7 @@ export function Composer({
   modelChip,
   skills,
   fileMentionCandidates,
+  fileMentionLoading = false,
   voiceRecording,
   dictationError,
   voiceTranscribing = false,
@@ -232,9 +235,7 @@ export function Composer({
   }, [value, cursor, query])
 
   const fileMentionOpen =
-    activeFileMention !== null &&
-    fileMentionCandidates !== undefined &&
-    fileMentionCandidates.length > 0
+    activeFileMention !== null && fileMentionCandidates !== undefined
 
   const fileMentionSuggestions = useMemo((): ComposerFileReference[] => {
     if (!activeFileMention || !fileMentionCandidates) return []
@@ -518,13 +519,9 @@ export function Composer({
           <div ref={fileMentionMenuRef}>
             <ComposerFileMentionMenu
               items={fileMentionItems}
+              loading={fileMentionLoading}
               onPick={pickFileMention}
               onHover={setFileMentionActiveIndex}
-              emptyMessage={
-                activeFileMention?.query.trim()
-                  ? `No files match “${activeFileMention.query.trim()}”.`
-                  : 'No files available.'
-              }
             />
           </div>
         ) : null}

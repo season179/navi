@@ -66,6 +66,9 @@ import {
   type ComposerChangedFile,
 } from '../lib/composerChangeSummary'
 import {
+  COMPOSER_FILE_MENTION_EMPTY,
+  COMPOSER_FILE_MENTION_LOADING,
+  COMPOSER_FILE_MENTION_MENU_TITLE,
   COMPOSER_FILE_REFERENCES_PREVIEW,
   type ComposerFileReferenceChip,
 } from '../lib/composerFileReferences'
@@ -106,6 +109,8 @@ export type FloatingComposerPreviewMode =
   | 'plusMenu'
   | 'slashCommands'
   | 'fileMention'
+  | 'fileMentionLoading'
+  | 'fileMentionEmpty'
   | 'goalFloater'
   | 'goalPanel'
   | 'attachments'
@@ -158,6 +163,7 @@ export type FloatingComposerSnapshot = {
   showPlusMenu: boolean
   showSlashMenu: boolean
   showFileMentionMenu: boolean
+  fileMentionLoading: boolean
   showGoalFloater: boolean
   showGoalPanel: boolean
   showChangeSummary: boolean
@@ -391,20 +397,27 @@ export function ComposerSlashMenu({
 
 export function ComposerFileMentionMenu({
   items,
+  loading = false,
   onPick,
   onHover,
-  emptyMessage = 'No files match.',
 }: {
   items: ComposerFileMentionItem[]
+  loading?: boolean
   onPick?: (item: ComposerFileMentionItem) => void
   onHover?: (index: number) => void
-  emptyMessage?: string
 }): ReactElement {
+  const emptyMessage = loading
+    ? COMPOSER_FILE_MENTION_LOADING
+    : COMPOSER_FILE_MENTION_EMPTY
+
   return (
     <div className="floating-composer-file-mention-menu">
       <div className="floating-composer-file-mention-title">
         <FileText strokeWidth={1.9} />
-        <span>Insert file reference</span>
+        <span>{COMPOSER_FILE_MENTION_MENU_TITLE}</span>
+        {loading ? (
+          <Loader2 strokeWidth={1.9} className="floating-composer-file-mention-spinner" />
+        ) : null}
       </div>
       {items.length > 0 ? (
         <div className="floating-composer-file-mention-list">
@@ -630,6 +643,7 @@ export function resolveFloatingComposerSnapshot(
     showPlusMenu: false,
     showSlashMenu: false,
     showFileMentionMenu: false,
+    fileMentionLoading: false,
     showGoalFloater: false,
     showGoalPanel: false,
     showChangeSummary: false,
@@ -668,6 +682,21 @@ export function resolveFloatingComposerSnapshot(
       return { ...base, input: '/res', showSlashMenu: true }
     case 'fileMention':
       return { ...base, input: 'Check @src/rend', showFileMentionMenu: true }
+    case 'fileMentionLoading':
+      return {
+        ...base,
+        input: 'Check @src/rend',
+        showFileMentionMenu: true,
+        fileMentionLoading: true,
+        fileMentions: [],
+      }
+    case 'fileMentionEmpty':
+      return {
+        ...base,
+        input: 'Check @zzz-no-match',
+        showFileMentionMenu: true,
+        fileMentions: [],
+      }
     case 'goalFloater':
       return { ...base, showGoalFloater: true, goal: COMPOSER_GOAL_PREVIEW, goalBadge: true }
     case 'goalPanel':
@@ -765,7 +794,10 @@ export function FloatingComposer({
         ) : null}
 
         {snapshot.showFileMentionMenu ? (
-          <ComposerFileMentionMenu items={snapshot.fileMentions} />
+          <ComposerFileMentionMenu
+            items={snapshot.fileMentions}
+            loading={snapshot.fileMentionLoading}
+          />
         ) : null}
 
         {snapshot.showGoalPanel ? (

@@ -36721,6 +36721,14 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
   color: var(--ds-text-faint);
 }
 
+.floating-composer-file-mention-title .floating-composer-file-mention-spinner {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-left: auto;
+  color: var(--ds-text-faint);
+  animation: spin 0.8s linear infinite;
+}
+
 .floating-composer-slash-menu-list,
 .floating-composer-file-mention-list {
   display: flex;

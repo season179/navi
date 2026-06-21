@@ -7,7 +7,10 @@ import {
   CONTEXT_CAPACITY_PREVIEW,
 } from '../components/ContextCapacityPopover'
 import { Composer } from '../components/Composer'
-import { COMPOSER_FILE_MENTION_PREVIEW, COMPOSER_FILE_REFERENCES_PREVIEW } from '../lib/composerFileReferences'
+import {
+  COMPOSER_FILE_REFERENCES_PREVIEW,
+  resolveComposerFileMentionPreview,
+} from '../lib/composerFileReferences'
 import {
   COMPOSER_ATTACHMENTS_PREVIEW,
   resolveComposerAttachmentErrorPreview,
@@ -646,7 +649,7 @@ function HomePage() {
     if (typeof window === 'undefined') return ''
     const params = new URLSearchParams(window.location.search)
     if (params.has('composerFileMentionPreview')) {
-      return 'Please review @src/ren'
+      return resolveComposerFileMentionPreview(params.get('composerFileMentionPreview')).draft
     }
     if (params.has('composerPlanModePreview')) {
       return COMPOSER_PLAN_MODE_PLACEHOLDER
@@ -693,13 +696,13 @@ function HomePage() {
     return new URLSearchParams(window.location.search).has('contextCapacityPreview')
   }, [])
 
-  // Visual preview for the ported ComposerFileMentionMenu (?composerFileMentionPreview=1).
+  // Visual preview for the ported ComposerFileMentionMenu
+  // (?composerFileMentionPreview=1|loading|empty).
   const composerFileMentionPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
-    if (!new URLSearchParams(window.location.search).has('composerFileMentionPreview')) {
-      return undefined
-    }
-    return COMPOSER_FILE_MENTION_PREVIEW
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerFileMentionPreview')) return undefined
+    return resolveComposerFileMentionPreview(params.get('composerFileMentionPreview'))
   }, [])
 
   // Visual preview for the ported ComposerChangeSummary (?composerChangeSummaryPreview=1).
@@ -1282,7 +1285,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
+  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1292,6 +1295,8 @@ function HomePage() {
     if (value === 'plusMenu') return 'plusMenu'
     if (value === 'slashCommands') return 'slashCommands'
     if (value === 'fileMention') return 'fileMention'
+    if (value === 'fileMentionLoading') return 'fileMentionLoading'
+    if (value === 'fileMentionEmpty') return 'fileMentionEmpty'
     if (value === 'goalFloater') return 'goalFloater'
     if (value === 'goalPanel') return 'goalPanel'
     if (value === 'attachments') return 'attachments'
@@ -3851,7 +3856,8 @@ function HomePage() {
               : 'Send a message to Navi…'
       }
       skills={skills}
-      fileMentionCandidates={composerFileMentionPreview}
+      fileMentionCandidates={composerFileMentionPreview?.candidates}
+      fileMentionLoading={composerFileMentionPreview?.loading}
       changedFiles={composerChangeSummaryPreview?.files}
       changedStats={composerChangeSummaryPreview?.stats}
       fileReferences={composerFileReferencesPreview}
