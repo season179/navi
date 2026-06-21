@@ -476,6 +476,10 @@ import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
 import {
+  ModelChipsInputPreview,
+  type ModelChipsInputPreviewMode,
+} from '../components/providers/ModelChipsInput'
+import {
   ProviderModelImportDialogPreview,
   type ProviderModelImportDialogPreviewMode,
 } from '../components/providers/ProviderModelImportDialog'
@@ -1351,6 +1355,18 @@ function HomePage() {
     if (value === 'busy') return 'busy'
     if (value === 'error') return 'error'
     return 'add'
+  }, [])
+
+  // Visual preview for the ported ModelChipsInput
+  // (?modelChipsInputPreview=1|empty|many).
+  const modelChipsInputPreviewMode = useMemo((): ModelChipsInputPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('modelChipsInputPreview')) return null
+    const value = params.get('modelChipsInputPreview')
+    if (value === 'empty') return 'empty'
+    if (value === 'many') return 'many'
+    return 'default'
   }, [])
 
   // Visual preview for the ported ProviderModelImportDialog
@@ -2639,6 +2655,10 @@ function HomePage() {
 
   if (scheduleTasksViewPreviewMode) {
     return <ScheduleTasksViewPreview mode={scheduleTasksViewPreviewMode} />
+  }
+
+  if (modelChipsInputPreviewMode) {
+    return <ModelChipsInputPreview mode={modelChipsInputPreviewMode} />
   }
 
   if (providerModelImportDialogPreviewMode) {

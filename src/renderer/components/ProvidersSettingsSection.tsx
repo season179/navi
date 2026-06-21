@@ -27,6 +27,7 @@ import {
   Toggle,
   type InlineNotice,
 } from './SettingsControls'
+import { ModelChipsInput } from './providers/ModelChipsInput'
 import {
   ProviderModelsManager,
   providerModelEntriesFromIds,
@@ -125,6 +126,7 @@ const COPY = {
   providerModelListDesc: 'Models available for chat and capability routing.',
   providerModelEmpty: 'No models yet. Add one manually or fetch from the API.',
   modelProviderModelsPlaceholder: 'Type a model ID and press Enter',
+  modelProviderModelRemove: (model: string) => `Remove ${model}`,
   modelProviderImageCapability: 'Image capability',
   modelProviderImageCapabilityDesc: 'Enable image generation models for this provider.',
   modelProviderSpeechCapability: 'Speech capability',
@@ -426,6 +428,16 @@ export function ProvidersSettingsSection({
     }
     updateActiveProvider({
       [key]: enabled ? activeProvider[key] ?? defaults : undefined,
+    })
+  }
+
+  const updateCapabilityModels = (
+    key: 'image' | 'speech' | 'textToSpeech' | 'music' | 'video',
+    models: string[],
+  ): void => {
+    if (!activeProvider?.[key]) return
+    updateActiveProvider({
+      [key]: { ...activeProvider[key]!, models },
     })
   }
 
@@ -761,11 +773,13 @@ export function ProvidersSettingsSection({
                           </label>
                           <label className="providers-settings-field is-wide">
                             {COPY.imageGenModel}
-                            <input
-                              className="settings-text-input"
-                              value={capability.models.join(', ')}
+                            <ModelChipsInput
+                              key={`${activeProvider.id}-${key}`}
+                              values={capability.models}
+                              onChange={(models) => updateCapabilityModels(key, models)}
                               placeholder={COPY.modelProviderModelsPlaceholder}
-                              readOnly
+                              inputAriaLabel={title}
+                              removeLabel={COPY.modelProviderModelRemove}
                             />
                           </label>
                         </div>

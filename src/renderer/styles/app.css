@@ -36844,3 +36844,112 @@ button.usage-heatmap-cell:focus {
   box-shadow: 0 12px 32px rgba(20, 47, 95, 0.08);
 }
 
+/* ---------------------------------------------------------------------------
+   model-chips-input (Kun settings-section-providers.tsx ModelChipsInput port)
+   --------------------------------------------------------------------------- */
+.model-chips-input {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  border-radius: 12px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-card);
+  padding: 6px 8px;
+  box-shadow: 0 1px 2px rgba(20, 47, 95, 0.05);
+}
+
+.model-chips-input:focus-within {
+  border-color: color-mix(in srgb, var(--ds-accent) 40%, var(--ds-border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ds-accent) 30%, transparent);
+}
+
+.model-chips-input-chip {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  border-radius: 9999px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-bg-main) 60%, transparent);
+  padding: 2px 4px 2px 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: var(--ds-text);
+}
+
+.model-chips-input-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.model-chips-input-chip-remove {
+  display: inline-flex;
+  border: none;
+  border-radius: 9999px;
+  padding: 2px;
+  background: transparent;
+  color: var(--ds-text-faint);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.model-chips-input-chip-remove:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+.model-chips-input-chip-remove-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.model-chips-input-field {
+  min-width: 150px;
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--ds-text);
+}
+
+.model-chips-input-field::placeholder {
+  color: var(--ds-text-faint);
+}
+
+.model-chips-input-field:focus {
+  outline: none;
+}
+
+.model-chips-input-preview-wrap {
+  display: flex;
+  min-height: 100vh;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 24px;
+  background: var(--ds-main);
+}
+
+.model-chips-input-preview-card {
+  width: min(640px, 100%);
+  border-radius: 16px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-card);
+  padding: 20px;
+  box-shadow: 0 12px 32px rgba(20, 47, 95, 0.08);
+}
+
+.model-chips-input-preview-label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-text-muted);
+}
+
