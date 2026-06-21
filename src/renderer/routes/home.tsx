@@ -317,6 +317,10 @@ import {
   WriteWorkspaceToolbarPreview,
   type WriteWorkspaceToolbarPreviewMode,
 } from '../components/WriteWorkspaceToolbar'
+import {
+  WriteImagePreviewPreview,
+  type WriteImagePreviewPreviewMode,
+} from '../components/WriteImagePreview'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -744,6 +748,19 @@ function HomePage() {
       if (value === 'assistant') return 'assistant'
       if (value === 'review') return 'review'
       if (value === 'image') return 'image'
+      return 'default'
+    }, [])
+
+  // Visual preview for the ported WriteImagePreview
+  // (?writeImagePreview=1|actual|zoomed).
+  const writeImagePreviewPreviewMode =
+    useMemo((): WriteImagePreviewPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('writeImagePreview')) return null
+      const value = params.get('writeImagePreview')
+      if (value === 'actual') return 'actual'
+      if (value === 'zoomed') return 'zoomed'
       return 'default'
     }, [])
 
@@ -1628,6 +1645,10 @@ function HomePage() {
 
   if (writeWorkspaceToolbarPreviewMode) {
     return <WriteWorkspaceToolbarPreview mode={writeWorkspaceToolbarPreviewMode} />
+  }
+
+  if (writeImagePreviewPreviewMode) {
+    return <WriteImagePreviewPreview mode={writeImagePreviewPreviewMode} />
   }
 
   if (generalSettingsPreviewMode) {
