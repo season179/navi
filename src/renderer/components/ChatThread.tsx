@@ -11,6 +11,7 @@ import {
   TimelineCollapseEarlierButton,
   TimelineShowEarlierButton,
 } from './TimelinePaginationControls'
+import { ThreadForkBanner, ThreadForkPoint } from './ThreadForkBanner'
 
 const TURN_PAGE_SIZE = 18
 const AUTO_COLLAPSE_THRESHOLD = 24
@@ -89,7 +90,21 @@ function turnPreviewLabel(turn: ChatTurn, index: number): string {
   return oneLine.length > 48 ? `${oneLine.slice(0, 47).trimEnd()}…` : oneLine
 }
 
-export function ChatThread({ messages }: { messages: ChatMessage[] }): ReactElement {
+type ChatThreadProps = {
+  messages: ChatMessage[]
+  /** When true, renders Kun's fork banner above the turn list. */
+  showForkBanner?: boolean
+  forkedFromTitle?: string
+  /** Absolute turn index (0-based) at which the fork boundary marker is inserted. */
+  forkBoundaryTurnIndex?: number
+}
+
+export function ChatThread({
+  messages,
+  showForkBanner = false,
+  forkedFromTitle,
+  forkBoundaryTurnIndex,
+}: ChatThreadProps): ReactElement {
   const bottomRef = useRef<HTMLDivElement>(null)
   const turnRefMap = useRef(new Map<string, HTMLDivElement>())
   const turns = useMemo(() => groupMessagesIntoTurns(messages), [messages])
@@ -160,42 +175,58 @@ export function ChatThread({ messages }: { messages: ChatMessage[] }): ReactElem
           false,
         )}`}
       >
+        {showForkBanner ? <ThreadForkBanner parentTitle={forkedFromTitle} /> : null}
+
         <TimelineShowEarlierButton
           hiddenCount={hiddenTurnCount}
           pageSize={TURN_PAGE_SIZE}
           onShowEarlier={loadEarlierTurns}
         />
 
-        {visibleTurns.map((turn) => (
-          <div
-            key={turn.key}
-            ref={(node) => {
-              if (node) {
-                turnRefMap.current.set(turn.key, node)
-              } else {
-                turnRefMap.current.delete(turn.key)
-              }
-            }}
-            className="message-timeline-turn-anchor scroll-mt-6"
-          >
-            <div className="message-timeline-turn">
-              {turn.messages.map((message) => {
-                const snapshot = chatMessageToSnapshot(message)
-                const streaming = message.status === 'streaming'
-                const showBubble =
-                  snapshot &&
-                  !(streaming && snapshot.kind === 'assistant' && snapshot.text.trim() === '')
+        {visibleTurns.map((turn, index) => {
+          const absoluteTurnIndex = hiddenTurnCount + index
+          const showForkPoint =
+            typeof forkBoundaryTurnIndex === 'number' &&
+            forkBoundaryTurnIndex === absoluteTurnIndex
 
-                return (
-                  <div key={message.id}>
-                    {showBubble ? <MessageBubble block={snapshot} /> : null}
-                    {streaming ? <LiveTurnProgressRow /> : null}
-                  </div>
-                )
-              })}
+          return (
+            <div
+              key={turn.key}
+              ref={(node) => {
+                if (node) {
+                  turnRefMap.current.set(turn.key, node)
+                } else {
+                  turnRefMap.current.delete(turn.key)
+                }
+              }}
+              className="message-timeline-turn-anchor scroll-mt-6"
+            >
+              {showForkPoint ? <ThreadForkPoint parentTitle={forkedFromTitle} /> : null}
+              <div className="message-timeline-turn">
+                {turn.messages.map((message) => {
+                  const snapshot = chatMessageToSnapshot(message)
+                  const streaming = message.status === 'streaming'
+                  const showBubble =
+                    snapshot &&
+                    !(streaming && snapshot.kind === 'assistant' && snapshot.text.trim() === '')
+
+                  return (
+                    <div key={message.id}>
+                      {showBubble ? <MessageBubble block={snapshot} /> : null}
+                      {streaming ? <LiveTurnProgressRow /> : null}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
+
+        {typeof forkBoundaryTurnIndex === 'number' &&
+        forkBoundaryTurnIndex === totalTurns &&
+        totalTurns > 0 ? (
+          <ThreadForkPoint parentTitle={forkedFromTitle} />
+        ) : null}
 
         {hiddenTurnCount === 0 ? (
           <TimelineCollapseEarlierButton

@@ -2605,6 +2605,17 @@ function HomePage() {
     const project = projects.find((entry) => entry.id === currentProjectId)
     const workspaceLabel = project?.label ?? project?.name ?? 'navi'
 
+    const forkHeaderFields =
+      threadForkBannerPreviewMode != null
+        ? {
+            forkedFromThreadId: 'preview-fork',
+            forkedFromTitle:
+              threadForkBannerPreviewMode === 'unknown'
+                ? undefined
+                : THREAD_FORK_BANNER_PREVIEW_TITLE,
+          }
+        : {}
+
     if (empty) {
       return {
         title: 'New conversation',
@@ -2612,6 +2623,7 @@ function HomePage() {
         workspacePath: projectPath,
         mode: 'chat',
         updatedAt: conversation?.updatedAt ?? Date.now(),
+        ...forkHeaderFields,
       }
     }
 
@@ -2621,8 +2633,39 @@ function HomePage() {
       workspacePath: projectPath,
       mode: 'chat',
       updatedAt: conversation?.updatedAt ?? Date.now(),
+      ...forkHeaderFields,
     }
-  }, [conversations, currentId, empty, projects, currentProjectId, projectPath])
+  }, [
+    conversations,
+    currentId,
+    empty,
+    projects,
+    currentProjectId,
+    projectPath,
+    threadForkBannerPreviewMode,
+  ])
+
+  const productionChatFork = useMemo(() => {
+    if (!threadForkBannerPreviewMode && !threadForkPointPreviewMode) {
+      return {
+        showForkBanner: false,
+        forkedFromTitle: undefined,
+        forkBoundaryTurnIndex: undefined,
+      }
+    }
+
+    const forkTitle =
+      threadForkBannerPreviewMode === 'unknown' ||
+      threadForkPointPreviewMode === 'unknown'
+        ? undefined
+        : THREAD_FORK_BANNER_PREVIEW_TITLE
+
+    return {
+      showForkBanner: Boolean(threadForkBannerPreviewMode),
+      forkedFromTitle: forkTitle,
+      forkBoundaryTurnIndex: threadForkPointPreviewMode ? 0 : undefined,
+    }
+  }, [threadForkBannerPreviewMode, threadForkPointPreviewMode])
 
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
@@ -3251,7 +3294,12 @@ function HomePage() {
           }}
         />
       ) : null}
-      <ChatThread messages={messages} />
+      <ChatThread
+        messages={messages}
+        showForkBanner={productionChatFork.showForkBanner}
+        forkedFromTitle={productionChatFork.forkedFromTitle}
+        forkBoundaryTurnIndex={productionChatFork.forkBoundaryTurnIndex}
+      />
     </>
   )
 
@@ -4151,7 +4199,8 @@ function HomePage() {
         </div>
       ) : null}
 
-      {threadForkBannerPreviewMode || threadForkPointPreviewMode ? (
+      {(!useProductionWorkbenchLayout || empty) &&
+      (threadForkBannerPreviewMode || threadForkPointPreviewMode) ? (
         <div className="thread-fork-preview">
           {threadForkBannerPreviewMode ? (
             <ThreadForkBanner
