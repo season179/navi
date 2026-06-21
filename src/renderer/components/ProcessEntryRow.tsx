@@ -41,6 +41,31 @@ export type ProcessEntrySnapshot = {
   pendingUserInput?: boolean
 }
 
+function normalizeProcessText(text: string): string {
+  return text.replace(/\s+/g, ' ').trim().toLowerCase()
+}
+
+function entryFullSummary(entry: ProcessEntrySnapshot): string {
+  return [entry.verb, entry.rest].filter(Boolean).join(' ').trim()
+}
+
+/** Kun getProcessDetail — hide expand chevron when detail duplicates the summary line. */
+function processEntryHasExpandableDetail(entry: ProcessEntrySnapshot): boolean {
+  if (entry.nestedBubble) return true
+  const detailText = entry.detailText?.trim()
+  if (!detailText) return false
+  if (
+    entry.detailKind === 'patch' ||
+    entry.detailKind === 'error' ||
+    entry.detailKind === 'assistant' ||
+    entry.detailKind === 'approval' ||
+    entry.detailKind === 'user_input'
+  ) {
+    return true
+  }
+  return normalizeProcessText(detailText) !== normalizeProcessText(entryFullSummary(entry))
+}
+
 const PREVIEW_PATCH = `--- a/src/auth/middleware.ts
 +++ b/src/auth/middleware.ts
 @@ -12,7 +12,9 @@ export function authMiddleware(req, res, next) {
@@ -126,6 +151,15 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
     detailText: 'Opened middleware.ts to inspect current token handling.',
     detailKind: 'command',
     meta: RUNTIME_META_CHIPS_PREVIEW,
+  },
+  redundantDetail: {
+    verb: 'Read',
+    rest: 'src/auth/middleware.ts',
+    filePath: 'src/auth/middleware.ts',
+    collapsible: true,
+    expanded: false,
+    detailText: 'Read src/auth/middleware.ts',
+    detailKind: 'command',
   },
   assistant: {
     verb: 'Text',
@@ -244,8 +278,7 @@ function ProcessEntryDetail({
 export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElement {
   const [userOpen, setUserOpen] = useState<boolean | null>(null)
   const canExpand =
-    entry.collapsible !== false &&
-    (Boolean(entry.detailText) || Boolean(entry.nestedBubble))
+    entry.collapsible !== false && processEntryHasExpandableDetail(entry)
   const defaultOpen = entry.error === true
   const autoOpenPending =
     entry.pendingApproval === true ||

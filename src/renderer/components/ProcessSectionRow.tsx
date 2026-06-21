@@ -509,6 +509,31 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
       },
     ],
   },
+  executionRedundantDetail: {
+    kind: 'execution',
+    title: 'Edited 1 file · Ran 1 command',
+    collapsible: true,
+    expanded: true,
+    stackEntries: [
+      {
+        id: 'read',
+        summary: 'Read src/auth/middleware.ts',
+        filePath: 'src/auth/middleware.ts',
+        detailText: 'Read src/auth/middleware.ts',
+        detailKind: 'command',
+      },
+      {
+        id: 'edit',
+        summary: 'Edit src/auth/middleware.ts',
+        filePath: 'src/auth/middleware.ts',
+        collapsible: true,
+        expanded: false,
+        detailText: PREVIEW_PATCH,
+        detailKind: 'patch',
+        detailFilePath: 'src/auth/middleware.ts',
+      },
+    ],
+  },
   executionRequestInput: {
     kind: 'execution',
     title: 'Waiting for input',
@@ -570,12 +595,38 @@ type Props = {
   singleReasoningSection?: boolean
 }
 
+function normalizeProcessText(text: string): string {
+  return text.replace(/\s+/g, ' ').trim().toLowerCase()
+}
+
 function splitSummaryVerb(summary: string): { verb: string; rest: string } {
   const trimmed = summary.trim()
   if (!trimmed) return { verb: '', rest: '' }
   const space = trimmed.search(/\s/)
   if (space < 0) return { verb: trimmed, rest: '' }
   return { verb: trimmed.slice(0, space), rest: trimmed.slice(space + 1).trim() }
+}
+
+/** Kun getProcessDetail — hide expand chevron when detail duplicates the summary line. */
+function stackEntryHasExpandableDetail(entry: ProcessStackEntrySnapshot): boolean {
+  if (entry.nestedBubble) return true
+  const detailText = entry.detailText?.trim()
+  if (!detailText) return false
+  if (
+    entry.detailKind === 'patch' ||
+    entry.detailKind === 'error' ||
+    entry.detailKind === 'assistant' ||
+    entry.detailKind === 'approval' ||
+    entry.detailKind === 'user_input'
+  ) {
+    return true
+  }
+  return normalizeProcessText(detailText) !== normalizeProcessText(entry.summary)
+}
+
+function sectionHasError(section: ProcessSectionSnapshot): boolean {
+  if (section.hasError === true) return true
+  return section.stackEntries?.some((entry) => entry.error === true) ?? false
 }
 
 function stackEntryToProcessEntry(
@@ -691,8 +742,7 @@ function ProcessStackEntryRow({
   onToggle: () => void
 }): ReactElement {
   const canExpand =
-    (Boolean(entry.detailText) || Boolean(entry.nestedBubble)) &&
-    entry.collapsible !== false
+    stackEntryHasExpandableDetail(entry) && entry.collapsible !== false
   const rowActive = entry.active === true
 
   const handleToggleButton = (event: MouseEvent<HTMLButtonElement>): void => {
@@ -792,7 +842,7 @@ function ProcessStackRows({
   return (
     <div className="ds-work-stack">
       {entries.map((entry) => {
-        const hasDetail = Boolean(entry.detailText) || Boolean(entry.nestedBubble)
+        const hasDetail = stackEntryHasExpandableDetail(entry)
         const staticOpen = hasDetail && entry.collapsible === false
         const defaultOpen = entry.error === true
         const forceOpen =
@@ -880,8 +930,9 @@ export function ProcessSectionRow({
       : (section.stackEntries?.length ?? 0) > 0
   const pendingApproval = sectionHasPendingApproval(section)
   const requestUserInput = sectionHasRequestUserInput(section)
+  const hasError = sectionHasError(section)
   const defaultExpanded =
-    section.hasError === true ||
+    hasError ||
     pendingApproval ||
     (section.active === true && section.kind === 'reasoning') ||
     (section.processing === true &&
@@ -905,9 +956,9 @@ export function ProcessSectionRow({
     if (isControlled) return
     setUserExpanded(!(userExpanded ?? defaultExpanded))
   }
-  const showActiveError = section.showActiveError === true
-  const titleClass = section.hasError ? 'is-error' : ''
-  const titleShimmer = section.active && !section.hasError ? 'ds-shiny-text' : ''
+  const showActiveError = section.active === true && hasError
+  const titleClass = hasError ? 'is-error' : ''
+  const titleShimmer = section.active && !hasError ? 'ds-shiny-text' : ''
   const displayTitle = resolveProcessSectionTitle(section, {
     singleReasoningSection,
     reasoningDurationMs,
