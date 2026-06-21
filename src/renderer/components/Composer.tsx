@@ -3,9 +3,8 @@
 // on the right. Controlled by the parent; sends on Enter (Shift+Enter for a
 // newline) and turns into a stop button while a reply is streaming.
 
-import { useEffect, useRef, type KeyboardEvent } from 'react'
-import { Plus, ChevronDown, ArrowUp, Square } from 'lucide-react'
-import { MODEL_LABEL } from '../../shared/flue'
+import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
+import { Plus, ArrowUp, Square } from 'lucide-react'
 
 interface ComposerProps {
   value: string
@@ -15,6 +14,8 @@ interface ComposerProps {
   busy?: boolean
   disabled?: boolean
   placeholder?: string
+  /** Model picker rendered in the toolbar (replaces the old static model chip). */
+  modelChip?: ReactNode
 }
 
 export function Composer({
@@ -25,6 +26,7 @@ export function Composer({
   busy = false,
   disabled = false,
   placeholder = 'Send a message to Navi…',
+  modelChip,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -63,10 +65,7 @@ export function Composer({
             <button className="tool-btn" aria-label="Add" title="Add">
               <Plus />
             </button>
-            <button className="model-chip" aria-label="Model">
-              {MODEL_LABEL}
-              <ChevronDown />
-            </button>
+            {modelChip}
           </div>
           <div className="composer-toolbar-right">
             {busy ? (

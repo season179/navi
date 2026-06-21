@@ -5,8 +5,16 @@ const flue: FlueBridge = {
   status: () => ipcRenderer.invoke('flue:status'),
   send: (conversationId, message) => ipcRenderer.invoke('flue:send', conversationId, message),
   cancel: (requestId) => ipcRenderer.invoke('flue:cancel', requestId),
-  setApiKey: (key) => ipcRenderer.invoke('flue:setApiKey', key),
-  setBaseUrl: (url) => ipcRenderer.invoke('flue:setBaseUrl', url),
+  listProviders: () => ipcRenderer.invoke('providers:list'),
+  upsertProvider: (profile, apiKey) => ipcRenderer.invoke('providers:upsert', profile, apiKey),
+  deleteProvider: (id) => ipcRenderer.invoke('providers:delete', id),
+  getDefaultSelection: () => ipcRenderer.invoke('providers:getDefault'),
+  setDefaultSelection: (sel) => ipcRenderer.invoke('providers:setDefault', sel),
+  probeProvider: (req) => ipcRenderer.invoke('providers:probe', req),
+  setActiveModel: (conversationId, providerId, modelId) =>
+    ipcRenderer.invoke('conversations:setActiveModel', conversationId, providerId, modelId),
+  setReasoning: (conversationId, level) =>
+    ipcRenderer.invoke('conversations:setReasoning', conversationId, level),
   onEvent: (listener) => {
     const handler = (_evt: unknown, message: FlueStreamMessage) => listener(message)
     ipcRenderer.on('flue:event', handler)

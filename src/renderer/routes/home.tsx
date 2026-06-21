@@ -5,12 +5,14 @@ import { TopBar } from '../components/TopBar'
 import { HeroStage } from '../components/HeroStage'
 import { Composer } from '../components/Composer'
 import { ChatThread } from '../components/ChatThread'
-import { ApiKeyBanner } from '../components/ApiKeyBanner'
-import { useNaviThread } from '../flue/NaviChatContext'
+import { FloatingModelPicker } from '../components/FloatingModelPicker'
+import { ProvidersSettings } from '../components/providers/ProvidersSettings'
+import { hasUsableProvider } from '../../shared/flue'
+import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
 
-function statusLabel(ready: boolean, hasApiKey: boolean, error?: string): string {
-  if (!hasApiKey) return 'needs API key'
+function statusLabel(ready: boolean, hasProvider: boolean, error?: string): string {
+  if (!hasProvider) return 'needs provider'
   if (error) return 'backend error'
   if (!ready) return 'connecting…'
   return 'ready'
@@ -20,10 +22,20 @@ function HomePage() {
   const { collapsed, toggle } = useSidebar()
   const [draft, setDraft] = useState('')
   const [showSettings, setShowSettings] = useState(false)
-  const { messages, status, busy, send, cancel, setApiKey, setBaseUrl } = useNaviThread()
+  const { messages, status, busy, send, cancel, activeSelection, pickModel, pickReasoning } =
+    useNaviThread()
+  const {
+    providerProfiles,
+    defaultSelection,
+    upsertProvider,
+    removeProvider,
+    probeProvider,
+    setDefaultSelection,
+  } = useNaviList()
 
   const empty = messages.length === 0
-  const composerDisabled = !status.ready || !status.hasApiKey
+  const hasProvider = hasUsableProvider(status, providerProfiles)
+  const composerDisabled = !status.ready || !hasProvider
 
   const handleSend = () => {
     const text = draft
@@ -35,7 +47,7 @@ function HomePage() {
     <>
       <TopBar
         title={empty ? 'New conversation' : 'Conversation'}
-        subtitle={statusLabel(status.ready, status.hasApiKey, status.error)}
+        subtitle={statusLabel(status.ready, hasProvider, status.error)}
         sidebarCollapsed={collapsed}
         onToggleSidebar={toggle}
         onOpenSettings={() => setShowSettings((v) => !v)}
@@ -43,20 +55,22 @@ function HomePage() {
       />
 
       {showSettings ? (
-        <div className="composer-wrap">
-          <div style={{ width: '100%', maxWidth: 760 }}>
-            <ApiKeyBanner
-              mode="settings"
-              currentBaseUrl={status.baseUrl}
-              onSaveKey={setApiKey}
-              onSaveBaseUrl={setBaseUrl}
+        <div className="stage-scroll">
+          <div className="providers-wrap">
+            <ProvidersSettings
+              providers={providerProfiles}
+              statuses={status.providers}
+              ready={status.ready}
+              defaultSelection={defaultSelection}
+              onUpsert={upsertProvider}
+              onDelete={removeProvider}
+              onSetDefault={setDefaultSelection}
+              onProbe={probeProvider}
               onClose={() => setShowSettings(false)}
             />
           </div>
         </div>
-      ) : null}
-
-      {empty ? (
+      ) : empty ? (
         <div className="stage-scroll">
           <div className="hero">
             <HeroStage />
@@ -64,30 +78,16 @@ function HomePage() {
             <p className="hero-sub">
               Navi is your local-first companion. Start a conversation below.
             </p>
-            {!status.hasApiKey && !showSettings ? (
-              <ApiKeyBanner
-                currentBaseUrl={status.baseUrl}
-                onSaveKey={setApiKey}
-                onSaveBaseUrl={setBaseUrl}
-              />
+            {!hasProvider ? (
+              <button className="btn btn-primary connect-provider" onClick={() => setShowSettings(true)}>
+                Connect a provider
+              </button>
             ) : null}
           </div>
         </div>
       ) : (
         <ChatThread messages={messages} />
       )}
-
-      {!empty && !status.hasApiKey && !showSettings ? (
-        <div className="composer-wrap">
-          <div style={{ width: '100%', maxWidth: 760 }}>
-            <ApiKeyBanner
-              currentBaseUrl={status.baseUrl}
-              onSaveKey={setApiKey}
-              onSaveBaseUrl={setBaseUrl}
-            />
-          </div>
-        </div>
-      ) : null}
 
       <Composer
         value={draft}
@@ -97,11 +97,21 @@ function HomePage() {
         busy={busy}
         disabled={composerDisabled}
         placeholder={
-          !status.hasApiKey
-            ? 'Add your API key to start chatting…'
+          !hasProvider
+            ? 'Add a provider to start chatting…'
             : !status.ready
               ? 'Connecting to Navi…'
               : 'Send a message to Navi…'
+        }
+        modelChip={
+          <FloatingModelPicker
+            providers={providerProfiles}
+            statuses={status.providers}
+            active={activeSelection}
+            onPickModel={pickModel}
+            onPickReasoning={pickReasoning}
+            onConfigure={() => setShowSettings(true)}
+          />
         }
       />
     </>
