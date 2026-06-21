@@ -16,6 +16,8 @@ export type WriteRichEditorImageWidgetPreviewMode =
   | 'infographicPrototype'
   | 'htmlEmbed'
   | 'htmlEmbedLoaded'
+  | 'htmlEmbedError'
+  | 'htmlEmbedMissing'
 
 const PREVIEW_BROKEN_IMAGE_ALT = 'Hero screenshot'
 const PREVIEW_BROKEN_IMAGE_TITLE = 'File not found: ./assets/missing-hero.png'
@@ -112,6 +114,24 @@ export function imageWidgetSnapshotForMode(
       },
     }
   }
+  if (mode === 'htmlEmbedError') {
+    return {
+      htmlEmbed: {
+        rawSrc: PREVIEW_HTML_EMBED_SRC,
+        alt: PREVIEW_HTML_EMBED_ALT,
+        visualState: 'error',
+      },
+    }
+  }
+  if (mode === 'htmlEmbedMissing') {
+    return {
+      htmlEmbed: {
+        rawSrc: PREVIEW_HTML_EMBED_SRC,
+        alt: PREVIEW_HTML_EMBED_ALT,
+        visualState: 'missing',
+      },
+    }
+  }
   return {
     htmlEmbed: {
       rawSrc: PREVIEW_HTML_EMBED_SRC,
@@ -132,6 +152,8 @@ export function isWriteRichEditorImageWidgetMode(
     value === 'infographicDesign' ||
     value === 'infographicPrototype' ||
     value === 'htmlEmbed' ||
-    value === 'htmlEmbedLoaded'
+    value === 'htmlEmbedLoaded' ||
+    value === 'htmlEmbedError' ||
+    value === 'htmlEmbedMissing'
   )
 }

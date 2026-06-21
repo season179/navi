@@ -1427,7 +1427,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported WriteMarkdownPreview
-  // (?writeMarkdownPreview=1|plain|error|imagePending|imageError|infographic|htmlEmbed|…).
+  // (?writeMarkdownPreview=1|plain|error|imagePending|imageError|infographic|htmlEmbed|htmlEmbedLoaded|htmlEmbedError|htmlEmbedMissing|…).
   const writeMarkdownPreviewPreviewMode = useMemo((): WriteMarkdownPreviewPreviewMode | null => {
     if (typeof window === 'undefined') return null
     return resolveWriteMarkdownPreviewMode(new URLSearchParams(window.location.search))
@@ -1489,7 +1489,7 @@ function HomePage() {
     return 'default'
   }, [])
 
-  // (?writeRichEditor=1|readonly|fallback|requirementBadges|inlineCompletion|inlineEdit|imageError|loadedImage|infographic|infographicStale|infographicDesign|infographicPrototype|htmlEmbed|htmlEmbedLoaded).
+  // (?writeRichEditor=1|readonly|fallback|requirementBadges|inlineCompletion|inlineEdit|imageError|loadedImage|infographic|infographicStale|infographicDesign|infographicPrototype|htmlEmbed|htmlEmbedLoaded|htmlEmbedError|htmlEmbedMissing).
   const writeRichEditorPreviewMode = useMemo((): WriteRichEditorPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)

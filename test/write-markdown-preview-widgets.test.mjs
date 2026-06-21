@@ -35,6 +35,14 @@ test('resolveWriteMarkdownPreviewMode maps widget preview params', () => {
     'htmlEmbedLoaded',
   )
   assert.equal(
+    resolveWriteMarkdownPreviewMode(new URLSearchParams('writeMarkdownPreview=htmlEmbedError')),
+    'htmlEmbedError',
+  )
+  assert.equal(
+    resolveWriteMarkdownPreviewMode(new URLSearchParams('writeMarkdownPreview=htmlEmbedMissing')),
+    'htmlEmbedMissing',
+  )
+  assert.equal(
     resolveWriteMarkdownPreviewMode(new URLSearchParams('writeMarkdownPreview=imageError')),
     'imageError',
   )
@@ -66,5 +74,15 @@ test('previewContentForMode wires widget overrides for image, infographic, and h
   assert.match(htmlEmbed.content, /\.html\)/)
   assert.deepEqual(htmlEmbed.widgetOverrides, {
     htmlEmbed: { visualState: 'cover' },
+  })
+
+  const htmlEmbedError = previewContentForMode('htmlEmbedError')
+  assert.deepEqual(htmlEmbedError.widgetOverrides, {
+    htmlEmbed: { visualState: 'error' },
+  })
+
+  const htmlEmbedMissing = previewContentForMode('htmlEmbedMissing')
+  assert.deepEqual(htmlEmbedMissing.widgetOverrides, {
+    htmlEmbed: { visualState: 'missing' },
   })
 })

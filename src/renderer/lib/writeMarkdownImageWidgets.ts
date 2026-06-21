@@ -64,6 +64,8 @@ export type WriteMarkdownPreviewPreviewMode =
   | 'infographicPrototype'
   | 'htmlEmbed'
   | 'htmlEmbedLoaded'
+  | 'htmlEmbedError'
+  | 'htmlEmbedMissing'
 
 const PREVIEW_INFOGRAPHIC_ID = 'preview-infographic-id'
 const PREVIEW_HTML_EMBED_SRC = '../../proto/launch-mockup.html'
@@ -115,6 +117,8 @@ export function resolveWriteMarkdownPreviewMode(
   if (value === 'infographicPrototype') return 'infographicPrototype'
   if (value === 'htmlEmbed') return 'htmlEmbed'
   if (value === 'htmlEmbedLoaded') return 'htmlEmbedLoaded'
+  if (value === 'htmlEmbedError') return 'htmlEmbedError'
+  if (value === 'htmlEmbedMissing') return 'htmlEmbedMissing'
   return 'default'
 }
 
@@ -138,6 +142,12 @@ export function widgetOverridesForPreviewMode(
   }
   if (mode === 'htmlEmbedLoaded') {
     return { htmlEmbed: { visualState: 'loaded' } }
+  }
+  if (mode === 'htmlEmbedError') {
+    return { htmlEmbed: { visualState: 'error' } }
+  }
+  if (mode === 'htmlEmbedMissing') {
+    return { htmlEmbed: { visualState: 'missing' } }
   }
   if (mode === 'imagePending') {
     return { image: { state: 'pending' } }
@@ -183,7 +193,12 @@ export function previewContentForMode(mode: WriteMarkdownPreviewPreviewMode): {
       widgetOverrides: widgetOverridesForPreviewMode(mode),
     }
   }
-  if (mode === 'htmlEmbed' || mode === 'htmlEmbedLoaded') {
+  if (
+    mode === 'htmlEmbed' ||
+    mode === 'htmlEmbedLoaded' ||
+    mode === 'htmlEmbedError' ||
+    mode === 'htmlEmbedMissing'
+  ) {
     return {
       content: WRITE_MARKDOWN_PREVIEW_HTML_EMBED_SAMPLE,
       isMarkdown: true,

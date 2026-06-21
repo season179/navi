@@ -143,7 +143,9 @@ export function resolveWriteRichEditorPreviewMode(
   | 'infographicDesign'
   | 'infographicPrototype'
   | 'htmlEmbed'
-  | 'htmlEmbedLoaded' {
+  | 'htmlEmbedLoaded'
+  | 'htmlEmbedError'
+  | 'htmlEmbedMissing' {
   if (value === 'readonly') return 'readonly'
   if (value === 'fallback') return 'fallback'
   if (value === 'requirementBadges') return 'requirementBadges'
@@ -157,5 +159,7 @@ export function resolveWriteRichEditorPreviewMode(
   if (value === 'infographicPrototype') return 'infographicPrototype'
   if (value === 'htmlEmbed') return 'htmlEmbed'
   if (value === 'htmlEmbedLoaded') return 'htmlEmbedLoaded'
+  if (value === 'htmlEmbedError') return 'htmlEmbedError'
+  if (value === 'htmlEmbedMissing') return 'htmlEmbedMissing'
   return 'default'
 }
