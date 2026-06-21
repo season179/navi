@@ -160,7 +160,7 @@ function RootLayout() {
             </div>
           ) : null}
 
-          <main className="stage ds-stage-surface ds-chat-stage">
+          <main className="stage ds-stage-surface ds-chat-stage workbench-chat-stage">
             <Outlet />
           </main>
             </div>

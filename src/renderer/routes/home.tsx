@@ -586,6 +586,10 @@ function HomePage() {
   )
   const [productionExecutionSettings, setProductionExecutionSettings] =
     useState<ComposerExecutionSettings>(() => EXECUTION_PICKER_PREVIEW)
+  const [productionRightPanelMode, setProductionRightPanelMode] = useState<RightPanelMode>(null)
+  const [productionTerminalOpen, setProductionTerminalOpen] = useState(false)
+  const [productionFileTreeOpen, setProductionFileTreeOpen] = useState(false)
+  const [productionSideChatOpen, setProductionSideChatOpen] = useState(false)
 
   // Visual preview for the ported GitBranchPicker (?gitBranchPickerPreview=1).
   const gitBranchPickerPreviewMode = useMemo(() => {
@@ -3076,6 +3080,214 @@ function HomePage() {
     )
   }
 
+  const useProductionWorkbenchLayout =
+    !sessionHeaderPreviewMode && !workbenchTopBarPreviewMode
+
+  const chatStageInner = settingsOpen ? (
+    <div className="settings-view ds-drag production-settings-view">
+      <SettingsSidebar
+        category={settingsCategory}
+        setCategory={setSettingsCategory}
+        goBack={closeSettings}
+      />
+      <div className="settings-view-main ds-no-drag">
+        <div className="settings-view-inner">
+          {!hasProvider ? (
+            <div className="settings-view-api-key-banner" role="status">
+              <div className="settings-view-api-key-banner-title">
+                {PRODUCTION_SETTINGS_COPY.apiKeyRequiredTitle}
+              </div>
+              <p className="settings-view-api-key-banner-body">
+                {PRODUCTION_SETTINGS_COPY.apiKeyRequiredBody}
+              </p>
+            </div>
+          ) : null}
+
+          <div className="settings-view-header">
+            <div>
+              <h1 className="settings-view-title">{PRODUCTION_SETTINGS_COPY.title}</h1>
+              <p className="settings-view-subtitle">{PRODUCTION_SETTINGS_COPY.subtitle}</p>
+            </div>
+            <span className="settings-view-save-status is-idle">
+              {PRODUCTION_SETTINGS_COPY.autoApplyHint}
+            </span>
+          </div>
+
+          {settingsCategory === 'providers' ? (
+            <ProvidersSettings
+              embedded
+              providers={providerProfiles}
+              statuses={status.providers}
+              ready={status.ready}
+              defaultSelection={defaultSelection}
+              onUpsert={upsertProvider}
+              onDelete={removeProvider}
+              onSetDefault={setDefaultSelection}
+              onProbe={probeProvider}
+              onClose={closeSettings}
+            />
+          ) : settingsCategory === 'agents' ? (
+            <SkillsSettings projectPath={projectPath} onClose={closeSettings} />
+          ) : (
+            <SettingsSidebarPreviewContent category={settingsCategory} showHeader={false} />
+          )}
+        </div>
+      </div>
+    </div>
+  ) : empty ? (
+    <div className="stage-scroll">
+      {runtimeWakeHeroPreviewMode ? (
+        <div className="runtime-wake-hero-preview-wrap">
+          <RuntimeWakeHero
+            runtimeError={
+              runtimeWakeHeroPreviewMode === 'error'
+                ? RUNTIME_WAKE_HERO_PREVIEW_ERROR
+                : null
+            }
+            waking={runtimeWakeHeroPreviewMode === 'waking' ? true : false}
+          />
+        </div>
+      ) : clawEmptyHeroPreviewMode ? (
+        <ClawEmptyHero
+          agentName={CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME}
+          hasInboundConversation={clawEmptyHeroPreviewMode !== 'needsInbound'}
+        />
+      ) : workspaceSelectEmptyHeroPreview ? (
+        <WorkspaceSelectEmptyHero />
+      ) : initialSessionUsageHeatmapPreviewMode ? (
+        <InitialSessionUsageHeatmap previewMode={initialSessionUsageHeatmapPreviewMode} />
+      ) : (
+        <MessageTimelineEmptyHero
+          ready={status.ready}
+          hasWorkspace={Boolean(projectPath)}
+          runtimeError={status.error}
+          onOpenSettings={() => openSettingsTab('providers')}
+        />
+      )}
+    </div>
+  ) : (
+    <>
+      {status.error && (status.ready || !empty) && !runtimeBannerPreviewMode ? (
+        <RuntimeBanner
+          snapshot={{
+            message: status.error,
+            runtimeReady: status.ready,
+          }}
+          onOpenSettings={() => openSettingsTab('providers')}
+          onRetryConnection={() => {
+            void window.navi.flue.status()
+          }}
+        />
+      ) : null}
+      <ChatThread messages={messages} />
+    </>
+  )
+
+  const composerElement = (
+    <Composer
+      value={draft}
+      onChange={setDraft}
+      onSend={handleSend}
+      onCancel={cancel}
+      busy={busy}
+      disabled={composerDisabled}
+      placeholder={
+        !hasProvider
+          ? 'Add a provider to start chatting…'
+          : !status.ready
+            ? 'Connecting to Navi…'
+            : 'Send a message to Navi…'
+      }
+      skills={skills}
+      modelChip={
+        <FloatingModelPicker
+          providers={providerProfiles}
+          statuses={status.providers}
+          active={activeSelection}
+          onPickModel={pickModel}
+          onPickReasoning={pickReasoning}
+          onConfigure={() => openSettingsTab('providers')}
+        />
+      }
+      contextCapacity={productionContextCapacity}
+      voiceRecording={voiceRecording}
+      queuedMessages={queuedMessagesPreview}
+      executionPicker={
+        hasProvider ? (
+          <FloatingComposerExecutionPicker
+            value={
+              executionPickerPreviewMode ? executionPickerPreview : productionExecutionSettings
+            }
+            disabled={composerDisabled}
+            onChange={(patch) => {
+              if (executionPickerPreviewMode) {
+                setExecutionPickerPreview((current) => ({ ...current, ...patch }))
+                return
+              }
+              setProductionExecutionSettings((current) => ({ ...current, ...patch }))
+            }}
+          />
+        ) : undefined
+      }
+      footerLeft={
+        composerFooterPreview ? (
+          <>
+            {workspaceProjectPickerPreviewMode ? (
+              <WorkspaceProjectPicker
+                snapshot={
+                  workspaceProjectPickerPreviewSnapshot ?? WORKSPACE_PROJECT_PICKER_PREVIEW_EMPTY
+                }
+                acting={workspaceProjectPickerPreviewMode === 'acting'}
+                onSelect={(root) => {
+                  if (workspaceProjectPickerPreviewMode !== 'default') return
+                  setWorkspaceProjectPickerPreview((current) => ({
+                    ...current,
+                    currentRoot: root,
+                  }))
+                }}
+              />
+            ) : null}
+            {gitBranchPickerPreviewMode ? (
+              <GitBranchPicker
+                snapshot={gitBranchPickerPreviewSnapshot}
+                loading={gitBranchPickerPreviewMode === 'loading'}
+                onSwitchBranch={(branch) => {
+                  if (gitBranchPickerPreviewMode !== 'default') return
+                  setGitBranchPickerPreview((current) => {
+                    if (!current.ok) return current
+                    return {
+                      ...current,
+                      currentBranch: branch,
+                      branches: current.branches.map((entry) => ({
+                        ...entry,
+                        current: entry.name === branch,
+                      })),
+                    }
+                  })
+                }}
+              />
+            ) : null}
+          </>
+        ) : productionWorkspaceSnapshot ? (
+          <>
+            <WorkspaceProjectPicker
+              snapshot={productionWorkspaceSnapshot}
+              onSelect={(root) => {
+                const normalized = root.replace(/[/\\]+$/, '').toLowerCase()
+                const project = projects.find((entry) => {
+                  if (!entry.path) return false
+                  return entry.path.replace(/[/\\]+$/, '').toLowerCase() === normalized
+                })
+                if (project) void selectProject(project.id)
+              }}
+            />
+            <GitBranchPicker snapshot={GIT_BRANCH_PICKER_PREVIEW} />
+          </>
+        ) : undefined
+      }
+    />
+  )
+
   return (
     <>
       {sessionHeaderPreviewMode === 'compact' ||
@@ -3132,30 +3344,50 @@ function HomePage() {
           <div className="topbar-actions">{renderWorkbenchTopBarPreview()}</div>
         </header>
       ) : (
-        <header className="chat-topbar ds-topbar-surface">
-          <div className="chat-topbar-grid">
-            <div
-              className={`chat-topbar-session${
-                collapsed ? ' ds-window-controls-safe-inset' : ''
-              }`}
-            >
-              <SidebarTitlebarToggleButton
-                onClick={toggle}
-                title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              />
-              <SessionHeader
-                snapshot={productionSessionHeaderSnapshot}
-                compact
-                busy={busy}
-                className="workbench-session-header"
-              />
+        <div className="ds-stage-inset workbench-chat-stage-inset production-chat-stage-inset">
+          <header className="chat-topbar ds-topbar-surface workbench-chat-topbar">
+            <div className="chat-topbar-grid">
+              <div
+                className={`chat-topbar-session${
+                  collapsed ? ' ds-window-controls-safe-inset' : ''
+                }`}
+              >
+                <SidebarTitlebarToggleButton
+                  onClick={toggle}
+                  title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                />
+                <SessionHeader
+                  snapshot={productionSessionHeaderSnapshot}
+                  compact
+                  busy={busy}
+                  className="workbench-session-header"
+                />
+              </div>
+              <div className="chat-topbar-actions">
+                {busy ? <span className="workbench-running-pill">Running</span> : null}
+                <WorkbenchTopBar
+                  planPanelEnabled
+                  rightPanelMode={productionRightPanelMode}
+                  onToggleRightPanelMode={(mode) =>
+                    setProductionRightPanelMode((current) => (current === mode ? null : mode))
+                  }
+                  terminalOpen={productionTerminalOpen}
+                  onToggleTerminal={() => setProductionTerminalOpen((value) => !value)}
+                  sideChatOpen={productionSideChatOpen}
+                  onOpenSideChat={() => setProductionSideChatOpen((value) => !value)}
+                  fileTreeOpen={productionFileTreeOpen}
+                  onToggleFileTree={() => setProductionFileTreeOpen((value) => !value)}
+                />
+              </div>
             </div>
-            <div className="chat-topbar-actions">
-              {busy ? <span className="workbench-running-pill">Running</span> : null}
-              <WorkbenchTopBar planPanelEnabled />
-            </div>
-          </div>
-        </header>
+          </header>
+
+          <div className="workbench-timeline-wrap">{chatStageInner}</div>
+
+          {!settingsOpen ? (
+            <div className="workbench-composer-wrap">{composerElement}</div>
+          ) : null}
+        </div>
       )}
 
       {sessionHeaderPreviewMode &&
@@ -3377,206 +3609,9 @@ function HomePage() {
         </div>
       ) : null}
 
-      {settingsOpen ? (
-        <div className="settings-view ds-drag production-settings-view">
-          <SettingsSidebar
-            category={settingsCategory}
-            setCategory={setSettingsCategory}
-            goBack={closeSettings}
-          />
-          <div className="settings-view-main ds-no-drag">
-            <div className="settings-view-inner">
-              {!hasProvider ? (
-                <div className="settings-view-api-key-banner" role="status">
-                  <div className="settings-view-api-key-banner-title">
-                    {PRODUCTION_SETTINGS_COPY.apiKeyRequiredTitle}
-                  </div>
-                  <p className="settings-view-api-key-banner-body">
-                    {PRODUCTION_SETTINGS_COPY.apiKeyRequiredBody}
-                  </p>
-                </div>
-              ) : null}
+      {!useProductionWorkbenchLayout ? chatStageInner : null}
 
-              <div className="settings-view-header">
-                <div>
-                  <h1 className="settings-view-title">{PRODUCTION_SETTINGS_COPY.title}</h1>
-                  <p className="settings-view-subtitle">{PRODUCTION_SETTINGS_COPY.subtitle}</p>
-                </div>
-                <span className="settings-view-save-status is-idle">
-                  {PRODUCTION_SETTINGS_COPY.autoApplyHint}
-                </span>
-              </div>
-
-              {settingsCategory === 'providers' ? (
-                <ProvidersSettings
-                  embedded
-                  providers={providerProfiles}
-                  statuses={status.providers}
-                  ready={status.ready}
-                  defaultSelection={defaultSelection}
-                  onUpsert={upsertProvider}
-                  onDelete={removeProvider}
-                  onSetDefault={setDefaultSelection}
-                  onProbe={probeProvider}
-                  onClose={closeSettings}
-                />
-              ) : settingsCategory === 'agents' ? (
-                <SkillsSettings projectPath={projectPath} onClose={closeSettings} />
-              ) : (
-                <SettingsSidebarPreviewContent category={settingsCategory} showHeader={false} />
-              )}
-            </div>
-          </div>
-        </div>
-      ) : empty ? (
-        <div className="stage-scroll">
-          {runtimeWakeHeroPreviewMode ? (
-            <div className="runtime-wake-hero-preview-wrap">
-              <RuntimeWakeHero
-                runtimeError={
-                  runtimeWakeHeroPreviewMode === 'error'
-                    ? RUNTIME_WAKE_HERO_PREVIEW_ERROR
-                    : null
-                }
-                waking={runtimeWakeHeroPreviewMode === 'waking' ? true : false}
-              />
-            </div>
-          ) : clawEmptyHeroPreviewMode ? (
-            <ClawEmptyHero
-              agentName={CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME}
-              hasInboundConversation={clawEmptyHeroPreviewMode !== 'needsInbound'}
-            />
-          ) : workspaceSelectEmptyHeroPreview ? (
-            <WorkspaceSelectEmptyHero />
-          ) : initialSessionUsageHeatmapPreviewMode ? (
-            <InitialSessionUsageHeatmap previewMode={initialSessionUsageHeatmapPreviewMode} />
-          ) : (
-            <MessageTimelineEmptyHero
-              ready={status.ready}
-              hasWorkspace={Boolean(projectPath)}
-              runtimeError={status.error}
-              onOpenSettings={() => openSettingsTab('providers')}
-            />
-          )}
-        </div>
-      ) : (
-        <>
-          {status.error && (status.ready || !empty) && !runtimeBannerPreviewMode ? (
-            <RuntimeBanner
-              snapshot={{
-                message: status.error,
-                runtimeReady: status.ready,
-              }}
-              onOpenSettings={() => openSettingsTab('providers')}
-              onRetryConnection={() => {
-                void window.navi.flue.status()
-              }}
-            />
-          ) : null}
-          <ChatThread messages={messages} />
-        </>
-      )}
-
-      <Composer
-        value={draft}
-        onChange={setDraft}
-        onSend={handleSend}
-        onCancel={cancel}
-        busy={busy}
-        disabled={composerDisabled}
-        placeholder={
-          !hasProvider
-            ? 'Add a provider to start chatting…'
-            : !status.ready
-              ? 'Connecting to Navi…'
-              : 'Send a message to Navi…'
-        }
-        skills={skills}
-        modelChip={
-          <FloatingModelPicker
-            providers={providerProfiles}
-            statuses={status.providers}
-            active={activeSelection}
-            onPickModel={pickModel}
-            onPickReasoning={pickReasoning}
-            onConfigure={() => openSettingsTab('providers')}
-          />
-        }
-        contextCapacity={productionContextCapacity}
-        voiceRecording={voiceRecording}
-        queuedMessages={queuedMessagesPreview}
-        executionPicker={
-          hasProvider ? (
-            <FloatingComposerExecutionPicker
-              value={
-                executionPickerPreviewMode ? executionPickerPreview : productionExecutionSettings
-              }
-              disabled={composerDisabled}
-              onChange={(patch) => {
-                if (executionPickerPreviewMode) {
-                  setExecutionPickerPreview((current) => ({ ...current, ...patch }))
-                  return
-                }
-                setProductionExecutionSettings((current) => ({ ...current, ...patch }))
-              }}
-            />
-          ) : undefined
-        }
-        footerLeft={
-          composerFooterPreview ? (
-            <>
-              {workspaceProjectPickerPreviewMode ? (
-                <WorkspaceProjectPicker
-                  snapshot={workspaceProjectPickerPreviewSnapshot ?? WORKSPACE_PROJECT_PICKER_PREVIEW_EMPTY}
-                  acting={workspaceProjectPickerPreviewMode === 'acting'}
-                  onSelect={(root) => {
-                    if (workspaceProjectPickerPreviewMode !== 'default') return
-                    setWorkspaceProjectPickerPreview((current) => ({
-                      ...current,
-                      currentRoot: root,
-                    }))
-                  }}
-                />
-              ) : null}
-              {gitBranchPickerPreviewMode ? (
-                <GitBranchPicker
-                  snapshot={gitBranchPickerPreviewSnapshot}
-                  loading={gitBranchPickerPreviewMode === 'loading'}
-                  onSwitchBranch={(branch) => {
-                    if (gitBranchPickerPreviewMode !== 'default') return
-                    setGitBranchPickerPreview((current) => {
-                      if (!current.ok) return current
-                      return {
-                        ...current,
-                        currentBranch: branch,
-                        branches: current.branches.map((entry) => ({
-                          ...entry,
-                          current: entry.name === branch,
-                        })),
-                      }
-                    })
-                  }}
-                />
-              ) : null}
-            </>
-          ) : productionWorkspaceSnapshot ? (
-            <>
-              <WorkspaceProjectPicker
-                snapshot={productionWorkspaceSnapshot}
-                onSelect={(root) => {
-                  const normalized = root.replace(/[/\\]+$/, '').toLowerCase()
-                  const project = projects.find((entry) => {
-                    if (!entry.path) return false
-                    return entry.path.replace(/[/\\]+$/, '').toLowerCase() === normalized
-                  })
-                  if (project) void selectProject(project.id)
-                }}
-              />
-              <GitBranchPicker snapshot={GIT_BRANCH_PICKER_PREVIEW} />
-            </>
-          ) : undefined
-        }
-      />
+      {!useProductionWorkbenchLayout ? composerElement : null}
 
       {contextCapacityPreview ? (
         <div className="context-capacity-preview" aria-hidden="true">
