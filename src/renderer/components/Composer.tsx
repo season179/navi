@@ -19,6 +19,7 @@ import {
   type ComposerFileReference,
 } from '../lib/composerFileReferences'
 import type { ComposerChangedFile } from '../lib/composerChangeSummary'
+import type { ComposerImageAttachment } from '../lib/composerAttachments'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import {
   FloatingComposerQueuedMessages,
@@ -30,6 +31,7 @@ import {
   ComposerFileMentionMenu,
   ComposerChangeSummary,
   ComposerFileReferenceChips,
+  ComposerImageAttachmentPreview,
   type ComposerSlashCommandItem,
   type ComposerFileMentionItem,
 } from './FloatingComposer'
@@ -83,6 +85,9 @@ interface ComposerProps {
   /** File reference chips shown below the textarea in Kun's composer shell. */
   fileReferences?: ComposerFileReferenceChip[]
   onRemoveFileReference?: (relativePath: string) => void
+  /** Image attachment previews shown below file-reference chips in Kun's composer shell. */
+  attachments?: ComposerImageAttachment[]
+  onRemoveAttachment?: (id: string) => void
 }
 
 /**
@@ -119,6 +124,8 @@ export function Composer({
   changedStats,
   fileReferences,
   onRemoveFileReference,
+  attachments,
+  onRemoveAttachment,
 }: ComposerProps) {
   const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -499,6 +506,17 @@ export function Composer({
               references={fileReferences}
               onRemove={onRemoveFileReference}
             />
+          ) : null}
+          {!compact && attachments && attachments.length > 0 ? (
+            <div className="floating-composer-attachment-row">
+              {attachments.map((attachment) => (
+                <ComposerImageAttachmentPreview
+                  key={attachment.id}
+                  attachment={attachment}
+                  onRemoveAttachment={onRemoveAttachment}
+                />
+              ))}
+            </div>
           ) : null}
           <div className={toolbarClass}>
             {!compact ? (

@@ -69,17 +69,17 @@ import {
   COMPOSER_FILE_REFERENCES_PREVIEW,
   type ComposerFileReferenceChip,
 } from '../lib/composerFileReferences'
+import {
+  COMPOSER_ATTACHMENTS_PREVIEW,
+  type ComposerImageAttachment,
+} from '../lib/composerAttachments'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
 export type { ComposerFileReferenceChip } from '../lib/composerFileReferences'
 export { COMPOSER_FILE_REFERENCES_PREVIEW } from '../lib/composerFileReferences'
-
-const SAMPLE_IMAGE =
-  'data:image/svg+xml,' +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><rect width="160" height="160" fill="#dbeafe"/><circle cx="52" cy="58" r="18" fill="#93c5fd"/><path d="M16 132l38-42 28 24 22-18 40 36H16z" fill="#60a5fa"/></svg>`,
-  )
+export type { ComposerImageAttachment } from '../lib/composerAttachments'
+export { COMPOSER_ATTACHMENTS_PREVIEW } from '../lib/composerAttachments'
 
 export type FloatingComposerPreviewMode =
   | 'default'
@@ -123,13 +123,6 @@ type FileMentionPreview = ComposerFileMentionItem
 
 type FileReferencePreview = ComposerFileReferenceChip
 
-type AttachmentPreview = {
-  id: string
-  name: string
-  previewUrl: string
-}
-
-
 type ChangedFilePreview = ComposerChangedFile
 
 type GoalPreview = {
@@ -160,7 +153,7 @@ export type FloatingComposerSnapshot = {
   slashCommands: SlashCommandPreview[]
   fileMentions: FileMentionPreview[]
   fileReferences: FileReferencePreview[]
-  attachments: AttachmentPreview[]
+  attachments: ComposerImageAttachment[]
   changedFiles: ChangedFilePreview[]
   changedStats: { added: number; removed: number }
   execution: ComposerExecutionSettings
@@ -225,10 +218,7 @@ const FILE_MENTIONS_PREVIEW: FileMentionPreview[] = [
 
 const FILE_REFERENCES_PREVIEW: FileReferencePreview[] = COMPOSER_FILE_REFERENCES_PREVIEW
 
-const ATTACHMENTS_PREVIEW: AttachmentPreview[] = [
-  { id: 'img-1', name: 'mock-screenshot.png', previewUrl: SAMPLE_IMAGE },
-  { id: 'img-2', name: 'wireframe.png', previewUrl: SAMPLE_IMAGE },
-]
+const ATTACHMENTS_PREVIEW: ComposerImageAttachment[] = COMPOSER_ATTACHMENTS_PREVIEW
 
 
 const CHANGED_FILES_PREVIEW: ChangedFilePreview[] = COMPOSER_CHANGE_SUMMARY_PREVIEW.files
@@ -243,12 +233,12 @@ function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`
 }
 
-function ComposerImageAttachmentPreview({
+export function ComposerImageAttachmentPreview({
   attachment,
-  onRemove,
+  onRemoveAttachment,
 }: {
-  attachment: AttachmentPreview
-  onRemove?: () => void
+  attachment: ComposerImageAttachment
+  onRemoveAttachment?: (id: string) => void
 }): ReactElement {
   const [open, setOpen] = useState(false)
 
@@ -262,11 +252,11 @@ function ComposerImageAttachmentPreview({
       >
         <img src={attachment.previewUrl} alt={attachment.name} />
       </button>
-      {onRemove ? (
+      {onRemoveAttachment ? (
         <button
           type="button"
           className="floating-composer-image-attachment-remove"
-          onClick={onRemove}
+          onClick={() => onRemoveAttachment(attachment.id)}
           aria-label="Remove attachment"
         >
           <X strokeWidth={2.2} />
