@@ -337,6 +337,10 @@ import {
   type AppShellPreviewMode,
 } from '../components/AppShell'
 import {
+  AppPreview,
+  type AppPreviewMode,
+} from '../components/App'
+import {
   WriteWorkspaceEmptyState,
   WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
   type WriteWorkspaceEmptyStatePreviewMode,
@@ -943,6 +947,20 @@ function HomePage() {
     if (value === 'fileTree') return 'fileTree'
     if (value === 'sidechat') return 'sidechat'
     if (value === 'runtimeError') return 'runtimeError'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported App root wrapper
+  // (?appPreview=default|startup|windows|settings|loading).
+  const appPreviewMode = useMemo((): AppPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('appPreview')) return null
+    const value = params.get('appPreview')
+    if (value === 'startup') return 'startup'
+    if (value === 'windows') return 'windows'
+    if (value === 'settings') return 'settings'
+    if (value === 'loading') return 'loading'
     return 'default'
   }, [])
 
@@ -2425,6 +2443,10 @@ function HomePage() {
 
   if (sddDraftEditorViewPreviewMode) {
     return <SddDraftEditorViewPreview mode={sddDraftEditorViewPreviewMode} />
+  }
+
+  if (appPreviewMode) {
+    return <AppPreview mode={appPreviewMode} />
   }
 
   if (appShellPreviewMode) {
