@@ -1,6 +1,6 @@
 // Runtime disclosure meta chips echoing Kun's RuntimeMetaChips
 // (../Kun/src/renderer/src/components/chat/message-timeline-bubbles.tsx).
-// Visual only: parent supplies parsed meta snapshots.
+// Process-entry badges use RuntimeMetaBadges instead.
 
 import type { ReactElement } from 'react'
 
@@ -21,8 +21,6 @@ type Props = {
   meta: RuntimeMetaChipsSnapshot
   align?: 'left' | 'right'
   hideAttachments?: boolean
-  /** Kun RuntimeMetaBadges under ProcessEntryRow uses ml-7 mt-1 instead of mt-2. */
-  placement?: 'default' | 'process-entry'
 }
 
 /** Sample meta for ?runtimeMetaChips=1 visual verification (user-message footer). */
@@ -53,7 +51,6 @@ export function RuntimeMetaChips({
   meta,
   align = 'left',
   hideAttachments = false,
-  placement = 'default',
 }: Props): ReactElement | null {
   const attachmentIds = meta.attachmentIds ?? []
   const activeSkillIds = meta.activeSkillIds ?? []
@@ -73,9 +70,7 @@ export function RuntimeMetaChips({
 
   return (
     <div
-      className={`runtime-meta-chips${
-        align === 'right' ? ' is-right' : ''
-      }${placement === 'process-entry' ? ' is-process-entry' : ''}`}
+      className={`runtime-meta-chips${align === 'right' ? ' is-right' : ''}`}
     >
       {!hideAttachments && attachmentIds.length > 0 ? (
         <span

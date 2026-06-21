@@ -13,10 +13,10 @@ import {
 import { ProcessEntryDetail } from './ProcessEntryDetail'
 import { ProcessSummaryText } from './ProcessFileReference'
 import {
-  RuntimeMetaChips,
-  RUNTIME_META_CHIPS_PREVIEW,
-  type RuntimeMetaChipsSnapshot,
-} from './RuntimeMetaChips'
+  RuntimeMetaBadges,
+  RUNTIME_META_BADGES_PREVIEW,
+} from './RuntimeMetaBadges'
+import { type RuntimeMetaChipsSnapshot } from './RuntimeMetaChips'
 
 export type ProcessEntrySnapshot = {
   verb: string
@@ -215,7 +215,7 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
     expanded: false,
     detailText: 'Opened middleware.ts to inspect current token handling.',
     detailKind: 'command',
-    meta: RUNTIME_META_CHIPS_PREVIEW,
+    meta: RUNTIME_META_BADGES_PREVIEW,
   },
   redundantDetail: {
     verb: 'Read',
@@ -452,9 +452,7 @@ export function ProcessEntryRow({
         {summaryContent}
       </div>
 
-      {entry.meta ? (
-        <RuntimeMetaChips meta={entry.meta} placement="process-entry" />
-      ) : null}
+      {entry.meta ? <RuntimeMetaBadges meta={entry.meta} /> : null}
 
       {isOpen && (entry.detailText || entry.nestedBubble) ? (
         entry.detailKind === 'assistant' ? (

@@ -2104,11 +2104,6 @@ html[data-theme='dark'] .process-entry-row-header.is-error {
   color: var(--ds-text);
 }
 
-.runtime-meta-chips.is-process-entry {
-  margin-top: 4px;
-  margin-left: 28px;
-}
-
 .process-entry-row-preview {
   position: fixed;
   left: 50%;
@@ -2895,6 +2890,15 @@ html[data-theme='dark'] .process-entry-row-header.is-error {
   justify-content: flex-end;
 }
 
+.runtime-meta-badges {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+  margin-left: 28px;
+}
+
 .runtime-meta-chip {
   display: inline-flex;
   max-width: 100%;
@@ -2922,6 +2926,18 @@ a.runtime-meta-chip:hover {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--ds-text-muted);
+}
+
+.runtime-meta-chip-mono.is-child {
+  max-width: 7rem;
+}
+
+.runtime-meta-badge-source-title {
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--ds-text-muted);
 }
 
