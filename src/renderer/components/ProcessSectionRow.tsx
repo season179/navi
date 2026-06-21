@@ -2,8 +2,9 @@
 // (../Kun/src/renderer/src/components/chat/message-timeline-process.tsx).
 // Visual only: parent supplies section snapshots and optional toggle callbacks.
 
-import { useState, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react'
+import { useState, type KeyboardEvent, type MouseEvent, type ReactElement, type RefObject } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
+import { useDeferredRender } from '../hooks/use-deferred-render'
 import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
 import {
@@ -40,6 +41,8 @@ export type ProcessStackEntrySnapshot = {
   pendingApproval?: boolean
   /** Pending user_input block — auto force-opens during processing like Kun. */
   pendingUserInput?: boolean
+  /** Wrap summary text instead of truncating — used for assistant/system rows. */
+  wrapSummary?: boolean
 }
 
 export type ProcessOutputEntrySnapshot = {
@@ -410,6 +413,7 @@ type Props = {
   section: ProcessSectionSnapshot
   expanded?: boolean
   onToggle?: () => void
+  viewportRef?: RefObject<HTMLDivElement | null>
 }
 
 function splitSummaryVerb(summary: string): { verb: string; rest: string } {
@@ -445,6 +449,10 @@ function stackEntryToProcessEntry(
     showCompactionIcon: entry.showCompactionIcon,
     pendingApproval: entry.pendingApproval,
     pendingUserInput: entry.pendingUserInput,
+    wrapSummary:
+      entry.wrapSummary === true ||
+      entry.detailKind === 'assistant' ||
+      (entry.collapsible === false && !entry.detailText && !entry.nestedBubble),
   }
 }
 
@@ -678,7 +686,12 @@ function ProcessStackRows({
   )
 }
 
-export function ProcessSectionRow({ section, expanded, onToggle }: Props): ReactElement {
+export function ProcessSectionRow({
+  section,
+  expanded,
+  onToggle,
+  viewportRef,
+}: Props): ReactElement {
   const [userExpanded, setUserExpanded] = useState<boolean | null>(null)
   const singleExecutionEntry =
     section.kind === 'execution' && section.stackEntries?.length === 1
@@ -739,6 +752,12 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
   const showActiveError = section.showActiveError === true
   const titleClass = section.hasError ? 'is-error' : ''
   const titleShimmer = section.active && !section.hasError ? 'ds-shiny-text' : ''
+  const { ref: deferredDetailRef, shouldRender: shouldRenderDetail } =
+    useDeferredRender<HTMLDivElement>({
+      enabled: isExpanded && hasDetails,
+      immediate: Boolean(section.active) || section.kind === 'execution',
+      root: viewportRef,
+    })
 
   const header = (
     <>
@@ -774,19 +793,25 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
       )}
 
       {isExpanded && hasDetails ? (
-        <div className="process-section-row-detail">
-          {section.kind === 'reasoning' && section.reasoningText ? (
-            <div className="process-section-row-reasoning ds-markdown">
-              <Markdown
-                text={section.reasoningText}
-                streaming={Boolean(section.active && section.processing)}
+        <div
+          ref={deferredDetailRef}
+          className="process-section-row-detail"
+          style={{ contentVisibility: 'auto', containIntrinsicSize: 'auto 220px' }}
+        >
+          {shouldRenderDetail ? (
+            section.kind === 'reasoning' && section.reasoningText ? (
+              <div className="process-section-row-reasoning ds-markdown">
+                <Markdown
+                  text={section.reasoningText}
+                  streaming={Boolean(section.active && section.processing)}
+                />
+              </div>
+            ) : section.stackEntries ? (
+              <ProcessStackRows
+                entries={section.stackEntries}
+                processing={section.processing}
               />
-            </div>
-          ) : section.stackEntries ? (
-            <ProcessStackRows
-              entries={section.stackEntries}
-              processing={section.processing}
-            />
+            ) : null
           ) : null}
         </div>
       ) : null}

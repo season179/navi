@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
   type ReactElement,
+  type RefObject,
 } from 'react'
 import { CompactionDivider, type CompactionDividerSnapshot } from './CompactionDivider'
 import { DevPreviewLaunchCard, DEV_PREVIEW_LAUNCH_CARD_PREVIEW } from './DevPreviewLaunchCard'
@@ -120,8 +121,10 @@ function turnPreviewLabel(turn: MessageTurnSnapshot, index: number): string {
 
 function MessageTurnImpl({
   turn,
+  viewportRef,
 }: {
   turn: MessageTurnSnapshot
+  viewportRef?: RefObject<HTMLDivElement | null>
 }): ReactElement {
   const [workExpandedOverride, setWorkExpandedOverride] = useState<boolean | null>(null)
   const processing = turn.processing === true
@@ -160,6 +163,7 @@ function MessageTurnImpl({
                       : `${section.kind}-${index}`)
                   }
                   section={section}
+                  viewportRef={viewportRef}
                 />
               ))}
             </div>
@@ -201,7 +205,11 @@ function MessageTurnImpl({
       ) : null}
 
       {!processing && turn.changes?.length ? (
-        <TurnChangeSummary changes={turn.changes} compact={turn.compactCards} />
+        <TurnChangeSummary
+          changes={turn.changes}
+          compact={turn.compactCards}
+          viewportRef={viewportRef}
+        />
       ) : null}
 
       {turn.compaction ? <CompactionDivider block={turn.compaction} /> : null}
@@ -297,7 +305,7 @@ export function MessageTimeline({
               className="message-timeline-turn-anchor scroll-mt-6"
             >
               {showForkPoint ? <ThreadForkPoint parentTitle={forkTitle} /> : null}
-              <MemoMessageTurn turn={turn} />
+              <MemoMessageTurn turn={turn} viewportRef={containerRef} />
             </div>
           )
         })}

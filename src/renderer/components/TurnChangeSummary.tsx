@@ -2,8 +2,15 @@
 // (../Kun/src/renderer/src/components/chat/message-timeline-cards.tsx).
 // Visual only: parent supplies change snapshots with optional unified diffs.
 
-import { useEffect, useMemo, useState, type ReactElement } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ReactElement,
+  type RefObject,
+} from 'react'
 import { ChevronDown, ChevronRight, FileEdit } from 'lucide-react'
+import { useDeferredRender } from '../hooks/use-deferred-render'
 import { countDiffStats, sumDiffStats } from '../lib/diff-stats'
 import { DiffView } from './DiffView'
 
@@ -61,12 +68,14 @@ type Props = {
   changes: TurnChangeSnapshot[]
   compact?: boolean
   defaultExpanded?: boolean
+  viewportRef?: RefObject<HTMLDivElement | null>
 }
 
 export function TurnChangeSummary({
   changes,
   compact = false,
   defaultExpanded = false,
+  viewportRef,
 }: Props): ReactElement {
   const [expanded, setExpanded] = useState(defaultExpanded)
   const [activeId, setActiveId] = useState<string | null>(
@@ -92,6 +101,11 @@ export function TurnChangeSummary({
     changes.length === 1
       ? '1 file changed'
       : `${changes.length} files changed`
+  const { ref: deferredBodyRef, shouldRender: shouldRenderBody } =
+    useDeferredRender<HTMLDivElement>({
+      enabled: expanded,
+      root: viewportRef,
+    })
 
   return (
     <section className={`turn-change-summary ${compact ? 'is-compact' : ''}`}>
@@ -122,8 +136,16 @@ export function TurnChangeSummary({
       </button>
 
       {expanded ? (
-        <div className="turn-change-summary-body">
-          {changes.map((change) => {
+        <div
+          ref={deferredBodyRef}
+          className="turn-change-summary-body"
+          style={{
+            contentVisibility: 'auto',
+            containIntrinsicSize: compact ? 'auto 180px' : 'auto 280px',
+          }}
+        >
+          {shouldRenderBody
+            ? changes.map((change) => {
             const stats = countDiffStats(change.detail)
             const open = activeId === change.id
             const primary = change.filePath ?? 'File'
@@ -164,7 +186,8 @@ export function TurnChangeSummary({
                 ) : null}
               </div>
             )
-          })}
+          })
+            : null}
         </div>
       ) : null}
     </section>

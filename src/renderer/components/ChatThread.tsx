@@ -183,6 +183,7 @@ export function ChatThread({
   workProcess,
 }: ChatThreadProps): ReactElement {
   const bottomRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const turnRefMap = useRef(new Map<string, HTMLDivElement>())
   const [workExpandedOverride, setWorkExpandedOverride] = useState<boolean | null>(null)
   const turns = useMemo(() => groupMessagesIntoTurns(messages), [messages])
@@ -245,7 +246,7 @@ export function ChatThread({
   }, [messages])
 
   return (
-    <div className="message-timeline ds-no-drag">
+    <div ref={containerRef} className="message-timeline ds-no-drag">
       <TimelineJumpRail anchors={anchors} onJump={jumpToTurn} />
       <div
         className={`message-timeline-content ds-message-timeline-content ds-chat-column-inset ${goalTimelinePaddingClass(
@@ -356,6 +357,7 @@ export function ChatThread({
                                 : `${section.kind}-${index}`)
                             }
                             section={section}
+                            viewportRef={containerRef}
                           />
                         ))}
                       </div>
@@ -406,6 +408,7 @@ export function ChatThread({
                     changes={turnChanges}
                     compact={turnChangesCompact}
                     defaultExpanded={turnChangesDefaultExpanded}
+                    viewportRef={containerRef}
                   />
                 ) : null}
                 {showCompaction ? <CompactionDivider block={compactionBlock} /> : null}
