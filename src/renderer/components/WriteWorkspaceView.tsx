@@ -919,6 +919,25 @@ function resolveProductionWriteAssistantSnapshot(): Partial<WriteAssistantPanelS
   return {}
 }
 
+function writeWorkspaceViewChromeFromMode(
+  mode: WriteWorkspaceViewPreviewMode,
+  snapshotPreviewMode: WriteDocumentPreviewMode,
+): {
+  previewMode: WriteDocumentPreviewMode
+  richModeActive: boolean
+  defaultExportMenuOpen: boolean
+  defaultModeMenuOpen: boolean
+  exportInFlight: boolean
+} {
+  return {
+    previewMode: mode === 'exportMenu' ? 'live' : snapshotPreviewMode,
+    richModeActive: mode === 'rich' || mode === 'modeMenu',
+    defaultExportMenuOpen: mode === 'exportMenu',
+    defaultModeMenuOpen: mode === 'modeMenu',
+    exportInFlight: mode === 'exporting',
+  }
+}
+
 /** Production shell for Write workspace tab — mock snapshots for visual parity. */
 export function WriteWorkspaceProductionView({
   leftSidebarCollapsed,
@@ -929,6 +948,10 @@ export function WriteWorkspaceProductionView({
 }): ReactElement {
   const snapshotMode = useMemo(() => resolveProductionWriteWorkspaceSnapshotMode(), [])
   const snapshot = useMemo(() => previewSnapshot(snapshotMode), [snapshotMode])
+  const chrome = useMemo(
+    () => writeWorkspaceViewChromeFromMode(snapshotMode, snapshot.previewMode),
+    [snapshot.previewMode, snapshotMode],
+  )
   const [assistantOpen, setAssistantOpen] = useState(() => resolveProductionWriteAssistantPreviewOpen())
   const assistantPanelSnapshot = useMemo(() => resolveProductionWriteAssistantSnapshot(), [])
 
@@ -944,8 +967,10 @@ export function WriteWorkspaceProductionView({
         fileLoading={snapshot.fileLoading}
         fileContent={snapshot.fileContent}
         fileSize={snapshot.fileSize}
-        previewMode={snapshot.previewMode}
-        richModeActive={snapshotMode === 'rich'}
+        previewMode={chrome.previewMode}
+        richModeActive={chrome.richModeActive}
+        defaultExportMenuOpen={chrome.defaultExportMenuOpen}
+        defaultModeMenuOpen={chrome.defaultModeMenuOpen}
         renderSafety={snapshot.renderSafety}
         fileGuardMessage={snapshot.fileGuardMessage}
         fileGuardDetail={snapshot.fileGuardDetail}
@@ -961,7 +986,7 @@ export function WriteWorkspaceProductionView({
         inlineAgentPreviewMode={snapshot.inlineAgentPreviewMode}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}
-        exportInFlight={snapshotMode === 'exporting'}
+        exportInFlight={chrome.exportInFlight}
         runtimeBanner={snapshot.runtimeBanner}
         leftSidebarCollapsed={leftSidebarCollapsed}
         onToggleLeftSidebar={onToggleLeftSidebar}
@@ -1009,6 +1034,10 @@ function assistantPanelPreviewOpen(mode: WriteWorkspaceViewPreviewMode): boolean
 /** Full-page preview shell for ?writeWorkspaceView URL hooks. */
 export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement {
   const snapshot = useMemo(() => previewSnapshot(mode), [mode])
+  const chrome = useMemo(
+    () => writeWorkspaceViewChromeFromMode(mode, snapshot.previewMode),
+    [mode, snapshot.previewMode],
+  )
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(false)
   const [assistantOpen, setAssistantOpen] = useState(() => assistantPanelPreviewOpen(mode))
   const assistantPanelSnapshot = useMemo(() => assistantPanelPreviewSnapshot(mode), [mode])
@@ -1025,10 +1054,10 @@ export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement 
         fileLoading={snapshot.fileLoading}
         fileContent={snapshot.fileContent}
         fileSize={snapshot.fileSize}
-        previewMode={mode === 'exportMenu' ? 'live' : snapshot.previewMode}
-        richModeActive={mode === 'rich' || mode === 'modeMenu'}
-        defaultExportMenuOpen={mode === 'exportMenu'}
-        defaultModeMenuOpen={mode === 'modeMenu'}
+        previewMode={chrome.previewMode}
+        richModeActive={chrome.richModeActive}
+        defaultExportMenuOpen={chrome.defaultExportMenuOpen}
+        defaultModeMenuOpen={chrome.defaultModeMenuOpen}
         renderSafety={snapshot.renderSafety}
         fileGuardMessage={snapshot.fileGuardMessage}
         fileGuardDetail={snapshot.fileGuardDetail}
@@ -1044,7 +1073,7 @@ export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement 
         inlineAgentPreviewMode={snapshot.inlineAgentPreviewMode}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}
-        exportInFlight={mode === 'exporting'}
+        exportInFlight={chrome.exportInFlight}
         runtimeBanner={snapshot.runtimeBanner}
         leftSidebarCollapsed={leftSidebarCollapsed}
         onToggleLeftSidebar={() => setLeftSidebarCollapsed((open) => !open)}

@@ -41,13 +41,23 @@ test('maps document-pane and toolbar snapshot modes', () => {
     'truncated',
     'liveDisabled',
     'inlineAgent',
+    'inlineAgentBlockMenu',
+    'inlineAgentEmptyAgents',
+    'inlineAgentAskOnly',
+    'inlineAgentPreferAbove',
+    'inlineAgentInFlight',
+    'inlineAgentSkills',
+    'inlineAgentImageMode',
     'error',
     'exportSuccess',
     'exportError',
     'exporting',
     'dirty',
     'saving',
+    'readonly',
     'review',
+    'exportMenu',
+    'modeMenu',
   ]) {
     assert.ok(PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES.has(mode), `expected ${mode} in snapshot modes`)
     assert.equal(
