@@ -1856,12 +1856,8 @@ html[data-theme='dark'] .process-stack-entry-row.is-error {
   opacity: 0.45;
 }
 
-.process-stack-entry-detail {
-  margin-top: 4px;
+.process-stack-entry-detail-inset {
   margin-left: 4px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--ds-surface-subtle) 72%, transparent);
-  padding: 10px 14px;
 }
 
 .process-stack-entry-assistant {
@@ -2098,18 +2094,8 @@ html[data-theme='dark'] .process-entry-row-header.is-error {
   opacity: 0.45;
 }
 
-.process-entry-row-detail {
+.process-entry-row-assistant-wrap {
   margin-top: 4px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--ds-surface-subtle) 72%, transparent);
-  padding: 10px 14px;
-}
-
-.process-entry-row-detail.is-assistant {
-  margin-top: 4px;
-  border-radius: 0;
-  background: transparent;
-  padding: 0;
 }
 
 .process-entry-row-assistant {

@@ -411,9 +411,12 @@ export function ProcessEntryRow({
     entry.pendingApproval === true ||
     (processing === true &&
       (entry.pendingUserInput === true || entry.showCompactionIcon === true))
+  const isStreamingAssistant =
+    processing === true && entry.blockId === 'live-assistant'
   const forceOpen =
     entry.forceOpen === true ||
     entry.detailKind === 'assistant' ||
+    isStreamingAssistant ||
     autoOpenPending
   const isOpen = canExpand && (forceOpen || (expanded ?? (userOpen ?? defaultOpen)))
   const canToggle = canExpand && !forceOpen
@@ -511,15 +514,15 @@ export function ProcessEntryRow({
       ) : null}
 
       {isOpen && (entry.detailText || entry.nestedBubble) ? (
-        <div
-          className={
-            entry.detailKind === 'assistant'
-              ? 'process-entry-row-detail is-assistant'
-              : 'process-entry-row-detail'
-          }
-        >
-          <ProcessEntryDetail entry={entry} processing={processing} />
-        </div>
+        entry.detailKind === 'assistant' ? (
+          <div className="process-entry-row-assistant-wrap">
+            <ProcessEntryDetail entry={entry} processing={processing} />
+          </div>
+        ) : (
+          <div className="ds-work-timeline-detail">
+            <ProcessEntryDetail entry={entry} processing={processing} />
+          </div>
+        )
       ) : null}
     </div>
   )

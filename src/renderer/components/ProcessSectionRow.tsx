@@ -927,7 +927,7 @@ function ProcessStackEntryRow({
             <ProcessStackEntryDetail entry={entry} processing={processing} />
           </div>
         ) : (
-          <div className="process-stack-entry-detail ds-work-timeline-detail">
+          <div className="process-stack-entry-detail-inset ds-work-timeline-detail">
             <ProcessStackEntryDetail entry={entry} processing={processing} />
           </div>
         )
