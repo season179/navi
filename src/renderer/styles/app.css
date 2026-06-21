@@ -175,7 +175,21 @@ textarea {
   padding-right: 0;
 }
 
+.production-main-stage--write {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .production-plugins-stage {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.production-write-stage {
   display: flex;
   height: 100%;
   min-height: 0;

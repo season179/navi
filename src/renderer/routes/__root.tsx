@@ -16,6 +16,7 @@ import { SidebarContext } from '../sidebar'
 import { SidebarRouteProvider, useSidebarRoute } from '../sidebar-route'
 import { SettingsContext } from '../settings'
 import { FocusModeProvider, useFocusMode } from '../focus-mode'
+import { WorkspaceModeProvider, useWorkspaceMode } from '../workspace-mode'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import {
   RuntimeStatusBanner,
@@ -26,7 +27,6 @@ import {
 import { SidebarProjects } from './SidebarProjects'
 import {
   WorkspaceModeTabs,
-  type WorkspaceModeView,
 } from '../components/WorkspaceModeTabs'
 import { SidebarCommandRow, SidebarFrame } from '../components/SidebarPrimitives'
 import {
@@ -46,6 +46,16 @@ function resolveProductionPlatform(): string {
 }
 
 function RootLayoutInner() {
+  const { scheduleActive } = useSidebarRoute()
+
+  return (
+    <WorkspaceModeProvider scheduleActive={scheduleActive}>
+      <RootLayoutContent />
+    </WorkspaceModeProvider>
+  )
+}
+
+function RootLayoutContent() {
   const { theme, toggleTheme } = useTheme()
   const { focusModeEnabled, toggleFocusMode } = useFocusMode()
   const {
@@ -83,16 +93,12 @@ function RootLayoutInner() {
     openPluginsRoute()
   }, [closeSettings, openPluginsRoute])
 
-  const workspaceModeTabsPreviewMode = useMemo((): WorkspaceModeView | null => {
-    if (typeof window === 'undefined') return null
-    const params = new URLSearchParams(window.location.search)
-    if (!params.has('workspaceModeTabsPreview')) return null
-    return params.get('workspaceModeTabsPreview') === 'write' ? 'write' : 'chat'
-  }, [])
-  const [workspaceModeTabsPreviewView, setWorkspaceModeTabsPreviewView] =
-    useState<WorkspaceModeView>(() => workspaceModeTabsPreviewMode ?? 'chat')
-  const [productionWorkspaceMode, setProductionWorkspaceMode] =
-    useState<WorkspaceModeView>('chat')
+  const {
+    workspaceMode: workspaceModeActiveView,
+    setProductionWorkspaceMode,
+    workspaceModeTabsPreviewActive,
+    setWorkspaceModeTabsPreviewView,
+  } = useWorkspaceMode()
   const connectPhoneSidebarPreviewOpen = useMemo(() => {
     if (typeof window === 'undefined') return false
     const params = new URLSearchParams(window.location.search)
@@ -109,21 +115,12 @@ function RootLayoutInner() {
     setConnectPhoneSidebarOpen((open) => !open)
   }, [openChatRoute])
 
-  const workspaceModeActiveView = useMemo((): WorkspaceModeView => {
-    if (workspaceModeTabsPreviewMode !== null) return workspaceModeTabsPreviewView
-    if (scheduleActive) return 'schedule'
-    return productionWorkspaceMode
-  }, [
-    workspaceModeTabsPreviewMode,
-    workspaceModeTabsPreviewView,
-    scheduleActive,
-    productionWorkspaceMode,
-  ])
-
   const mainStageClass =
     sidebarRoute === 'plugins'
       ? 'stage ds-stage-surface workbench-chat-stage production-main-stage production-main-stage--plugins'
-      : 'stage ds-stage-surface ds-chat-stage workbench-chat-stage production-main-stage'
+      : workspaceModeActiveView === 'write'
+        ? 'stage ds-stage-surface production-main-stage production-main-stage--write'
+        : 'stage ds-stage-surface ds-chat-stage workbench-chat-stage production-main-stage'
 
   const platform = useMemo(() => resolveProductionPlatform(), [])
   const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
@@ -231,7 +228,7 @@ function RootLayoutInner() {
                   <WorkspaceModeTabs
                     activeView={workspaceModeActiveView}
                     onCodeOpen={() => {
-                      if (workspaceModeTabsPreviewMode) {
+                      if (workspaceModeTabsPreviewActive) {
                         setWorkspaceModeTabsPreviewView('chat')
                         return
                       }
@@ -239,7 +236,7 @@ function RootLayoutInner() {
                       setProductionWorkspaceMode('chat')
                     }}
                     onWriteOpen={() => {
-                      if (workspaceModeTabsPreviewMode) {
+                      if (workspaceModeTabsPreviewActive) {
                         setWorkspaceModeTabsPreviewView('write')
                         return
                       }

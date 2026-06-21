@@ -410,6 +410,7 @@ import {
 } from '../components/WriteWorkspaceDocumentPane'
 import {
   WriteWorkspaceViewPreview,
+  WriteWorkspaceProductionView,
   type WriteWorkspaceViewPreviewMode,
 } from '../components/WriteWorkspaceView'
 import {
@@ -508,6 +509,7 @@ import { hasUsableProvider, type SkillSummary } from '../../shared/flue'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
 import { useSidebarRoute } from '../sidebar-route'
+import { useWorkspaceMode } from '../workspace-mode'
 import { useSettings } from '../settings'
 import { useFocusMode } from '../focus-mode'
 
@@ -581,6 +583,7 @@ function renderProductionRightPanel(
 function HomePage() {
   const { collapsed, toggle } = useSidebar()
   const { route: sidebarRoute } = useSidebarRoute()
+  const { workspaceMode } = useWorkspaceMode()
   const { settingsOpen, openSettings, closeSettings } = useSettings()
   const { focusModeEnabled } = useFocusMode()
   const [draft, setDraft] = useState('')
@@ -3374,6 +3377,15 @@ function HomePage() {
   if (sidebarRoute === 'schedule') {
     return (
       <ScheduleTasksProductionView
+        leftSidebarCollapsed={collapsed}
+        onToggleLeftSidebar={toggle}
+      />
+    )
+  }
+
+  if (workspaceMode === 'write') {
+    return (
+      <WriteWorkspaceProductionView
         leftSidebarCollapsed={collapsed}
         onToggleLeftSidebar={toggle}
       />

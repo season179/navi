@@ -499,6 +499,50 @@ type PreviewProps = {
   mode: WriteWorkspaceViewPreviewMode
 }
 
+/** Production shell for Write workspace tab — mock snapshots for visual parity. */
+export function WriteWorkspaceProductionView({
+  leftSidebarCollapsed,
+  onToggleLeftSidebar,
+}: {
+  leftSidebarCollapsed: boolean
+  onToggleLeftSidebar: () => void
+}): ReactElement {
+  const snapshot = useMemo(() => previewSnapshot('split'), [])
+
+  return (
+    <div className="production-write-stage">
+      <WriteWorkspaceView
+        workspaceReady={snapshot.workspaceReady}
+        workspaceError={snapshot.workspaceError}
+        activeFilePath={snapshot.activeFilePath}
+        activeFileIsImage={snapshot.activeFileIsImage}
+        activeFileIsPdf={snapshot.activeFileIsPdf}
+        activeFileIsText={snapshot.activeFileIsText}
+        fileLoading={snapshot.fileLoading}
+        fileContent={snapshot.fileContent}
+        fileSize={snapshot.fileSize}
+        previewMode={snapshot.previewMode}
+        renderSafety={snapshot.renderSafety}
+        fileGuardMessage={snapshot.fileGuardMessage}
+        fileGuardDetail={snapshot.fileGuardDetail}
+        imageSrc={snapshot.imageSrc}
+        imageMimeType={snapshot.imageMimeType}
+        activeFileName={snapshot.activeFileName}
+        activeFileLabel={snapshot.activeFileLabel}
+        documentStatsLabel={snapshot.documentStatsLabel}
+        saveStatus={snapshot.saveStatus}
+        readOnly={snapshot.readOnly}
+        showInlineAgent={snapshot.showInlineAgent}
+        fileError={snapshot.fileError}
+        exportNotice={snapshot.exportNotice}
+        leftSidebarCollapsed={leftSidebarCollapsed}
+        onToggleLeftSidebar={onToggleLeftSidebar}
+        onPickWorkspace={() => undefined}
+      />
+    </div>
+  )
+}
+
 /** Full-page preview shell for ?writeWorkspaceView URL hooks. */
 export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement {
   const snapshot = useMemo(() => previewSnapshot(mode), [mode])
