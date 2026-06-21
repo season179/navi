@@ -75,9 +75,11 @@ import {
   type ComposerFileReferenceChip,
 } from '../lib/composerFileReferences'
 import {
+  COMPOSER_ATTACHMENT_NO_PREVIEW,
   COMPOSER_ATTACHMENTS_PREVIEW,
   COMPOSER_ATTACHMENT_MODEL_UNSUPPORTED_PREVIEW,
   COMPOSER_ATTACHMENT_UNAVAILABLE_PREVIEW,
+  COMPOSER_REMOVE_ATTACHMENT_LABEL,
   type ComposerImageAttachment,
 } from '../lib/composerAttachments'
 import { COMPOSER_GOAL_PREVIEW, type ComposerGoal } from '../lib/composerGoal'
@@ -151,6 +153,7 @@ export type FloatingComposerPreviewMode =
   | 'goalFloater'
   | 'goalPanel'
   | 'attachments'
+  | 'attachmentsNoPreview'
   | 'changeSummary'
   | 'recording'
   | 'busy'
@@ -296,6 +299,26 @@ export function ComposerImageAttachmentPreview({
   onRemoveAttachment?: (id: string) => void
 }): ReactElement {
   const [open, setOpen] = useState(false)
+  const label = attachment.name || attachment.id
+
+  if (!attachment.previewUrl) {
+    return (
+      <span className="floating-composer-attachment-chip" title={attachment.id}>
+        <ImagePlus strokeWidth={1.8} />
+        <span>{label}</span>
+        {onRemoveAttachment ? (
+          <button
+            type="button"
+            onClick={() => onRemoveAttachment(attachment.id)}
+            aria-label={COMPOSER_REMOVE_ATTACHMENT_LABEL}
+            title={COMPOSER_REMOVE_ATTACHMENT_LABEL}
+          >
+            <X strokeWidth={2} />
+          </button>
+        ) : null}
+      </span>
+    )
+  }
 
   return (
     <span className="floating-composer-image-attachment" title={attachment.name}>
@@ -817,6 +840,11 @@ export function resolveFloatingComposerSnapshot(
         ...base,
         attachments: ATTACHMENTS_PREVIEW,
         fileReferences: FILE_REFERENCES_PREVIEW,
+      }
+    case 'attachmentsNoPreview':
+      return {
+        ...base,
+        attachments: [COMPOSER_ATTACHMENT_NO_PREVIEW],
       }
     case 'changeSummary':
       return { ...base, showChangeSummary: true }

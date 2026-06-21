@@ -12,7 +12,8 @@ import {
   resolveComposerFileMentionPreview,
 } from '../lib/composerFileReferences'
 import {
-  COMPOSER_ATTACHMENTS_PREVIEW,
+  resolveComposerAttachmentsPreview,
+  type ComposerAttachmentsPreviewMode,
   resolveComposerAttachmentErrorPreview,
 } from '../lib/composerAttachments'
 import { COMPOSER_GOAL_PREVIEW } from '../lib/composerGoal'
@@ -739,13 +740,16 @@ function HomePage() {
     return COMPOSER_FILE_REFERENCES_PREVIEW
   }, [])
 
-  // Visual preview for the ported ComposerImageAttachmentPreview row (?composerAttachmentsPreview=1).
+  // Visual preview for the ported ComposerImageAttachmentPreview row
+  // (?composerAttachmentsPreview=1|noPreview).
   const composerAttachmentsPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
-    if (!new URLSearchParams(window.location.search).has('composerAttachmentsPreview')) {
-      return undefined
-    }
-    return COMPOSER_ATTACHMENTS_PREVIEW
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerAttachmentsPreview')) return undefined
+    const value = params.get('composerAttachmentsPreview')
+    const mode: ComposerAttachmentsPreviewMode =
+      value === 'noPreview' ? 'noPreview' : 'default'
+    return resolveComposerAttachmentsPreview(mode)
   }, [])
 
   // Visual preview for attachment upload error row
@@ -1322,7 +1326,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
+  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalPanel|attachments|attachmentsNoPreview|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)

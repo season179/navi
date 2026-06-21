@@ -2,8 +2,12 @@
 export type ComposerImageAttachment = {
   id: string
   name: string
-  previewUrl: string
+  /** When omitted, Kun renders the compact ImagePlus fallback chip instead of a thumbnail. */
+  previewUrl?: string
 }
+
+/** English copy matching Kun's composerRemoveAttachment locale string. */
+export const COMPOSER_REMOVE_ATTACHMENT_LABEL = 'Remove attachment'
 
 const SAMPLE_IMAGE =
   'data:image/svg+xml,' +
@@ -16,6 +20,21 @@ export const COMPOSER_ATTACHMENTS_PREVIEW = [
   { id: 'img-1', name: 'mock-screenshot.png', previewUrl: SAMPLE_IMAGE },
   { id: 'img-2', name: 'wireframe.png', previewUrl: SAMPLE_IMAGE },
 ] satisfies ComposerImageAttachment[]
+
+/** Mock attachment without previewUrl for Kun's fallback chip visual verification. */
+export const COMPOSER_ATTACHMENT_NO_PREVIEW = {
+  id: 'img-pending',
+  name: 'uploading-image.png',
+} satisfies ComposerImageAttachment
+
+export type ComposerAttachmentsPreviewMode = 'default' | 'noPreview'
+
+export function resolveComposerAttachmentsPreview(
+  mode: ComposerAttachmentsPreviewMode = 'default',
+): ComposerImageAttachment[] {
+  if (mode === 'noPreview') return [COMPOSER_ATTACHMENT_NO_PREVIEW]
+  return COMPOSER_ATTACHMENTS_PREVIEW
+}
 
 /** English copy matching Kun's composerAttachmentUnavailable locale string. */
 export const COMPOSER_ATTACHMENT_UNAVAILABLE_PREVIEW = 'Attachment upload is unavailable.'
