@@ -13,6 +13,8 @@ import {
 } from './TimelinePaginationControls'
 import { CompactionDivider, type CompactionDividerSnapshot } from './CompactionDivider'
 import { DevPreviewLaunchCard } from './DevPreviewLaunchCard'
+import { GeneratedFilesPanel } from './GeneratedFilesPanel'
+import type { MediaReference } from './MediaPreviewTile'
 import { ReviewPlanCard } from './ReviewPlanCard'
 import { ReviewSummaryCard, type ReviewSummarySnapshot } from './ReviewSummaryCard'
 import { ThreadForkBanner, ThreadForkPoint } from './ThreadForkBanner'
@@ -112,6 +114,9 @@ type ChatThreadProps = {
   planAtTurnIndex?: number
   planTitle?: string
   planRelativePath?: string
+  /** When set with generatedFiles, renders Kun's generated files panel at this turn. */
+  generatedFilesAtTurnIndex?: number
+  generatedFiles?: MediaReference[]
   /** When set with turnReviews, renders Kun's review summary cards at this turn. */
   reviewsAtTurnIndex?: number
   turnReviews?: ReviewSummarySnapshot[]
@@ -137,6 +142,8 @@ export function ChatThread({
   planAtTurnIndex,
   planTitle,
   planRelativePath,
+  generatedFilesAtTurnIndex,
+  generatedFiles,
   reviewsAtTurnIndex,
   turnReviews,
   devPreviewAtTurnIndex,
@@ -240,6 +247,11 @@ export function ChatThread({
             planRelativePath != null &&
             typeof planAtTurnIndex === 'number' &&
             planAtTurnIndex === absoluteTurnIndex
+          const showGeneratedFiles =
+            generatedFiles != null &&
+            generatedFiles.length > 0 &&
+            typeof generatedFilesAtTurnIndex === 'number' &&
+            generatedFilesAtTurnIndex === absoluteTurnIndex
           const showReviews =
             turnReviews != null &&
             turnReviews.length > 0 &&
@@ -283,6 +295,9 @@ export function ChatThread({
                     </div>
                   )
                 })}
+                {showGeneratedFiles ? (
+                  <GeneratedFilesPanel media={generatedFiles} />
+                ) : null}
                 {showReviews
                   ? turnReviews.map((review) => (
                       <ReviewSummaryCard key={review.title} review={review} />

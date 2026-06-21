@@ -2805,6 +2805,37 @@ function HomePage() {
     }
   }, [])
 
+  // Production ChatThread generated files panel via ?productionGeneratedFilesPanel=…
+  const productionChatGeneratedFiles = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {
+        generatedFilesAtTurnIndex: undefined,
+        generatedFiles: undefined,
+      }
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionGeneratedFilesPanel')) {
+      return {
+        generatedFilesAtTurnIndex: undefined,
+        generatedFiles: undefined,
+      }
+    }
+    const mode = params.get('productionGeneratedFilesPanel')
+    const media =
+      mode === 'single'
+        ? GENERATED_FILES_PANEL_PREVIEW_SINGLE
+        : mode === 'mixed'
+          ? GENERATED_FILES_PANEL_PREVIEW_MIXED
+          : GENERATED_FILES_PANEL_PREVIEW
+    const turnParam = params.get('productionGeneratedFilesTurnIndex')
+    const parsedTurnIndex = turnParam ? Number.parseInt(turnParam, 10) : 0
+    const generatedFilesAtTurnIndex = Number.isFinite(parsedTurnIndex) ? parsedTurnIndex : 0
+    return {
+      generatedFilesAtTurnIndex,
+      generatedFiles: media,
+    }
+  }, [])
+
   // Production ChatThread dev preview launch card via ?productionDevPreviewLaunchCard=…
   const productionDevPreviewLaunchCardMode = useMemo(() => {
     if (typeof window === 'undefined') return null
@@ -3477,6 +3508,8 @@ function HomePage() {
         planRelativePath={productionChatPlan.planRelativePath}
         reviewsAtTurnIndex={productionChatReviews.reviewsAtTurnIndex}
         turnReviews={productionChatReviews.turnReviews}
+        generatedFilesAtTurnIndex={productionChatGeneratedFiles.generatedFilesAtTurnIndex}
+        generatedFiles={productionChatGeneratedFiles.generatedFiles}
         devPreviewAtTurnIndex={productionChatDevPreview.devPreviewAtTurnIndex}
         devPreviewUrl={productionChatDevPreview.devPreviewUrl}
         devPreviewOpened={productionDevPreviewOpened}
