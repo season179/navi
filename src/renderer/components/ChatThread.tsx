@@ -2,11 +2,32 @@
 // uses the ported MessageBubble chrome (Kun message-timeline-bubbles.tsx) while
 // mapping navi's simple ChatMessage thread onto user/assistant/system snapshots.
 
-import { useEffect, useMemo, useRef, type ReactElement } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
 import type { ChatMessage } from '../flue/useNaviChat'
 import { goalTimelinePaddingClass, LiveTurnProgressRow } from './LiveTurnProgressRow'
 import { MessageBubble, type MessageBubbleSnapshot } from './MessageBubble'
 import { TimelineJumpRail, type TimelineJumpAnchor } from './TimelineJumpRail'
+import {
+  TimelineCollapseEarlierButton,
+  TimelineShowEarlierButton,
+} from './TimelinePaginationControls'
+
+const TURN_PAGE_SIZE = 18
+const AUTO_COLLAPSE_THRESHOLD = 24
+
+function deriveVisibleTurnCount(
+  totalTurns: number,
+  current: number,
+  historyExpanded: boolean,
+): number {
+  const shouldCollapse = totalTurns > AUTO_COLLAPSE_THRESHOLD
+  if (!shouldCollapse) return totalTurns
+  const latestPageCount = Math.min(TURN_PAGE_SIZE, totalTurns)
+  if (historyExpanded) {
+    return Math.min(totalTurns, Math.max(current, latestPageCount))
+  }
+  return latestPageCount
+}
 
 type ChatTurn = {
   key: string
@@ -72,16 +93,53 @@ export function ChatThread({ messages }: { messages: ChatMessage[] }): ReactElem
   const bottomRef = useRef<HTMLDivElement>(null)
   const turnRefMap = useRef(new Map<string, HTMLDivElement>())
   const turns = useMemo(() => groupMessagesIntoTurns(messages), [messages])
+  const [visibleTurnCount, setVisibleTurnCount] = useState(TURN_PAGE_SIZE)
+  const [historyExpanded, setHistoryExpanded] = useState(false)
+
+  const totalTurns = turns.length
+  const busy = useMemo(
+    () => messages.some((message) => message.status === 'streaming'),
+    [messages],
+  )
+
+  useEffect(() => {
+    setVisibleTurnCount((current) =>
+      deriveVisibleTurnCount(totalTurns, current, historyExpanded),
+    )
+  }, [totalTurns, historyExpanded])
+
+  const hiddenTurnCount = Math.max(0, totalTurns - visibleTurnCount)
+  const visibleTurns = useMemo(
+    () => (hiddenTurnCount > 0 ? turns.slice(hiddenTurnCount) : turns),
+    [hiddenTurnCount, turns],
+  )
 
   const anchors = useMemo((): TimelineJumpAnchor[] => {
-    return turns
+    let questionIndex = turns
+      .slice(0, hiddenTurnCount)
+      .filter((turn) => turn.messages.some((message) => message.role === 'user')).length
+
+    return visibleTurns
       .filter((turn) => turn.messages.some((message) => message.role === 'user'))
-      .map((turn, index) => ({
-        key: turn.key,
-        label: String(index + 1),
-        title: turnPreviewLabel(turn, index + 1),
-      }))
-  }, [turns])
+      .map((turn) => {
+        questionIndex += 1
+        return {
+          key: turn.key,
+          label: String(questionIndex),
+          title: turnPreviewLabel(turn, questionIndex),
+        }
+      })
+  }, [hiddenTurnCount, turns, visibleTurns])
+
+  const loadEarlierTurns = (): void => {
+    setHistoryExpanded(true)
+    setVisibleTurnCount((count) => Math.min(totalTurns, count + TURN_PAGE_SIZE))
+  }
+
+  const collapseEarlierTurns = (): void => {
+    setHistoryExpanded(false)
+    setVisibleTurnCount(Math.min(TURN_PAGE_SIZE, totalTurns))
+  }
 
   const jumpToTurn = (key: string): void => {
     const target = turnRefMap.current.get(key)
@@ -102,7 +160,13 @@ export function ChatThread({ messages }: { messages: ChatMessage[] }): ReactElem
           false,
         )}`}
       >
-        {turns.map((turn) => (
+        <TimelineShowEarlierButton
+          hiddenCount={hiddenTurnCount}
+          pageSize={TURN_PAGE_SIZE}
+          onShowEarlier={loadEarlierTurns}
+        />
+
+        {visibleTurns.map((turn) => (
           <div
             key={turn.key}
             ref={(node) => {
@@ -132,6 +196,17 @@ export function ChatThread({ messages }: { messages: ChatMessage[] }): ReactElem
             </div>
           </div>
         ))}
+
+        {hiddenTurnCount === 0 ? (
+          <TimelineCollapseEarlierButton
+            totalTurns={totalTurns}
+            pageSize={TURN_PAGE_SIZE}
+            autoCollapseThreshold={AUTO_COLLAPSE_THRESHOLD}
+            busy={busy}
+            onCollapseEarlier={collapseEarlierTurns}
+          />
+        ) : null}
+
         <div ref={bottomRef} />
       </div>
     </div>
