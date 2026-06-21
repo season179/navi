@@ -41,3 +41,10 @@ test('routes rich toolbar mode preview without opening mode menu', () => {
     'rich',
   )
 })
+
+test('routes source toolbar mode preview without opening mode menu', () => {
+  assert.equal(
+    resolveWriteWorkspaceToolbarPreviewMode(new URLSearchParams('writeWorkspaceToolbar=source')),
+    'source',
+  )
+})

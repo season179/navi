@@ -14,6 +14,7 @@ export type WriteWorkspaceToolbarPreviewMode =
   | 'image'
   | 'exporting'
   | 'rich'
+  | 'source'
 
 export function resolveWriteWorkspaceToolbarPreviewMode(
   params: URLSearchParams,
@@ -32,5 +33,6 @@ export function resolveWriteWorkspaceToolbarPreviewMode(
   if (value === 'image') return 'image'
   if (value === 'exporting') return 'exporting'
   if (value === 'rich') return 'rich'
+  if (value === 'source') return 'source'
   return 'default'
 }
