@@ -2487,6 +2487,152 @@ a.runtime-meta-chip:hover {
 }
 
 /* =====================================================
+   Copy feedback button (Kun CopyFeedbackButton)
+   ===================================================== */
+.copy-feedback-button {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color 0.14s ease,
+    background 0.14s ease;
+}
+
+.copy-feedback-button.is-icon-only {
+  gap: 0;
+  padding: 4px;
+}
+
+.copy-feedback-button:not(.is-icon-only) {
+  gap: 4px;
+  padding: 2px 6px;
+  font-size: 11.5px;
+}
+
+.copy-feedback-button.is-idle {
+  color: var(--ds-text-faint);
+}
+
+.copy-feedback-button.is-idle:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text-muted);
+}
+
+.copy-feedback-button.is-success {
+  color: #10b981;
+}
+
+.copy-feedback-button.is-error {
+  color: #fb7185;
+}
+
+.copy-feedback-button.is-success:hover,
+.copy-feedback-button.is-error:hover {
+  background: var(--ds-hover);
+}
+
+.copy-feedback-button-icon {
+  flex-shrink: 0;
+}
+
+.copy-feedback-button-icon.is-large {
+  width: 16px;
+  height: 16px;
+}
+
+.copy-feedback-button-icon.is-small {
+  width: 14px;
+  height: 14px;
+}
+
+.copy-feedback-button-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  bottom: calc(var(--composer-height, 120px) + 24px);
+  transform: translateX(-50%);
+  width: min(560px, calc(100vw - 48px));
+}
+
+.copy-feedback-button-preview-bubble {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--ds-border-muted);
+  background: var(--ds-surface-elevated);
+  box-shadow: var(--ds-shadow-card);
+}
+
+[data-theme='dark'] .copy-feedback-button-preview-bubble {
+  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.copy-feedback-button-preview-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.58;
+}
+
+.copy-feedback-button-preview-footer {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  color: color-mix(in srgb, var(--ds-text-faint) 90%, transparent);
+  opacity: 0.9;
+}
+
+.copy-feedback-button-preview-footer.is-assistant {
+  justify-content: flex-end;
+  min-height: 20px;
+  font-size: 11.5px;
+}
+
+.copy-feedback-button-preview-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.copy-feedback-button-preview-edit {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ds-text-faint);
+  cursor: default;
+}
+
+.copy-feedback-button-preview-edit-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.copy-feedback-button-preview-timestamp {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--ds-text-faint);
+}
+
+/* =====================================================
    Media preview tile (Kun MediaPreviewTile)
    ===================================================== */
 .media-preview-tile {

@@ -90,6 +90,11 @@ import {
   MEDIA_PREVIEW_TILE_PREVIEW_FILE,
   MEDIA_ATTACHMENT_GALLERY_PREVIEW,
 } from '../components/MediaPreviewTile'
+import {
+  CopyFeedbackButton,
+  COPY_FEEDBACK_BUTTON_PREVIEW_TEXT,
+} from '../components/CopyFeedbackButton'
+import { PencilLine } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -350,6 +355,18 @@ function HomePage() {
     if (mode === 'tool') return 'tool'
     if (mode === 'conversation') return 'conversation'
     return 'user'
+  }, [])
+
+  // Visual preview for the ported CopyFeedbackButton (?copyFeedbackButton=1|labeled|success|error).
+  const copyFeedbackButtonPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('copyFeedbackButton')) return null
+    const mode = params.get('copyFeedbackButton')
+    if (mode === 'labeled') return 'labeled'
+    if (mode === 'success') return 'success'
+    if (mode === 'error') return 'error'
+    return 'icon'
   }, [])
 
   const composerFooterPreview =
@@ -765,6 +782,58 @@ function HomePage() {
               />
             </div>
           )}
+        </div>
+      ) : null}
+
+      {copyFeedbackButtonPreviewMode === 'labeled' ? (
+        <div className="copy-feedback-button-preview">
+          <div className="copy-feedback-button-preview-bubble">
+            <div className="copy-feedback-button-preview-text">
+              {COPY_FEEDBACK_BUTTON_PREVIEW_TEXT}
+            </div>
+            <div className="copy-feedback-button-preview-footer is-assistant">
+              <span className="copy-feedback-button-preview-timestamp">
+                Jun 21, 2026, 2:30 PM
+              </span>
+              <CopyFeedbackButton text={COPY_FEEDBACK_BUTTON_PREVIEW_TEXT} />
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {copyFeedbackButtonPreviewMode &&
+      copyFeedbackButtonPreviewMode !== 'labeled' ? (
+        <div className="copy-feedback-button-preview">
+          <div className="copy-feedback-button-preview-bubble">
+            <div className="copy-feedback-button-preview-text">
+              {COPY_FEEDBACK_BUTTON_PREVIEW_TEXT}
+            </div>
+            <div className="copy-feedback-button-preview-footer">
+              <ModelMetaTag label={MODEL_META_TAG_PREVIEW} align="left" />
+              <div className="copy-feedback-button-preview-actions">
+                <CopyFeedbackButton
+                  text={COPY_FEEDBACK_BUTTON_PREVIEW_TEXT}
+                  iconOnly
+                  forceStatus={
+                    copyFeedbackButtonPreviewMode === 'success'
+                      ? 'success'
+                      : copyFeedbackButtonPreviewMode === 'error'
+                        ? 'error'
+                        : undefined
+                  }
+                />
+                <span
+                  className="copy-feedback-button-preview-edit"
+                  aria-hidden="true"
+                >
+                  <PencilLine
+                    className="copy-feedback-button-preview-edit-icon"
+                    strokeWidth={1.8}
+                  />
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       ) : null}
     </>
