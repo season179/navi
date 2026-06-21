@@ -130,7 +130,7 @@ function KunStateFigure({
   )
 }
 
-function SidebarMascot(): ReactElement {
+export function SidebarMascot(): ReactElement {
   const [kindIndex, setKindIndex] = useState(() =>
     Math.floor(Math.random() * SIDEBAR_MASCOT_KINDS.length),
   )
@@ -146,7 +146,7 @@ function SidebarMascot(): ReactElement {
   return <KunStateFigure key={kind} kind={kind} className="ds-sidebar-mascot" />
 }
 
-function FocusModeToggle({
+export function FocusModeToggle({
   enabled,
   onToggle,
 }: {

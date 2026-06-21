@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { Plus, Settings, Sun, Moon } from 'lucide-react'
+import { FocusModeToggle, SidebarMascot } from '../components/Sidebar'
 import { useTheme } from '../theme'
 import { SidebarContext } from '../sidebar'
 import { SettingsContext } from '../settings'
@@ -53,6 +54,7 @@ function RootLayout() {
     useState<WorkspaceModeView>(() => workspaceModeTabsPreviewMode ?? 'chat')
   const [productionWorkspaceMode, setProductionWorkspaceMode] =
     useState<WorkspaceModeView>('chat')
+  const [productionFocusModeEnabled, setProductionFocusModeEnabled] = useState(false)
 
   const platform = useMemo(() => resolveProductionPlatform(), [])
   const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
@@ -115,7 +117,18 @@ function RootLayout() {
                 title="Collapse sidebar"
                 onCollapse={() => setCollapsed(true)}
                 footer={
-                  <>
+                  <div className="space-y-1">
+                    <div className="flex min-h-[42px] items-center justify-center gap-2.5 pb-1">
+                      {!productionFocusModeEnabled ? (
+                        <span className="flex h-[46px] w-[56px] shrink-0 items-center justify-center">
+                          <SidebarMascot />
+                        </span>
+                      ) : null}
+                      <FocusModeToggle
+                        enabled={productionFocusModeEnabled}
+                        onToggle={() => setProductionFocusModeEnabled((enabled) => !enabled)}
+                      />
+                    </div>
                     <SidebarCommandRow
                       icon={
                         theme === 'dark' ? (
@@ -135,7 +148,7 @@ function RootLayout() {
                       active={settingsOpen}
                       variant="footer"
                     />
-                  </>
+                  </div>
                 }
               >
                 <div className="ds-no-drag flex flex-col px-1">
