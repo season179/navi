@@ -4033,6 +4033,120 @@ a.runtime-meta-chip:hover {
 
 
 /* =====================================================
+   Write workspace empty state (Kun WriteWorkspaceEmptyState)
+   ===================================================== */
+.write-workspace-empty-state {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.write-workspace-empty-state-card {
+  max-width: 28rem;
+  padding: 32px;
+  border: 1px solid var(--ds-border);
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--ds-card) 90%, transparent);
+  text-align: center;
+  box-shadow: 0 22px 56px rgba(20, 47, 95, 0.08);
+  backdrop-filter: blur(24px);
+}
+
+[data-theme='dark'] .write-workspace-empty-state-card {
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.18);
+}
+
+.write-workspace-empty-state-icon-wrap {
+  display: flex;
+  width: 56px;
+  height: 56px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+  color: var(--ds-accent);
+}
+
+.write-workspace-empty-state-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.write-workspace-empty-state-title {
+  margin: 20px 0 0;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ds-text);
+}
+
+.write-workspace-empty-state-sub {
+  margin: 12px 0 0;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--ds-text-muted);
+}
+
+.write-workspace-empty-state-error {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border: 1px solid rgba(254, 202, 202, 0.7);
+  border-radius: 8px;
+  background: rgba(254, 242, 242, 0.8);
+  font-size: 12px;
+  line-height: 1.25;
+  color: #b91c1c;
+}
+
+[data-theme='dark'] .write-workspace-empty-state-error {
+  border-color: rgba(127, 29, 29, 0.6);
+  background: rgba(69, 10, 10, 0.4);
+  color: #fecaca;
+}
+
+.write-workspace-empty-state-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--ds-accent);
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(59, 130, 216, 0.22);
+  transition: filter 0.15s ease;
+  cursor: pointer;
+}
+
+.write-workspace-empty-state-btn:hover {
+  filter: brightness(1.1);
+}
+
+.write-workspace-empty-state-btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.write-workspace-empty-state-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  display: flex;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--ds-bg-main);
+}
+
+
+/* =====================================================
    Initial session usage heatmap (Kun InitialSessionUsageHeatmap)
    ===================================================== */
 .initial-session-usage-heatmap {

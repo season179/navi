@@ -300,6 +300,11 @@ import {
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
 import { WorkspaceSelectEmptyHero } from '../components/WorkspaceSelectEmptyHero'
+import {
+  WriteWorkspaceEmptyState,
+  WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
+  type WriteWorkspaceEmptyStatePreviewMode,
+} from '../components/WriteWorkspaceEmptyState'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -678,6 +683,16 @@ function HomePage() {
     const params = new URLSearchParams(window.location.search)
     return params.has('workspaceSelectEmptyHero')
   }, [])
+
+  // Visual preview for the ported WriteWorkspaceEmptyState
+  // (?writeWorkspaceEmptyState=1|error).
+  const writeWorkspaceEmptyStatePreviewMode =
+    useMemo((): WriteWorkspaceEmptyStatePreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('writeWorkspaceEmptyState')) return null
+      return params.get('writeWorkspaceEmptyState') === 'error' ? 'error' : 'default'
+    }, [])
 
   // Visual preview for the ported InitialSessionUsageHeatmap
   // (?initialSessionUsageHeatmap=populated|loading|empty|error|collapsed|models).
@@ -1526,6 +1541,20 @@ function HomePage() {
   if (appErrorBoundaryPreviewMode) {
     return (
       <AppErrorFallback error={APP_ERROR_BOUNDARY_PREVIEW[appErrorBoundaryPreviewMode]} />
+    )
+  }
+
+  if (writeWorkspaceEmptyStatePreviewMode) {
+    return (
+      <div className="write-workspace-empty-state-preview">
+        <WriteWorkspaceEmptyState
+          error={
+            writeWorkspaceEmptyStatePreviewMode === 'error'
+              ? WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR
+              : null
+          }
+        />
+      </div>
     )
   }
 
