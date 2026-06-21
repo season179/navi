@@ -20,7 +20,14 @@ const {
   getFileMentionAtCursor,
   filterWorkspaceFileMentionSuggestions,
   replaceFileMentionInInput,
+  COMPOSER_FILE_REFERENCES_PREVIEW,
 } = await import(out)
+
+test('COMPOSER_FILE_REFERENCES_PREVIEW matches Kun file-reference chip mock data', () => {
+  assert.equal(COMPOSER_FILE_REFERENCES_PREVIEW.length, 2)
+  assert.match(COMPOSER_FILE_REFERENCES_PREVIEW[0].relativePath, /Composer\.tsx$/)
+  assert.equal(COMPOSER_FILE_REFERENCES_PREVIEW[1].isDirectory, true)
+})
 
 test('getFileMentionAtCursor parses @ file mention queries at the cursor', () => {
   assert.deepEqual(

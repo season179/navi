@@ -7,7 +7,7 @@ import {
   CONTEXT_CAPACITY_PREVIEW,
 } from '../components/ContextCapacityPopover'
 import { Composer } from '../components/Composer'
-import { COMPOSER_FILE_MENTION_PREVIEW } from '../lib/composerFileReferences'
+import { COMPOSER_FILE_MENTION_PREVIEW, COMPOSER_FILE_REFERENCES_PREVIEW } from '../lib/composerFileReferences'
 import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
@@ -689,6 +689,15 @@ function HomePage() {
       return undefined
     }
     return COMPOSER_CHANGE_SUMMARY_PREVIEW
+  }, [])
+
+  // Visual preview for the ported ComposerFileReferenceChips (?composerFileReferencesPreview=1).
+  const composerFileReferencesPreview = useMemo(() => {
+    if (typeof window === 'undefined') return undefined
+    if (!new URLSearchParams(window.location.search).has('composerFileReferencesPreview')) {
+      return undefined
+    }
+    return COMPOSER_FILE_REFERENCES_PREVIEW
   }, [])
 
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
@@ -3734,6 +3743,7 @@ function HomePage() {
       fileMentionCandidates={composerFileMentionPreview}
       changedFiles={composerChangeSummaryPreview?.files}
       changedStats={composerChangeSummaryPreview?.stats}
+      fileReferences={composerFileReferencesPreview}
       modelChip={
         <FloatingModelPicker
           providers={providerProfiles}

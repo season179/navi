@@ -132,6 +132,18 @@ export function filterWorkspaceFileMentionSuggestions(
     .map((entry) => entry.file)
 }
 
+/** Chip row item for Kun's composer file-reference strip above the textarea. */
+export type ComposerFileReferenceChip = {
+  relativePath: string
+  isDirectory?: boolean
+}
+
+/** Mock file references for ?composerFileReferencesPreview visual verification. */
+export const COMPOSER_FILE_REFERENCES_PREVIEW: ComposerFileReferenceChip[] = [
+  { relativePath: 'src/renderer/components/Composer.tsx' },
+  { relativePath: 'src/renderer/components', isDirectory: true },
+]
+
 /** Mock workspace files for ?composerFileMentionPreview visual verification. */
 export const COMPOSER_FILE_MENTION_PREVIEW: ComposerFileReference[] = [
   {

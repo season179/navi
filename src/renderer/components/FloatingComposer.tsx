@@ -65,9 +65,15 @@ import {
   COMPOSER_CHANGE_SUMMARY_PREVIEW,
   type ComposerChangedFile,
 } from '../lib/composerChangeSummary'
+import {
+  COMPOSER_FILE_REFERENCES_PREVIEW,
+  type ComposerFileReferenceChip,
+} from '../lib/composerFileReferences'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
+export type { ComposerFileReferenceChip } from '../lib/composerFileReferences'
+export { COMPOSER_FILE_REFERENCES_PREVIEW } from '../lib/composerFileReferences'
 
 const SAMPLE_IMAGE =
   'data:image/svg+xml,' +
@@ -115,10 +121,7 @@ export type ComposerFileMentionItem = {
 
 type FileMentionPreview = ComposerFileMentionItem
 
-type FileReferencePreview = {
-  relativePath: string
-  isDirectory?: boolean
-}
+type FileReferencePreview = ComposerFileReferenceChip
 
 type AttachmentPreview = {
   id: string
@@ -220,10 +223,7 @@ const FILE_MENTIONS_PREVIEW: FileMentionPreview[] = [
   { relativePath: 'src/renderer/routes', isDirectory: true },
 ]
 
-const FILE_REFERENCES_PREVIEW: FileReferencePreview[] = [
-  { relativePath: 'src/renderer/components/Composer.tsx' },
-  { relativePath: 'src/renderer/components', isDirectory: true },
-]
+const FILE_REFERENCES_PREVIEW: FileReferencePreview[] = COMPOSER_FILE_REFERENCES_PREVIEW
 
 const ATTACHMENTS_PREVIEW: AttachmentPreview[] = [
   { id: 'img-1', name: 'mock-screenshot.png', previewUrl: SAMPLE_IMAGE },
@@ -488,6 +488,49 @@ function ComposerGoalPanel({ goal }: { goal: GoalPreview | null }): ReactElement
   )
 }
 
+export function ComposerFileReferenceChips({
+  references,
+  onRemove,
+}: {
+  references: ComposerFileReferenceChip[]
+  onRemove?: (relativePath: string) => void
+}): ReactElement | null {
+  if (references.length === 0) return null
+
+  return (
+    <div className="floating-composer-file-ref-row">
+      {references.map((reference) => {
+        const displayPath = reference.isDirectory
+          ? `${reference.relativePath}/`
+          : reference.relativePath
+        return (
+          <span key={displayPath} className="floating-composer-file-ref-chip" title={displayPath}>
+            {reference.isDirectory ? (
+              <Folder strokeWidth={1.8} />
+            ) : (
+              <FileText strokeWidth={1.8} />
+            )}
+            <span>{displayPath}</span>
+            {onRemove ? (
+              <button
+                type="button"
+                aria-label="Remove file reference"
+                onClick={() => onRemove(reference.relativePath)}
+              >
+                <X strokeWidth={2} />
+              </button>
+            ) : (
+              <button type="button" aria-label="Remove file reference">
+                <X strokeWidth={2} />
+              </button>
+            )}
+          </span>
+        )
+      })}
+    </div>
+  )
+}
+
 export function ComposerChangeSummary({
   files,
   stats,
@@ -680,26 +723,7 @@ export function FloatingComposer({
           />
 
           {snapshot.fileReferences.length > 0 ? (
-            <div className="floating-composer-file-ref-row">
-              {snapshot.fileReferences.map((reference) => {
-                const displayPath = reference.isDirectory
-                  ? `${reference.relativePath}/`
-                  : reference.relativePath
-                return (
-                  <span key={displayPath} className="floating-composer-file-ref-chip" title={displayPath}>
-                    {reference.isDirectory ? (
-                      <Folder strokeWidth={1.8} />
-                    ) : (
-                      <FileText strokeWidth={1.8} />
-                    )}
-                    <span>{displayPath}</span>
-                    <button type="button" aria-label="Remove file reference">
-                      <X strokeWidth={2} />
-                    </button>
-                  </span>
-                )
-              })}
-            </div>
+            <ComposerFileReferenceChips references={snapshot.fileReferences} />
           ) : null}
 
           {snapshot.attachments.length > 0 ? (

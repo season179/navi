@@ -29,9 +29,11 @@ import {
   ComposerSlashMenu,
   ComposerFileMentionMenu,
   ComposerChangeSummary,
+  ComposerFileReferenceChips,
   type ComposerSlashCommandItem,
   type ComposerFileMentionItem,
 } from './FloatingComposer'
+import type { ComposerFileReferenceChip } from '../lib/composerFileReferences'
 import {
   ContextCapacityPopover,
   type ContextCapacity,
@@ -78,6 +80,9 @@ interface ComposerProps {
   changedFiles?: ComposerChangedFile[]
   /** Diff stats for the change-summary card; defaults to zeros when omitted. */
   changedStats?: { added: number; removed: number }
+  /** File reference chips shown below the textarea in Kun's composer shell. */
+  fileReferences?: ComposerFileReferenceChip[]
+  onRemoveFileReference?: (relativePath: string) => void
 }
 
 /**
@@ -112,6 +117,8 @@ export function Composer({
   footerLeft,
   changedFiles,
   changedStats,
+  fileReferences,
+  onRemoveFileReference,
 }: ComposerProps) {
   const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -487,6 +494,12 @@ export function Composer({
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
           />
+          {!compact && fileReferences && fileReferences.length > 0 ? (
+            <ComposerFileReferenceChips
+              references={fileReferences}
+              onRemove={onRemoveFileReference}
+            />
+          ) : null}
           <div className={toolbarClass}>
             {!compact ? (
               <div className="floating-composer-toolbar-start">
