@@ -11,6 +11,7 @@ import {
   TimelineCollapseEarlierButton,
   TimelineShowEarlierButton,
 } from './TimelinePaginationControls'
+import { CompactionDivider, type CompactionDividerSnapshot } from './CompactionDivider'
 import { ThreadForkBanner, ThreadForkPoint } from './ThreadForkBanner'
 
 const TURN_PAGE_SIZE = 18
@@ -97,6 +98,9 @@ type ChatThreadProps = {
   forkedFromTitle?: string
   /** Absolute turn index (0-based) at which the fork boundary marker is inserted. */
   forkBoundaryTurnIndex?: number
+  /** When set with compactionBlock, renders Kun's compaction divider at this turn. */
+  compactionAtTurnIndex?: number
+  compactionBlock?: CompactionDividerSnapshot
 }
 
 export function ChatThread({
@@ -104,6 +108,8 @@ export function ChatThread({
   showForkBanner = false,
   forkedFromTitle,
   forkBoundaryTurnIndex,
+  compactionAtTurnIndex,
+  compactionBlock,
 }: ChatThreadProps): ReactElement {
   const bottomRef = useRef<HTMLDivElement>(null)
   const turnRefMap = useRef(new Map<string, HTMLDivElement>())
@@ -188,6 +194,10 @@ export function ChatThread({
           const showForkPoint =
             typeof forkBoundaryTurnIndex === 'number' &&
             forkBoundaryTurnIndex === absoluteTurnIndex
+          const showCompaction =
+            compactionBlock != null &&
+            typeof compactionAtTurnIndex === 'number' &&
+            compactionAtTurnIndex === absoluteTurnIndex
 
           return (
             <div
@@ -217,6 +227,7 @@ export function ChatThread({
                     </div>
                   )
                 })}
+                {showCompaction ? <CompactionDivider block={compactionBlock} /> : null}
               </div>
             </div>
           )

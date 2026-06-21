@@ -131,6 +131,7 @@ import {
   THREAD_FORK_BANNER_PREVIEW_TITLE,
 } from '../components/ThreadForkBanner'
 import {
+  COMPACTION_DIVIDER_PREVIEW,
   CompactionDividerPreview,
   type CompactionDividerPreviewMode,
 } from '../components/CompactionDivider'
@@ -2667,6 +2668,41 @@ function HomePage() {
     }
   }, [threadForkBannerPreviewMode, threadForkPointPreviewMode])
 
+  // Production ChatThread compaction divider via ?productionCompactionDivider=…
+  const productionChatCompaction = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {
+        compactionAtTurnIndex: undefined,
+        compactionBlock: undefined,
+      }
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionCompactionDivider')) {
+      return {
+        compactionAtTurnIndex: undefined,
+        compactionBlock: undefined,
+      }
+    }
+    const mode = params.get('productionCompactionDivider')
+    const previewMode: CompactionDividerPreviewMode =
+      mode === 'autoCompleted'
+        ? 'autoCompleted'
+        : mode === 'manualCompleted'
+          ? 'manualCompleted'
+          : mode === 'errorWithSummary'
+            ? 'errorWithSummary'
+            : mode === 'error'
+              ? 'error'
+              : 'running'
+    const turnParam = params.get('productionCompactionTurnIndex')
+    const parsedTurnIndex = turnParam ? Number.parseInt(turnParam, 10) : 0
+    const compactionAtTurnIndex = Number.isFinite(parsedTurnIndex) ? parsedTurnIndex : 0
+    return {
+      compactionAtTurnIndex,
+      compactionBlock: COMPACTION_DIVIDER_PREVIEW[previewMode],
+    }
+  }, [])
+
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
   // toggles (a create/enable/disable in the Skills tab may have changed the set).
@@ -3299,6 +3335,8 @@ function HomePage() {
         showForkBanner={productionChatFork.showForkBanner}
         forkedFromTitle={productionChatFork.forkedFromTitle}
         forkBoundaryTurnIndex={productionChatFork.forkBoundaryTurnIndex}
+        compactionAtTurnIndex={productionChatCompaction.compactionAtTurnIndex}
+        compactionBlock={productionChatCompaction.compactionBlock}
       />
     </>
   )
