@@ -72,6 +72,8 @@ interface ComposerProps {
   placeholder?: string
   /** Context window occupancy chip shown before the model picker when set. */
   contextCapacity?: ContextCapacity | null
+  /** Opens the context-capacity popover on mount for visual verification hooks. */
+  defaultContextCapacityOpen?: boolean
   /** Model picker rendered in the toolbar end row after context controls. */
   modelChip?: ReactNode
   /** Available skills for the `/skill` picker (scoped to active project). */
@@ -154,6 +156,7 @@ export function Composer({
   variant = 'default',
   placeholder = 'Send a message to Navi…',
   contextCapacity,
+  defaultContextCapacityOpen = false,
   modelChip,
   skills,
   fileMentionCandidates,
@@ -189,7 +192,7 @@ export function Composer({
   const [pickerOpen, setPickerOpen] = useState(false)
   const [focused, setFocused] = useState(false)
   const [plusMenuOpen, setPlusMenuOpen] = useState(defaultPlusMenuOpen)
-  const [contextCapacityOpen, setContextCapacityOpen] = useState(false)
+  const [contextCapacityOpen, setContextCapacityOpen] = useState(defaultContextCapacityOpen)
   const [slashActiveIndex, setSlashActiveIndex] = useState(0)
   const [fileMentionActiveIndex, setFileMentionActiveIndex] = useState(0)
   const [cursor, setCursor] = useState(0)

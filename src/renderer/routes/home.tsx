@@ -29,6 +29,7 @@ import {
 import { COMPOSER_DICTATION_ERROR_PREVIEW } from '../lib/composerVoiceDictation'
 import { COMPOSER_QUEUE_PLACEHOLDER } from '../lib/composerBusyState'
 import { resolveComposerSlashCommandsPreview } from '../lib/composerSlashCommands'
+import { resolveComposerContextCapacityPreview } from '../lib/composerContextCapacity'
 import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
@@ -700,6 +701,15 @@ function HomePage() {
   const contextCapacityPreview = useMemo(() => {
     if (typeof window === 'undefined') return false
     return new URLSearchParams(window.location.search).has('contextCapacityPreview')
+  }, [])
+
+  // Visual preview for the context-capacity chip + open popover in production Composer
+  // (?composerContextCapacityPreview=1).
+  const composerContextCapacityPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerContextCapacityPreview')) return false
+    return resolveComposerContextCapacityPreview(params.get('composerContextCapacityPreview'))
   }, [])
 
   // Visual preview for the ported ComposerFileMentionMenu
@@ -2777,10 +2787,10 @@ function HomePage() {
   }, [projectPath, projects])
 
   const productionContextCapacity = useMemo(() => {
-    if (contextCapacityPreview) return CONTEXT_CAPACITY_PREVIEW
+    if (contextCapacityPreview || composerContextCapacityPreview) return CONTEXT_CAPACITY_PREVIEW
     if (!status.ready || empty) return undefined
     return CONTEXT_CAPACITY_PREVIEW
-  }, [contextCapacityPreview, empty, status.ready])
+  }, [contextCapacityPreview, composerContextCapacityPreview, empty, status.ready])
 
   const productionSessionHeaderSnapshot = useMemo((): SessionHeaderSnapshot | null => {
     const conversation = conversations.find((entry) => entry.id === currentId)
@@ -3909,6 +3919,7 @@ function HomePage() {
         />
       }
       contextCapacity={productionContextCapacity}
+      defaultContextCapacityOpen={composerContextCapacityPreview}
       voiceRecording={voiceRecording}
       queuedMessages={queuedMessagesPreview}
       executionPicker={
@@ -4455,7 +4466,7 @@ function HomePage() {
 
       {!useProductionWorkbenchLayout ? composerElement : null}
 
-      {contextCapacityPreview ? (
+      {contextCapacityPreview && !composerContextCapacityPreview ? (
         <div className="context-capacity-preview" aria-hidden="true">
           <ContextCapacityPopover capacity={CONTEXT_CAPACITY_PREVIEW} />
         </div>
