@@ -292,6 +292,10 @@ import {
   type ProvidersPreviewMode,
 } from '../components/ProvidersSettingsSection'
 import {
+  AgentsSettingsSectionPreview,
+  type AgentsPreviewMode,
+} from '../components/AgentsSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1403,6 +1407,16 @@ function HomePage() {
     return mode as ProvidersPreviewMode
   }, [])
 
+  // Visual preview for the ported AgentsSettingsSection (?agentsPreview=1|tokenEconomy|computerUse|…).
+  const agentsPreviewMode = useMemo((): AgentsPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('agentsPreview')) return null
+    const mode = params.get('agentsPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as AgentsPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1733,6 +1747,22 @@ function HomePage() {
           </p>
           <div className="providers-preview-stack">
             <ProvidersSettingsSectionPreview mode={providersPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (agentsPreviewMode) {
+    return (
+      <div className="agents-preview">
+        <div className="agents-preview-inner">
+          <h1 className="agents-preview-title">AI assistant</h1>
+          <p className="agents-preview-subtitle">
+            Agents category from Kun settings-section-agents.tsx.
+          </p>
+          <div className="agents-preview-stack">
+            <AgentsSettingsSectionPreview mode={agentsPreviewMode} />
           </div>
         </div>
       </div>

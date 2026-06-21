@@ -3,7 +3,6 @@
 // Visual only: parent supplies active category and navigation callbacks.
 
 import type { Dispatch, ReactElement, SetStateAction } from 'react'
-import { SettingsControlsPreview } from './SettingsControls'
 import { GeneralSettingsSectionPreview } from './GeneralSettingsSection'
 import { KeyboardShortcutsSettingsSectionPreview } from './KeyboardShortcutsSettingsSection'
 import { EasterEggSettingsSectionPreview } from './EasterEggSettingsSection'
@@ -18,6 +17,7 @@ import { WorktreeSettingsSectionPreview } from './WorktreeSettingsSection'
 import { ClawSettingsSectionPreview } from './ClawSettingsSection'
 import { WriteSettingsSectionPreview } from './WriteSettingsSection'
 import { ProvidersSettingsSectionPreview } from './ProvidersSettingsSection'
+import { AgentsSettingsSectionPreview } from './AgentsSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -192,8 +192,12 @@ export function SettingsSidebarPreviewContent({
           <WriteSettingsSectionPreview />
         </div>
       ) : category === 'agents' ? (
-        <div className="settings-controls-preview-stack">
-          <SettingsControlsPreview mode="modelSelect" />
+        <div className="agents-settings-preview-stack">
+          <AgentsSettingsSectionPreview />
+        </div>
+      ) : category === 'permissions' ? (
+        <div className="agents-settings-preview-stack">
+          <AgentsSettingsSectionPreview />
         </div>
       ) : category === 'updates' ? (
         <div className="updates-settings-preview-stack">
