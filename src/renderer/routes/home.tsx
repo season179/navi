@@ -534,6 +534,7 @@ function HomePage() {
     currentProjectId,
     conversations,
     currentId,
+    selectProject,
   } = useNaviList()
 
   const empty = messages.length === 0
@@ -2503,6 +2504,29 @@ function HomePage() {
     return proj?.path || undefined
   }, [projects, currentProjectId])
 
+  const productionWorkspaceSnapshot = useMemo((): WorkspaceProjectsSnapshot | null => {
+    if (!projectPath) return null
+    const options = projects
+      .filter((project) => project.path)
+      .map((project) => {
+        const root = project.path!.replace(/[/\\]+$/, '')
+        const parts = root.split(/[/\\]/).filter(Boolean)
+        const label = project.label ?? project.name ?? (parts[parts.length - 1] ?? root)
+        const context = parts.length > 1 ? (parts[parts.length - 2] ?? '') : ''
+        return { root, label, context }
+      })
+    return {
+      currentRoot: projectPath.replace(/[/\\]+$/, ''),
+      options,
+    }
+  }, [projectPath, projects])
+
+  const productionContextCapacity = useMemo(() => {
+    if (contextCapacityPreview) return CONTEXT_CAPACITY_PREVIEW
+    if (!status.ready || empty) return undefined
+    return CONTEXT_CAPACITY_PREVIEW
+  }, [contextCapacityPreview, empty, status.ready])
+
   const productionSessionHeaderSnapshot = useMemo((): SessionHeaderSnapshot | null => {
     const conversation = conversations.find((entry) => entry.id === currentId)
     const project = projects.find((entry) => entry.id === currentProjectId)
@@ -3476,6 +3500,7 @@ function HomePage() {
             onConfigure={() => openSettingsTab('providers')}
           />
         }
+        contextCapacity={productionContextCapacity}
         voiceRecording={voiceRecording}
         queuedMessages={queuedMessagesPreview}
         executionPicker={
@@ -3522,6 +3547,21 @@ function HomePage() {
                   }}
                 />
               ) : null}
+            </>
+          ) : productionWorkspaceSnapshot ? (
+            <>
+              <WorkspaceProjectPicker
+                snapshot={productionWorkspaceSnapshot}
+                onSelect={(root) => {
+                  const normalized = root.replace(/[/\\]+$/, '').toLowerCase()
+                  const project = projects.find((entry) => {
+                    if (!entry.path) return false
+                    return entry.path.replace(/[/\\]+$/, '').toLowerCase() === normalized
+                  })
+                  if (project) void selectProject(project.id)
+                }}
+              />
+              <GitBranchPicker snapshot={GIT_BRANCH_PICKER_PREVIEW} />
             </>
           ) : undefined
         }

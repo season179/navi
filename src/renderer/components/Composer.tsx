@@ -16,7 +16,15 @@ import {
   FloatingComposerQueuedMessages,
   type QueuedComposerMessage,
 } from './FloatingComposerQueuedMessages'
+import {
+  ContextCapacityPopover,
+  type ContextCapacity,
+} from './ContextCapacityPopover'
 import type { SkillSummary } from '../../shared/flue'
+
+function formatContextPercent(value: number): string {
+  return `${Math.round(value * 100)}%`
+}
 
 interface ComposerProps {
   value: string
@@ -26,6 +34,8 @@ interface ComposerProps {
   busy?: boolean
   disabled?: boolean
   placeholder?: string
+  /** Context window occupancy chip shown before the model picker when set. */
+  contextCapacity?: ContextCapacity | null
   /** Model picker rendered in the toolbar end row after context controls. */
   modelChip?: ReactNode
   /** Available skills for the `/skill` picker (scoped to active project). */
@@ -66,6 +76,7 @@ export function Composer({
   busy = false,
   disabled = false,
   placeholder = 'Send a message to Navi…',
+  contextCapacity,
   modelChip,
   skills,
   voiceRecording,
@@ -75,8 +86,21 @@ export function Composer({
   footerLeft,
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const contextCapacityRef = useRef<HTMLDivElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [focused, setFocused] = useState(false)
+  const [contextCapacityOpen, setContextCapacityOpen] = useState(false)
+
+  useEffect(() => {
+    if (!contextCapacityOpen) return
+    const onPointerDown = (event: PointerEvent): void => {
+      const target = event.target
+      if (target instanceof Node && contextCapacityRef.current?.contains(target)) return
+      setContextCapacityOpen(false)
+    }
+    window.addEventListener('pointerdown', onPointerDown)
+    return () => window.removeEventListener('pointerdown', onPointerDown)
+  }, [contextCapacityOpen])
 
   // Auto-grow the textarea up to its CSS max-height.
   useEffect(() => {
@@ -225,6 +249,38 @@ export function Composer({
                   </>
                 ) : (
                   <>
+                    {contextCapacity ? (
+                      <div className="floating-composer-context-wrap" ref={contextCapacityRef}>
+                        <button
+                          type="button"
+                          className="floating-composer-context-chip"
+                          aria-expanded={contextCapacityOpen}
+                          aria-label={`Context capacity ${formatContextPercent(contextCapacity.usedRatio)}`}
+                          title="Context capacity"
+                          onClick={() => setContextCapacityOpen((open) => !open)}
+                        >
+                          <span className="floating-composer-context-bar" aria-hidden>
+                            <span
+                              style={{
+                                width: `${Math.min(100, contextCapacity.usedRatio * 100)}%`,
+                                background:
+                                  contextCapacity.usedRatio >= 0.9
+                                    ? '#d9544e'
+                                    : contextCapacity.usedRatio >= 0.75
+                                      ? '#d9920f'
+                                      : 'var(--ds-accent)',
+                              }}
+                            />
+                          </span>
+                          <span>{formatContextPercent(contextCapacity.usedRatio)}</span>
+                        </button>
+                        {contextCapacityOpen ? (
+                          <div className="floating-composer-context-popover">
+                            <ContextCapacityPopover capacity={contextCapacity} />
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
                     {modelChip}
                     {executionPicker}
                     <button
