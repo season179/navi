@@ -309,7 +309,7 @@ function MessageBubbleImpl({
 
     return (
       <div className="message-bubble-assistant group/message">
-        <div className="ds-chat-answer message-bubble-assistant-body">
+        <div className="ds-markdown ds-chat-answer message-bubble-assistant-body">
           <Markdown text={block.text} streaming={streaming} />
         </div>
         {!streaming ? (
@@ -325,7 +325,7 @@ function MessageBubbleImpl({
   if (block.kind === 'reasoning') {
     return (
       <div className="message-bubble-reasoning">
-        <div className="message-bubble-reasoning-body">
+        <div className="ds-markdown message-bubble-reasoning-body">
           <Markdown text={block.text} streaming={false} />
         </div>
       </div>
