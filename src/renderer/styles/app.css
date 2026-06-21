@@ -170,6 +170,20 @@ textarea {
   box-shadow: var(--ds-sidebar-shadow);
 }
 
+.production-main-stage--plugins {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.production-plugins-stage {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 /* Sidebar haze overlay (sits above gradient, below content) */
 .sidebar::before {
   content: '';

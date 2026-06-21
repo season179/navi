@@ -434,6 +434,7 @@ import {
 } from '../components/ScheduleDefaultsDialog'
 import {
   ScheduleTasksViewPreview,
+  ScheduleTasksProductionView,
   type ScheduleTasksPreviewMode,
 } from '../components/ScheduleTasksView'
 import {
@@ -446,6 +447,7 @@ import {
 } from '../components/InitialSetupDialog'
 import {
   PluginMarketplaceViewPreview,
+  PluginMarketplaceProductionView,
   type PluginMarketplacePreviewMode,
 } from '../components/PluginMarketplaceView'
 import {
@@ -505,6 +507,7 @@ import { SkillsSettings } from '../components/skills/SkillsSettings'
 import { hasUsableProvider, type SkillSummary } from '../../shared/flue'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'
+import { useSidebarRoute } from '../sidebar-route'
 import { useSettings } from '../settings'
 import { useFocusMode } from '../focus-mode'
 
@@ -577,6 +580,7 @@ function renderProductionRightPanel(
 
 function HomePage() {
   const { collapsed, toggle } = useSidebar()
+  const { route: sidebarRoute } = useSidebarRoute()
   const { settingsOpen, openSettings, closeSettings } = useSettings()
   const { focusModeEnabled } = useFocusMode()
   const [draft, setDraft] = useState('')
@@ -3352,6 +3356,29 @@ function HomePage() {
       }
     />
   )
+
+  if (sidebarRoute === 'plugins') {
+    return (
+      <div className="production-plugins-stage">
+        <div className="ds-no-drag shrink-0 px-4 pt-4">
+          <SidebarTitlebarToggleButton
+            onClick={toggle}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          />
+        </div>
+        <PluginMarketplaceProductionView />
+      </div>
+    )
+  }
+
+  if (sidebarRoute === 'schedule') {
+    return (
+      <ScheduleTasksProductionView
+        leftSidebarCollapsed={collapsed}
+        onToggleLeftSidebar={toggle}
+      />
+    )
+  }
 
   return (
     <>

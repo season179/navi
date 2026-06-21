@@ -1034,3 +1034,45 @@ export function ScheduleTasksViewPreview({
     </div>
   )
 }
+
+/** Production shell for sidebar Schedule route — mock snapshots for visual parity. */
+export function ScheduleTasksProductionView({
+  leftSidebarCollapsed,
+  onToggleLeftSidebar,
+}: {
+  leftSidebarCollapsed: boolean
+  onToggleLeftSidebar: () => void
+}): ReactElement {
+  const initial = useMemo(() => previewState('default'), [])
+  const [filter, setFilter] = useState(initial.filter)
+  const [keepAwake, setKeepAwake] = useState(true)
+  const [expandedResultTaskIds, setExpandedResultTaskIds] = useState(
+    initial.expandedResultTaskIds,
+  )
+
+  return (
+    <ScheduleTasksView
+      tasks={initial.tasks}
+      filter={filter}
+      keepAwake={keepAwake}
+      loading={initial.loading}
+      error={initial.error}
+      runningTaskIds={initial.runningTaskIds}
+      expandedResultTaskIds={expandedResultTaskIds}
+      leftSidebarCollapsed={leftSidebarCollapsed}
+      dialogMode={initial.dialogMode}
+      settingsDialogOpen={initial.settingsDialogOpen}
+      onToggleLeftSidebar={onToggleLeftSidebar}
+      onFilterChange={setFilter}
+      onKeepAwakeChange={setKeepAwake}
+      onToggleResult={(taskId) => {
+        setExpandedResultTaskIds((current) => {
+          const next = new Set(current)
+          if (next.has(taskId)) next.delete(taskId)
+          else next.add(taskId)
+          return next
+        })
+      }}
+    />
+  )
+}

@@ -1,9 +1,19 @@
 import { useCallback, useMemo, useState } from 'react'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
-import { Plus, Settings, Sun, Moon, Smartphone } from 'lucide-react'
+import {
+  Clock3,
+  FileQuestion,
+  LayoutGrid,
+  Plus,
+  Settings,
+  Sun,
+  Moon,
+  Smartphone,
+} from 'lucide-react'
 import { FocusModeToggle, SidebarMascot } from '../components/Sidebar'
 import { useTheme } from '../theme'
 import { SidebarContext } from '../sidebar'
+import { SidebarRouteProvider, useSidebarRoute } from '../sidebar-route'
 import { SettingsContext } from '../settings'
 import { FocusModeProvider, useFocusMode } from '../focus-mode'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
@@ -38,6 +48,14 @@ function resolveProductionPlatform(): string {
 function RootLayoutInner() {
   const { theme, toggleTheme } = useTheme()
   const { focusModeEnabled, toggleFocusMode } = useFocusMode()
+  const {
+    route: sidebarRoute,
+    pluginsActive,
+    scheduleActive,
+    openChatRoute,
+    openScheduleRoute,
+    openPluginsRoute,
+  } = useSidebarRoute()
   const [collapsed, setCollapsed] = useState(false)
   const toggle = useCallback(() => setCollapsed((v) => !v), [])
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -49,8 +67,21 @@ function RootLayoutInner() {
 
   const handleNew = useCallback(() => {
     closeSettings()
+    openChatRoute()
     newConversation()
-  }, [closeSettings, newConversation])
+  }, [closeSettings, newConversation, openChatRoute])
+
+  const handleOpenSchedule = useCallback(() => {
+    closeSettings()
+    setConnectPhoneSidebarOpen(false)
+    openScheduleRoute()
+  }, [closeSettings, openScheduleRoute])
+
+  const handleOpenPlugins = useCallback(() => {
+    closeSettings()
+    setConnectPhoneSidebarOpen(false)
+    openPluginsRoute()
+  }, [closeSettings, openPluginsRoute])
 
   const workspaceModeTabsPreviewMode = useMemo((): WorkspaceModeView | null => {
     if (typeof window === 'undefined') return null
@@ -74,8 +105,25 @@ function RootLayoutInner() {
   const [connectPhoneQrStatus, setConnectPhoneQrStatus] = useState<ConnectPhoneQrStatus>('idle')
 
   const toggleConnectPhoneSidebar = useCallback(() => {
+    openChatRoute()
     setConnectPhoneSidebarOpen((open) => !open)
-  }, [])
+  }, [openChatRoute])
+
+  const workspaceModeActiveView = useMemo((): WorkspaceModeView => {
+    if (workspaceModeTabsPreviewMode !== null) return workspaceModeTabsPreviewView
+    if (scheduleActive) return 'schedule'
+    return productionWorkspaceMode
+  }, [
+    workspaceModeTabsPreviewMode,
+    workspaceModeTabsPreviewView,
+    scheduleActive,
+    productionWorkspaceMode,
+  ])
+
+  const mainStageClass =
+    sidebarRoute === 'plugins'
+      ? 'stage ds-stage-surface workbench-chat-stage production-main-stage production-main-stage--plugins'
+      : 'stage ds-stage-surface ds-chat-stage workbench-chat-stage production-main-stage'
 
   const platform = useMemo(() => resolveProductionPlatform(), [])
   const hasDesktopTitleBar = supportsDesktopTitleBar(platform)
@@ -181,16 +229,13 @@ function RootLayoutInner() {
               >
                 <div className="ds-no-drag flex flex-col px-1">
                   <WorkspaceModeTabs
-                    activeView={
-                      workspaceModeTabsPreviewMode !== null
-                        ? workspaceModeTabsPreviewView
-                        : productionWorkspaceMode
-                    }
+                    activeView={workspaceModeActiveView}
                     onCodeOpen={() => {
                       if (workspaceModeTabsPreviewMode) {
                         setWorkspaceModeTabsPreviewView('chat')
                         return
                       }
+                      openChatRoute()
                       setProductionWorkspaceMode('chat')
                     }}
                     onWriteOpen={() => {
@@ -198,19 +243,45 @@ function RootLayoutInner() {
                         setWorkspaceModeTabsPreviewView('write')
                         return
                       }
+                      openChatRoute()
                       setProductionWorkspaceMode('write')
                     }}
                   />
-                </div>
 
-                <div className="ds-no-drag flex flex-col px-1">
+                  {!scheduleActive ? (
+                    <>
+                      <SidebarCommandRow
+                        icon={<Plus className="h-4 w-4" strokeWidth={2} />}
+                        label="New conversation"
+                        onClick={handleNew}
+                        disabled={!status.ready}
+                        disabledHint="Connect a provider first"
+                        variant="accent"
+                      />
+                      <SidebarCommandRow
+                        icon={<FileQuestion className="h-4 w-4" strokeWidth={1.9} />}
+                        label="New requirement"
+                        disabled={!status.ready}
+                        disabledHint="Connect a provider first"
+                        variant="accent"
+                      />
+                    </>
+                  ) : null}
                   <SidebarCommandRow
-                    icon={<Plus className="h-4 w-4" strokeWidth={2} />}
-                    label="New conversation"
-                    onClick={handleNew}
-                    variant="accent"
+                    icon={<LayoutGrid className="h-4 w-4" strokeWidth={1.75} />}
+                    label="Plugins"
+                    onClick={handleOpenPlugins}
+                    active={pluginsActive}
+                  />
+                  <SidebarCommandRow
+                    icon={<Clock3 className="h-4 w-4" strokeWidth={1.75} />}
+                    label="Schedule"
+                    onClick={handleOpenSchedule}
+                    active={scheduleActive}
                   />
                 </div>
+
+                <div className="ds-no-drag mx-1 my-1" />
 
                 {connectPhoneSidebarOpen || connectPhoneSidebarPreviewOpen ? (
                   <ConnectPhoneSidebarPanel
@@ -235,7 +306,7 @@ function RootLayoutInner() {
             </div>
           ) : null}
 
-          <main className="stage ds-stage-surface ds-chat-stage workbench-chat-stage">
+          <main className={mainStageClass}>
             <Outlet />
           </main>
             </div>
@@ -249,7 +320,9 @@ function RootLayoutInner() {
 function RootLayout() {
   return (
     <FocusModeProvider>
-      <RootLayoutInner />
+      <SidebarRouteProvider>
+        <RootLayoutInner />
+      </SidebarRouteProvider>
     </FocusModeProvider>
   )
 }

@@ -961,3 +961,26 @@ export function PluginMarketplaceViewPreview({
     </div>
   )
 }
+
+/** Production shell for sidebar Plugins route — mock snapshots for visual parity. */
+export function PluginMarketplaceProductionView(): ReactElement {
+  const initial = useMemo(() => previewSnapshot('default'), [])
+  const [activeKind, setActiveKind] = useState(initial.activeKind)
+  const [filter, setFilter] = useState(initial.filter)
+  const [query, setQuery] = useState(initial.query)
+  const [customOpen, setCustomOpen] = useState(initial.customOpen)
+
+  return (
+    <PluginMarketplaceView
+      snapshot={initial}
+      activeKind={activeKind}
+      filter={filter}
+      query={query}
+      customOpen={customOpen}
+      onActiveKindChange={setActiveKind}
+      onFilterChange={setFilter}
+      onQueryChange={setQuery}
+      onCustomOpenChange={setCustomOpen}
+    />
+  )
+}
