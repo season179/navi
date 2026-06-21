@@ -630,18 +630,34 @@ type PreviewProps = {
   mode: WriteWorkspaceViewPreviewMode
 }
 
+const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceViewPreviewMode>([
+  'empty',
+  'emptyError',
+  'start',
+  'runtimeBanner',
+])
+
+function resolveProductionWriteWorkspaceParam(): string | null {
+  if (typeof window === 'undefined') return null
+  return new URLSearchParams(window.location.search).get('productionWriteWorkspace')
+}
+
+function resolveProductionWriteWorkspaceSnapshotMode(): WriteWorkspaceViewPreviewMode {
+  const value = resolveProductionWriteWorkspaceParam()
+  if (value && PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES.has(value as WriteWorkspaceViewPreviewMode)) {
+    return value as WriteWorkspaceViewPreviewMode
+  }
+  return 'split'
+}
+
 function resolveProductionWriteAssistantPreviewOpen(): boolean {
-  if (typeof window === 'undefined') return false
-  const value = new URLSearchParams(window.location.search).get('productionWriteWorkspace')
+  const value = resolveProductionWriteWorkspaceParam()
   return value === 'assistant' || value === 'assistantTimeline' || value === 'assistantQuoted'
 }
 
 function resolveProductionWriteAssistantSnapshot(): Partial<WriteAssistantPanelSnapshot> {
   const activeFileLabel = WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel
-  if (typeof window === 'undefined') {
-    return { ...WRITE_ASSISTANT_PANEL_PREVIEW_DEFAULT, activeFileLabel }
-  }
-  const value = new URLSearchParams(window.location.search).get('productionWriteWorkspace')
+  const value = resolveProductionWriteWorkspaceParam()
   if (value === 'assistantTimeline') {
     return { ...WRITE_ASSISTANT_PANEL_PREVIEW_TIMELINE, activeFileLabel }
   }
@@ -662,7 +678,10 @@ export function WriteWorkspaceProductionView({
   leftSidebarCollapsed: boolean
   onToggleLeftSidebar: () => void
 }): ReactElement {
-  const snapshot = useMemo(() => previewSnapshot('split'), [])
+  const snapshot = useMemo(
+    () => previewSnapshot(resolveProductionWriteWorkspaceSnapshotMode()),
+    [],
+  )
   const [assistantOpen, setAssistantOpen] = useState(() => resolveProductionWriteAssistantPreviewOpen())
   const assistantPanelSnapshot = useMemo(() => resolveProductionWriteAssistantSnapshot(), [])
 
