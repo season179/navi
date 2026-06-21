@@ -115,6 +115,76 @@ function describeReasoningSectionTitle(
   return 'Thinking'
 }
 
+type StackEntrySummaryKind =
+  | 'file_change'
+  | 'command_execution'
+  | 'tool'
+  | 'approval'
+
+function classifyStackEntry(entry: ProcessStackEntrySnapshot): StackEntrySummaryKind {
+  if (entry.detailKind === 'approval' || entry.pendingApproval === true) {
+    return 'approval'
+  }
+  if (entry.detailKind === 'patch') {
+    return 'file_change'
+  }
+  if (entry.detailKind === 'command') {
+    return 'command_execution'
+  }
+  const verb = entry.summary.trim().split(/\s+/)[0]?.toLowerCase() ?? ''
+  if (verb === 'edit' || verb === 'write') {
+    return 'file_change'
+  }
+  if (verb === 'read' && entry.filePath) {
+    return 'file_change'
+  }
+  if (verb === 'run' || verb === 'bash' || verb === 'shell') {
+    return 'command_execution'
+  }
+  return 'tool'
+}
+
+/** Kun summarizeExecutionSection — grouped multi-entry execution section titles. */
+function summarizeExecutionSection(entries: ProcessStackEntrySnapshot[]): string {
+  let fileCount = 0
+  let commandCount = 0
+  let toolCount = 0
+  let approvalCount = 0
+
+  for (const entry of entries) {
+    switch (classifyStackEntry(entry)) {
+      case 'approval':
+        approvalCount += 1
+        break
+      case 'file_change':
+        fileCount += 1
+        break
+      case 'command_execution':
+        commandCount += 1
+        break
+      default:
+        toolCount += 1
+    }
+  }
+
+  const parts: string[] = []
+  if (fileCount > 0) {
+    parts.push(fileCount === 1 ? 'Edited 1 file' : `Edited ${fileCount} files`)
+  }
+  if (commandCount > 0) {
+    parts.push(commandCount === 1 ? 'Ran 1 command' : `Ran ${commandCount} commands`)
+  }
+  if (toolCount > 0) {
+    parts.push(toolCount === 1 ? 'Used 1 tool' : `Used ${toolCount} tools`)
+  }
+  if (approvalCount > 0) {
+    parts.push(approvalCount === 1 ? '1 approval' : `${approvalCount} approvals`)
+  }
+
+  if (parts.length > 0) return parts.join(' · ')
+  return `Work process (${entries.length} steps)`
+}
+
 function resolveProcessSectionTitle(
   section: ProcessSectionSnapshot,
   opts?: {
@@ -123,15 +193,21 @@ function resolveProcessSectionTitle(
   },
 ): string {
   if (
-    section.kind !== 'reasoning' ||
-    opts?.singleReasoningSection === undefined
+    section.kind === 'reasoning' &&
+    opts?.singleReasoningSection !== undefined
   ) {
-    return section.title
+    return describeReasoningSectionTitle(section, {
+      singleReasoningSection: opts.singleReasoningSection,
+      reasoningDurationMs: opts.reasoningDurationMs,
+    })
   }
-  return describeReasoningSectionTitle(section, {
-    singleReasoningSection: opts.singleReasoningSection,
-    reasoningDurationMs: opts.reasoningDurationMs,
-  })
+  if (section.kind === 'execution') {
+    const entries = section.stackEntries ?? []
+    if (entries.length > 1) {
+      return summarizeExecutionSection(entries)
+    }
+  }
+  return section.title
 }
 
 function entryAutoForceOpen(
