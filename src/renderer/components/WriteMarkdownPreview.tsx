@@ -1,69 +1,43 @@
 // Write-mode markdown preview echoing Kun's WriteMarkdownPreview
 // (../Kun/src/renderer/src/components/write/WriteMarkdownPreview.tsx).
-// Visual only: uses navi's Markdown component instead of react-markdown.
+// Visual only: Streamdown markdown with infographic and HTML embed widgets.
 
-import { Component, type ReactElement, type ReactNode } from 'react'
-import { Markdown } from './Markdown'
+import { Component, type ImgHTMLAttributes, type ReactElement, type ReactNode } from 'react'
+import { Streamdown, type StreamdownProps } from 'streamdown'
+import remarkGfm from 'remark-gfm'
+import { harden } from 'rehype-harden'
+import {
+  WRITE_MARKDOWN_PREVIEW_PLAIN_SAMPLE,
+  WRITE_MARKDOWN_PREVIEW_SAMPLE,
+  isHtmlEmbedSrc,
+  parsePendingInfographicId,
+  previewContentForMode,
+  type WriteMarkdownPreviewPreviewMode,
+  type WriteMarkdownPreviewWidgetOverrides,
+} from '../lib/writeMarkdownImageWidgets'
+import { CodeBlock } from './CodeBlock'
+import { WriteHtmlEmbed } from './WriteHtmlEmbed'
+import { WriteInfographicPending } from './WriteInfographicPending'
+
+export type { WriteMarkdownPreviewPreviewMode } from '../lib/writeMarkdownImageWidgets'
+export {
+  WRITE_MARKDOWN_PREVIEW_PLAIN_SAMPLE,
+  WRITE_MARKDOWN_PREVIEW_SAMPLE,
+} from '../lib/writeMarkdownImageWidgets'
 
 const COPY = {
   previewErrorFallback: 'Markdown preview failed, showing source text instead.',
 }
 
-export type WriteMarkdownPreviewPreviewMode = 'default' | 'plain' | 'error'
-
-/** Rich sample document for ?writeMarkdownPreview preview hooks. */
-export const WRITE_MARKDOWN_PREVIEW_SAMPLE = `# Launch plan draft
-
-This document outlines the phased rollout for the writing workspace preview.
-
-## Goals
-
-- Match Kun's write preview typography and spacing
-- Keep code blocks, tables, and task lists readable
-- Preserve the centered **864px** reading column
-
-> Good prose is clear thinking made visible. The preview pane should feel like a calm reading surface, not a chat bubble.
-
-### Milestones
-
-1. Port preview chrome and typography
-2. Wire split-pane layout in the document pane
-3. Validate dark theme contrast
-
-| Phase | Owner | Status |
-| --- | --- | --- |
-| Preview port | Season | In progress |
-| Editor port | Season | Planned |
-| PDF viewer | Season | Planned |
-
-\`\`\`typescript
-export function clamp(value: number, min: number, max: number): number {
-  if (max < min) return min
-  return Math.min(Math.max(value, min), max)
-}
-\`\`\`
-
-Inline \`clamp()\` helpers keep zoom ranges stable across preview modes.
-
----
-
-### Checklist
-
-- [x] Typography tokens
-- [x] Code block styling
-- [ ] Live image embeds
-
-Read more in the [Kun reference app](https://example.com/kun).
-`
-
-export const WRITE_MARKDOWN_PREVIEW_PLAIN_SAMPLE = `# Raw text preview
-
-This pane renders as monospace plain text when the file is not markdown.
-
-function example() {
-  return 'no markdown parsing'
-}
-`
+const rehypePlugins = [
+  [
+    harden,
+    {
+      allowedLinkPrefixes: ['*'],
+      allowedImagePrefixes: ['*'],
+    },
+  ],
+] satisfies StreamdownProps['rehypePlugins']
 
 type Props = {
   content: string
@@ -71,6 +45,8 @@ type Props = {
   previewErrorMessage?: string
   /** Static preview: render the amber error fallback without throwing. */
   showErrorFallback?: boolean
+  /** Override widget chrome for pending infographics and HTML embeds. */
+  widgetOverrides?: WriteMarkdownPreviewWidgetOverrides
 }
 
 function plainTextFallback(content: string): ReactElement {
@@ -120,15 +96,95 @@ class PreviewErrorBoundary extends Component<PreviewBoundaryProps, PreviewBounda
   }
 }
 
+type PreviewImageProps = ImgHTMLAttributes<HTMLImageElement> & {
+  widgetOverrides?: WriteMarkdownPreviewWidgetOverrides
+}
+
+function WriteMarkdownPreviewImage({
+  src,
+  alt,
+  widgetOverrides,
+  ...props
+}: PreviewImageProps): ReactElement {
+  const imageSrc = typeof src === 'string' ? src : undefined
+  const pendingId = parsePendingInfographicId(imageSrc)
+
+  if (pendingId !== null) {
+    return (
+      <span className="block">
+        <WriteInfographicPending
+          pendingId={pendingId}
+          kind={widgetOverrides?.infographic?.kind ?? 'infographic'}
+          state={widgetOverrides?.infographic?.state ?? 'active'}
+        />
+      </span>
+    )
+  }
+
+  if (imageSrc && isHtmlEmbedSrc(imageSrc)) {
+    return (
+      <span className="block">
+        <WriteHtmlEmbed
+          rawSrc={imageSrc}
+          alt={typeof alt === 'string' ? alt : ''}
+          visualState={widgetOverrides?.htmlEmbed?.visualState ?? 'cover'}
+        />
+      </span>
+    )
+  }
+
+  if (!imageSrc) {
+    return (
+      <span
+        className="write-markdown-preview-image-chip"
+        title={typeof alt === 'string' ? alt : undefined}
+      >
+        {alt || 'Image'}
+      </span>
+    )
+  }
+
+  return (
+    <img
+      {...props}
+      src={imageSrc}
+      alt={typeof alt === 'string' ? alt : ''}
+    />
+  )
+}
+
 function WriteMarkdownPreviewContent({
   content,
   isMarkdown = true,
-}: Pick<Props, 'content' | 'isMarkdown'>): ReactElement {
+  widgetOverrides,
+}: Pick<Props, 'content' | 'isMarkdown' | 'widgetOverrides'>): ReactElement {
   if (!isMarkdown) return plainTextFallback(content)
+
+  const components = {
+    code: CodeBlock,
+    img: (props) => (
+      <WriteMarkdownPreviewImage
+        {...(props as ImgHTMLAttributes<HTMLImageElement>)}
+        widgetOverrides={widgetOverrides}
+      />
+    ),
+  } as StreamdownProps['components']
 
   return (
     <div className="write-markdown-preview ds-markdown min-h-full text-ds-ink">
-      <Markdown text={content} streaming={false} />
+      <Streamdown
+        mode="static"
+        parseIncompleteMarkdown={false}
+        isAnimating={false}
+        controls={false}
+        animated={false}
+        linkSafety={{ enabled: false }}
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={rehypePlugins}
+        components={components}
+      >
+        {content}
+      </Streamdown>
     </div>
   )
 }
@@ -138,6 +194,7 @@ export function WriteMarkdownPreview({
   isMarkdown = true,
   previewErrorMessage = COPY.previewErrorFallback,
   showErrorFallback = false,
+  widgetOverrides,
 }: Props): ReactElement {
   if (showErrorFallback) {
     return (
@@ -152,27 +209,13 @@ export function WriteMarkdownPreview({
 
   return (
     <PreviewErrorBoundary content={content} previewErrorMessage={previewErrorMessage}>
-      <WriteMarkdownPreviewContent content={content} isMarkdown={isMarkdown} />
+      <WriteMarkdownPreviewContent
+        content={content}
+        isMarkdown={isMarkdown}
+        widgetOverrides={widgetOverrides}
+      />
     </PreviewErrorBoundary>
   )
-}
-
-function previewContent(mode: WriteMarkdownPreviewPreviewMode): {
-  content: string
-  isMarkdown: boolean
-  showErrorFallback?: boolean
-} {
-  if (mode === 'plain') {
-    return { content: WRITE_MARKDOWN_PREVIEW_PLAIN_SAMPLE, isMarkdown: false }
-  }
-  if (mode === 'error') {
-    return {
-      content: WRITE_MARKDOWN_PREVIEW_SAMPLE,
-      isMarkdown: true,
-      showErrorFallback: true,
-    }
-  }
-  return { content: WRITE_MARKDOWN_PREVIEW_SAMPLE, isMarkdown: true }
 }
 
 type PreviewProps = {
@@ -181,7 +224,7 @@ type PreviewProps = {
 
 /** Full-page preview shell for ?writeMarkdownPreview URL hooks. */
 export function WriteMarkdownPreviewPreview({ mode }: PreviewProps): ReactElement {
-  const snapshot = previewContent(mode)
+  const snapshot = previewContentForMode(mode)
 
   return (
     <div className="write-markdown-preview-preview">
@@ -190,6 +233,7 @@ export function WriteMarkdownPreviewPreview({ mode }: PreviewProps): ReactElemen
           content={snapshot.content}
           isMarkdown={snapshot.isMarkdown}
           showErrorFallback={snapshot.showErrorFallback}
+          widgetOverrides={snapshot.widgetOverrides}
         />
       </div>
     </div>

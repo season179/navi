@@ -401,6 +401,7 @@ import {
   WriteMarkdownPreviewPreview,
   type WriteMarkdownPreviewPreviewMode,
 } from '../components/WriteMarkdownPreview'
+import { resolveWriteMarkdownPreviewMode } from '../lib/writeMarkdownImageWidgets'
 import {
   WriteInfographicPendingPreview,
   type WriteInfographicPendingPreviewMode,
@@ -1425,15 +1426,10 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported WriteMarkdownPreview
-  // (?writeMarkdownPreview=1|plain|error).
+  // (?writeMarkdownPreview=1|plain|error|infographic|htmlEmbed|…).
   const writeMarkdownPreviewPreviewMode = useMemo((): WriteMarkdownPreviewPreviewMode | null => {
     if (typeof window === 'undefined') return null
-    const params = new URLSearchParams(window.location.search)
-    if (!params.has('writeMarkdownPreview')) return null
-    const value = params.get('writeMarkdownPreview')
-    if (value === 'plain') return 'plain'
-    if (value === 'error') return 'error'
-    return 'default'
+    return resolveWriteMarkdownPreviewMode(new URLSearchParams(window.location.search))
   }, [])
 
   // Visual preview for the ported WriteInfographicPending
