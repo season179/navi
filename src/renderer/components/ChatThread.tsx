@@ -13,6 +13,7 @@ import {
 } from './TimelinePaginationControls'
 import { CompactionDivider, type CompactionDividerSnapshot } from './CompactionDivider'
 import { ReviewPlanCard } from './ReviewPlanCard'
+import { ReviewSummaryCard, type ReviewSummarySnapshot } from './ReviewSummaryCard'
 import { ThreadForkBanner, ThreadForkPoint } from './ThreadForkBanner'
 import {
   TurnChangeSummary,
@@ -110,6 +111,9 @@ type ChatThreadProps = {
   planAtTurnIndex?: number
   planTitle?: string
   planRelativePath?: string
+  /** When set with turnReviews, renders Kun's review summary cards at this turn. */
+  reviewsAtTurnIndex?: number
+  turnReviews?: ReviewSummarySnapshot[]
   /** When set with turnChanges, renders Kun's turn change summary at this turn. */
   changesAtTurnIndex?: number
   turnChanges?: TurnChangeSnapshot[]
@@ -127,6 +131,8 @@ export function ChatThread({
   planAtTurnIndex,
   planTitle,
   planRelativePath,
+  reviewsAtTurnIndex,
+  turnReviews,
   changesAtTurnIndex,
   turnChanges,
   turnChangesCompact = false,
@@ -224,6 +230,11 @@ export function ChatThread({
             planRelativePath != null &&
             typeof planAtTurnIndex === 'number' &&
             planAtTurnIndex === absoluteTurnIndex
+          const showReviews =
+            turnReviews != null &&
+            turnReviews.length > 0 &&
+            typeof reviewsAtTurnIndex === 'number' &&
+            reviewsAtTurnIndex === absoluteTurnIndex
           const showTurnChanges =
             turnChanges != null &&
             turnChanges.length > 0 &&
@@ -258,6 +269,11 @@ export function ChatThread({
                     </div>
                   )
                 })}
+                {showReviews
+                  ? turnReviews.map((review) => (
+                      <ReviewSummaryCard key={review.title} review={review} />
+                    ))
+                  : null}
                 {showPlan ? (
                   <ReviewPlanCard title={planTitle} relativePath={planRelativePath} />
                 ) : null}

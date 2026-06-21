@@ -2770,6 +2770,41 @@ function HomePage() {
     }
   }, [])
 
+  // Production ChatThread review summary card via ?productionReviewSummaryCard=…
+  const productionChatReviews = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {
+        reviewsAtTurnIndex: undefined,
+        turnReviews: undefined,
+      }
+    }
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('productionReviewSummaryCard')) {
+      return {
+        reviewsAtTurnIndex: undefined,
+        turnReviews: undefined,
+      }
+    }
+    const mode = params.get('productionReviewSummaryCard')
+    const review =
+      mode === 'running'
+        ? REVIEW_SUMMARY_CARD_PREVIEW_RUNNING
+        : mode === 'error'
+          ? REVIEW_SUMMARY_CARD_PREVIEW_ERROR
+          : mode === 'incorrect'
+            ? REVIEW_SUMMARY_CARD_PREVIEW_INCORRECT
+            : mode === 'noFindings'
+              ? REVIEW_SUMMARY_CARD_PREVIEW_NO_FINDINGS
+              : REVIEW_SUMMARY_CARD_PREVIEW
+    const turnParam = params.get('productionReviewSummaryTurnIndex')
+    const parsedTurnIndex = turnParam ? Number.parseInt(turnParam, 10) : 0
+    const reviewsAtTurnIndex = Number.isFinite(parsedTurnIndex) ? parsedTurnIndex : 0
+    return {
+      reviewsAtTurnIndex,
+      turnReviews: [review],
+    }
+  }, [])
+
   // Available skills for the composer `/skill` picker, scoped to the active
   // project. Reloaded when the project changes or when the settings stage
   // toggles (a create/enable/disable in the Skills tab may have changed the set).
@@ -3407,6 +3442,8 @@ function HomePage() {
         planAtTurnIndex={productionChatPlan.planAtTurnIndex}
         planTitle={productionChatPlan.planTitle}
         planRelativePath={productionChatPlan.planRelativePath}
+        reviewsAtTurnIndex={productionChatReviews.reviewsAtTurnIndex}
+        turnReviews={productionChatReviews.turnReviews}
         changesAtTurnIndex={productionChatTurnChanges.changesAtTurnIndex}
         turnChanges={productionChatTurnChanges.turnChanges}
         turnChangesCompact={productionChatTurnChanges.turnChangesCompact}
