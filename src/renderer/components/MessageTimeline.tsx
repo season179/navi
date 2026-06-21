@@ -151,8 +151,16 @@ function MessageTurnImpl({
           />
           {workExpanded && processSections.length > 0 ? (
             <div className="message-timeline-turn-process-sections">
-              {processSections.map((section) => (
-                <ProcessSectionRow key={section.title} section={section} />
+              {processSections.map((section, index) => (
+                <ProcessSectionRow
+                  key={
+                    section.title ||
+                    (section.kind === 'output'
+                      ? `output-${section.outputEntries?.[0]?.id ?? index}`
+                      : `${section.kind}-${index}`)
+                  }
+                  section={section}
+                />
               ))}
             </div>
           ) : null}
@@ -331,6 +339,7 @@ const PREVIEW_TURN_PROCESSING: MessageTurnSnapshot = {
   workMeta: WORK_META_ROW_PREVIEW.processing,
   processSections: [
     { ...PROCESS_SECTION_ROW_PREVIEW.reasoningActive, expanded: true },
+    { ...PROCESS_SECTION_ROW_PREVIEW.outputStreaming },
     {
       ...PROCESS_SECTION_ROW_PREVIEW.execution,
       active: true,
@@ -348,6 +357,7 @@ const PREVIEW_TURN_RICH: MessageTurnSnapshot = {
   workMeta: WORK_META_ROW_PREVIEW.processed,
   processSections: [
     { ...PROCESS_SECTION_ROW_PREVIEW.reasoningExpanded, expanded: true },
+    { ...PROCESS_SECTION_ROW_PREVIEW.output },
     { ...PROCESS_SECTION_ROW_PREVIEW.executionExpanded, expanded: true },
   ],
   assistantBlocks: [MESSAGE_BUBBLE_PREVIEW_ASSISTANT],

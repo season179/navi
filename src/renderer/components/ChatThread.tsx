@@ -347,8 +347,16 @@ export function ChatThread({
                     />
                     {workExpanded && processSections.length > 0 ? (
                       <div className="message-timeline-turn-process-sections">
-                        {processSections.map((section) => (
-                          <ProcessSectionRow key={section.title} section={section} />
+                        {processSections.map((section, index) => (
+                          <ProcessSectionRow
+                            key={
+                              section.title ||
+                              (section.kind === 'output'
+                                ? `output-${section.outputEntries?.[0]?.id ?? index}`
+                                : `${section.kind}-${index}`)
+                            }
+                            section={section}
+                          />
                         ))}
                       </div>
                     ) : null}

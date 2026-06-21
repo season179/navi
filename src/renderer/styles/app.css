@@ -1680,6 +1680,13 @@ textarea {
   flex-direction: column;
 }
 
+.process-section-row-output {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .process-section-row-toggle,
 .process-section-row-label {
   display: flex;

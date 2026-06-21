@@ -24,8 +24,14 @@ export type ProcessStackEntrySnapshot = {
   detailFilePath?: string
 }
 
+export type ProcessOutputEntrySnapshot = {
+  id: string
+  text: string
+  streaming?: boolean
+}
+
 export type ProcessSectionSnapshot = {
-  kind: 'reasoning' | 'execution'
+  kind: 'reasoning' | 'execution' | 'output'
   title: string
   processing?: boolean
   active?: boolean
@@ -36,6 +42,7 @@ export type ProcessSectionSnapshot = {
   forceExpanded?: boolean
   reasoningText?: string
   stackEntries?: ProcessStackEntrySnapshot[]
+  outputEntries?: ProcessOutputEntrySnapshot[]
 }
 
 const PREVIEW_PATCH = `--- a/src/auth/middleware.ts
@@ -169,6 +176,27 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         expanded: true,
         detailKind: 'error',
         detailText: 'Command failed with exit code 1\n\n✗ session store persistence test failed',
+      },
+    ],
+  },
+  output: {
+    kind: 'output',
+    title: '',
+    outputEntries: [
+      {
+        id: 'assistant-1',
+        text: 'I will update the auth middleware to normalize Bearer tokens and attach the verified user before calling `next()`.',
+      },
+    ],
+  },
+  outputStreaming: {
+    kind: 'output',
+    title: '',
+    outputEntries: [
+      {
+        id: 'live-assistant',
+        text: 'Updating the middleware now — extracting the Bearer prefix and calling verifyToken…',
+        streaming: true,
       },
     ],
   },
@@ -327,6 +355,18 @@ function ProcessStackEntryRow({
   )
 }
 
+function ProcessOutputDetail({
+  entry,
+}: {
+  entry: ProcessOutputEntrySnapshot
+}): ReactElement {
+  return (
+    <div className="process-entry-row-assistant ds-markdown">
+      <Markdown text={entry.text} streaming={entry.streaming === true} />
+    </div>
+  )
+}
+
 function ProcessStackRows({
   entries,
   expandedEntryId,
@@ -363,6 +403,19 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
     section.kind === 'execution' && section.stackEntries?.length === 1
       ? section.stackEntries[0]
       : null
+
+  if (section.kind === 'output') {
+    const outputEntries =
+      section.outputEntries?.filter((entry) => entry.text.trim().length > 0) ?? []
+    if (outputEntries.length === 0) return <></>
+    return (
+      <div className="process-section-row-output">
+        {outputEntries.map((entry) => (
+          <ProcessOutputDetail key={entry.id} entry={entry} />
+        ))}
+      </div>
+    )
+  }
 
   if (singleExecutionEntry) {
     const entrySnapshot = stackEntryToProcessEntry(singleExecutionEntry, section)

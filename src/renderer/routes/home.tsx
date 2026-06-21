@@ -747,7 +747,7 @@ function HomePage() {
   const [workMetaRowExpanded, setWorkMetaRowExpanded] = useState(false)
 
   // Visual preview for the ported ProcessSectionRow
-  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|error).
+  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|error|output|outputStreaming).
   const processSectionRowPreviewMode = useMemo((): ProcessSectionRowPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -758,6 +758,8 @@ function HomePage() {
     if (mode === 'execution') return 'execution'
     if (mode === 'executionExpanded') return 'executionExpanded'
     if (mode === 'error') return 'error'
+    if (mode === 'output') return 'output'
+    if (mode === 'outputStreaming') return 'outputStreaming'
     return 'reasoning'
   }, [])
   const [processSectionRowExpanded, setProcessSectionRowExpanded] = useState(false)
@@ -2898,6 +2900,7 @@ function HomePage() {
           workMeta: WORK_META_ROW_PREVIEW.processing,
           processSections: [
             { ...PROCESS_SECTION_ROW_PREVIEW.reasoningActive, expanded: true },
+            { ...PROCESS_SECTION_ROW_PREVIEW.outputStreaming },
             {
               ...PROCESS_SECTION_ROW_PREVIEW.execution,
               active: true,
