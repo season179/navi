@@ -35,7 +35,11 @@ test('routes largeFile and truncated file-guard preview modes', () => {
   )
 })
 
-test('routes review toolbar preview mode', () => {
+test('routes readonly and review toolbar preview modes', () => {
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=readonly')),
+    'readonly',
+  )
   assert.equal(
     resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=review')),
     'review',

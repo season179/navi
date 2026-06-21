@@ -452,7 +452,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     renderSafety: {
       livePreviewEnabled: previewMode === 'live' || previewMode === 'split' || richModeActive,
       markdownPreviewEnabled: true,
-      readOnly: false,
+      readOnly: mode === 'readonly',
       notice: 'none',
     },
     fileGuardMessage: '',
@@ -464,7 +464,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     activeFilePathLabel: SAMPLE_PATH,
     documentStatsLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.documentStatsLabel,
     saveStatus: mode === 'dirty' ? 'dirty' : mode === 'saving' ? 'saving' : 'saved',
-    readOnly: false,
+    readOnly: mode === 'readonly',
     reviewActive: mode === 'review',
     showInlineAgent: mode === 'inlineAgent',
     fileError: mode === 'error' ? 'Could not save the file. Check disk space and try again.' : null,
