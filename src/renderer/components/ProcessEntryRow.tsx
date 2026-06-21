@@ -4,15 +4,13 @@
 
 import { useState, type KeyboardEvent, type ReactElement } from 'react'
 import { ChevronDown, ChevronRight, Minimize2 } from 'lucide-react'
-import { DiffView } from './DiffView'
-import { Markdown } from './Markdown'
 import {
-  MessageBubble,
   MESSAGE_BUBBLE_PREVIEW_APPROVAL_DONE,
   MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
   MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
   type MessageBubbleSnapshot,
 } from './MessageBubble'
+import { ProcessEntryDetail } from './ProcessEntryDetail'
 import { ProcessSummaryText } from './ProcessFileReference'
 import {
   RuntimeMetaChips,
@@ -36,7 +34,15 @@ export type ProcessEntrySnapshot = {
   forceOpen?: boolean
   expanded?: boolean
   detailText?: string
-  detailKind?: 'text' | 'command' | 'patch' | 'error' | 'assistant' | 'approval' | 'user_input'
+  detailKind?:
+    | 'text'
+    | 'command'
+    | 'patch'
+    | 'error'
+    | 'assistant'
+    | 'approval'
+    | 'user_input'
+    | 'reasoning'
   detailFilePath?: string
   nestedBubble?: MessageBubbleSnapshot
   meta?: RuntimeMetaChipsSnapshot
@@ -92,6 +98,7 @@ function processEntryHasExpandableDetail(entry: ProcessEntrySnapshot): boolean {
     entry.detailKind === 'patch' ||
     entry.detailKind === 'error' ||
     entry.detailKind === 'assistant' ||
+    entry.detailKind === 'reasoning' ||
     entry.detailKind === 'approval' ||
     entry.detailKind === 'user_input'
   ) {
@@ -265,6 +272,18 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
     detailText: 'I will normalize Bearer token extraction and call verifyToken before next().',
     detailKind: 'assistant',
   },
+  reasoning: {
+    verb: 'Thinking',
+    rest: '',
+    blockId: 'live-reasoning',
+    active: true,
+    wrapSummary: true,
+    forceOpen: true,
+    expanded: true,
+    detailText:
+      'Let me trace the token extraction path through the middleware stack and verify how Bearer prefixes are stripped.',
+    detailKind: 'reasoning',
+  },
   approvalResolved: {
     verb: 'Approved',
     rest: 'deploy to staging',
@@ -319,57 +338,6 @@ type Props = {
   processing?: boolean
   expanded?: boolean
   onToggle?: () => void
-}
-
-function ProcessEntryDetail({
-  entry,
-  processing,
-}: {
-  entry: ProcessEntrySnapshot
-  processing?: boolean
-}): ReactElement | null {
-  if (entry.detailKind === 'approval' || entry.detailKind === 'user_input') {
-    if (!entry.nestedBubble) return null
-    return <MessageBubble block={entry.nestedBubble} nested />
-  }
-  if (!entry.detailText) return null
-  if (entry.detailKind === 'patch') {
-    return (
-      <DiffView
-        patch={entry.detailText}
-        filePath={entry.detailFilePath ?? entry.filePath}
-      />
-    )
-  }
-  if (entry.detailKind === 'error') {
-    return (
-      <div className="process-stack-entry-error-panel">
-        {entry.detailFilePath ?? entry.filePath ? (
-          <div className="process-stack-entry-error-path">
-            {entry.detailFilePath ?? entry.filePath}
-          </div>
-        ) : null}
-        <pre className="process-stack-entry-error-text">{entry.detailText}</pre>
-      </div>
-    )
-  }
-  if (entry.detailKind === 'assistant') {
-    return (
-      <div className="process-entry-row-assistant ds-markdown">
-        <Markdown
-          text={entry.detailText}
-          streaming={
-            processing === true &&
-            entry.blockId === 'live-assistant'
-          }
-        />
-      </div>
-    )
-  }
-  if (entry.detailKind === 'command') {
-    return <pre className="process-stack-entry-command-text">{entry.detailText}</pre>
-  }
-  return <p className="process-stack-entry-muted-text">{entry.detailText}</p>
 }
 
 export function ProcessEntryRow({
@@ -491,11 +459,19 @@ export function ProcessEntryRow({
       {isOpen && (entry.detailText || entry.nestedBubble) ? (
         entry.detailKind === 'assistant' ? (
           <div className="process-entry-row-assistant-wrap">
-            <ProcessEntryDetail entry={entry} processing={processing} />
+            <ProcessEntryDetail
+              entry={entry}
+              processing={processing}
+              streamBlockId={entry.blockId}
+            />
           </div>
         ) : (
           <div className="ds-work-timeline-detail">
-            <ProcessEntryDetail entry={entry} processing={processing} />
+            <ProcessEntryDetail
+              entry={entry}
+              processing={processing}
+              streamBlockId={entry.blockId}
+            />
           </div>
         )
       ) : null}

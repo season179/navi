@@ -797,6 +797,7 @@ function HomePage() {
     if (mode === 'approvalResolved') return 'approvalResolved'
     if (mode === 'compactionProcessing') return 'compactionProcessing'
     if (mode === 'streamingAssistant') return 'streamingAssistant'
+    if (mode === 'reasoning') return 'reasoning'
     if (mode === 'userInput') return 'userInput'
     return 'default'
   }, [])
@@ -4294,6 +4295,7 @@ function HomePage() {
               processEntryRowPreviewMode === 'compactionRunning' ||
               processEntryRowPreviewMode === 'compactionProcessing' ||
               processEntryRowPreviewMode === 'streamingAssistant' ||
+              processEntryRowPreviewMode === 'reasoning' ||
               processEntryRowPreviewMode === 'userInput'
                 ? true
                 : undefined
@@ -4307,6 +4309,7 @@ function HomePage() {
               processEntryRowPreviewMode === 'approvalPendingShimmer' ||
               processEntryRowPreviewMode === 'compactionProcessing' ||
               processEntryRowPreviewMode === 'streamingAssistant' ||
+              processEntryRowPreviewMode === 'reasoning' ||
               processEntryRowPreviewMode === 'userInput'
                 ? true
                 : processEntryRowExpanded

@@ -5,15 +5,14 @@
 import { useState, type KeyboardEvent, type MouseEvent, type ReactElement, type RefObject } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useDeferredRender } from '../hooks/use-deferred-render'
-import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
 import {
-  MessageBubble,
   MESSAGE_BUBBLE_PREVIEW_APPROVAL_DONE,
   MESSAGE_BUBBLE_PREVIEW_APPROVAL_PENDING,
   MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
   type MessageBubbleSnapshot,
 } from './MessageBubble'
+import { ProcessEntryDetail } from './ProcessEntryDetail'
 import {
   ProcessEntryRow,
   type ProcessEntrySnapshot,
@@ -34,7 +33,15 @@ export type ProcessStackEntrySnapshot = {
   collapsible?: boolean
   forceOpen?: boolean
   detailText?: string
-  detailKind?: 'text' | 'command' | 'patch' | 'error' | 'assistant' | 'approval' | 'user_input'
+  detailKind?:
+    | 'text'
+    | 'command'
+    | 'patch'
+    | 'error'
+    | 'assistant'
+    | 'approval'
+    | 'user_input'
+    | 'reasoning'
   detailFilePath?: string
   nestedBubble?: MessageBubbleSnapshot
   meta?: RuntimeMetaChipsSnapshot
@@ -713,6 +720,7 @@ function stackEntryHasExpandableDetail(entry: ProcessStackEntrySnapshot): boolea
     entry.detailKind === 'patch' ||
     entry.detailKind === 'error' ||
     entry.detailKind === 'assistant' ||
+    entry.detailKind === 'reasoning' ||
     entry.detailKind === 'approval' ||
     entry.detailKind === 'user_input'
   ) {
@@ -773,56 +781,6 @@ function stackEntryToProcessEntry(
         )) ||
       (entry.collapsible === false && !entry.detailText && !entry.nestedBubble),
   }
-}
-
-function ProcessStackEntryDetail({
-  entry,
-  processing,
-}: {
-  entry: ProcessStackEntrySnapshot
-  processing?: boolean
-}): ReactElement | null {
-  if (entry.detailKind === 'approval' || entry.detailKind === 'user_input') {
-    if (!entry.nestedBubble) return null
-    return <MessageBubble block={entry.nestedBubble} nested />
-  }
-  if (!entry.detailText) return null
-  if (entry.detailKind === 'patch') {
-    return (
-      <DiffView
-        patch={entry.detailText}
-        filePath={entry.detailFilePath ?? entry.filePath}
-      />
-    )
-  }
-  if (entry.detailKind === 'error') {
-    return (
-      <div className="process-stack-entry-error-panel">
-        {entry.detailFilePath ?? entry.filePath ? (
-          <div className="process-stack-entry-error-path">
-            {entry.detailFilePath ?? entry.filePath}
-          </div>
-        ) : null}
-        <pre className="process-stack-entry-error-text">{entry.detailText}</pre>
-      </div>
-    )
-  }
-  if (entry.detailKind === 'assistant') {
-    return (
-      <div className="process-entry-row-assistant ds-markdown">
-        <Markdown
-          text={entry.detailText}
-          streaming={
-            processing === true && entry.id === 'live-assistant'
-          }
-        />
-      </div>
-    )
-  }
-  if (entry.detailKind === 'command') {
-    return <pre className="process-stack-entry-command-text">{entry.detailText}</pre>
-  }
-  return <p className="process-stack-entry-muted-text">{entry.detailText}</p>
 }
 
 function ProcessStackEntryRow({
@@ -899,11 +857,19 @@ function ProcessStackEntryRow({
       {open && (entry.detailText || entry.nestedBubble) ? (
         entry.detailKind === 'assistant' ? (
           <div className="process-stack-entry-assistant">
-            <ProcessStackEntryDetail entry={entry} processing={processing} />
+            <ProcessEntryDetail
+              entry={entry}
+              processing={processing}
+              streamBlockId={entry.id}
+            />
           </div>
         ) : (
           <div className="process-stack-entry-detail-inset ds-work-timeline-detail">
-            <ProcessStackEntryDetail entry={entry} processing={processing} />
+            <ProcessEntryDetail
+              entry={entry}
+              processing={processing}
+              streamBlockId={entry.id}
+            />
           </div>
         )
       ) : null}
