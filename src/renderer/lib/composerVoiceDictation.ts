@@ -5,5 +5,11 @@ export const COMPOSER_DICTATION_ERROR_PREVIEW =
 /** English copy matching Kun's composerVoiceStart locale string. */
 export const COMPOSER_VOICE_START_LABEL = 'Voice input'
 
+/** English copy matching Kun's composerVoiceStop locale string. */
+export const COMPOSER_VOICE_STOP_LABEL = 'Stop recording'
+
+/** English copy matching Kun's composerVoiceSend locale string. */
+export const COMPOSER_VOICE_SEND_LABEL = 'Stop and send'
+
 /** English copy matching Kun's composerVoiceTranscribing locale string. */
 export const COMPOSER_VOICE_TRANSCRIBING_LABEL = 'Transcribing…'

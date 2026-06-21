@@ -30,7 +30,9 @@ import {
   COMPOSER_STOP_LABEL,
 } from '../lib/composerBusyState'
 import {
+  COMPOSER_VOICE_SEND_LABEL,
   COMPOSER_VOICE_START_LABEL,
+  COMPOSER_VOICE_STOP_LABEL,
   COMPOSER_VOICE_TRANSCRIBING_LABEL,
 } from '../lib/composerVoiceDictation'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
@@ -680,8 +682,8 @@ export function Composer({
                     type="button"
                     className="floating-composer-voice-stop"
                     onClick={voiceRecording.onStop}
-                    aria-label="Stop recording"
-                    title="Stop recording"
+                    aria-label={COMPOSER_VOICE_STOP_LABEL}
+                    title={COMPOSER_VOICE_STOP_LABEL}
                   >
                     <Square strokeWidth={2.4} />
                   </button>
@@ -689,8 +691,8 @@ export function Composer({
                     type="button"
                     className="floating-composer-send-btn"
                     onClick={voiceRecording.onSend}
-                    aria-label="Send recording"
-                    title="Send recording"
+                    aria-label={COMPOSER_VOICE_SEND_LABEL}
+                    title={COMPOSER_VOICE_SEND_LABEL}
                   >
                     <Send strokeWidth={2.2} />
                   </button>

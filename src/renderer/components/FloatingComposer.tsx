@@ -130,7 +130,9 @@ import {
 } from '../lib/composerFooterHint'
 import {
   COMPOSER_DICTATION_ERROR_PREVIEW,
+  COMPOSER_VOICE_SEND_LABEL,
   COMPOSER_VOICE_START_LABEL,
+  COMPOSER_VOICE_STOP_LABEL,
   COMPOSER_VOICE_TRANSCRIBING_LABEL,
 } from '../lib/composerVoiceDictation'
 import {
@@ -1166,10 +1168,20 @@ export function FloatingComposer({
               {snapshot.recording ? (
                 <>
                   <VoiceRecordingStrip getLevel={() => 0.45} startedAtMs={Date.now() - 12_000} />
-                  <button type="button" className="floating-composer-voice-stop" aria-label="Stop recording">
+                  <button
+                    type="button"
+                    className="floating-composer-voice-stop"
+                    aria-label={COMPOSER_VOICE_STOP_LABEL}
+                    title={COMPOSER_VOICE_STOP_LABEL}
+                  >
                     <Square strokeWidth={2.4} />
                   </button>
-                  <button type="button" className="floating-composer-send-btn" aria-label="Send recording">
+                  <button
+                    type="button"
+                    className="floating-composer-send-btn"
+                    aria-label={COMPOSER_VOICE_SEND_LABEL}
+                    title={COMPOSER_VOICE_SEND_LABEL}
+                  >
                     <Send strokeWidth={2.2} />
                   </button>
                 </>
