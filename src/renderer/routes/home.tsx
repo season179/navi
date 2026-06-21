@@ -325,6 +325,10 @@ import {
   type MessageTimelineEmptyHeroPreviewMode,
 } from '../components/MessageTimelineEmptyHero'
 import {
+  MessageTimelinePreview,
+  type MessageTimelinePreviewMode,
+} from '../components/MessageTimeline'
+import {
   WriteWorkspaceEmptyState,
   WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
   type WriteWorkspaceEmptyStatePreviewMode,
@@ -908,6 +912,26 @@ function HomePage() {
     if (typeof window === 'undefined') return false
     const params = new URLSearchParams(window.location.search)
     return params.has('workspaceSelectEmptyHero')
+  }, [])
+
+  // Visual preview for the ported MessageTimeline orchestrator
+  // (?messageTimelinePreview=empty|emptyWaking|emptyNoWorkspace|emptyClaw|single|processing|multi|paginated|forked|rich|withGoal).
+  const messageTimelinePreviewMode = useMemo((): MessageTimelinePreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('messageTimelinePreview')) return null
+    const value = params.get('messageTimelinePreview')
+    if (value === 'emptyWaking') return 'emptyWaking'
+    if (value === 'emptyNoWorkspace') return 'emptyNoWorkspace'
+    if (value === 'emptyClaw') return 'emptyClaw'
+    if (value === 'single') return 'single'
+    if (value === 'processing') return 'processing'
+    if (value === 'multi') return 'multi'
+    if (value === 'paginated') return 'paginated'
+    if (value === 'forked') return 'forked'
+    if (value === 'rich') return 'rich'
+    if (value === 'withGoal') return 'withGoal'
+    return 'empty'
   }, [])
 
   // Visual preview for the ported MessageTimelineEmptyHero orchestrator
@@ -2350,6 +2374,10 @@ function HomePage() {
 
   if (sddDraftEditorViewPreviewMode) {
     return <SddDraftEditorViewPreview mode={sddDraftEditorViewPreviewMode} />
+  }
+
+  if (messageTimelinePreviewMode) {
+    return <MessageTimelinePreview mode={messageTimelinePreviewMode} />
   }
 
   if (messageTimelineEmptyHeroPreviewMode) {

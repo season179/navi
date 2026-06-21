@@ -11357,6 +11357,60 @@ button.usage-heatmap-cell:focus {
   overflow: auto;
 }
 
+.message-timeline {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.message-timeline-content {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 56rem;
+  flex-direction: column;
+  gap: 2rem;
+  margin-inline: auto;
+}
+
+.message-timeline-turn-anchor.scroll-mt-6 {
+  scroll-margin-top: 1.5rem;
+}
+
+.message-timeline-turn {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message-timeline-turn-process {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 0.5rem;
+}
+
+.message-timeline-turn-process-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.message-timeline-preview-wrap {
+  min-height: 100vh;
+  overflow: auto;
+  background: var(--ds-canvas, #f5f5f4);
+}
+
+.message-timeline-preview-wrap .message-timeline {
+  min-height: 100vh;
+}
+
 
 .generated-files-panel {
   display: flex;
