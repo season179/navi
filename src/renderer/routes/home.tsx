@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
 import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
 import { SidebarTitlebarToggleButton } from '../components/SidebarPrimitives'
@@ -514,6 +514,62 @@ const PRODUCTION_SETTINGS_COPY = {
   apiKeyRequiredTitle: 'API key required',
   apiKeyRequiredBody:
     'Add an API key in Providers first. Once entered, the app can start the local AI assistant service for you.',
+}
+
+const PRODUCTION_RIGHT_SIDEBAR_WIDTH = 360
+const PRODUCTION_FILE_TREE_SIDEBAR_WIDTH = 320
+const PRODUCTION_TERMINAL_HEIGHT = 360
+
+function renderProductionRightPanel(
+  mode: RightPanelMode,
+  onCollapse: () => void,
+): ReactElement | null {
+  switch (mode) {
+    case 'todo':
+      return (
+        <TodoPanel
+          items={TODO_PANEL_PREVIEW_ITEMS}
+          className="h-full max-h-full w-full"
+          onCollapse={onCollapse}
+        />
+      )
+    case 'changes':
+      return (
+        <ChangeInspector
+          items={CHANGE_INSPECTOR_PREVIEW_ITEMS}
+          className="h-full max-h-full w-full flex-col"
+          onCollapse={onCollapse}
+        />
+      )
+    case 'browser':
+      return (
+        <DevBrowserPanel
+          {...DEV_BROWSER_PANEL_PREVIEW}
+          className="h-full max-h-full w-full flex-col"
+          onCollapse={onCollapse}
+        />
+      )
+    case 'plan':
+      return (
+        <PlanPanel
+          {...PLAN_PANEL_PREVIEW}
+          className="h-full max-h-full w-full"
+          onCollapse={onCollapse}
+        />
+      )
+    case 'file':
+      return (
+        <WorkspaceFilePreviewPanel
+          target={WORKSPACE_FILE_PREVIEW_TARGET}
+          openTargets={WORKSPACE_FILE_PREVIEW_TARGETS}
+          result={WORKSPACE_FILE_PREVIEW_RESULT}
+          className="h-full max-h-full w-full"
+          onCollapse={onCollapse}
+        />
+      )
+    default:
+      return null
+  }
 }
 
 function HomePage() {
@@ -3082,6 +3138,10 @@ function HomePage() {
 
   const useProductionWorkbenchLayout =
     !sessionHeaderPreviewMode && !workbenchTopBarPreviewMode
+  const productionRightPanelVisible = productionRightPanelMode !== null
+  const productionSideChatRightOffset =
+    (productionRightPanelVisible ? PRODUCTION_RIGHT_SIDEBAR_WIDTH + 24 : 24) +
+    (productionFileTreeOpen ? PRODUCTION_FILE_TREE_SIDEBAR_WIDTH : 0)
 
   const chatStageInner = settingsOpen ? (
     <div className="settings-view ds-drag production-settings-view">
@@ -3344,48 +3404,124 @@ function HomePage() {
           <div className="topbar-actions">{renderWorkbenchTopBarPreview()}</div>
         </header>
       ) : (
-        <div className="ds-stage-inset workbench-chat-stage-inset production-chat-stage-inset">
-          <header className="chat-topbar ds-topbar-surface workbench-chat-topbar">
-            <div className="chat-topbar-grid">
-              <div
-                className={`chat-topbar-session${
-                  collapsed ? ' ds-window-controls-safe-inset' : ''
-                }`}
-              >
-                <SidebarTitlebarToggleButton
-                  onClick={toggle}
-                  title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                />
-                <SessionHeader
-                  snapshot={productionSessionHeaderSnapshot}
-                  compact
-                  busy={busy}
-                  className="workbench-session-header"
-                />
+        <div className="workbench-main-row production-workbench-main-row">
+          <div className="workbench-chat-column">
+            <div className="workbench-chat-stage production-chat-stage-column">
+              <div className="ds-stage-inset workbench-chat-stage-inset production-chat-stage-inset">
+                <header className="chat-topbar ds-topbar-surface workbench-chat-topbar">
+                  <div className="chat-topbar-grid">
+                    <div
+                      className={`chat-topbar-session${
+                        collapsed ? ' ds-window-controls-safe-inset' : ''
+                      }`}
+                    >
+                      <SidebarTitlebarToggleButton
+                        onClick={toggle}
+                        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                      />
+                      <SessionHeader
+                        snapshot={productionSessionHeaderSnapshot}
+                        compact
+                        busy={busy}
+                        className="workbench-session-header"
+                      />
+                    </div>
+                    <div className="chat-topbar-actions">
+                      {busy ? <span className="workbench-running-pill">Running</span> : null}
+                      <WorkbenchTopBar
+                        planPanelEnabled
+                        rightPanelMode={productionRightPanelMode}
+                        onToggleRightPanelMode={(mode) =>
+                          setProductionRightPanelMode((current) => (current === mode ? null : mode))
+                        }
+                        terminalOpen={productionTerminalOpen}
+                        onToggleTerminal={() => setProductionTerminalOpen((value) => !value)}
+                        sideChatCount={productionSideChatOpen ? 1 : 0}
+                        sideChatRunningCount={0}
+                        sideChatOpen={productionSideChatOpen}
+                        sideChatEnabled
+                        fileTreeOpen={productionFileTreeOpen}
+                        fileTreeEnabled
+                        onToggleFileTree={() => setProductionFileTreeOpen((value) => !value)}
+                        onOpenSideChat={() => setProductionSideChatOpen((value) => !value)}
+                      />
+                    </div>
+                  </div>
+                </header>
+
+                <div className="workbench-timeline-wrap">{chatStageInner}</div>
+
+                {!settingsOpen ? (
+                  <div className="workbench-composer-wrap">{composerElement}</div>
+                ) : null}
               </div>
-              <div className="chat-topbar-actions">
-                {busy ? <span className="workbench-running-pill">Running</span> : null}
-                <WorkbenchTopBar
-                  planPanelEnabled
-                  rightPanelMode={productionRightPanelMode}
-                  onToggleRightPanelMode={(mode) =>
-                    setProductionRightPanelMode((current) => (current === mode ? null : mode))
-                  }
-                  terminalOpen={productionTerminalOpen}
-                  onToggleTerminal={() => setProductionTerminalOpen((value) => !value)}
-                  sideChatOpen={productionSideChatOpen}
-                  onOpenSideChat={() => setProductionSideChatOpen((value) => !value)}
-                  fileTreeOpen={productionFileTreeOpen}
-                  onToggleFileTree={() => setProductionFileTreeOpen((value) => !value)}
-                />
-              </div>
+
+              {productionTerminalOpen ? (
+                <div className="workbench-terminal-wrap">
+                  <div
+                    role="separator"
+                    aria-orientation="horizontal"
+                    className="workbench-terminal-divider"
+                  />
+                  <TerminalPanel
+                    height={PRODUCTION_TERMINAL_HEIGHT}
+                    tabs={TERMINAL_PANEL_PREVIEW_TABS}
+                    className="w-full"
+                    onCollapse={() => setProductionTerminalOpen(false)}
+                  />
+                </div>
+              ) : null}
             </div>
-          </header>
 
-          <div className="workbench-timeline-wrap">{chatStageInner}</div>
+            {productionSideChatOpen ? (
+              <SideConversationPanel
+                rightOffset={productionSideChatRightOffset}
+                parentTitle={productionSessionHeaderSnapshot?.title ?? 'Conversation'}
+                sides={SIDE_CONVERSATION_PANEL_PREVIEW_SIDES}
+                activeSideId={SIDE_CONVERSATION_PANEL_PREVIEW_SIDES[0]?.threadId ?? null}
+                onClose={() => setProductionSideChatOpen(false)}
+                onMinimize={() => setProductionSideChatOpen(false)}
+              />
+            ) : null}
+          </div>
 
-          {!settingsOpen ? (
-            <div className="workbench-composer-wrap">{composerElement}</div>
+          {productionRightPanelVisible ? (
+            <>
+              <div
+                role="separator"
+                aria-orientation="vertical"
+                className="ds-workbench-divider ds-no-drag"
+              />
+              <div
+                className="workbench-right-panel"
+                style={{ width: PRODUCTION_RIGHT_SIDEBAR_WIDTH }}
+              >
+                {renderProductionRightPanel(productionRightPanelMode, () =>
+                  setProductionRightPanelMode(null),
+                )}
+              </div>
+            </>
+          ) : null}
+
+          {productionFileTreeOpen ? (
+            <>
+              <div
+                role="separator"
+                aria-orientation="vertical"
+                className="ds-workbench-divider ds-no-drag"
+              />
+              <aside
+                className="workbench-file-tree-panel ds-no-drag"
+                style={{ width: PRODUCTION_FILE_TREE_SIDEBAR_WIDTH }}
+              >
+                <ChatFileTreePanel
+                  workspaceRoot={projectPath ?? CHAT_FILE_TREE_PREVIEW.workspaceRoot}
+                  entries={CHAT_FILE_TREE_PREVIEW.entries}
+                  selectedPath={CHAT_FILE_TREE_PREVIEW.selectedPath}
+                  fill
+                />
+              </aside>
+            </>
           ) : null}
         </div>
       )}
