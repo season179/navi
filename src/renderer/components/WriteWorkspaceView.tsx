@@ -541,6 +541,10 @@ type ViewProps = {
   onAssistantOpenChange?: (open: boolean) => void
   /** Optional override for WriteAssistantPanel snapshot fields. */
   assistantPanelSnapshot?: Partial<WriteAssistantPanelSnapshot>
+  /** Initial export dropdown open state for preview hooks. */
+  defaultExportMenuOpen?: boolean
+  /** Initial mode dropdown open state for preview hooks. */
+  defaultModeMenuOpen?: boolean
 }
 
 export function WriteWorkspaceView({
@@ -581,6 +585,8 @@ export function WriteWorkspaceView({
   assistantOpen: controlledAssistantOpen,
   onAssistantOpenChange,
   assistantPanelSnapshot,
+  defaultExportMenuOpen = false,
+  defaultModeMenuOpen = false,
 }: ViewProps): ReactElement {
   const [content, setContent] = useState(fileContent)
   const [toolbarPreviewModeState, setToolbarPreviewModeState] = useState<WritePreviewMode>(() => {
@@ -600,8 +606,8 @@ export function WriteWorkspaceView({
     [assistantOpen, controlledAssistantOpen, onAssistantOpenChange],
   )
   const [assistantInput, setAssistantInput] = useState('')
-  const [exportMenuOpen, setExportMenuOpen] = useState(false)
-  const [modeMenuOpen, setModeMenuOpen] = useState(false)
+  const [exportMenuOpen, setExportMenuOpen] = useState(defaultExportMenuOpen)
+  const [modeMenuOpen, setModeMenuOpen] = useState(defaultModeMenuOpen)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const editorPaneRef = useRef<HTMLDivElement | null>(null)
   const previewPaneRef = useRef<HTMLDivElement | null>(null)
@@ -900,8 +906,10 @@ export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement 
         fileLoading={snapshot.fileLoading}
         fileContent={snapshot.fileContent}
         fileSize={snapshot.fileSize}
-        previewMode={snapshot.previewMode}
-        richModeActive={mode === 'rich'}
+        previewMode={mode === 'exportMenu' ? 'live' : snapshot.previewMode}
+        richModeActive={mode === 'rich' || mode === 'modeMenu'}
+        defaultExportMenuOpen={mode === 'exportMenu'}
+        defaultModeMenuOpen={mode === 'modeMenu'}
         renderSafety={snapshot.renderSafety}
         fileGuardMessage={snapshot.fileGuardMessage}
         fileGuardDetail={snapshot.fileGuardDetail}

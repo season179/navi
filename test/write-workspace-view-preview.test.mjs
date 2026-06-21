@@ -41,3 +41,14 @@ test('routes review toolbar preview mode', () => {
     'review',
   )
 })
+
+test('routes exportMenu and modeMenu toolbar dropdown preview modes', () => {
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=exportMenu')),
+    'exportMenu',
+  )
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=modeMenu')),
+    'modeMenu',
+  )
+})
