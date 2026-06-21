@@ -3,6 +3,7 @@
 // Visual only: parent supplies active category and navigation callbacks.
 
 import type { Dispatch, ReactElement, SetStateAction } from 'react'
+import { SettingsControlsPreview } from './SettingsControls'
 import {
   Archive,
   AudioLines,
@@ -164,12 +165,26 @@ export function SettingsSidebarPreviewContent({
     <div className="settings-sidebar-preview-content">
       <h1 className="settings-sidebar-preview-title">Settings</h1>
       <p className="settings-sidebar-preview-subtitle">Configure {label.toLowerCase()} preferences.</p>
-      <div className="settings-sidebar-preview-panel">
-        <div className="settings-sidebar-preview-panel-title">{label}</div>
-        <p className="settings-sidebar-preview-panel-body">
-          Mock settings content for visual verification of the sidebar chrome.
-        </p>
-      </div>
+      {category === 'general' ? (
+        <div className="settings-controls-preview-stack">
+          <SettingsControlsPreview />
+        </div>
+      ) : category === 'agents' ? (
+        <div className="settings-controls-preview-stack">
+          <SettingsControlsPreview mode="modelSelect" />
+        </div>
+      ) : category === 'updates' ? (
+        <div className="settings-controls-preview-stack">
+          <SettingsControlsPreview mode="disclosure" />
+        </div>
+      ) : (
+        <div className="settings-sidebar-preview-panel">
+          <div className="settings-sidebar-preview-panel-title">{label}</div>
+          <p className="settings-sidebar-preview-panel-body">
+            Mock settings content for visual verification of the sidebar chrome.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

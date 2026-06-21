@@ -232,6 +232,10 @@ import {
   type SettingsSidebarPreviewMode,
 } from '../components/SettingsSidebar'
 import {
+  SettingsControlsPreview,
+  type SettingsControlsPreviewMode,
+} from '../components/SettingsControls'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1203,6 +1207,16 @@ function HomePage() {
       resolveSettingsSidebarPreviewCategory(settingsSidebarPreviewMode),
     )
 
+  // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
+  const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('settingsControlsPreview')) return null
+    const mode = params.get('settingsControlsPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as SettingsControlsPreviewMode
+  }, [])
+
   // Visual preview for the ported GuiUpdateControl (?guiUpdateControlPreview=1|current|downloading|…).
   const guiUpdateControlPreviewMode = useMemo((): GuiUpdateControlPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1302,6 +1316,20 @@ function HomePage() {
   if (appErrorBoundaryPreviewMode) {
     return (
       <AppErrorFallback error={APP_ERROR_BOUNDARY_PREVIEW[appErrorBoundaryPreviewMode]} />
+    )
+  }
+
+  if (settingsControlsPreviewMode) {
+    return (
+      <div className="settings-controls-preview">
+        <div className="settings-controls-preview-inner">
+          <h1 className="settings-controls-preview-title">Settings controls</h1>
+          <p className="settings-controls-preview-subtitle">
+            Shared form primitives from Kun settings-controls.tsx.
+          </p>
+          <SettingsControlsPreview mode={settingsControlsPreviewMode} />
+        </div>
+      </div>
     )
   }
 
