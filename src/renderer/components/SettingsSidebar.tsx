@@ -10,6 +10,7 @@ import { EasterEggSettingsSectionPreview } from './EasterEggSettingsSection'
 import { ArchivedThreadsSettingsSectionPreview } from './ArchivedThreadsSettingsSection'
 import { UpdatesSettingsSectionPreview } from './UpdatesSettingsSection'
 import { LlmDebugSettingsSectionPreview } from './LlmDebugSettingsSection'
+import { MemorySettingsSectionPreview } from './MemorySettingsSection'
 import {
   Archive,
   AudioLines,
@@ -198,6 +199,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'debug' ? (
         <div className="llm-debug-preview-stack">
           <LlmDebugSettingsSectionPreview />
+        </div>
+      ) : category === 'memory' ? (
+        <div className="memory-preview-stack">
+          <MemorySettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">

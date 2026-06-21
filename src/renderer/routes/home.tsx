@@ -260,6 +260,10 @@ import {
   type LlmDebugPreviewMode,
 } from '../components/LlmDebugSettingsSection'
 import {
+  MemorySettingsSectionPreview,
+  type MemoryPreviewMode,
+} from '../components/MemorySettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1291,6 +1295,16 @@ function HomePage() {
     return mode as LlmDebugPreviewMode
   }, [])
 
+  // Visual preview for the ported MemorySettingsSection (?memoryPreview=1|empty|disabled|creating|…).
+  const memoryPreviewMode = useMemo((): MemoryPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('memoryPreview')) return null
+    const mode = params.get('memoryPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as MemoryPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1493,6 +1507,22 @@ function HomePage() {
           </p>
           <div className="llm-debug-preview-stack">
             <LlmDebugSettingsSectionPreview mode={llmDebugPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (memoryPreviewMode) {
+    return (
+      <div className="memory-preview">
+        <div className="memory-preview-inner">
+          <h1 className="memory-preview-title">Long-term memory</h1>
+          <p className="memory-preview-subtitle">
+            Memory category from Kun settings-section-memory.tsx.
+          </p>
+          <div className="memory-preview-stack">
+            <MemorySettingsSectionPreview mode={memoryPreviewMode} />
           </div>
         </div>
       </div>
