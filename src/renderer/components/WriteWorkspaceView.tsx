@@ -2,8 +2,12 @@
 // (../Kun/src/renderer/src/components/write/WriteWorkspaceView.tsx).
 // Visual only: composes toolbar, document pane, inline agent, and toast notices.
 
-import { useMemo, useRef, useState, type ReactElement } from 'react'
+import { useCallback, useMemo, useRef, useState, type ReactElement } from 'react'
 import { WriteWorkspaceEmptyState } from './WriteWorkspaceEmptyState'
+import {
+  WriteAssistantPanel,
+  type WriteAssistantPanelSnapshot,
+} from './WriteAssistantPanel'
 import {
   WriteWorkspaceToolbar,
   WRITE_WORKSPACE_TOOLBAR_PREVIEW,
@@ -338,6 +342,11 @@ type ViewProps = {
   leftSidebarCollapsed?: boolean
   onToggleLeftSidebar?: () => void
   onPickWorkspace?: () => void
+  /** When set, controls Kun Workbench writeAssistantOpen for the right assistant panel. */
+  assistantOpen?: boolean
+  onAssistantOpenChange?: (open: boolean) => void
+  /** Optional override for WriteAssistantPanel snapshot fields. */
+  assistantPanelSnapshot?: Partial<WriteAssistantPanelSnapshot>
 }
 
 export function WriteWorkspaceView({
@@ -372,12 +381,27 @@ export function WriteWorkspaceView({
   leftSidebarCollapsed = false,
   onToggleLeftSidebar,
   onPickWorkspace,
+  assistantOpen: controlledAssistantOpen,
+  onAssistantOpenChange,
+  assistantPanelSnapshot,
 }: ViewProps): ReactElement {
   const [content, setContent] = useState(fileContent)
   const [toolbarPreviewModeState, setToolbarPreviewModeState] = useState<WritePreviewMode>(
     toolbarPreviewMode(previewMode),
   )
-  const [assistantOpen, setAssistantOpen] = useState(false)
+  const [internalAssistantOpen, setInternalAssistantOpen] = useState(false)
+  const assistantOpen = controlledAssistantOpen ?? internalAssistantOpen
+  const setAssistantOpen = useCallback(
+    (next: boolean | ((open: boolean) => boolean)) => {
+      const resolved = typeof next === 'function' ? next(assistantOpen) : next
+      onAssistantOpenChange?.(resolved)
+      if (controlledAssistantOpen === undefined) {
+        setInternalAssistantOpen(resolved)
+      }
+    },
+    [assistantOpen, controlledAssistantOpen, onAssistantOpenChange],
+  )
+  const [assistantInput, setAssistantInput] = useState('')
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [modeMenuOpen, setModeMenuOpen] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -390,6 +414,20 @@ export function WriteWorkspaceView({
   const liveModeActive = toolbarPreviewModeState === 'live'
   const modeMenuItems = buildModeMenuItems(toolbarPreviewModeState)
   const inlinePosition = useMemo(() => inlineAgentPosition(), [])
+  const writeAssistantPanelSnapshot = useMemo(
+    (): WriteAssistantPanelSnapshot => ({
+      activeFileLabel,
+      hasTimeline: false,
+      quotedSelections: [],
+      selectionIsPdf: activeFileIsPdf,
+      selectionCharCount: 0,
+      input: assistantInput,
+      busy: false,
+      canCreateConversation: true,
+      ...assistantPanelSnapshot,
+    }),
+    [activeFileIsPdf, activeFileLabel, assistantInput, assistantPanelSnapshot],
+  )
 
   if (!workspaceReady) {
     return (
@@ -424,29 +462,48 @@ export function WriteWorkspaceView({
         onToggleModeMenu={() => setModeMenuOpen((open) => !open)}
         onSetPreviewMode={setToolbarPreviewModeState}
       />
-      <div className="write-workspace-view-body">
-        <div className="write-workspace-view-card">
-          <WriteWorkspaceDocumentPane
-            activeFilePath={activeFilePath}
-            activeFileIsImage={activeFileIsImage}
-            activeFileIsPdf={activeFileIsPdf}
-            activeFileIsText={activeFileIsText}
-            fileLoading={fileLoading}
-            fileContent={content}
-            fileSize={fileSize}
-            workspaceRoot={WRITE_PDF_VIEWER_PREVIEW_SAMPLE.workspaceRoot}
-            workspaceName={WRITE_WORKSPACE_START_PREVIEW.workspaceName}
-            workspacePathLabel={WRITE_WORKSPACE_START_PREVIEW.workspacePathLabel}
-            renderSafety={renderSafety}
-            fileGuardMessage={fileGuardMessage}
-            fileGuardDetail={fileGuardDetail}
-            previewMode={previewMode}
-            imageSrc={imageSrc}
-            imageMimeType={imageMimeType}
-            onContentChange={setContent}
-            onPickWorkspace={onPickWorkspace}
-          />
+      <div className="write-workspace-view-main">
+        <div className="write-workspace-view-body">
+          <div className="write-workspace-view-card">
+            <WriteWorkspaceDocumentPane
+              activeFilePath={activeFilePath}
+              activeFileIsImage={activeFileIsImage}
+              activeFileIsPdf={activeFileIsPdf}
+              activeFileIsText={activeFileIsText}
+              fileLoading={fileLoading}
+              fileContent={content}
+              fileSize={fileSize}
+              workspaceRoot={WRITE_PDF_VIEWER_PREVIEW_SAMPLE.workspaceRoot}
+              workspaceName={WRITE_WORKSPACE_START_PREVIEW.workspaceName}
+              workspacePathLabel={WRITE_WORKSPACE_START_PREVIEW.workspacePathLabel}
+              renderSafety={renderSafety}
+              fileGuardMessage={fileGuardMessage}
+              fileGuardDetail={fileGuardDetail}
+              previewMode={previewMode}
+              imageSrc={imageSrc}
+              imageMimeType={imageMimeType}
+              onContentChange={setContent}
+              onPickWorkspace={onPickWorkspace}
+            />
+          </div>
         </div>
+        {assistantOpen ? (
+          <>
+            <div
+              role="separator"
+              aria-orientation="vertical"
+              className="ds-workbench-divider ds-no-drag"
+            />
+            <div className="write-workspace-assistant-panel">
+              <WriteAssistantPanel
+                className="write-workspace-assistant-panel-inner"
+                snapshot={writeAssistantPanelSnapshot}
+                onCollapse={() => setAssistantOpen(false)}
+                onInputChange={setAssistantInput}
+              />
+            </div>
+          </>
+        ) : null}
       </div>
       {showInlineAgent && activeFilePath && (activeFileIsText || activeFileIsPdf) ? (
         <WriteInlineAgent
