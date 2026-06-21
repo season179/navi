@@ -20,6 +20,9 @@ import {
   Type,
 } from 'lucide-react'
 import { WriteFontSizeControl } from './WriteFontSizeControl'
+import type { WriteWorkspaceToolbarPreviewMode } from '../lib/writeWorkspaceToolbarPreviewModes'
+
+export type { WriteWorkspaceToolbarPreviewMode } from '../lib/writeWorkspaceToolbarPreviewModes'
 
 export type WritePreviewMode = 'live' | 'rich' | 'source' | 'split' | 'preview'
 export type WriteSaveStatus = 'saved' | 'dirty' | 'saving' | 'error'
@@ -31,19 +34,6 @@ export type WriteModeMenuItem = {
   icon: ReactElement
   active: boolean
 }
-
-export type WriteWorkspaceToolbarPreviewMode =
-  | 'default'
-  | 'pdf'
-  | 'dirty'
-  | 'saving'
-  | 'error'
-  | 'readonly'
-  | 'exportMenu'
-  | 'modeMenu'
-  | 'assistant'
-  | 'review'
-  | 'image'
 
 const WRITE_EXPORT_FORMATS: WriteExportFormat[] = ['html', 'pdf', 'doc', 'docx']
 
@@ -535,7 +525,7 @@ function previewState(mode: WriteWorkspaceToolbarPreviewMode): {
     assistantOpen: mode === 'assistant',
     exportMenuOpen: mode === 'exportMenu',
     modeMenuOpen: mode === 'modeMenu',
-    exportInFlight: false,
+    exportInFlight: mode === 'exporting',
     previewMode,
     liveModeActive: previewMode === 'live',
   }

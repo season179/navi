@@ -433,6 +433,7 @@ import {
   type WriteWorkspaceViewPreviewMode,
 } from '../components/WriteWorkspaceView'
 import { resolveWriteWorkspaceViewPreviewMode } from '../lib/writeWorkspacePreviewModes'
+import { resolveWriteWorkspaceToolbarPreviewMode } from '../lib/writeWorkspaceToolbarPreviewModes'
 import {
   WriteDebugLogModalPreview,
   type WriteDebugLogModalPreviewMode,
@@ -1299,24 +1300,11 @@ function HomePage() {
     }, [])
 
   // Visual preview for the ported WriteWorkspaceToolbar
-  // (?writeWorkspaceToolbar=1|pdf|dirty|saving|error|readonly|exportMenu|modeMenu|assistant|review|image).
+  // (?writeWorkspaceToolbar=1|pdf|dirty|saving|error|readonly|exportMenu|modeMenu|assistant|review|image|exporting).
   const writeWorkspaceToolbarPreviewMode =
     useMemo((): WriteWorkspaceToolbarPreviewMode | null => {
       if (typeof window === 'undefined') return null
-      const params = new URLSearchParams(window.location.search)
-      if (!params.has('writeWorkspaceToolbar')) return null
-      const value = params.get('writeWorkspaceToolbar')
-      if (value === 'pdf') return 'pdf'
-      if (value === 'dirty') return 'dirty'
-      if (value === 'saving') return 'saving'
-      if (value === 'error') return 'error'
-      if (value === 'readonly') return 'readonly'
-      if (value === 'exportMenu') return 'exportMenu'
-      if (value === 'modeMenu') return 'modeMenu'
-      if (value === 'assistant') return 'assistant'
-      if (value === 'review') return 'review'
-      if (value === 'image') return 'image'
-      return 'default'
+      return resolveWriteWorkspaceToolbarPreviewMode(new URLSearchParams(window.location.search))
     }, [])
 
   // Visual preview for the ported WriteImagePreview
