@@ -49,6 +49,11 @@ import {
   REVIEW_SUMMARY_CARD_PREVIEW_NO_FINDINGS,
   REVIEW_SUMMARY_CARD_PREVIEW_RUNNING,
 } from '../components/ReviewSummaryCard'
+import {
+  WorkMetaRow,
+  WORK_META_ROW_PREVIEW,
+  type WorkMetaRowPreviewMode,
+} from '../components/WorkMetaRow'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -210,6 +215,17 @@ function HomePage() {
     if (mode === 'nofindings') return REVIEW_SUMMARY_CARD_PREVIEW_NO_FINDINGS
     return REVIEW_SUMMARY_CARD_PREVIEW
   }, [])
+
+  // Visual preview for the ported WorkMetaRow (?workMetaRow=processing|processed|steps|static).
+  const workMetaRowPreviewMode = useMemo((): WorkMetaRowPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('workMetaRow')) return null
+    const mode = params.get('workMetaRow')
+    if (mode === 'processed' || mode === 'steps' || mode === 'static') return mode
+    return 'processing'
+  }, [])
+  const [workMetaRowExpanded, setWorkMetaRowExpanded] = useState(false)
 
   const composerFooterPreview =
     gitBranchPickerPreviewMode != null || workspaceProjectPickerPreviewMode != null
@@ -433,6 +449,20 @@ function HomePage() {
       {reviewSummaryCardPreviewSnapshot ? (
         <div className="review-summary-card-preview">
           <ReviewSummaryCard review={reviewSummaryCardPreviewSnapshot} />
+        </div>
+      ) : null}
+
+      {workMetaRowPreviewMode ? (
+        <div className="work-meta-row-preview">
+          <WorkMetaRow
+            {...WORK_META_ROW_PREVIEW[workMetaRowPreviewMode]}
+            expanded={
+              workMetaRowPreviewMode === 'steps'
+                ? true
+                : workMetaRowExpanded
+            }
+            onToggle={() => setWorkMetaRowExpanded((value) => !value)}
+          />
         </div>
       ) : null}
     </>

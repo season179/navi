@@ -1545,6 +1545,118 @@ textarea {
 }
 
 /* =====================================================
+   Work meta row (turn-level process summary)
+   ===================================================== */
+.work-meta-row {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 0;
+  background: transparent;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+}
+
+.work-meta-row:hover {
+  opacity: 0.85;
+}
+
+.work-meta-row.is-static {
+  cursor: default;
+}
+
+.work-meta-row.is-static:hover {
+  opacity: 1;
+}
+
+.work-meta-row-label {
+  font-variant-numeric: tabular-nums;
+}
+
+.work-meta-row-thought {
+  color: var(--ds-text-faint);
+}
+
+.work-meta-row-chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+}
+
+.work-meta-row:hover .work-meta-row-chevron:not(.is-expanded) {
+  opacity: 0.65;
+}
+
+.work-meta-row-chevron.is-expanded {
+  opacity: 0.45;
+}
+
+.work-meta-row-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  width: min(calc(100% - 32px), 560px);
+  transform: translateX(-50%);
+  bottom: calc(var(--composer-height, 120px) + 24px);
+}
+
+.ds-shiny-text {
+  --shine-base: rgba(84, 103, 140, 0.95);
+  --shine-peak: rgba(133, 193, 241, 1);
+  --shine-soft: rgba(108, 162, 221, 0.96);
+  --shine-size: 104px;
+  position: relative;
+  display: inline-block;
+  background-image:
+    linear-gradient(
+      90deg,
+      var(--shine-base) 0%,
+      var(--shine-base) 27%,
+      var(--shine-soft) 40%,
+      var(--shine-peak) 50%,
+      var(--shine-soft) 60%,
+      var(--shine-base) 73%,
+      var(--shine-base) 100%
+    ),
+    linear-gradient(90deg, var(--shine-base) 0%, var(--shine-base) 100%);
+  background-repeat: no-repeat, no-repeat;
+  background-size:
+    calc(var(--shine-size) * 2.4) 100%,
+    100% 100%;
+  background-position:
+    calc(var(--shine-size) * -2.4) 0,
+    0 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ds-shiny-text 2.05s linear infinite;
+}
+
+[data-theme='dark'] .ds-shiny-text {
+  --shine-base: rgba(150, 168, 199, 0.78);
+  --shine-peak: rgba(191, 225, 252, 1);
+  --shine-soft: rgba(151, 192, 235, 0.92);
+}
+
+@keyframes ds-shiny-text {
+  to {
+    background-position:
+      calc(100% + var(--shine-size) * 2.4) 0,
+      0 0;
+  }
+}
+
+/* =====================================================
    Composer execution picker (approval + sandbox access)
    ===================================================== */
 .execution-picker {
