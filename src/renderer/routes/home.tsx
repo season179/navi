@@ -55,6 +55,11 @@ import {
   type WorkMetaRowPreviewMode,
 } from '../components/WorkMetaRow'
 import {
+  ProcessSectionRow,
+  PROCESS_SECTION_ROW_PREVIEW,
+  type ProcessSectionRowPreviewMode,
+} from '../components/ProcessSectionRow'
+import {
   TurnChangeSummary,
   TURN_CHANGE_SUMMARY_PREVIEW,
   TURN_CHANGE_SUMMARY_PREVIEW_SINGLE,
@@ -305,6 +310,22 @@ function HomePage() {
     return 'processing'
   }, [])
   const [workMetaRowExpanded, setWorkMetaRowExpanded] = useState(false)
+
+  // Visual preview for the ported ProcessSectionRow
+  // (?processSectionRow=reasoning|reasoningExpanded|reasoningActive|execution|executionExpanded|error).
+  const processSectionRowPreviewMode = useMemo((): ProcessSectionRowPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('processSectionRow')) return null
+    const mode = params.get('processSectionRow')
+    if (mode === 'reasoningExpanded') return 'reasoningExpanded'
+    if (mode === 'reasoningActive') return 'reasoningActive'
+    if (mode === 'execution') return 'execution'
+    if (mode === 'executionExpanded') return 'executionExpanded'
+    if (mode === 'error') return 'error'
+    return 'reasoning'
+  }, [])
+  const [processSectionRowExpanded, setProcessSectionRowExpanded] = useState(false)
 
   // Visual preview for the ported TurnChangeSummary (?turnChangeSummary=1).
   const turnChangeSummaryPreviewMode = useMemo((): TurnChangeSummaryPreviewMode | null => {
@@ -770,6 +791,23 @@ function HomePage() {
                 : workMetaRowExpanded
             }
             onToggle={() => setWorkMetaRowExpanded((value) => !value)}
+          />
+        </div>
+      ) : null}
+
+      {processSectionRowPreviewMode ? (
+        <div className="process-section-row-preview">
+          <ProcessSectionRow
+            section={PROCESS_SECTION_ROW_PREVIEW[processSectionRowPreviewMode]}
+            expanded={
+              processSectionRowPreviewMode === 'reasoningExpanded' ||
+              processSectionRowPreviewMode === 'reasoningActive' ||
+              processSectionRowPreviewMode === 'executionExpanded' ||
+              processSectionRowPreviewMode === 'error'
+                ? true
+                : processSectionRowExpanded
+            }
+            onToggle={() => setProcessSectionRowExpanded((value) => !value)}
           />
         </div>
       ) : null}

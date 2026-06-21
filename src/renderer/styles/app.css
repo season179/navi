@@ -1611,6 +1611,277 @@ textarea {
 }
 
 /* =====================================================
+   Process section row (Kun ProcessSectionRow)
+   ===================================================== */
+.process-section-row {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.process-section-row-toggle,
+.process-section-row-label {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  padding: 2px 0;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+}
+
+.process-section-row-toggle {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.process-section-row-toggle:hover {
+  opacity: 0.85;
+}
+
+.process-section-row-toggle.is-error,
+.process-section-row-label.is-error {
+  color: #dc2626;
+}
+
+html[data-theme='dark'] .process-section-row-toggle.is-error,
+html[data-theme='dark'] .process-section-row-label.is-error {
+  color: #fca5a5;
+}
+
+.process-section-row-error-dot-wrap {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 15px;
+  margin-right: 2px;
+  overflow: visible;
+}
+
+.process-section-row-error-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #ef4444;
+}
+
+html[data-theme='dark'] .process-section-row-error-dot {
+  background: #fca5a5;
+}
+
+.process-section-row-chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.process-section-row-chevron.is-expanded {
+  opacity: 0.45;
+}
+
+.process-section-row-toggle:hover .process-section-row-chevron:not(.is-expanded) {
+  opacity: 0.55;
+}
+
+.process-section-row-detail {
+  margin-top: 4px;
+  border-left: 2px solid color-mix(in srgb, var(--ds-border-muted) 35%, transparent);
+  padding-left: 12px;
+}
+
+.process-section-row-reasoning {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ds-text-muted);
+}
+
+.process-stack {
+  margin-top: 3px;
+  margin-left: 20px;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 1px solid color-mix(in srgb, var(--ds-border-muted) 48%, transparent);
+  padding-left: 11px;
+}
+
+.process-stack-entry-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  padding: 2px 4px;
+  text-align: left;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ds-text-faint);
+  cursor: default;
+}
+
+button.process-stack-entry-row {
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+button.process-stack-entry-row:hover {
+  color: var(--ds-text-muted);
+  background: color-mix(in srgb, var(--ds-hover) 70%, transparent);
+}
+
+.process-stack-entry-row.is-error {
+  color: #dc2626;
+}
+
+html[data-theme='dark'] .process-stack-entry-row.is-error {
+  color: #fca5a5;
+}
+
+.process-stack-entry-summary {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.process-stack-entry-toggle {
+  display: flex;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.process-stack-entry-toggle:hover {
+  background: color-mix(in srgb, var(--ds-hover) 70%, transparent);
+}
+
+.process-stack-entry-chevron {
+  width: 12px;
+  height: 12px;
+  opacity: 0.45;
+}
+
+.process-stack-entry-detail {
+  margin-top: 4px;
+  margin-left: 4px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ds-surface-subtle) 72%, transparent);
+  padding: 10px 14px;
+}
+
+.process-stack-entry-text {
+  max-height: 18rem;
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ds-text);
+}
+
+.process-stack-entry-error-panel {
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, #fecaca 80%, transparent);
+  background: color-mix(in srgb, #fef2f2 80%, transparent);
+}
+
+html[data-theme='dark'] .process-stack-entry-error-panel {
+  border-color: color-mix(in srgb, #991b1b 40%, transparent);
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+}
+
+.process-stack-entry-error-path {
+  border-bottom: 1px solid color-mix(in srgb, #fecaca 70%, transparent);
+  background: color-mix(in srgb, #fee2e2 50%, transparent);
+  padding: 6px 12px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+html[data-theme='dark'] .process-stack-entry-error-path {
+  border-bottom-color: color-mix(in srgb, #991b1b 40%, transparent);
+  background: color-mix(in srgb, #ef4444 15%, transparent);
+  color: #fca5a5;
+}
+
+.process-stack-entry-error-text {
+  max-height: 18rem;
+  overflow: auto;
+  margin: 0;
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1.5;
+  color: #991b1b;
+}
+
+html[data-theme='dark'] .process-stack-entry-error-text {
+  color: #fecaca;
+}
+
+.process-file-reference {
+  appearance: none;
+  display: inline;
+  margin: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  padding: 0 2px;
+  color: var(--ds-accent);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.process-file-reference:hover {
+  background: var(--ds-accent-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.process-section-row-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  width: min(calc(100% - 32px), 560px);
+  transform: translateX(-50%);
+  bottom: calc(var(--composer-height, 120px) + 24px);
+}
+
+/* =====================================================
    Turn change summary (Kun TurnChangeSummary)
    ===================================================== */
 .turn-change-summary {
