@@ -1365,6 +1365,185 @@ textarea {
   bottom: calc(var(--composer-height, 120px) + 24px);
 }
 
+/* Review summary card (Kun ReviewSummaryCard) */
+.review-summary-card {
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid var(--ds-border);
+  background: color-mix(in srgb, var(--ds-surface-elevated) 80%, transparent);
+  box-shadow: 0 16px 40px rgba(86, 103, 136, 0.08);
+  backdrop-filter: blur(24px);
+}
+
+.review-summary-card-header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.review-summary-card-header:hover {
+  background: color-mix(in srgb, var(--ds-surface-hover) 40%, transparent);
+}
+
+.review-summary-card-icon {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+}
+
+.review-summary-card-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.review-summary-card-icon.is-success {
+  background: color-mix(in srgb, #10b981 10%, transparent);
+  color: #059669;
+}
+
+[data-theme='dark'] .review-summary-card-icon.is-success {
+  color: #6ee7b7;
+}
+
+.review-summary-card-icon.is-running {
+  background: color-mix(in srgb, var(--ds-accent) 10%, transparent);
+  color: var(--ds-accent);
+}
+
+.review-summary-card-icon.is-error {
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+  color: #dc2626;
+}
+
+[data-theme='dark'] .review-summary-card-icon.is-error {
+  color: #fca5a5;
+}
+
+.review-summary-card-heading {
+  min-width: 0;
+  flex: 1;
+}
+
+.review-summary-card-title {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.review-summary-card-status {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--ds-text-muted);
+}
+
+.review-summary-card-chevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--ds-text-faint);
+}
+
+.review-summary-card-body {
+  border-top: 1px solid color-mix(in srgb, var(--ds-border-muted) 70%, transparent);
+  padding: 16px 20px;
+}
+
+.review-summary-card-explanation {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ds-text-muted);
+}
+
+.review-summary-card-findings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.review-summary-card-finding {
+  border-radius: 12px;
+  border: 1px solid var(--ds-border-muted);
+  background: color-mix(in srgb, var(--ds-card-muted) 45%, transparent);
+  padding: 12px 14px;
+}
+
+.review-summary-card-finding-head {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.review-summary-card-finding-priority {
+  margin-top: 2px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: var(--ds-surface-elevated);
+  padding: 2px 6px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--ds-text-muted);
+}
+
+.review-summary-card-finding-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.review-summary-card-finding-title {
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ds-text);
+}
+
+.review-summary-card-finding-location {
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11.5px;
+  color: var(--ds-text-faint);
+}
+
+.review-summary-card-finding-body {
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ds-text-muted);
+}
+
+.review-summary-card-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  width: min(calc(100% - 32px), 560px);
+  transform: translateX(-50%);
+  bottom: calc(var(--composer-height, 120px) + 24px);
+}
+
 /* =====================================================
    Composer execution picker (approval + sandbox access)
    ===================================================== */

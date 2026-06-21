@@ -41,6 +41,14 @@ import {
   ReviewPlanCard,
   REVIEW_PLAN_CARD_PREVIEW,
 } from '../components/ReviewPlanCard'
+import {
+  ReviewSummaryCard,
+  REVIEW_SUMMARY_CARD_PREVIEW,
+  REVIEW_SUMMARY_CARD_PREVIEW_ERROR,
+  REVIEW_SUMMARY_CARD_PREVIEW_INCORRECT,
+  REVIEW_SUMMARY_CARD_PREVIEW_NO_FINDINGS,
+  REVIEW_SUMMARY_CARD_PREVIEW_RUNNING,
+} from '../components/ReviewSummaryCard'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -189,6 +197,19 @@ function HomePage() {
     return params.get('reviewPlanCard') === 'busy' ? 'busy' : 'default'
   }, [])
   const [reviewPlanCardBuildBusy, setReviewPlanCardBuildBusy] = useState(false)
+
+  // Visual preview for the ported ReviewSummaryCard (?reviewSummaryCard=1).
+  const reviewSummaryCardPreviewSnapshot = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('reviewSummaryCard')) return null
+    const mode = params.get('reviewSummaryCard')
+    if (mode === 'running') return REVIEW_SUMMARY_CARD_PREVIEW_RUNNING
+    if (mode === 'error') return REVIEW_SUMMARY_CARD_PREVIEW_ERROR
+    if (mode === 'incorrect') return REVIEW_SUMMARY_CARD_PREVIEW_INCORRECT
+    if (mode === 'nofindings') return REVIEW_SUMMARY_CARD_PREVIEW_NO_FINDINGS
+    return REVIEW_SUMMARY_CARD_PREVIEW
+  }, [])
 
   const composerFooterPreview =
     gitBranchPickerPreviewMode != null || workspaceProjectPickerPreviewMode != null
@@ -406,6 +427,12 @@ function HomePage() {
             onOpen={() => undefined}
             onBuild={() => setReviewPlanCardBuildBusy(true)}
           />
+        </div>
+      ) : null}
+
+      {reviewSummaryCardPreviewSnapshot ? (
+        <div className="review-summary-card-preview">
+          <ReviewSummaryCard review={reviewSummaryCardPreviewSnapshot} />
         </div>
       ) : null}
     </>
