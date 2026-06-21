@@ -6,6 +6,10 @@ import { useState, type ReactElement } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { DiffView } from './DiffView'
 import { Markdown } from './Markdown'
+import {
+  ProcessEntryRow,
+  type ProcessEntrySnapshot,
+} from './ProcessEntryRow'
 
 export type ProcessStackEntrySnapshot = {
   id: string
@@ -96,6 +100,24 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
       },
     ],
   },
+  executionSingle: {
+    kind: 'execution',
+    title: 'Edit src/auth/middleware.ts',
+    collapsible: true,
+    expanded: false,
+    stackEntries: [
+      {
+        id: 'edit',
+        summary: 'Edit src/auth/middleware.ts',
+        filePath: 'src/auth/middleware.ts',
+        collapsible: true,
+        expanded: false,
+        detailText: PREVIEW_PATCH,
+        detailKind: 'patch',
+        detailFilePath: 'src/auth/middleware.ts',
+      },
+    ],
+  },
   executionExpanded: {
     kind: 'execution',
     title: 'Edited 2 files · Ran 1 command',
@@ -158,6 +180,34 @@ type Props = {
   section: ProcessSectionSnapshot
   expanded?: boolean
   onToggle?: () => void
+}
+
+function splitSummaryVerb(summary: string): { verb: string; rest: string } {
+  const trimmed = summary.trim()
+  if (!trimmed) return { verb: '', rest: '' }
+  const space = trimmed.search(/\s/)
+  if (space < 0) return { verb: trimmed, rest: '' }
+  return { verb: trimmed.slice(0, space), rest: trimmed.slice(space + 1).trim() }
+}
+
+function stackEntryToProcessEntry(
+  entry: ProcessStackEntrySnapshot,
+  section: ProcessSectionSnapshot,
+): ProcessEntrySnapshot {
+  const { verb, rest } = splitSummaryVerb(entry.summary)
+  return {
+    verb,
+    rest: rest || undefined,
+    filePath: entry.filePath,
+    active: entry.active ?? section.active,
+    error: entry.error ?? section.hasError,
+    collapsible: entry.collapsible,
+    forceOpen: section.forceExpanded === true,
+    expanded: entry.expanded ?? section.expanded,
+    detailText: entry.detailText,
+    detailKind: entry.detailKind,
+    detailFilePath: entry.detailFilePath ?? entry.filePath,
+  }
 }
 
 function ProcessSummaryLine({
@@ -307,6 +357,26 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
     const preset = section.stackEntries?.find((entry) => entry.expanded)?.id
     return preset ?? null
   })
+
+  const singleExecutionEntry =
+    section.kind === 'execution' && section.stackEntries?.length === 1
+      ? section.stackEntries[0]
+      : null
+
+  if (singleExecutionEntry) {
+    const entrySnapshot = stackEntryToProcessEntry(singleExecutionEntry, {
+      ...section,
+      expanded: expanded ?? section.expanded,
+    })
+    return (
+      <ProcessEntryRow
+        entry={entrySnapshot}
+        expanded={expanded ?? section.expanded}
+        onToggle={onToggle}
+      />
+    )
+  }
+
   const hasDetails =
     section.kind === 'reasoning'
       ? Boolean(section.reasoningText?.trim())
