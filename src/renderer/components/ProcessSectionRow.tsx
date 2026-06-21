@@ -16,6 +16,7 @@ import {
   ProcessEntryRow,
   type ProcessEntrySnapshot,
 } from './ProcessEntryRow'
+import { type RuntimeMetaChipsSnapshot, RUNTIME_META_CHIPS_PREVIEW } from './RuntimeMetaChips'
 
 export type ProcessStackEntrySnapshot = {
   id: string
@@ -30,6 +31,8 @@ export type ProcessStackEntrySnapshot = {
   detailKind?: 'text' | 'command' | 'patch' | 'error' | 'assistant' | 'approval' | 'user_input'
   detailFilePath?: string
   nestedBubble?: MessageBubbleSnapshot
+  meta?: RuntimeMetaChipsSnapshot
+  showCompactionIcon?: boolean
 }
 
 export type ProcessOutputEntrySnapshot = {
@@ -55,11 +58,15 @@ export type ProcessSectionSnapshot = {
   outputEntries?: ProcessOutputEntrySnapshot[]
 }
 
-function entryAutoForceOpen(entry: ProcessStackEntrySnapshot): boolean {
-  return (
-    entry.active === true &&
-    (entry.detailKind === 'approval' || entry.detailKind === 'user_input')
-  )
+function entryAutoForceOpen(
+  entry: ProcessStackEntrySnapshot,
+  processing?: boolean,
+): boolean {
+  if (entry.active !== true) return false
+  if (entry.detailKind === 'approval' || entry.detailKind === 'user_input') {
+    return true
+  }
+  return processing === true && entry.showCompactionIcon === true
 }
 
 function sectionHasPendingApproval(section: ProcessSectionSnapshot): boolean {
@@ -159,6 +166,7 @@ export const PROCESS_SECTION_ROW_PREVIEW = {
         detailText: PREVIEW_PATCH,
         detailKind: 'patch',
         detailFilePath: 'src/auth/middleware.ts',
+        meta: RUNTIME_META_CHIPS_PREVIEW,
       },
     ],
   },
@@ -379,6 +387,8 @@ function stackEntryToProcessEntry(
     detailKind: entry.detailKind,
     detailFilePath: entry.detailFilePath ?? entry.filePath,
     nestedBubble: entry.nestedBubble,
+    meta: entry.meta,
+    showCompactionIcon: entry.showCompactionIcon,
   }
 }
 
@@ -550,8 +560,10 @@ function ProcessOutputDetail({
 
 function ProcessStackRows({
   entries,
+  processing,
 }: {
   entries: ProcessStackEntrySnapshot[]
+  processing?: boolean
 }): ReactElement {
   const [openBlockId, setOpenBlockId] = useState<string | null>(() => {
     const preset = entries.find((entry) => entry.expanded)?.id
@@ -565,7 +577,8 @@ function ProcessStackRows({
         const hasDetail = Boolean(entry.detailText) || Boolean(entry.nestedBubble)
         const staticOpen = hasDetail && entry.collapsible === false
         const defaultOpen = entry.error === true
-        const forceOpen = entry.forceOpen === true || entryAutoForceOpen(entry)
+        const forceOpen =
+          entry.forceOpen === true || entryAutoForceOpen(entry, processing)
         const userClosed = closedBlockIds.has(entry.id)
         const userOpened = openBlockId === entry.id
         const open =
@@ -596,14 +609,13 @@ function ProcessStackRows({
         }
 
         return (
-          <div key={entry.id} className="process-stack-entry">
-            <ProcessStackEntryRow
-              entry={entry}
-              open={open}
-              canToggle={canToggle}
-              onToggle={handleToggle}
-            />
-          </div>
+          <ProcessStackEntryRow
+            key={entry.id}
+            entry={entry}
+            open={open}
+            canToggle={canToggle}
+            onToggle={handleToggle}
+          />
         )
       })}
     </div>
@@ -675,7 +687,7 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
   const header = (
     <>
       {showActiveError ? (
-        <span className="process-section-row-error-dot-wrap">
+        <span className="ds-work-logo-slot ds-work-logo-slot-sm process-section-row-error-dot-wrap">
           <span className="process-section-row-error-dot" />
         </span>
       ) : null}
@@ -715,7 +727,10 @@ export function ProcessSectionRow({ section, expanded, onToggle }: Props): React
               />
             </div>
           ) : section.stackEntries ? (
-            <ProcessStackRows entries={section.stackEntries} />
+            <ProcessStackRows
+              entries={section.stackEntries}
+              processing={section.processing}
+            />
           ) : null}
         </div>
       ) : null}

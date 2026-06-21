@@ -778,6 +778,7 @@ function HomePage() {
     if (mode === 'expanded') return 'expanded'
     if (mode === 'active') return 'active'
     if (mode === 'compaction') return 'compaction'
+    if (mode === 'compactionRunning') return 'compactionRunning'
     if (mode === 'error') return 'error'
     if (mode === 'meta') return 'meta'
     if (mode === 'assistant') return 'assistant'

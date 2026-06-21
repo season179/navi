@@ -90,6 +90,17 @@ export const PROCESS_ENTRY_ROW_PREVIEW = {
       'Folded older turns into a summary checkpoint to stay within the context window.',
     detailKind: 'text',
   },
+  compactionRunning: {
+    verb: 'Compacting',
+    rest: 'context window',
+    showCompactionIcon: true,
+    active: true,
+    wrapSummary: true,
+    collapsible: true,
+    expanded: true,
+    detailText: 'Summarizing older turns to free context space…',
+    detailKind: 'text',
+  },
   error: {
     verb: 'Run',
     rest: 'npm test',
@@ -225,7 +236,9 @@ export function ProcessEntryRow({ entry, expanded, onToggle }: Props): ReactElem
   const defaultOpen = entry.error === true
   const autoOpenPending =
     entry.active === true &&
-    (entry.detailKind === 'approval' || entry.detailKind === 'user_input')
+    (entry.detailKind === 'approval' ||
+      entry.detailKind === 'user_input' ||
+      entry.showCompactionIcon === true)
   const forceOpen =
     entry.forceOpen === true ||
     entry.detailKind === 'assistant' ||
