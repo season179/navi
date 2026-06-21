@@ -8,6 +8,7 @@ import { GeneralSettingsSectionPreview } from './GeneralSettingsSection'
 import { KeyboardShortcutsSettingsSectionPreview } from './KeyboardShortcutsSettingsSection'
 import { EasterEggSettingsSectionPreview } from './EasterEggSettingsSection'
 import { ArchivedThreadsSettingsSectionPreview } from './ArchivedThreadsSettingsSection'
+import { UpdatesSettingsSectionPreview } from './UpdatesSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -178,8 +179,8 @@ export function SettingsSidebarPreviewContent({
           <SettingsControlsPreview mode="modelSelect" />
         </div>
       ) : category === 'updates' ? (
-        <div className="settings-controls-preview-stack">
-          <SettingsControlsPreview mode="disclosure" />
+        <div className="updates-settings-preview-stack">
+          <UpdatesSettingsSectionPreview />
         </div>
       ) : category === 'shortcuts' ? (
         <div className="keyboard-shortcuts-preview-stack">

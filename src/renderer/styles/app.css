@@ -14953,3 +14953,34 @@ button.usage-heatmap-cell:focus {
   margin-top: 32px;
 }
 
+.updates-settings-preview {
+  min-height: 100vh;
+  padding: 48px 24px;
+  background: var(--ds-bg-main);
+}
+
+.updates-settings-preview-inner {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.updates-settings-preview-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+}
+
+.updates-settings-preview-subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ds-text-muted);
+}
+
+.updates-settings-preview-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 32px;
+}
+

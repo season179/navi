@@ -252,6 +252,10 @@ import {
   type ArchivedThreadsPreviewMode,
 } from '../components/ArchivedThreadsSettingsSection'
 import {
+  UpdatesSettingsSectionPreview,
+  type UpdatesSettingsPreviewMode,
+} from '../components/UpdatesSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1263,6 +1267,16 @@ function HomePage() {
     return mode as ArchivedThreadsPreviewMode
   }, [])
 
+  // Visual preview for the ported UpdatesSettingsSection (?updatesSettingsPreview=1|available|downloading|…).
+  const updatesSettingsPreviewMode = useMemo((): UpdatesSettingsPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('updatesSettingsPreview')) return null
+    const mode = params.get('updatesSettingsPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as UpdatesSettingsPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1433,6 +1447,22 @@ function HomePage() {
           </p>
           <div className="archived-threads-preview-stack">
             <ArchivedThreadsSettingsSectionPreview mode={archivedThreadsPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (updatesSettingsPreviewMode) {
+    return (
+      <div className="updates-settings-preview">
+        <div className="updates-settings-preview-inner">
+          <h1 className="updates-settings-preview-title">Version & updates</h1>
+          <p className="updates-settings-preview-subtitle">
+            Updates category from Kun settings-section-updates.tsx.
+          </p>
+          <div className="updates-settings-preview-stack">
+            <UpdatesSettingsSectionPreview mode={updatesSettingsPreviewMode} />
           </div>
         </div>
       </div>
