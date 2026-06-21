@@ -12,8 +12,13 @@ import {
   MESSAGE_BUBBLE_PREVIEW_USER_INPUT,
   type MessageBubbleSnapshot,
 } from './MessageBubble'
-import { ProcessEntryDetail } from './ProcessEntryDetail'
 import { ProcessEntryRow, type ProcessEntrySnapshot } from './ProcessEntryRow'
+import {
+  ProcessOutputSection,
+  type ProcessOutputEntrySnapshot,
+} from './ProcessOutputSection'
+
+export type { ProcessOutputEntrySnapshot } from './ProcessOutputSection'
 import { ProcessStackRows, systemEntryHasExpandableDetail } from './ProcessStackRows'
 import { type RuntimeMetaChipsSnapshot, RUNTIME_META_CHIPS_PREVIEW } from './RuntimeMetaChips'
 
@@ -56,12 +61,6 @@ export type ProcessStackEntrySnapshot = {
   toolBlock?: boolean
   /** Wrap summary text instead of truncating — used for assistant/system rows. */
   wrapSummary?: boolean
-}
-
-export type ProcessOutputEntrySnapshot = {
-  id: string
-  text: string
-  streaming?: boolean
 }
 
 export type ProcessSectionSnapshot = {
@@ -701,18 +700,6 @@ function stackEntryToProcessEntry(
   }
 }
 
-function ProcessOutputDetail({
-  entry,
-}: {
-  entry: ProcessOutputEntrySnapshot
-}): ReactElement {
-  return (
-    <div className="process-entry-row-assistant ds-markdown">
-      <Markdown text={entry.text} streaming={entry.streaming === true} />
-    </div>
-  )
-}
-
 export function ProcessSectionRow({
   section,
   expanded,
@@ -728,15 +715,11 @@ export function ProcessSectionRow({
       : null
 
   if (section.kind === 'output') {
-    const outputEntries =
-      section.outputEntries?.filter((entry) => entry.text.trim().length > 0) ?? []
-    if (outputEntries.length === 0) return <></>
     return (
-      <div className="process-section-row-output">
-        {outputEntries.map((entry) => (
-          <ProcessOutputDetail key={entry.id} entry={entry} />
-        ))}
-      </div>
+      <ProcessOutputSection
+        entries={section.outputEntries ?? []}
+        processing={section.processing}
+      />
     )
   }
 
