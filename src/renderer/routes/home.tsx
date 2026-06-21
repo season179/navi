@@ -184,6 +184,11 @@ import {
   type PlanPanelPreviewMode,
 } from '../components/PlanPanel'
 import {
+  ChatFileTreePanel,
+  CHAT_FILE_TREE_PREVIEW,
+  type ChatFileTreePreviewMode,
+} from '../components/ChatFileTreePanel'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -851,6 +856,61 @@ function HomePage() {
     return { ...PLAN_PANEL_PREVIEW }
   }, [planPanelPreviewMode])
 
+  // Visual preview for the ported ChatFileTreePanel (?chatFileTreePanelPreview=1|loading|empty|error).
+  const chatFileTreePanelPreviewMode = useMemo((): ChatFileTreePreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('chatFileTreePanelPreview')) return null
+    const mode = params.get('chatFileTreePanelPreview')
+    if (mode === 'loading' || mode === 'empty' || mode === 'error' || mode === 'noworkspace') {
+      return mode
+    }
+    return 'default'
+  }, [])
+  const [chatFileTreePanelPreviewSelectedPath, setChatFileTreePanelPreviewSelectedPath] =
+    useState<string | null>(() => CHAT_FILE_TREE_PREVIEW.selectedPath)
+  const chatFileTreePanelPreviewProps = useMemo(() => {
+    if (!chatFileTreePanelPreviewMode) return null
+    if (chatFileTreePanelPreviewMode === 'noworkspace') {
+      return {
+        workspaceRoot: '',
+        entries: [] as typeof CHAT_FILE_TREE_PREVIEW.entries,
+        loading: false,
+        error: null as string | null,
+      }
+    }
+    if (chatFileTreePanelPreviewMode === 'loading') {
+      return {
+        workspaceRoot: CHAT_FILE_TREE_PREVIEW.workspaceRoot,
+        entries: [],
+        loading: true,
+        error: null,
+      }
+    }
+    if (chatFileTreePanelPreviewMode === 'empty') {
+      return {
+        workspaceRoot: CHAT_FILE_TREE_PREVIEW.workspaceRoot,
+        entries: [],
+        loading: false,
+        error: null,
+      }
+    }
+    if (chatFileTreePanelPreviewMode === 'error') {
+      return {
+        workspaceRoot: CHAT_FILE_TREE_PREVIEW.workspaceRoot,
+        entries: [],
+        loading: false,
+        error: 'Could not read workspace directory.',
+      }
+    }
+    return {
+      workspaceRoot: CHAT_FILE_TREE_PREVIEW.workspaceRoot,
+      entries: CHAT_FILE_TREE_PREVIEW.entries,
+      loading: false,
+      error: null,
+    }
+  }, [chatFileTreePanelPreviewMode])
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -1130,6 +1190,21 @@ function HomePage() {
                 loading: false,
               }))
             }
+          />
+        </div>
+      ) : null}
+
+      {chatFileTreePanelPreviewMode && chatFileTreePanelPreviewProps ? (
+        <div className="chat-file-tree-panel-preview-wrap">
+          <ChatFileTreePanel
+            workspaceRoot={chatFileTreePanelPreviewProps.workspaceRoot}
+            entries={chatFileTreePanelPreviewProps.entries}
+            selectedPath={chatFileTreePanelPreviewSelectedPath}
+            loading={chatFileTreePanelPreviewProps.loading}
+            error={chatFileTreePanelPreviewProps.error}
+            fill
+            onPreviewFile={setChatFileTreePanelPreviewSelectedPath}
+            onAddReference={() => undefined}
           />
         </div>
       ) : null}
