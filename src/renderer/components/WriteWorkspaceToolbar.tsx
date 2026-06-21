@@ -21,10 +21,16 @@ import {
 } from 'lucide-react'
 import { WriteFontSizeControl } from './WriteFontSizeControl'
 import type { WriteWorkspaceToolbarPreviewMode } from '../lib/writeWorkspaceToolbarPreviewModes'
+import {
+  resolveLiveModeActive,
+  resolveWriteToolbarModeActiveFlags,
+  type WriteToolbarPreviewMode,
+} from '../lib/writeWorkspaceToolbarModeState'
 
 export type { WriteWorkspaceToolbarPreviewMode } from '../lib/writeWorkspaceToolbarPreviewModes'
+export { resolveLiveModeActive } from '../lib/writeWorkspaceToolbarModeState'
 
-export type WritePreviewMode = 'live' | 'rich' | 'source' | 'split' | 'preview'
+export type WritePreviewMode = WriteToolbarPreviewMode
 export type WriteSaveStatus = 'saved' | 'dirty' | 'saving' | 'error'
 export type WriteExportFormat = 'html' | 'pdf' | 'doc' | 'docx'
 
@@ -101,9 +107,18 @@ function formatSaveLabel(status: WriteSaveStatus): string {
   return COPY.writeSaved
 }
 
-export function buildModeMenuItems(previewMode: WritePreviewMode): WriteModeMenuItem[] {
-  const richModeActive = previewMode === 'rich'
-  const sourceModeActive = previewMode === 'source'
+export type BuildModeMenuItemsOptions = {
+  livePreviewEnabled?: boolean
+  isMarkdown?: boolean
+  activeFileIsText?: boolean
+}
+
+export function buildModeMenuItems(
+  previewMode: WritePreviewMode,
+  options: BuildModeMenuItemsOptions = {},
+): WriteModeMenuItem[] {
+  const { richModeActive, sourceModeActive, splitModeActive, previewModeActive } =
+    resolveWriteToolbarModeActiveFlags(previewMode, options)
   return [
     {
       mode: 'rich',
@@ -121,13 +136,13 @@ export function buildModeMenuItems(previewMode: WritePreviewMode): WriteModeMenu
       mode: 'split',
       shortLabel: COPY.writeModeSplit,
       icon: <Columns2 className="write-workspace-toolbar-icon" strokeWidth={1.85} />,
-      active: previewMode === 'split',
+      active: splitModeActive,
     },
     {
       mode: 'preview',
       shortLabel: COPY.writeModePreview,
       icon: <Eye className="write-workspace-toolbar-icon" strokeWidth={1.85} />,
-      active: previewMode === 'preview',
+      active: previewModeActive,
     },
   ]
 }
@@ -145,6 +160,7 @@ type Props = {
   exportMenuOpen?: boolean
   leftSidebarCollapsed?: boolean
   liveModeActive?: boolean
+  livePreviewEnabled?: boolean
   modeMenuItems?: WriteModeMenuItem[]
   modeMenuOpen?: boolean
   previewMode?: WritePreviewMode
@@ -174,7 +190,8 @@ export function WriteWorkspaceToolbar({
   exportInFlight = false,
   exportMenuOpen = false,
   leftSidebarCollapsed = false,
-  liveModeActive = true,
+  liveModeActive,
+  livePreviewEnabled = true,
   modeMenuItems,
   modeMenuOpen = false,
   previewMode = 'live',
@@ -193,7 +210,11 @@ export function WriteWorkspaceToolbar({
 }: Props): ReactElement {
   const exportMenuRef = useRef<HTMLDivElement>(null)
   const modeMenuRef = useRef<HTMLDivElement>(null)
-  const items = modeMenuItems ?? buildModeMenuItems(previewMode)
+  const resolvedLiveModeActive =
+    liveModeActive ?? resolveLiveModeActive(previewMode, livePreviewEnabled)
+  const items =
+    modeMenuItems ??
+    buildModeMenuItems(previewMode, { livePreviewEnabled, activeFileIsText })
   const resolvedSaveLabel = saveLabel ?? formatSaveLabel(saveStatus)
 
   if (activeFileIsPdf) {
@@ -281,7 +302,7 @@ export function WriteWorkspaceToolbar({
               type="button"
               onClick={() => onSetPreviewMode?.('live')}
               disabled={!activeFileIsText}
-              className={`write-workspace-toolbar-mode-btn ${liveModeActive ? 'write-workspace-toolbar-mode-btn-active' : ''} ${!activeFileIsText ? 'write-workspace-toolbar-mode-btn-disabled' : ''}`}
+              className={`write-workspace-toolbar-mode-btn ${resolvedLiveModeActive ? 'write-workspace-toolbar-mode-btn-active' : ''} ${!activeFileIsText ? 'write-workspace-toolbar-mode-btn-disabled' : ''}`}
               title={COPY.writeModeLive}
               aria-label={COPY.writeModeLive}
             >
@@ -292,7 +313,7 @@ export function WriteWorkspaceToolbar({
               type="button"
               onClick={onToggleModeMenu}
               disabled={!activeFileIsText}
-              className={`write-workspace-toolbar-mode-btn write-workspace-toolbar-mode-menu-btn ${modeMenuOpen || !liveModeActive ? 'write-workspace-toolbar-mode-btn-active' : ''} ${!activeFileIsText ? 'write-workspace-toolbar-mode-btn-disabled' : ''}`}
+              className={`write-workspace-toolbar-mode-btn write-workspace-toolbar-mode-menu-btn ${modeMenuOpen || !resolvedLiveModeActive ? 'write-workspace-toolbar-mode-btn-active' : ''} ${!activeFileIsText ? 'write-workspace-toolbar-mode-btn-disabled' : ''}`}
               title={COPY.writeModePreview}
               aria-label={COPY.writeModePreview}
               aria-haspopup="menu"
@@ -458,7 +479,30 @@ function previewState(mode: WriteWorkspaceToolbarPreviewMode): {
   exportInFlight: boolean
   previewMode: WritePreviewMode
   liveModeActive: boolean
+  livePreviewEnabled: boolean
 } {
+  if (mode === 'liveDisabled') {
+    return {
+      activeFileIsPdf: false,
+      activeFileIsImage: false,
+      activeFileIsText: true,
+      activeFileName: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileName,
+      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
+      activeFilePath: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFilePath,
+      documentStatsLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.documentStatsLabel,
+      saveStatus: 'saved',
+      readOnly: false,
+      reviewActive: false,
+      assistantOpen: false,
+      exportMenuOpen: false,
+      modeMenuOpen: false,
+      exportInFlight: false,
+      previewMode: 'live',
+      liveModeActive: false,
+      livePreviewEnabled: false,
+    }
+  }
+
   if (mode === 'pdf') {
     return {
       activeFileIsPdf: true,
@@ -477,6 +521,7 @@ function previewState(mode: WriteWorkspaceToolbarPreviewMode): {
       exportInFlight: false,
       previewMode: 'preview',
       liveModeActive: false,
+      livePreviewEnabled: false,
     }
   }
 
@@ -498,6 +543,7 @@ function previewState(mode: WriteWorkspaceToolbarPreviewMode): {
       exportInFlight: false,
       previewMode: 'live',
       liveModeActive: true,
+      livePreviewEnabled: true,
     }
   }
 
@@ -537,7 +583,8 @@ function previewState(mode: WriteWorkspaceToolbarPreviewMode): {
     modeMenuOpen: mode === 'modeMenu',
     exportInFlight: mode === 'exporting',
     previewMode,
-    liveModeActive: previewMode === 'live',
+    liveModeActive: resolveLiveModeActive(previewMode),
+    livePreviewEnabled: true,
   }
 }
 
@@ -550,8 +597,10 @@ export function WriteWorkspaceToolbarPreview({ mode }: PreviewProps): ReactEleme
   const [previewMode, setPreviewMode] = useState<WritePreviewMode>(initial.previewMode)
   const [leftSidebarCollapsed, setLeftSidebarCollapsed] = useState(false)
 
-  const liveModeActive = previewMode === 'live'
-  const modeMenuItems = buildModeMenuItems(previewMode)
+  const modeMenuItems = buildModeMenuItems(previewMode, {
+    livePreviewEnabled: initial.livePreviewEnabled,
+    activeFileIsText: initial.activeFileIsText,
+  })
 
   return (
     <div className="write-workspace-toolbar-preview">
@@ -567,7 +616,8 @@ export function WriteWorkspaceToolbarPreview({ mode }: PreviewProps): ReactEleme
         exportInFlight={initial.exportInFlight}
         exportMenuOpen={exportMenuOpen}
         leftSidebarCollapsed={leftSidebarCollapsed}
-        liveModeActive={liveModeActive}
+        liveModeActive={initial.liveModeActive}
+        livePreviewEnabled={initial.livePreviewEnabled}
         modeMenuItems={modeMenuItems}
         modeMenuOpen={modeMenuOpen}
         previewMode={previewMode}

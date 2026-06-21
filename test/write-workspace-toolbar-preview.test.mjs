@@ -1,6 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { resolveWriteWorkspaceToolbarPreviewMode } from '../src/renderer/lib/writeWorkspaceToolbarPreviewModes.ts'
+import {
+  resolveLiveModeActive,
+  resolveWriteToolbarModeActiveFlags,
+} from '../src/renderer/lib/writeWorkspaceToolbarModeState.ts'
 
 test('returns null when writeWorkspaceToolbar param is absent', () => {
   assert.equal(resolveWriteWorkspaceToolbarPreviewMode(new URLSearchParams()), null)
@@ -68,4 +72,18 @@ test('routes live toolbar mode preview without opening mode menu', () => {
     resolveWriteWorkspaceToolbarPreviewMode(new URLSearchParams('writeWorkspaceToolbar=live')),
     'live',
   )
+})
+
+test('routes live-disabled toolbar preview when live preview is off', () => {
+  assert.equal(
+    resolveWriteWorkspaceToolbarPreviewMode(new URLSearchParams('writeWorkspaceToolbar=liveDisabled')),
+    'liveDisabled',
+  )
+})
+
+test('marks source active when live mode is selected but live preview is disabled', () => {
+  assert.equal(resolveLiveModeActive('live', false), false)
+  const flags = resolveWriteToolbarModeActiveFlags('live', { livePreviewEnabled: false })
+  assert.equal(flags.sourceModeActive, true)
+  assert.equal(flags.splitModeActive, false)
 })

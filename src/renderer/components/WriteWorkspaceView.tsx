@@ -23,6 +23,7 @@ import {
   type WritePreviewMode,
   type WriteSaveStatus,
 } from './WriteWorkspaceToolbar'
+import { resolveLiveModeActive } from '../lib/writeWorkspaceToolbarModeState'
 import {
   WriteWorkspaceDocumentPane,
   type WriteDocumentPreviewMode,
@@ -630,8 +631,14 @@ export function WriteWorkspaceView({
     WRITE_SETTINGS_PREVIEW_DEFAULT.agentPresets[0]?.id ?? '',
   )
 
-  const liveModeActive = toolbarPreviewModeState === 'live'
-  const modeMenuItems = buildModeMenuItems(toolbarPreviewModeState)
+  const liveModeActive = resolveLiveModeActive(
+    toolbarPreviewModeState,
+    renderSafety.livePreviewEnabled,
+  )
+  const modeMenuItems = buildModeMenuItems(toolbarPreviewModeState, {
+    livePreviewEnabled: renderSafety.livePreviewEnabled,
+    activeFileIsText,
+  })
   const documentPaneLayout = documentPaneLayoutFromToolbar(toolbarPreviewModeState, previewMode)
   const richModeActive = controlledRichModeActive ?? documentPaneLayout.richModeActive
   const documentPreviewMode = documentPaneLayout.previewMode
@@ -690,6 +697,7 @@ export function WriteWorkspaceView({
         exportMenuOpen={exportMenuOpen}
         leftSidebarCollapsed={leftSidebarCollapsed}
         liveModeActive={liveModeActive}
+        livePreviewEnabled={renderSafety.livePreviewEnabled}
         modeMenuItems={modeMenuItems}
         modeMenuOpen={modeMenuOpen}
         previewMode={toolbarPreviewModeState}
