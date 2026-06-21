@@ -3173,6 +3173,28 @@ a.runtime-meta-chip:hover {
   transform: translateX(-50%);
 }
 
+.generated-files-panel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.generated-files-panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-text-faint);
+}
+
+.generated-files-panel-preview {
+  position: fixed;
+  left: 50%;
+  z-index: 40;
+  bottom: calc(var(--composer-offset, 120px) + 24px);
+  width: min(calc(100vw - 48px), 760px);
+  transform: translateX(-50%);
+}
+
 /* =====================================================
    Media preview tile (Kun MediaPreviewTile)
    ===================================================== */

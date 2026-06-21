@@ -103,6 +103,12 @@ import {
   USER_INPUT_BUBBLE_PREVIEW_MULTI,
   USER_INPUT_BUBBLE_PREVIEW_SUBMITTED,
 } from '../components/UserInputBubble'
+import {
+  GeneratedFilesPanel,
+  GENERATED_FILES_PANEL_PREVIEW,
+  GENERATED_FILES_PANEL_PREVIEW_MIXED,
+  GENERATED_FILES_PANEL_PREVIEW_SINGLE,
+} from '../components/GeneratedFilesPanel'
 import { PencilLine } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -390,6 +396,17 @@ function HomePage() {
     if (mode === 'error') return USER_INPUT_BUBBLE_PREVIEW_ERROR
     if (mode === 'multi') return USER_INPUT_BUBBLE_PREVIEW_MULTI
     return USER_INPUT_BUBBLE_PREVIEW
+  }, [])
+
+  // Visual preview for the ported GeneratedFilesPanel (?generatedFilesPanel=1|single|mixed).
+  const generatedFilesPanelPreviewMedia = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('generatedFilesPanel')) return null
+    const mode = params.get('generatedFilesPanel')
+    if (mode === 'single') return GENERATED_FILES_PANEL_PREVIEW_SINGLE
+    if (mode === 'mixed') return GENERATED_FILES_PANEL_PREVIEW_MIXED
+    return GENERATED_FILES_PANEL_PREVIEW
   }, [])
 
   const composerFooterPreview =
@@ -788,15 +805,7 @@ function HomePage() {
       mediaAttachmentGalleryPreviewMode !== 'tool' ? (
         <div className="media-attachment-gallery-preview">
           {mediaAttachmentGalleryPreviewMode === 'conversation' ? (
-            <>
-              <div className="media-attachment-gallery-preview-label">
-                Generated files
-              </div>
-              <MediaAttachmentGallery
-                media={MEDIA_ATTACHMENT_GALLERY_PREVIEW}
-                variant="conversation"
-              />
-            </>
+            <GeneratedFilesPanel media={MEDIA_ATTACHMENT_GALLERY_PREVIEW} />
           ) : (
             <div className="media-preview-tile-preview-bubble">
               <MediaAttachmentGallery
@@ -863,6 +872,12 @@ function HomePage() {
       {userInputBubblePreviewSnapshot ? (
         <div className="user-input-bubble-preview">
           <UserInputBubble block={userInputBubblePreviewSnapshot} />
+        </div>
+      ) : null}
+
+      {generatedFilesPanelPreviewMedia ? (
+        <div className="generated-files-panel-preview">
+          <GeneratedFilesPanel media={generatedFilesPanelPreviewMedia} />
         </div>
       ) : null}
     </>
