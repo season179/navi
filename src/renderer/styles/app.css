@@ -24386,3 +24386,231 @@ button.usage-heatmap-cell:focus {
 .claw-add-im-btn-icon.is-spin {
   animation: spin 1s linear infinite;
 }
+
+/* Windows/Linux custom title bar (Kun WindowsTitleBar.tsx) */
+
+:root {
+  --ds-windows-titlebar-height: 40px;
+}
+
+.ds-drag {
+  -webkit-app-region: drag;
+}
+
+.ds-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.ds-drag button,
+.ds-drag input,
+.ds-drag textarea,
+.ds-drag select,
+.ds-drag option,
+.ds-drag a,
+.ds-drag summary,
+.ds-drag [role='button'],
+.ds-drag [contenteditable='true'] {
+  -webkit-app-region: no-drag;
+}
+
+.ds-windows-app-frame {
+  background: var(--ds-bg-main);
+}
+
+.ds-windows-titlebar {
+  position: relative;
+  z-index: 80;
+  display: flex;
+  height: var(--ds-windows-titlebar-height, 40px);
+  min-height: var(--ds-windows-titlebar-height, 40px);
+  flex: 0 0 var(--ds-windows-titlebar-height, 40px);
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--ds-border-muted);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(246, 248, 251, 0.72)),
+    var(--ds-bg-main);
+  color: var(--ds-text);
+  user-select: none;
+}
+
+.ds-windows-titlebar-content {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.ds-windows-titlebar-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.ds-windows-menu {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 1px;
+}
+
+.ds-windows-menu-slot {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ds-windows-menu-button {
+  display: inline-flex;
+  height: 28px;
+  align-items: center;
+  border: none;
+  border-radius: 6px;
+  padding: 0 9px;
+  background: transparent;
+  color: var(--ds-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.ds-windows-menu-button:hover,
+.ds-windows-menu-button.is-open {
+  background: var(--ds-surface-hover);
+  color: var(--ds-text);
+}
+
+.ds-windows-menu-popover {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  z-index: 90;
+  min-width: 218px;
+  overflow: hidden;
+  border: 1px solid var(--ds-border);
+  border-radius: 8px;
+  background: var(--ds-card-strong);
+  padding: 5px;
+  box-shadow:
+    0 18px 48px rgba(20, 47, 95, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px);
+}
+
+.ds-windows-menu-item {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 9px;
+  background: transparent;
+  color: var(--ds-text);
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.ds-windows-menu-item:hover {
+  background: var(--ds-surface-hover);
+}
+
+.ds-windows-menu-shortcut {
+  flex: 0 0 auto;
+  color: var(--ds-text-faint);
+  font-size: 12px;
+}
+
+.ds-windows-menu-separator {
+  height: 1px;
+  margin: 5px 4px;
+  background: var(--ds-border-muted);
+}
+
+.ds-window-controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: stretch;
+  height: 100%;
+}
+
+.ds-window-control-btn {
+  display: inline-flex;
+  width: 46px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--ds-text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.ds-window-control-btn:hover {
+  background: var(--ds-surface-hover);
+  color: var(--ds-text);
+}
+
+.ds-window-control-btn--close:hover {
+  background: #c42b1c;
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .ds-windows-titlebar {
+  background:
+    linear-gradient(180deg, rgba(22, 29, 47, 0.92), rgba(14, 19, 32, 0.82)),
+    var(--ds-bg-main);
+}
+
+:root[data-theme='dark'] .ds-window-control-btn--close:hover {
+  background: #c42b1c;
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .ds-windows-menu-popover {
+  box-shadow:
+    0 22px 56px rgba(2, 6, 16, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.windows-titlebar-preview-wrap {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background: var(--ds-bg-main);
+}
+
+.windows-titlebar-preview-body {
+  flex: 1 1 auto;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.windows-titlebar-preview-copy {
+  max-width: 28rem;
+  margin: 0;
+  color: var(--ds-text-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+}

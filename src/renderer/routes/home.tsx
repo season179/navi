@@ -369,6 +369,10 @@ import {
   ClawAddImDialogPreview,
   type ClawAddImDialogPreviewMode,
 } from '../components/ClawAddImDialog'
+import {
+  WindowsTitleBarPreview,
+  type WindowsTitleBarPreviewMode,
+} from '../components/WindowsTitleBar'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -989,6 +993,19 @@ function HomePage() {
     if (value === 'busy') return 'busy'
     if (value === 'error') return 'error'
     return 'add'
+  }, [])
+
+  // Visual preview for the ported WindowsTitleBar
+  // (?windowsTitleBarPreview=1|menuOpen|maximized|linux).
+  const windowsTitleBarPreviewMode = useMemo((): WindowsTitleBarPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('windowsTitleBarPreview')) return null
+    const value = params.get('windowsTitleBarPreview')
+    if (value === 'menuOpen') return 'menuOpen'
+    if (value === 'maximized') return 'maximized'
+    if (value === 'linux') return 'linux'
+    return 'default'
   }, [])
 
   // Visual preview for the ported WriteDebugLogModal
@@ -1918,6 +1935,10 @@ function HomePage() {
 
   if (clawAddImDialogPreviewMode) {
     return <ClawAddImDialogPreview mode={clawAddImDialogPreviewMode} />
+  }
+
+  if (windowsTitleBarPreviewMode) {
+    return <WindowsTitleBarPreview mode={windowsTitleBarPreviewMode} />
   }
 
   if (writeDebugLogPreviewMode) {
