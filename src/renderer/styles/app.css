@@ -15734,3 +15734,83 @@ button.usage-heatmap-cell:focus {
   margin-top: 32px;
 }
 
+/* ---------------------------------------------------------------------------
+   Image generation settings (Kun settings-section-image-generation.tsx)
+   --------------------------------------------------------------------------- */
+.image-generation-provider-control,
+.image-generation-model-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .image-generation-provider-control,
+  .image-generation-model-control {
+    max-width: 28rem;
+  }
+
+  .image-generation-secret-input {
+    max-width: 28rem;
+  }
+
+  .image-generation-text-input {
+    max-width: 28rem;
+  }
+}
+
+.image-generation-provider-warning {
+  margin: 0;
+  font-size: 12px;
+  color: #b45309;
+}
+
+[data-theme='dark'] .image-generation-provider-warning {
+  color: #fcd34d;
+}
+
+.image-generation-quality-hint {
+  padding: 12px;
+}
+
+.image-generation-size-input {
+  width: 10rem;
+}
+
+.image-generation-timeout-input {
+  width: 8rem;
+}
+
+.image-generation-preview {
+  min-height: 100vh;
+  background: var(--ds-bg-main);
+  padding: 48px 24px;
+}
+
+.image-generation-preview-inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.image-generation-preview-title {
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+}
+
+.image-generation-preview-subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ds-text-muted);
+}
+
+.image-generation-preview-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 32px;
+}
+

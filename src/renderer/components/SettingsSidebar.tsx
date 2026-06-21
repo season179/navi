@@ -12,6 +12,7 @@ import { UpdatesSettingsSectionPreview } from './UpdatesSettingsSection'
 import { LlmDebugSettingsSectionPreview } from './LlmDebugSettingsSection'
 import { MemorySettingsSectionPreview } from './MemorySettingsSection'
 import { SpeechToTextSettingsSectionPreview } from './SpeechToTextSettingsSection'
+import { ImageGenerationSettingsSectionPreview } from './ImageGenerationSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -208,6 +209,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'speechToText' ? (
         <div className="speech-to-text-preview-stack">
           <SpeechToTextSettingsSectionPreview />
+        </div>
+      ) : category === 'imageGeneration' ? (
+        <div className="image-generation-preview-stack">
+          <ImageGenerationSettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">

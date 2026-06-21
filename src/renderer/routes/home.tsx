@@ -268,6 +268,10 @@ import {
   type SpeechToTextPreviewMode,
 } from '../components/SpeechToTextSettingsSection'
 import {
+  ImageGenerationSettingsSectionPreview,
+  type ImageGenerationPreviewMode,
+} from '../components/ImageGenerationSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1319,6 +1323,16 @@ function HomePage() {
     return mode as SpeechToTextPreviewMode
   }, [])
 
+  // Visual preview for the ported ImageGenerationSettingsSection (?imageGenerationPreview=1|disabled|custom|…).
+  const imageGenerationPreviewMode = useMemo((): ImageGenerationPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('imageGenerationPreview')) return null
+    const mode = params.get('imageGenerationPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as ImageGenerationPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1553,6 +1567,22 @@ function HomePage() {
           </p>
           <div className="speech-to-text-preview-stack">
             <SpeechToTextSettingsSectionPreview mode={speechToTextPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (imageGenerationPreviewMode) {
+    return (
+      <div className="image-generation-preview">
+        <div className="image-generation-preview-inner">
+          <h1 className="image-generation-preview-title">Image generation</h1>
+          <p className="image-generation-preview-subtitle">
+            Image generation category from Kun settings-section-image-generation.tsx.
+          </p>
+          <div className="image-generation-preview-stack">
+            <ImageGenerationSettingsSectionPreview mode={imageGenerationPreviewMode} />
           </div>
         </div>
       </div>
