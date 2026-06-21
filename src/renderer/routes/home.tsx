@@ -27,7 +27,7 @@ import {
   resolveComposerFooterHintPreview,
   type ComposerFooterHintPreviewMode,
 } from '../lib/composerFooterHint'
-import { COMPOSER_DICTATION_ERROR_PREVIEW } from '../lib/composerVoiceDictation'
+import { resolveComposerDictationErrorPreview } from '../lib/composerVoiceDictation'
 import { COMPOSER_QUEUE_PLACEHOLDER } from '../lib/composerBusyState'
 import { resolveComposerSlashCommandsPreview } from '../lib/composerSlashCommands'
 import { resolveComposerContextCapacityPreview } from '../lib/composerContextCapacity'
@@ -821,13 +821,12 @@ function HomePage() {
     return resolveComposerFooterHintPreview(mode)
   }, [])
 
-  // Visual preview for dictation error row (?composerDictationErrorPreview=1).
+  // Visual preview for dictation error row (?composerDictationErrorPreview=1|micDenied|tooShort|failed).
   const composerDictationErrorPreview = useMemo(() => {
     if (typeof window === 'undefined') return undefined
-    if (!new URLSearchParams(window.location.search).has('composerDictationErrorPreview')) {
-      return undefined
-    }
-    return COMPOSER_DICTATION_ERROR_PREVIEW
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('composerDictationErrorPreview')) return undefined
+    return resolveComposerDictationErrorPreview(params.get('composerDictationErrorPreview'))
   }, [])
 
   // Visual preview for mic transcribing spinner (?composerVoiceTranscribingPreview=1).
@@ -1331,7 +1330,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalFloaterPaused|goalPanel|goalPanelPaused|attachments|attachmentsNoPreview|changeSummary|changeSummaryReviewDisabled|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
+  // (?floatingComposerPreview=default|queued|plusMenu|plusMenuUploading|plusMenuNoAttach|plusMenuNoWorktree|slashCommands|fileMention|fileMentionLoading|fileMentionEmpty|goalFloater|goalFloaterPaused|goalPanel|goalPanelPaused|attachments|attachmentsNoPreview|changeSummary|changeSummaryReviewDisabled|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders|worktreeHint|dictationError|dictationErrorTooShort|dictationErrorFailed|voiceTranscribing|attachmentError|attachmentErrorUnsupported).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1361,6 +1360,8 @@ function HomePage() {
     if (value === 'modelPickerNoProviders') return 'modelPickerNoProviders'
     if (value === 'worktreeHint') return 'worktreeHint'
     if (value === 'dictationError') return 'dictationError'
+    if (value === 'dictationErrorTooShort') return 'dictationErrorTooShort'
+    if (value === 'dictationErrorFailed') return 'dictationErrorFailed'
     if (value === 'voiceTranscribing') return 'voiceTranscribing'
     if (value === 'attachmentError') return 'attachmentError'
     if (value === 'attachmentErrorUnsupported') return 'attachmentErrorUnsupported'

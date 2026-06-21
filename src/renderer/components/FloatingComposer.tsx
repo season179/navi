@@ -129,11 +129,14 @@ import {
   COMPOSER_FOOTER_HINT_WORKTREE,
 } from '../lib/composerFooterHint'
 import {
-  COMPOSER_DICTATION_ERROR_PREVIEW,
+  COMPOSER_VOICE_MIC_DENIED_LABEL,
+  COMPOSER_VOICE_FAILED_SAMPLE_MESSAGE,
   COMPOSER_VOICE_SEND_LABEL,
   COMPOSER_VOICE_START_LABEL,
   COMPOSER_VOICE_STOP_LABEL,
+  COMPOSER_VOICE_TOO_SHORT_LABEL,
   COMPOSER_VOICE_TRANSCRIBING_LABEL,
+  formatComposerVoiceFailed,
 } from '../lib/composerVoiceDictation'
 import {
   COMPOSER_SLASH_COMMAND_EMPTY,
@@ -190,6 +193,8 @@ export type FloatingComposerPreviewMode =
   | 'modelPickerNoProviders'
   | 'worktreeHint'
   | 'dictationError'
+  | 'dictationErrorTooShort'
+  | 'dictationErrorFailed'
   | 'voiceTranscribing'
   | 'attachmentError'
   | 'attachmentErrorUnsupported'
@@ -1012,7 +1017,14 @@ export function resolveFloatingComposerSnapshot(
     case 'worktreeHint':
       return { ...base, footerHint: COMPOSER_FOOTER_HINT_WORKTREE }
     case 'dictationError':
-      return { ...base, dictationError: COMPOSER_DICTATION_ERROR_PREVIEW }
+      return { ...base, dictationError: COMPOSER_VOICE_MIC_DENIED_LABEL }
+    case 'dictationErrorTooShort':
+      return { ...base, dictationError: COMPOSER_VOICE_TOO_SHORT_LABEL }
+    case 'dictationErrorFailed':
+      return {
+        ...base,
+        dictationError: formatComposerVoiceFailed(COMPOSER_VOICE_FAILED_SAMPLE_MESSAGE),
+      }
     case 'voiceTranscribing':
       return { ...base, voiceTranscribing: true }
     case 'attachmentError':
