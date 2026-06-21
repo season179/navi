@@ -4,6 +4,10 @@ import { rootRoute } from './__root'
 import { TopBar } from '../components/TopBar'
 import { HeroStage } from '../components/HeroStage'
 import { ChatStarterGrid } from '../components/ChatStarterGrid'
+import {
+  ContextCapacityPopover,
+  CONTEXT_CAPACITY_PREVIEW,
+} from '../components/ContextCapacityPopover'
 import { Composer } from '../components/Composer'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
@@ -58,6 +62,12 @@ function HomePage() {
       onStop: () => undefined,
       onSend: () => undefined,
     }
+  }, [])
+
+  // Visual preview for the ported ContextCapacityPopover (?contextCapacityPreview=1).
+  const contextCapacityPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    return new URLSearchParams(window.location.search).has('contextCapacityPreview')
   }, [])
 
   // The active project's cwd, for scoping project skills in the Skills panel.
@@ -187,6 +197,12 @@ function HomePage() {
         }
         voiceRecording={voiceRecording}
       />
+
+      {contextCapacityPreview ? (
+        <div className="context-capacity-preview" aria-hidden="true">
+          <ContextCapacityPopover capacity={CONTEXT_CAPACITY_PREVIEW} />
+        </div>
+      ) : null}
     </>
   )
 }

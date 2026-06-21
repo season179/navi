@@ -819,6 +819,157 @@ textarea {
   background: #e4e4e7;
 }
 
+/* Context capacity popover (Kun ContextCapacityPopover) */
+.context-capacity-popover {
+  width: 300px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--ds-border-muted);
+  background: var(--ds-surface-elevated);
+  color: var(--ds-text);
+  box-shadow: 0 14px 34px rgba(20, 47, 95, 0.16);
+}
+
+.context-capacity-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.context-capacity-title {
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.context-capacity-total {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-faint);
+}
+
+.context-capacity-total-used {
+  font-weight: 500;
+}
+
+.context-capacity-bar-wrap {
+  position: relative;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.context-capacity-bar {
+  display: flex;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ds-surface-subtle);
+}
+
+.context-capacity-bar-segment {
+  display: block;
+  height: 100%;
+}
+
+.context-capacity-threshold {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 1px;
+  border-radius: 1px;
+  background: var(--ds-text-faint);
+  opacity: 0.45;
+  transform: translateX(-50%);
+}
+
+.context-capacity-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.context-capacity-status {
+  font-weight: 500;
+}
+
+.context-capacity-threshold-label {
+  color: var(--ds-text-faint);
+}
+
+.context-capacity-categories {
+  display: flex;
+  flex-direction: column;
+}
+
+.context-capacity-row {
+  display: grid;
+  grid-template-columns: 13px 1fr auto 46px;
+  align-items: center;
+  gap: 0 8px;
+  padding: 3px 0;
+}
+
+.context-capacity-row-free {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--ds-border-muted);
+}
+
+.context-capacity-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.context-capacity-swatch-free {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--ds-text-faint);
+  background: transparent;
+}
+
+.context-capacity-row-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--ds-text-muted);
+}
+
+.context-capacity-row-label-muted {
+  color: var(--ds-text-faint);
+}
+
+.context-capacity-row-tokens {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text);
+}
+
+.context-capacity-row-ratio {
+  text-align: right;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-faint);
+}
+
+.context-capacity-footnote {
+  margin-top: 10px;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--ds-text-faint);
+}
+
+.context-capacity-preview {
+  position: fixed;
+  right: 24px;
+  bottom: calc(var(--composer-height, 120px) + 16px);
+  z-index: 40;
+  pointer-events: none;
+}
+
 /* Round tool button (plus menu, etc.) */
 .tool-btn {
   display: inline-flex;
