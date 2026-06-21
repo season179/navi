@@ -36,6 +36,7 @@ import {
 } from './WriteInlineAgent'
 import { WRITE_SETTINGS_PREVIEW_DEFAULT } from './WriteSettingsSection'
 import { RuntimeBanner, RUNTIME_BANNER_PREVIEW, type RuntimeBannerSnapshot } from './RuntimeBanner'
+import { useWriteSplitScrollSync } from './useWriteSplitScrollSync'
 
 export type WriteWorkspaceViewPreviewMode =
   | 'empty'
@@ -422,6 +423,8 @@ export function WriteWorkspaceView({
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
   const [modeMenuOpen, setModeMenuOpen] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const editorPaneRef = useRef<HTMLDivElement | null>(null)
+  const previewPaneRef = useRef<HTMLDivElement | null>(null)
   const [inlineValue, setInlineValue] = useState('')
   const [blockType, setBlockType] = useState<WriteBlockType>('paragraph')
   const [activeAgentId, setActiveAgentId] = useState(
@@ -445,6 +448,14 @@ export function WriteWorkspaceView({
     }),
     [activeFileIsPdf, activeFileLabel, assistantInput, assistantPanelSnapshot],
   )
+
+  useWriteSplitScrollSync({
+    enabled:
+      workspaceReady && previewMode === 'split' && activeFileIsText && !fileLoading,
+    editorRootRef: editorPaneRef,
+    previewRef: previewPaneRef,
+    rebindKey: activeFilePath ?? 'write-preview',
+  })
 
   if (!workspaceReady) {
     return (
@@ -507,6 +518,8 @@ export function WriteWorkspaceView({
               imageMimeType={imageMimeType}
               onContentChange={setContent}
               onPickWorkspace={onPickWorkspace}
+              editorPaneRef={editorPaneRef}
+              previewPaneRef={previewPaneRef}
             />
           </div>
         </div>

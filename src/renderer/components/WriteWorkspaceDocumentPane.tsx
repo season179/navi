@@ -2,7 +2,7 @@
 // (../Kun/src/renderer/src/components/write/WriteWorkspaceDocumentPane.tsx).
 // Visual only: composes ported editor/preview surfaces without rich editor or IPC.
 
-import { useState, type ReactElement } from 'react'
+import { useState, type ReactElement, type RefObject } from 'react'
 import { WriteWorkspaceStart, WRITE_WORKSPACE_START_PREVIEW } from './WriteWorkspaceStart'
 import { WriteImagePreview, WRITE_IMAGE_PREVIEW_SAMPLE } from './WriteImagePreview'
 import { WritePdfViewer, WRITE_PDF_VIEWER_PREVIEW_SAMPLE } from './WritePdfViewer'
@@ -75,6 +75,9 @@ type Props = {
   onPickWorkspace?: () => void
   onRefreshWorkspace?: () => void
   onContentChange?: (content: string) => void
+  /** Scroll-sync anchors for split mode (Kun WriteWorkspaceDocumentPane refs). */
+  editorPaneRef?: RefObject<HTMLDivElement | null>
+  previewPaneRef?: RefObject<HTMLDivElement | null>
 }
 
 function editorWidthClass(previewMode: WriteDocumentPreviewMode): string {
@@ -136,6 +139,8 @@ export function WriteWorkspaceDocumentPane({
   onPickWorkspace,
   onRefreshWorkspace,
   onContentChange,
+  editorPaneRef,
+  previewPaneRef,
 }: Props): ReactElement {
   if (!activeFilePath) {
     return (
@@ -204,7 +209,10 @@ export function WriteWorkspaceDocumentPane({
       ) : null}
       <div className="write-document-pane-columns">
         {showEditor ? (
-          <div className={editorWidthClass(previewMode)}>
+          <div
+            ref={editorPaneRef}
+            className={`${editorWidthClass(previewMode)} write-document-pane-editor-scroll-root`}
+          >
             <WriteMarkdownEditor
               value={fileContent}
               appearance={appearance}
@@ -214,7 +222,7 @@ export function WriteWorkspaceDocumentPane({
           </div>
         ) : null}
         {showPreview ? (
-          <div className={previewWidthClass(previewMode)}>
+          <div ref={previewPaneRef} className={previewWidthClass(previewMode)}>
             <WriteMarkdownPreview
               content={fileContent}
               isMarkdown={isMarkdown && renderSafety.markdownPreviewEnabled}

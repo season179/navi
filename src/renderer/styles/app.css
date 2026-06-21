@@ -24845,6 +24845,10 @@ button.usage-heatmap-cell:focus {
   height: 100%;
 }
 
+.write-document-pane-editor-scroll-root {
+  overflow: hidden;
+}
+
 .write-document-pane-preview-col {
   overflow-x: hidden;
   overflow-y: auto;
