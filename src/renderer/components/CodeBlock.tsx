@@ -1,8 +1,8 @@
 // Markdown code renderer. Overrides Streamdown's default `code` component so
 // fenced blocks get shiki syntax highlighting, a language label, and
 // copy / download / collapse actions. Ported from Kun's StreamdownCode
-// (../kun/src/renderer/src/components/chat/StreamdownCode.tsx), stripped of the
-// workspace file-reference logic navi doesn't have.
+// (../kun/src/renderer/src/components/chat/StreamdownCode.tsx). Inline file
+// paths render as Kun-matching ds-file-reference-code buttons (visual-only).
 
 import type { Element } from 'hast'
 import { Check, ChevronDown, ChevronUp, Copy, Download } from 'lucide-react'
@@ -24,6 +24,10 @@ import {
   highlightCodeHtml,
   renderFallbackCodeHtml,
 } from '../lib/code-highlighting'
+import {
+  findFileReferences,
+  type FileReferenceTarget,
+} from '../lib/file-references'
 
 const LANGUAGE_REGEX = /language-([^\s]+)/
 const TRAILING_NEWLINES_REGEX = /\n+$/
@@ -93,6 +97,39 @@ function PlainTextBlock({ code }: { code: string }): ReactNode {
     <div className="ds-plain-text-block ds-plain-code-block" data-streamdown="plain-text-block">
       {trimmedCode}
     </div>
+  )
+}
+
+function inlineFileReference(
+  text: string,
+): { text: string; target: FileReferenceTarget } | null {
+  const trimmed = text.trim()
+  if (!trimmed) return null
+  const matches = findFileReferences(trimmed)
+  const match = matches.length === 1 ? matches[0] : null
+  if (!match || match.start !== 0 || match.end !== trimmed.length) return null
+  return { text: trimmed, target: match.target }
+}
+
+function InlineFileReferenceCode({
+  text,
+  target,
+  className,
+}: {
+  text: string
+  target: FileReferenceTarget
+  className?: string
+}): ReactNode {
+  return (
+    <button
+      type="button"
+      className={`ds-code-inline ds-file-reference-code ${className ?? ''}`.trim()}
+      data-streamdown="inline-code"
+      title={target.line ? `${target.path}:${target.line}` : target.path}
+      onClick={(event) => event.preventDefault()}
+    >
+      {text}
+    </button>
   )
 }
 
@@ -239,6 +276,17 @@ function CodeComponent({ node, className, children, ...props }: CodeProps) {
     (hasNodePosition ? startLine === endLine : !hasLanguageClass && !text.includes('\n'))
 
   if (inline) {
+    const fileRef = inlineFileReference(text)
+    if (fileRef) {
+      return (
+        <InlineFileReferenceCode
+          text={fileRef.text}
+          target={fileRef.target}
+          className={className}
+        />
+      )
+    }
+
     return (
       <code
         className={className ? `ds-code-inline ${className}` : 'ds-code-inline'}

@@ -1,6 +1,7 @@
-// Renders assistant message text as markdown. Ported from the core of Kun's
-// StreamdownAssistant (../kun/src/renderer/src/components/chat/StreamdownAssistant.tsx),
-// minus the workspace file-reference link handling.
+// Renders assistant message text as markdown. Ported from Kun's
+// StreamdownAssistant (../kun/src/renderer/src/components/chat/StreamdownAssistant.tsx).
+// File-reference links use Kun-matching ds-file-reference-link styling; click
+// handlers are visual-only (no workspace preview/open wiring).
 //
 // Streamdown is used purely as the markdown -> React engine (with GFM). Its own
 // streaming/remend pipeline is left off; the typewriter pacing below is what
@@ -12,10 +13,13 @@ import {
   useRef,
   useState,
   type AnchorHTMLAttributes,
+  type MouseEvent,
   type ReactElement,
 } from 'react'
 import { Streamdown, type StreamdownProps } from 'streamdown'
 import remarkGfm from 'remark-gfm'
+import { harden } from 'rehype-harden'
+import { parseFileReferenceHref, rehypeFileReferences } from '../lib/file-references'
 import { CodeBlock } from './CodeBlock'
 
 /** Reveal ~1/8 of the outstanding backlog per frame… */
@@ -61,19 +65,74 @@ function useTypewriterText(text: string, streaming: boolean): string {
   return text.slice(0, length)
 }
 
-// Open links in a new context rather than navigating the renderer away from
-// the app. (Electron routes target=_blank through the main process's
-// window-open handler.)
-function MarkdownLink({
-  node: _node,
+const rehypePlugins = [
+  rehypeFileReferences,
+  [
+    harden,
+    {
+      allowedLinkPrefixes: ['*'],
+    },
+  ],
+] satisfies StreamdownProps['rehypePlugins']
+
+type StreamdownLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & { node?: unknown }
+
+function StreamdownLink({
+  href,
+  children,
+  className,
+  title,
+  onClick,
   ...props
-}: AnchorHTMLAttributes<HTMLAnchorElement> & { node?: unknown }): ReactElement {
-  return <a {...props} target="_blank" rel="noreferrer noopener" />
+}: StreamdownLinkProps): ReactElement {
+  const fileTarget = parseFileReferenceHref(href)
+  const isExternal = href ? /^(https?:|mailto:)/i.test(href) : false
+  const cleanClassName = className?.replace(/\bds-file-reference-link\b/g, '').trim()
+
+  if (fileTarget) {
+    const handleClick = (event: MouseEvent<HTMLAnchorElement>): void => {
+      event.preventDefault()
+      onClick?.(event)
+    }
+
+    return (
+      <a
+        href={href}
+        title={
+          title ?? (fileTarget.line ? `${fileTarget.path}:${fileTarget.line}` : fileTarget.path)
+        }
+        className={['ds-file-reference-link', cleanClassName].filter(Boolean).join(' ')}
+        onClick={handleClick}
+        {...props}
+      >
+        {children}
+      </a>
+    )
+  }
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>): void => {
+    if (isExternal) event.preventDefault()
+    onClick?.(event)
+  }
+
+  return (
+    <a
+      href={href}
+      title={title}
+      className={cleanClassName}
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noreferrer noopener' : undefined}
+      onClick={handleClick}
+      {...props}
+    >
+      {children}
+    </a>
+  )
 }
 
 const components = {
   code: CodeBlock,
-  a: MarkdownLink,
+  a: StreamdownLink,
 } satisfies StreamdownProps['components']
 
 type Props = {
@@ -105,6 +164,7 @@ export function Markdown({ text, streaming }: Props): ReactElement {
       // leave a native button box.
       linkSafety={{ enabled: false }}
       remarkPlugins={[remarkGfm]}
+      rehypePlugins={rehypePlugins}
       components={components}
     >
       {pacedText}

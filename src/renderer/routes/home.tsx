@@ -478,6 +478,10 @@ import {
   FloatingModelPickerPreview,
   type FloatingModelPickerPreviewMode,
 } from '../components/FloatingModelPicker'
+import {
+  MarkdownFileReferencesPreview,
+  type MarkdownFileReferencesPreviewMode,
+} from '../components/MarkdownFileReferencesPreview'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
 import {
   ModelChipsInputPreview,
@@ -1037,6 +1041,16 @@ function HomePage() {
     if (value === 'noProviders') return 'noProviders'
     return 'default'
   }, [])
+
+  // Visual preview for Kun's StreamdownLink + InlineFileReferenceCode styling
+  // (?markdownFileReferencesPreview=1|inline).
+  const markdownFileReferencesPreviewMode =
+    useMemo((): MarkdownFileReferencesPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('markdownFileReferencesPreview')) return null
+      return params.get('markdownFileReferencesPreview') === 'inline' ? 'inline' : 'default'
+    }, [])
 
   // Visual preview for the ported AppShell orchestrator
   // (?appShellPreview=default|windows|linux|settings|windowsSettings|loading|initialSetup|windowsInitialSetup|runtimeStatus|windowsRuntimeStatus).
@@ -2576,6 +2590,10 @@ function HomePage() {
 
   if (floatingModelPickerPreviewMode) {
     return <FloatingModelPickerPreview mode={floatingModelPickerPreviewMode} />
+  }
+
+  if (markdownFileReferencesPreviewMode) {
+    return <MarkdownFileReferencesPreview mode={markdownFileReferencesPreviewMode} />
   }
 
   if (appShellPreviewMode) {

@@ -2,7 +2,7 @@
    Markdown + code block rendering for assistant messages.
    Ported from Kun (../kun/src/renderer/src/styles/markdown-code.css),
    scoped under .ds-markdown and trimmed to navi's feature set (no
-   workspace file references, code sidebar, or table-fullscreen).
+   code sidebar or table-fullscreen). File-reference link styling matches Kun.
    All colors come from navi's existing --ds-* tokens (see tokens.css).
    ===================================================== */
 
@@ -118,6 +118,22 @@
   text-decoration: underline;
 }
 
+.ds-markdown .ds-file-reference-link {
+  border-radius: 6px;
+  color: var(--ds-accent);
+  font-weight: 500;
+  text-decoration: none;
+  text-underline-offset: 3px;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ds-markdown .ds-file-reference-link:hover {
+  background: var(--ds-accent-soft);
+  text-decoration: underline;
+}
+
 /* ---- Blockquote ---- */
 .ds-markdown blockquote {
   border-left: 2px solid color-mix(in srgb, var(--ds-accent) 36%, transparent);
@@ -146,6 +162,21 @@
 .ds-markdown td code {
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.ds-file-reference-code {
+  appearance: none;
+  margin: 0;
+  cursor: pointer;
+  color: var(--ds-accent);
+  text-align: left;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ds-file-reference-code:hover {
+  background: var(--ds-inline-code-hover-bg);
 }
 
 /* Bare <pre> (e.g. a fenced block before highlighting resolves through the
