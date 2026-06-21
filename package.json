@@ -19,23 +19,23 @@
     "test": "node --test \"test/**/*.test.mjs\""
   },
   "devDependencies": {
-    "@flue/cli": "^1.0.0-beta.1",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "electron": "^39.8.10",
-    "esbuild": "^0.28.1",
-    "typescript": "^6.0.3"
+    "@flue/cli": "1.0.0-beta.1",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "electron": "42.4.1",
+    "esbuild": "0.28.1",
+    "typescript": "6.0.3"
   },
   "dependencies": {
-    "@flue/runtime": "^1.0.0-beta.2",
-    "@flue/sdk": "^1.0.0-beta.1",
-    "@tanstack/react-router": "^1.170.16",
-    "hono": "^4.12.26",
-    "lucide-react": "^1.21.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "remark-gfm": "^4.0.1",
-    "shiki": "^4.2.0",
-    "streamdown": "^2.5.0"
+    "@flue/runtime": "1.0.0-beta.2",
+    "@flue/sdk": "1.0.0-beta.1",
+    "@tanstack/react-router": "1.170.16",
+    "hono": "4.12.26",
+    "lucide-react": "1.21.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "remark-gfm": "4.0.1",
+    "shiki": "4.2.0",
+    "streamdown": "2.5.0"
   }
 }
