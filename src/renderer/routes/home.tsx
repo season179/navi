@@ -345,6 +345,9 @@ import {
   type FloatingComposerPreviewMode,
 } from '../components/FloatingComposer'
 import {
+  FloatingComposerModelPickerPreview,
+} from '../components/FloatingComposerModelPicker'
+import {
   WriteWorkspaceEmptyState,
   WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
   type WriteWorkspaceEmptyStatePreviewMode,
@@ -969,7 +972,7 @@ function HomePage() {
   }, [])
 
   // Visual preview for the ported FloatingComposer
-  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode).
+  // (?floatingComposerPreview=default|queued|plusMenu|slashCommands|fileMention|goalFloater|goalPanel|attachments|changeSummary|recording|busy|contextCapacity|planMode|modelPicker|modelPickerSubmenu|modelPickerNoProviders).
   const floatingComposerPreviewMode = useMemo((): FloatingComposerPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -987,6 +990,22 @@ function HomePage() {
     if (value === 'busy') return 'busy'
     if (value === 'contextCapacity') return 'contextCapacity'
     if (value === 'planMode') return 'planMode'
+    if (value === 'modelPicker') return 'modelPicker'
+    if (value === 'modelPickerSubmenu') return 'modelPickerSubmenu'
+    if (value === 'modelPickerNoProviders') return 'modelPickerNoProviders'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported FloatingComposerModelPicker
+  // (?floatingComposerModelPickerPreview=default|menu|submenu|noProviders).
+  const floatingComposerModelPickerPreviewMode = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('floatingComposerModelPickerPreview')) return null
+    const value = params.get('floatingComposerModelPickerPreview')
+    if (value === 'menu') return 'menu'
+    if (value === 'submenu') return 'submenu'
+    if (value === 'noProviders') return 'noProviders'
     return 'default'
   }, [])
 
@@ -2477,6 +2496,10 @@ function HomePage() {
 
   if (floatingComposerPreviewMode) {
     return <FloatingComposerPreview mode={floatingComposerPreviewMode} />
+  }
+
+  if (floatingComposerModelPickerPreviewMode) {
+    return <FloatingComposerModelPickerPreview mode={floatingComposerModelPickerPreviewMode} />
   }
 
   if (appShellPreviewMode) {

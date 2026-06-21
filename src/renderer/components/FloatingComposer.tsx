@@ -12,7 +12,6 @@ import {
 import {
   Archive,
   BarChart3,
-  ChevronDown,
   FileEdit,
   FileText,
   Folder,
@@ -49,6 +48,12 @@ import {
   FloatingComposerExecutionPicker,
   type ComposerExecutionSettings,
 } from './FloatingComposerExecutionPicker'
+import {
+  COMPOSER_MODEL_PICKER_GROUPS_PREVIEW,
+  COMPOSER_MODEL_PICKER_PREVIEW,
+  FloatingComposerModelPicker,
+  type ComposerModelPickerSettings,
+} from './FloatingComposerModelPicker'
 import { GitBranchPicker, GIT_BRANCH_PICKER_PREVIEW } from './GitBranchPicker'
 import { ImagePreviewLightbox } from './ImagePreviewLightbox'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
@@ -77,6 +82,9 @@ export type FloatingComposerPreviewMode =
   | 'busy'
   | 'contextCapacity'
   | 'planMode'
+  | 'modelPicker'
+  | 'modelPickerSubmenu'
+  | 'modelPickerNoProviders'
 
 type SlashCommandPreview = {
   id: string
@@ -141,6 +149,11 @@ export type FloatingComposerSnapshot = {
   changedFiles: ChangedFilePreview[]
   changedStats: { added: number; removed: number }
   execution: ComposerExecutionSettings
+  modelPicker: ComposerModelPickerSettings
+  modelPickerGroups: typeof COMPOSER_MODEL_PICKER_GROUPS_PREVIEW
+  showModelPickerMenu: boolean
+  modelPickerActiveProviderId: string | null
+  modelPickerNoProviders: boolean
   threadUsage: {
     tokens: string
     cost: string
@@ -260,18 +273,6 @@ function ComposerImageAttachmentPreview({
         onClose={() => setOpen(false)}
       />
     </span>
-  )
-}
-
-function ComposerModelChip(): ReactElement {
-  return (
-    <div className="ds-composer-model-picker">
-      <button type="button" className="model-chip" aria-label="Model">
-        Claude Sonnet 4
-        <span className="model-chip-reasoning">medium</span>
-        <ChevronDown aria-hidden="true" />
-      </button>
-    </div>
   )
 }
 
@@ -509,6 +510,11 @@ export function resolveFloatingComposerSnapshot(
     changedFiles: CHANGED_FILES_PREVIEW,
     changedStats: { added: 428, removed: 12 },
     execution: EXECUTION_PICKER_PREVIEW,
+    modelPicker: COMPOSER_MODEL_PICKER_PREVIEW,
+    modelPickerGroups: COMPOSER_MODEL_PICKER_GROUPS_PREVIEW,
+    showModelPickerMenu: false,
+    modelPickerActiveProviderId: null,
+    modelPickerNoProviders: false,
     threadUsage: {
       tokens: '145k',
       cost: '$0.42',
@@ -547,6 +553,21 @@ export function resolveFloatingComposerSnapshot(
       return { ...base, showContextCapacity: true, contextCapacityOpen: true }
     case 'planMode':
       return { ...base, mode: 'plan', planBadge: true, input: 'Draft a plan for the remaining composer overlays.' }
+    case 'modelPicker':
+      return { ...base, showModelPickerMenu: true }
+    case 'modelPickerSubmenu':
+      return {
+        ...base,
+        showModelPickerMenu: true,
+        modelPickerActiveProviderId: 'anthropic',
+      }
+    case 'modelPickerNoProviders':
+      return {
+        ...base,
+        modelPickerNoProviders: true,
+        showModelPickerMenu: true,
+        modelPickerGroups: [],
+      }
     default:
       return base
   }
@@ -558,6 +579,7 @@ export function FloatingComposer({
   snapshot: FloatingComposerSnapshot
 }): ReactElement {
   const [execution, setExecution] = useState(snapshot.execution)
+  const [modelPicker, setModelPicker] = useState(snapshot.modelPicker)
   const [menuOpen, setMenuOpen] = useState(snapshot.showPlusMenu)
 
   const shellClass = [
@@ -720,7 +742,15 @@ export function FloatingComposer({
                     </div>
                   ) : null}
 
-                  <ComposerModelChip />
+                  <FloatingComposerModelPicker
+                    value={modelPicker}
+                    groups={snapshot.modelPickerGroups}
+                    needsProviderSetup={snapshot.modelPickerNoProviders}
+                    menuOpen={snapshot.showModelPickerMenu || undefined}
+                    activeProviderId={snapshot.modelPickerActiveProviderId}
+                    onChange={(patch) => setModelPicker((current) => ({ ...current, ...patch }))}
+                    onConfigureProviders={() => undefined}
+                  />
 
                   <FloatingComposerExecutionPicker
                     value={execution}
