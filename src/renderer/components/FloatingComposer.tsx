@@ -75,6 +75,7 @@ import {
   COMPOSER_FILE_MENTION_LOADING,
   COMPOSER_FILE_MENTION_MENU_TITLE,
   COMPOSER_FILE_REFERENCES_PREVIEW,
+  COMPOSER_REMOVE_FILE_REFERENCE_LABEL,
   formatComposerFileMentionToken,
   type ComposerFileReferenceChip,
 } from '../lib/composerFileReferences'
@@ -95,6 +96,7 @@ import {
   COMPOSER_GOAL_PAUSED_PREVIEW,
   COMPOSER_GOAL_PREVIEW,
   COMPOSER_GOAL_SET_CURRENT_INPUT,
+  COMPOSER_GOAL_MODE_BADGE_LABEL,
   formatComposerGoalBannerLabel,
   formatComposerGoalStatusShort,
   type ComposerGoal,
@@ -362,7 +364,8 @@ export function ComposerImageAttachmentPreview({
           type="button"
           className="floating-composer-image-attachment-remove"
           onClick={() => onRemoveAttachment(attachment.id)}
-          aria-label="Remove attachment"
+          aria-label={COMPOSER_REMOVE_ATTACHMENT_LABEL}
+          title={COMPOSER_REMOVE_ATTACHMENT_LABEL}
         >
           <X strokeWidth={2.2} />
         </button>
@@ -692,13 +695,18 @@ export function ComposerFileReferenceChips({
             {onRemove ? (
               <button
                 type="button"
-                aria-label="Remove file reference"
+                aria-label={COMPOSER_REMOVE_FILE_REFERENCE_LABEL}
+                title={COMPOSER_REMOVE_FILE_REFERENCE_LABEL}
                 onClick={() => onRemove(reference.relativePath)}
               >
                 <X strokeWidth={2} />
               </button>
             ) : (
-              <button type="button" aria-label="Remove file reference">
+              <button
+                type="button"
+                aria-label={COMPOSER_REMOVE_FILE_REFERENCE_LABEL}
+                title={COMPOSER_REMOVE_FILE_REFERENCE_LABEL}
+              >
                 <X strokeWidth={2} />
               </button>
             )}
@@ -1142,7 +1150,7 @@ export function FloatingComposer({
                 {snapshot.goalBadge ? (
                   <span className="floating-composer-mode-badge">
                     <Target strokeWidth={1.9} />
-                    <span>Goal</span>
+                    <span>{COMPOSER_GOAL_MODE_BADGE_LABEL}</span>
                   </span>
                 ) : null}
               </div>

@@ -25,6 +25,7 @@ const {
   COMPOSER_FILE_MENTION_MENU_TITLE,
   COMPOSER_FILE_MENTION_LOADING,
   COMPOSER_FILE_MENTION_EMPTY,
+  COMPOSER_REMOVE_FILE_REFERENCE_LABEL,
   resolveComposerFileMentionPreview,
 } = await import(out)
 
@@ -32,6 +33,10 @@ test('file mention menu copy matches Kun composerFileMention locale strings', ()
   assert.equal(COMPOSER_FILE_MENTION_MENU_TITLE, 'Files & folders')
   assert.equal(COMPOSER_FILE_MENTION_LOADING, 'Loading files…')
   assert.equal(COMPOSER_FILE_MENTION_EMPTY, 'No files or folders found.')
+})
+
+test('COMPOSER_REMOVE_FILE_REFERENCE_LABEL matches Kun composerRemoveFileReference locale string', () => {
+  assert.equal(COMPOSER_REMOVE_FILE_REFERENCE_LABEL, 'Remove reference')
 })
 
 test('resolveComposerFileMentionPreview routes preview query values', () => {

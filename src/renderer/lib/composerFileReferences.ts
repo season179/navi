@@ -164,6 +164,9 @@ export const COMPOSER_FILE_REFERENCES_PREVIEW: ComposerFileReferenceChip[] = [
   { relativePath: 'src/renderer/components', isDirectory: true },
 ]
 
+/** English copy matching Kun's composerRemoveFileReference locale string. */
+export const COMPOSER_REMOVE_FILE_REFERENCE_LABEL = 'Remove reference'
+
 /** English copy matching Kun's composerFileMentionMenuTitle locale string. */
 export const COMPOSER_FILE_MENTION_MENU_TITLE = 'Files & folders'
 
