@@ -10747,6 +10747,11 @@ button.usage-heatmap-cell:focus {
   text-align: center;
 }
 
+.message-timeline-empty-hero-preview-wrap {
+  min-height: 100vh;
+  overflow: auto;
+}
+
 
 .generated-files-panel {
   display: flex;

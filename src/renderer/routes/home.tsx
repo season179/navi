@@ -301,6 +301,10 @@ import {
 } from '../components/ClawEmptyHero'
 import { WorkspaceSelectEmptyHero } from '../components/WorkspaceSelectEmptyHero'
 import {
+  MessageTimelineEmptyHeroPreview,
+  type MessageTimelineEmptyHeroPreviewMode,
+} from '../components/MessageTimelineEmptyHero'
+import {
   WriteWorkspaceEmptyState,
   WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
   type WriteWorkspaceEmptyStatePreviewMode,
@@ -801,6 +805,28 @@ function HomePage() {
     const params = new URLSearchParams(window.location.search)
     return params.has('workspaceSelectEmptyHero')
   }, [])
+
+  // Visual preview for the ported MessageTimelineEmptyHero orchestrator
+  // (?messageTimelineEmptyHeroPreview=waking|error|noWorkspace|claw|clawNeedsInbound|chat|chatFocus|chatLoading|chatEmpty|chatError|chatCollapsed|chatModels).
+  const messageTimelineEmptyHeroPreviewMode =
+    useMemo((): MessageTimelineEmptyHeroPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('messageTimelineEmptyHeroPreview')) return null
+      const value = params.get('messageTimelineEmptyHeroPreview')
+      if (value === 'waking') return 'waking'
+      if (value === 'error') return 'error'
+      if (value === 'noWorkspace') return 'noWorkspace'
+      if (value === 'claw') return 'claw'
+      if (value === 'clawNeedsInbound') return 'clawNeedsInbound'
+      if (value === 'chatFocus') return 'chatFocus'
+      if (value === 'chatLoading') return 'chatLoading'
+      if (value === 'chatEmpty') return 'chatEmpty'
+      if (value === 'chatError') return 'chatError'
+      if (value === 'chatCollapsed') return 'chatCollapsed'
+      if (value === 'chatModels') return 'chatModels'
+      return 'chat'
+    }, [])
 
   // Visual preview for the ported WriteWorkspaceEmptyState
   // (?writeWorkspaceEmptyState=1|error).
@@ -2220,6 +2246,10 @@ function HomePage() {
 
   if (sddDraftEditorViewPreviewMode) {
     return <SddDraftEditorViewPreview mode={sddDraftEditorViewPreviewMode} />
+  }
+
+  if (messageTimelineEmptyHeroPreviewMode) {
+    return <MessageTimelineEmptyHeroPreview mode={messageTimelineEmptyHeroPreviewMode} />
   }
 
   if (writeMarkdownPreviewPreviewMode) {
