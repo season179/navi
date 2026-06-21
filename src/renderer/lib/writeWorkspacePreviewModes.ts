@@ -26,6 +26,7 @@ export type WriteWorkspaceViewPreviewMode =
   | 'error'
   | 'exportSuccess'
   | 'exportError'
+  | 'exporting'
   | 'dirty'
   | 'saving'
   | 'readonly'
@@ -62,6 +63,7 @@ export function resolveWriteWorkspaceViewPreviewMode(
   if (value === 'error') return 'error'
   if (value === 'exportSuccess') return 'exportSuccess'
   if (value === 'exportError') return 'exportError'
+  if (value === 'exporting') return 'exporting'
   if (value === 'dirty') return 'dirty'
   if (value === 'saving') return 'saving'
   if (value === 'readonly') return 'readonly'
@@ -91,6 +93,7 @@ export const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceV
   'error',
   'exportSuccess',
   'exportError',
+  'exporting',
   'dirty',
   'saving',
   'readonly',

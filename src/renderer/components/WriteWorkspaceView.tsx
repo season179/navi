@@ -543,6 +543,7 @@ type ViewProps = {
   showInlineAgent?: boolean
   fileError?: string | null
   exportNotice?: WriteNotice | null
+  exportInFlight?: boolean
   runtimeBanner?: RuntimeBannerSnapshot | null
   leftSidebarCollapsed?: boolean
   onToggleLeftSidebar?: () => void
@@ -589,6 +590,7 @@ export function WriteWorkspaceView({
   showInlineAgent = false,
   fileError = null,
   exportNotice = null,
+  exportInFlight = false,
   runtimeBanner = null,
   leftSidebarCollapsed = false,
   onToggleLeftSidebar,
@@ -684,7 +686,7 @@ export function WriteWorkspaceView({
         activeFilePath={activeFilePath ?? ''}
         documentStatsLabel={documentStatsLabel}
         assistantOpen={assistantOpen}
-        exportInFlight={false}
+        exportInFlight={exportInFlight}
         exportMenuOpen={exportMenuOpen}
         leftSidebarCollapsed={leftSidebarCollapsed}
         liveModeActive={liveModeActive}
@@ -860,6 +862,7 @@ export function WriteWorkspaceProductionView({
         showInlineAgent={snapshot.showInlineAgent}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}
+        exportInFlight={snapshotMode === 'exporting'}
         runtimeBanner={snapshot.runtimeBanner}
         leftSidebarCollapsed={leftSidebarCollapsed}
         onToggleLeftSidebar={onToggleLeftSidebar}
@@ -941,6 +944,7 @@ export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement 
         showInlineAgent={snapshot.showInlineAgent}
         fileError={snapshot.fileError}
         exportNotice={snapshot.exportNotice}
+        exportInFlight={mode === 'exporting'}
         runtimeBanner={snapshot.runtimeBanner}
         leftSidebarCollapsed={leftSidebarCollapsed}
         onToggleLeftSidebar={() => setLeftSidebarCollapsed((open) => !open)}

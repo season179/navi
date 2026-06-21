@@ -43,6 +43,7 @@ test('maps document-pane and toolbar snapshot modes', () => {
     'error',
     'exportSuccess',
     'exportError',
+    'exporting',
     'dirty',
     'saving',
     'review',
