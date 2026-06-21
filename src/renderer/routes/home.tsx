@@ -54,6 +54,12 @@ import {
   WORK_META_ROW_PREVIEW,
   type WorkMetaRowPreviewMode,
 } from '../components/WorkMetaRow'
+import {
+  TurnChangeSummary,
+  TURN_CHANGE_SUMMARY_PREVIEW,
+  TURN_CHANGE_SUMMARY_PREVIEW_SINGLE,
+  type TurnChangeSummaryPreviewMode,
+} from '../components/TurnChangeSummary'
 import { ChatThread } from '../components/ChatThread'
 import { FloatingModelPicker } from '../components/FloatingModelPicker'
 import { ProvidersSettings } from '../components/providers/ProvidersSettings'
@@ -226,6 +232,22 @@ function HomePage() {
     return 'processing'
   }, [])
   const [workMetaRowExpanded, setWorkMetaRowExpanded] = useState(false)
+
+  // Visual preview for the ported TurnChangeSummary (?turnChangeSummary=1).
+  const turnChangeSummaryPreviewMode = useMemo((): TurnChangeSummaryPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('turnChangeSummary')) return null
+    const mode = params.get('turnChangeSummary')
+    if (mode === 'compact') return 'compact'
+    if (mode === 'single') return 'single'
+    return 'default'
+  }, [])
+  const turnChangeSummaryDefaultExpanded = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    const params = new URLSearchParams(window.location.search)
+    return params.get('turnChangeSummary') === 'expanded'
+  }, [])
 
   const composerFooterPreview =
     gitBranchPickerPreviewMode != null || workspaceProjectPickerPreviewMode != null
@@ -462,6 +484,20 @@ function HomePage() {
                 : workMetaRowExpanded
             }
             onToggle={() => setWorkMetaRowExpanded((value) => !value)}
+          />
+        </div>
+      ) : null}
+
+      {turnChangeSummaryPreviewMode ? (
+        <div className="turn-change-summary-preview">
+          <TurnChangeSummary
+            changes={
+              turnChangeSummaryPreviewMode === 'single'
+                ? TURN_CHANGE_SUMMARY_PREVIEW_SINGLE
+                : TURN_CHANGE_SUMMARY_PREVIEW
+            }
+            compact={turnChangeSummaryPreviewMode === 'compact'}
+            defaultExpanded={turnChangeSummaryDefaultExpanded}
           />
         </div>
       ) : null}
