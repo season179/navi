@@ -305,6 +305,10 @@ import {
   WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
   type WriteWorkspaceEmptyStatePreviewMode,
 } from '../components/WriteWorkspaceEmptyState'
+import {
+  WriteWorkspaceStart,
+  WRITE_WORKSPACE_START_PREVIEW,
+} from '../components/WriteWorkspaceStart'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -693,6 +697,13 @@ function HomePage() {
       if (!params.has('writeWorkspaceEmptyState')) return null
       return params.get('writeWorkspaceEmptyState') === 'error' ? 'error' : 'default'
     }, [])
+
+  // Visual preview for the ported WriteWorkspaceStart (?writeWorkspaceStart=1).
+  const writeWorkspaceStartPreview = useMemo(() => {
+    if (typeof window === 'undefined') return false
+    const params = new URLSearchParams(window.location.search)
+    return params.has('writeWorkspaceStart')
+  }, [])
 
   // Visual preview for the ported InitialSessionUsageHeatmap
   // (?initialSessionUsageHeatmap=populated|loading|empty|error|collapsed|models).
@@ -1553,6 +1564,17 @@ function HomePage() {
               ? WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR
               : null
           }
+        />
+      </div>
+    )
+  }
+
+  if (writeWorkspaceStartPreview) {
+    return (
+      <div className="write-workspace-start-preview">
+        <WriteWorkspaceStart
+          workspaceName={WRITE_WORKSPACE_START_PREVIEW.workspaceName}
+          workspacePathLabel={WRITE_WORKSPACE_START_PREVIEW.workspacePathLabel}
         />
       </div>
     )
