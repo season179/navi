@@ -240,6 +240,10 @@ import {
   type GeneralSettingsPreviewMode,
 } from '../components/GeneralSettingsSection'
 import {
+  KeyboardShortcutsSettingsSectionPreview,
+  type KeyboardShortcutsPreviewMode,
+} from '../components/KeyboardShortcutsSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1221,6 +1225,16 @@ function HomePage() {
     return mode as GeneralSettingsPreviewMode
   }, [])
 
+  // Visual preview for the ported KeyboardShortcutsSettingsSection (?keyboardShortcutsPreview=1|capturing|conflict|…).
+  const keyboardShortcutsPreviewMode = useMemo((): KeyboardShortcutsPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('keyboardShortcutsPreview')) return null
+    const mode = params.get('keyboardShortcutsPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as KeyboardShortcutsPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1343,6 +1357,22 @@ function HomePage() {
           </p>
           <div className="general-settings-preview-stack">
             <GeneralSettingsSectionPreview mode={generalSettingsPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (keyboardShortcutsPreviewMode) {
+    return (
+      <div className="keyboard-shortcuts-preview">
+        <div className="keyboard-shortcuts-preview-inner">
+          <h1 className="keyboard-shortcuts-preview-title">Keyboard shortcuts</h1>
+          <p className="keyboard-shortcuts-preview-subtitle">
+            Shortcuts category from Kun settings-section-shortcuts.tsx.
+          </p>
+          <div className="keyboard-shortcuts-preview-stack">
+            <KeyboardShortcutsSettingsSectionPreview mode={keyboardShortcutsPreviewMode} />
           </div>
         </div>
       </div>

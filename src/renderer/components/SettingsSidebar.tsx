@@ -5,6 +5,7 @@
 import type { Dispatch, ReactElement, SetStateAction } from 'react'
 import { SettingsControlsPreview } from './SettingsControls'
 import { GeneralSettingsSectionPreview } from './GeneralSettingsSection'
+import { KeyboardShortcutsSettingsSectionPreview } from './KeyboardShortcutsSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -177,6 +178,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'updates' ? (
         <div className="settings-controls-preview-stack">
           <SettingsControlsPreview mode="disclosure" />
+        </div>
+      ) : category === 'shortcuts' ? (
+        <div className="keyboard-shortcuts-preview-stack">
+          <KeyboardShortcutsSettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">
