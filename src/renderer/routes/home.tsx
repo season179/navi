@@ -402,6 +402,10 @@ import {
   type WriteMarkdownPreviewPreviewMode,
 } from '../components/WriteMarkdownPreview'
 import {
+  WriteInfographicPendingPreview,
+  type WriteInfographicPendingPreviewMode,
+} from '../components/WriteInfographicPending'
+import {
   WritePdfViewerPreview,
   type WritePdfViewerPreviewMode,
 } from '../components/WritePdfViewer'
@@ -1427,6 +1431,20 @@ function HomePage() {
     if (value === 'error') return 'error'
     return 'default'
   }, [])
+
+  // Visual preview for the ported WriteInfographicPending
+  // (?writeInfographicPending=1|stale|design|prototype).
+  const writeInfographicPendingPreviewMode =
+    useMemo((): WriteInfographicPendingPreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('writeInfographicPending')) return null
+      const value = params.get('writeInfographicPending')
+      if (value === 'stale') return 'stale'
+      if (value === 'design') return 'design'
+      if (value === 'prototype') return 'prototype'
+      return 'default'
+    }, [])
 
   // Visual preview for the ported WriteMarkdownEditor
   // (?writeMarkdownEditor=1|source|readonly|diffReview).
@@ -3192,6 +3210,10 @@ function HomePage() {
 
   if (writeMarkdownPreviewPreviewMode) {
     return <WriteMarkdownPreviewPreview mode={writeMarkdownPreviewPreviewMode} />
+  }
+
+  if (writeInfographicPendingPreviewMode) {
+    return <WriteInfographicPendingPreview mode={writeInfographicPendingPreviewMode} />
   }
 
   if (writeMarkdownEditorPreviewMode) {
