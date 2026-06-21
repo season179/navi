@@ -337,6 +337,10 @@ import {
   WriteAssistantPanelPreview,
   type WriteAssistantPanelPreviewMode,
 } from '../components/WriteAssistantPanel'
+import {
+  WriteMarkdownPreviewPreview,
+  type WriteMarkdownPreviewPreviewMode,
+} from '../components/WriteMarkdownPreview'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -836,6 +840,18 @@ function HomePage() {
     if (value === 'pdf') return 'pdf'
     if (value === 'noFile') return 'noFile'
     if (value === 'streaming') return 'streaming'
+    return 'default'
+  }, [])
+
+  // Visual preview for the ported WriteMarkdownPreview
+  // (?writeMarkdownPreview=1|plain|error).
+  const writeMarkdownPreviewPreviewMode = useMemo((): WriteMarkdownPreviewPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writeMarkdownPreview')) return null
+    const value = params.get('writeMarkdownPreview')
+    if (value === 'plain') return 'plain'
+    if (value === 'error') return 'error'
     return 'default'
   }, [])
 
@@ -1732,6 +1748,10 @@ function HomePage() {
 
   if (writeAssistantPanelPreviewMode) {
     return <WriteAssistantPanelPreview mode={writeAssistantPanelPreviewMode} />
+  }
+
+  if (writeMarkdownPreviewPreviewMode) {
+    return <WriteMarkdownPreviewPreview mode={writeMarkdownPreviewPreviewMode} />
   }
 
   if (writeInlineAgentPreviewMode) {
