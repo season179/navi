@@ -321,6 +321,10 @@ import {
   WriteImagePreviewPreview,
   type WriteImagePreviewPreviewMode,
 } from '../components/WriteImagePreview'
+import {
+  WriteFileTreePreview,
+  type WriteFileTreePreviewMode,
+} from '../components/WriteFileTree'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -763,6 +767,19 @@ function HomePage() {
       if (value === 'zoomed') return 'zoomed'
       return 'default'
     }, [])
+
+  // Visual preview for the ported WriteFileTree
+  // (?writeFileTreePreview=1|empty|loading|error).
+  const writeFileTreePreviewMode = useMemo((): WriteFileTreePreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writeFileTreePreview')) return null
+    const value = params.get('writeFileTreePreview')
+    if (value === 'empty') return 'empty'
+    if (value === 'loading') return 'loading'
+    if (value === 'error') return 'error'
+    return 'default'
+  }, [])
 
   // Visual preview for the ported InitialSessionUsageHeatmap
   // (?initialSessionUsageHeatmap=populated|loading|empty|error|collapsed|models).
@@ -1649,6 +1666,10 @@ function HomePage() {
 
   if (writeImagePreviewPreviewMode) {
     return <WriteImagePreviewPreview mode={writeImagePreviewPreviewMode} />
+  }
+
+  if (writeFileTreePreviewMode) {
+    return <WriteFileTreePreview mode={writeFileTreePreviewMode} />
   }
 
   if (generalSettingsPreviewMode) {
