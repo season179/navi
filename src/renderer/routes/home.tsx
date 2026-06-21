@@ -460,7 +460,9 @@ import {
 } from '../components/Sidebar'
 import {
   AnimatedWorkLogoPreview,
+  IkunCameoLayer,
   IkunCameoPreview,
+  KunCelebrationLayer,
   KunCelebrationPreview,
   type AnimatedWorkLogoPreviewMode,
   type IkunCameoPreviewMode,
@@ -3449,7 +3451,18 @@ function HomePage() {
                   </div>
                 </header>
 
-                <div className="workbench-timeline-wrap">{chatStageInner}</div>
+                <div className="workbench-timeline-wrap">
+                  {chatStageInner}
+                  {!settingsOpen ? (
+                    <>
+                      <IkunCameoLayer />
+                      <KunCelebrationLayer
+                        active={busy}
+                        suppressed={Boolean(status.error)}
+                      />
+                    </>
+                  ) : null}
+                </div>
 
                 {!settingsOpen ? (
                   <div className="workbench-composer-wrap">{composerElement}</div>
