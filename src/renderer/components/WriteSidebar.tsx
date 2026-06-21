@@ -376,6 +376,11 @@ type WriteSidebarProps = {
   onSelectFile?: (path: string) => void
   onToggleDir?: (path: string) => void
   onEntryDialogChange?: (dialog: EntryDialog | null) => void
+  onCodeOpen?: () => void
+  onWriteOpen?: () => void
+  onToggleConnectPhone?: () => void
+  onOpenSettings?: () => void
+  connectPhonePanel?: ReactNode
 }
 
 export function WriteSidebar({
@@ -384,6 +389,11 @@ export function WriteSidebar({
   onSelectFile,
   onToggleDir,
   onEntryDialogChange,
+  onCodeOpen,
+  onWriteOpen,
+  onToggleConnectPhone,
+  onOpenSettings,
+  connectPhonePanel,
 }: WriteSidebarProps): ReactElement {
   const {
     activeView,
@@ -423,8 +433,8 @@ export function WriteSidebar({
         <div className="write-sidebar-top">
           <WorkspaceModeTabs
             activeView={activeView}
-            onCodeOpen={() => undefined}
-            onWriteOpen={() => undefined}
+            onCodeOpen={onCodeOpen ?? (() => undefined)}
+            onWriteOpen={onWriteOpen ?? (() => undefined)}
           />
           <SidebarCommandRow
             icon={<FilePlus2 className="write-sidebar-action-icon" strokeWidth={1.9} />}
@@ -442,6 +452,9 @@ export function WriteSidebar({
 
         <div className="write-sidebar-divider" />
 
+        {connectPhoneSidebarOpen && connectPhonePanel ? (
+          <div className="write-sidebar-body write-sidebar-body--connect-phone">{connectPhonePanel}</div>
+        ) : (
         <div className="write-sidebar-body">
           <div className="write-sidebar-section-header">
             <span className="write-sidebar-section-label">{COPY.writeSpaces}</span>
@@ -584,6 +597,7 @@ export function WriteSidebar({
             })}
           </div>
         </div>
+        )}
 
         <div className="write-sidebar-footer">
           <SidebarCommandRow
@@ -591,11 +605,13 @@ export function WriteSidebar({
             label={COPY.claw}
             variant="footer"
             active={connectPhoneSidebarOpen}
+            onClick={onToggleConnectPhone}
           />
           <SidebarCommandRow
             icon={<Settings className="write-sidebar-action-icon" strokeWidth={1.75} />}
             label={COPY.settings}
             variant="footer"
+            onClick={onOpenSettings}
           />
         </div>
       </aside>
@@ -612,6 +628,91 @@ export function WriteSidebar({
         />
       ) : null}
     </>
+  )
+}
+
+type WriteSidebarProductionPanelProps = {
+  connectPhoneSidebarOpen: boolean
+  connectPhonePanel?: ReactNode
+  onCodeOpen: () => void
+  onWriteOpen: () => void
+  onToggleConnectPhone: () => void
+  onOpenSettings: () => void
+}
+
+/** Production write-mode sidebar with mock workspace snapshots for visual parity. */
+export function WriteSidebarProductionPanel({
+  connectPhoneSidebarOpen,
+  connectPhonePanel,
+  onCodeOpen,
+  onWriteOpen,
+  onToggleConnectPhone,
+  onOpenSettings,
+}: WriteSidebarProductionPanelProps): ReactElement {
+  const initialSnapshot = useMemo(() => previewSnapshot('default'), [])
+  const [workspaceRoot, setWorkspaceRoot] = useState(initialSnapshot.workspaceRoot)
+  const [collapsedWorkspaces, setCollapsedWorkspaces] = useState(initialSnapshot.collapsedWorkspaces)
+  const [selectedFilePath, setSelectedFilePath] = useState(initialSnapshot.activeFilePath)
+  const [expandedDirs, setExpandedDirs] = useState(initialSnapshot.expandedDirs)
+  const [entryDialog, setEntryDialog] = useState(initialSnapshot.entryDialog)
+
+  const snapshot = useMemo(
+    (): WriteSidebarSnapshot => ({
+      ...initialSnapshot,
+      activeView: 'write',
+      connectPhoneSidebarOpen,
+      workspaceRoot,
+      collapsedWorkspaces,
+      activeFilePath: selectedFilePath,
+      expandedDirs,
+      entryDialog,
+    }),
+    [
+      initialSnapshot,
+      connectPhoneSidebarOpen,
+      workspaceRoot,
+      collapsedWorkspaces,
+      selectedFilePath,
+      expandedDirs,
+      entryDialog,
+    ],
+  )
+
+  const handleToggleWorkspace = useCallback(
+    (workspacePath: string) => {
+      if (workspacePath !== workspaceRoot) {
+        setWorkspaceRoot(workspacePath)
+        setCollapsedWorkspaces((current) => ({ ...current, [workspacePath]: false }))
+        return
+      }
+      setCollapsedWorkspaces((current) => ({
+        ...current,
+        [workspacePath]: current[workspacePath] !== true,
+      }))
+    },
+    [workspaceRoot],
+  )
+
+  return (
+    <WriteSidebar
+      snapshot={snapshot}
+      connectPhonePanel={connectPhonePanel}
+      onToggleWorkspace={handleToggleWorkspace}
+      onSelectFile={setSelectedFilePath}
+      onToggleDir={(path) => {
+        setExpandedDirs((current) => {
+          const next = new Set(current)
+          if (next.has(path)) next.delete(path)
+          else next.add(path)
+          return next
+        })
+      }}
+      onEntryDialogChange={setEntryDialog}
+      onCodeOpen={onCodeOpen}
+      onWriteOpen={onWriteOpen}
+      onToggleConnectPhone={onToggleConnectPhone}
+      onOpenSettings={onOpenSettings}
+    />
   )
 }
 

@@ -38,6 +38,7 @@ import {
   CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS,
   type ConnectPhoneQrStatus,
 } from '../components/ConnectPhoneView'
+import { WriteSidebarProductionPanel } from '../components/WriteSidebar'
 import { type ClawInstallTarget } from '../components/ClawAddImDialog'
 
 function resolveProductionPlatform(): string {
@@ -99,6 +100,8 @@ function RootLayoutContent() {
     workspaceModeTabsPreviewActive,
     setWorkspaceModeTabsPreviewView,
   } = useWorkspaceMode()
+  const showWriteSidebar =
+    sidebarRoute === 'chat' && workspaceModeActiveView === 'write'
   const connectPhoneSidebarPreviewOpen = useMemo(() => {
     if (typeof window === 'undefined') return false
     const params = new URLSearchParams(window.location.search)
@@ -179,6 +182,50 @@ function RootLayoutContent() {
             >
           {!collapsed ? (
             <div className="production-sidebar-host">
+              {showWriteSidebar ? (
+                <WriteSidebarProductionPanel
+                  connectPhoneSidebarOpen={
+                    connectPhoneSidebarOpen || connectPhoneSidebarPreviewOpen
+                  }
+                  connectPhonePanel={
+                    connectPhoneSidebarOpen || connectPhoneSidebarPreviewOpen ? (
+                      <ConnectPhoneSidebarPanel
+                        channels={CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS}
+                        target={connectPhoneTarget}
+                        qrStatus={connectPhoneQrStatus}
+                        qrTimeLeft={0}
+                        userCode=""
+                        qrError=""
+                        saving={false}
+                        disconnecting={false}
+                        disconnectError=""
+                        onTargetChange={(target) => {
+                          setConnectPhoneTarget(target)
+                          setConnectPhoneQrStatus('idle')
+                        }}
+                      />
+                    ) : undefined
+                  }
+                  onCodeOpen={() => {
+                    if (workspaceModeTabsPreviewActive) {
+                      setWorkspaceModeTabsPreviewView('chat')
+                      return
+                    }
+                    openChatRoute()
+                    setProductionWorkspaceMode('chat')
+                  }}
+                  onWriteOpen={() => {
+                    if (workspaceModeTabsPreviewActive) {
+                      setWorkspaceModeTabsPreviewView('write')
+                      return
+                    }
+                    openChatRoute()
+                    setProductionWorkspaceMode('write')
+                  }}
+                  onToggleConnectPhone={toggleConnectPhoneSidebar}
+                  onOpenSettings={toggleSettings}
+                />
+              ) : (
               <SidebarFrame
                 title="Collapse sidebar"
                 onCollapse={() => setCollapsed(true)}
@@ -300,6 +347,7 @@ function RootLayoutContent() {
                   <SidebarProjects />
                 )}
               </SidebarFrame>
+              )}
             </div>
           ) : null}
 

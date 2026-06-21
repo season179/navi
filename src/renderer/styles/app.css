@@ -7245,6 +7245,11 @@ a.runtime-meta-chip:hover {
   flex-direction: column;
 }
 
+.write-sidebar-body--connect-phone {
+  min-height: 0;
+  overflow: hidden;
+}
+
 .write-sidebar-section-header {
   display: flex;
   align-items: center;
