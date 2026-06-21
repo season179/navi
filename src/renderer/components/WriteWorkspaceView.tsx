@@ -37,28 +37,13 @@ import {
 import { WRITE_SETTINGS_PREVIEW_DEFAULT } from './WriteSettingsSection'
 import { RuntimeBanner, RUNTIME_BANNER_PREVIEW, type RuntimeBannerSnapshot } from './RuntimeBanner'
 import { useWriteSplitScrollSync } from './useWriteSplitScrollSync'
+import {
+  resolveProductionWriteWorkspaceParam,
+  resolveProductionWriteWorkspaceSnapshotMode,
+  type WriteWorkspaceViewPreviewMode,
+} from '../lib/writeWorkspacePreviewModes'
 
-export type WriteWorkspaceViewPreviewMode =
-  | 'empty'
-  | 'emptyError'
-  | 'start'
-  | 'split'
-  | 'live'
-  | 'source'
-  | 'rich'
-  | 'preview'
-  | 'pdf'
-  | 'image'
-  | 'inlineAgent'
-  | 'assistant'
-  | 'assistantTimeline'
-  | 'assistantQuoted'
-  | 'runtimeBanner'
-  | 'error'
-  | 'exportSuccess'
-  | 'exportError'
-  | 'dirty'
-  | 'saving'
+export type { WriteWorkspaceViewPreviewMode } from '../lib/writeWorkspacePreviewModes'
 
 type WriteNotice = {
   tone: 'success' | 'error'
@@ -630,26 +615,6 @@ type PreviewProps = {
   mode: WriteWorkspaceViewPreviewMode
 }
 
-const PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES = new Set<WriteWorkspaceViewPreviewMode>([
-  'empty',
-  'emptyError',
-  'start',
-  'runtimeBanner',
-])
-
-function resolveProductionWriteWorkspaceParam(): string | null {
-  if (typeof window === 'undefined') return null
-  return new URLSearchParams(window.location.search).get('productionWriteWorkspace')
-}
-
-function resolveProductionWriteWorkspaceSnapshotMode(): WriteWorkspaceViewPreviewMode {
-  const value = resolveProductionWriteWorkspaceParam()
-  if (value && PRODUCTION_WRITE_WORKSPACE_SNAPSHOT_MODES.has(value as WriteWorkspaceViewPreviewMode)) {
-    return value as WriteWorkspaceViewPreviewMode
-  }
-  return 'split'
-}
-
 function resolveProductionWriteAssistantPreviewOpen(): boolean {
   const value = resolveProductionWriteWorkspaceParam()
   return value === 'assistant' || value === 'assistantTimeline' || value === 'assistantQuoted'
@@ -678,10 +643,8 @@ export function WriteWorkspaceProductionView({
   leftSidebarCollapsed: boolean
   onToggleLeftSidebar: () => void
 }): ReactElement {
-  const snapshot = useMemo(
-    () => previewSnapshot(resolveProductionWriteWorkspaceSnapshotMode()),
-    [],
-  )
+  const snapshotMode = useMemo(() => resolveProductionWriteWorkspaceSnapshotMode(), [])
+  const snapshot = useMemo(() => previewSnapshot(snapshotMode), [snapshotMode])
   const [assistantOpen, setAssistantOpen] = useState(() => resolveProductionWriteAssistantPreviewOpen())
   const assistantPanelSnapshot = useMemo(() => resolveProductionWriteAssistantSnapshot(), [])
 
@@ -698,6 +661,7 @@ export function WriteWorkspaceProductionView({
         fileContent={snapshot.fileContent}
         fileSize={snapshot.fileSize}
         previewMode={snapshot.previewMode}
+        richModeActive={snapshotMode === 'rich'}
         renderSafety={snapshot.renderSafety}
         fileGuardMessage={snapshot.fileGuardMessage}
         fileGuardDetail={snapshot.fileGuardDetail}
