@@ -64,6 +64,13 @@ test('routes exporting toolbar in-flight preview mode', () => {
   )
 })
 
+test('routes liveDisabled toolbar mode strip preview mode', () => {
+  assert.equal(
+    resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=liveDisabled')),
+    'liveDisabled',
+  )
+})
+
 test('routes assistant panel preview modes', () => {
   assert.equal(
     resolveWriteWorkspaceViewPreviewMode(new URLSearchParams('writeWorkspaceView=assistantPdf')),

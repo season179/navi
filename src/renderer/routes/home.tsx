@@ -1510,7 +1510,7 @@ function HomePage() {
     }, [])
 
   // Visual preview for the ported WriteWorkspaceView
-  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|rich|preview|pdf|image|loading|unsupported|largeFile|truncated|inlineAgent|assistant|assistantTimeline|assistantQuoted|assistantPdf|assistantNoFile|assistantStreaming|runtimeBanner|error|exportSuccess|exportError|exporting|dirty|saving|readonly|review|exportMenu|modeMenu).
+  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|rich|preview|pdf|image|loading|unsupported|largeFile|truncated|liveDisabled|inlineAgent|assistant|assistantTimeline|assistantQuoted|assistantPdf|assistantNoFile|assistantStreaming|runtimeBanner|error|exportSuccess|exportError|exporting|dirty|saving|readonly|review|exportMenu|modeMenu).
   const writeWorkspaceViewPreviewMode = useMemo((): WriteWorkspaceViewPreviewMode | null => {
     if (typeof window === 'undefined') return null
     return resolveWriteWorkspaceViewPreviewMode(new URLSearchParams(window.location.search))

@@ -33,6 +33,7 @@ export type WriteWorkspaceViewPreviewMode =
   | 'review'
   | 'exportMenu'
   | 'modeMenu'
+  | 'liveDisabled'
 
 export function resolveWriteWorkspaceViewPreviewMode(
   params: URLSearchParams,
@@ -70,6 +71,7 @@ export function resolveWriteWorkspaceViewPreviewMode(
   if (value === 'review') return 'review'
   if (value === 'exportMenu') return 'exportMenu'
   if (value === 'modeMenu') return 'modeMenu'
+  if (value === 'liveDisabled') return 'liveDisabled'
   return 'split'
 }
 

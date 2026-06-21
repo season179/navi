@@ -392,6 +392,42 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     }
   }
 
+  if (mode === 'liveDisabled') {
+    return {
+      workspaceReady: true,
+      workspaceError: null,
+      activeFilePath: SAMPLE_PATH,
+      activeFileIsImage: false,
+      activeFileIsPdf: false,
+      activeFileIsText: true,
+      fileLoading: false,
+      previewMode: 'live',
+      renderSafety: {
+        livePreviewEnabled: false,
+        markdownPreviewEnabled: true,
+        readOnly: false,
+        notice: 'none',
+      },
+      fileGuardMessage: '',
+      fileGuardDetail: '',
+      imageSrc: WRITE_IMAGE_PREVIEW_SAMPLE.src,
+      imageMimeType: WRITE_IMAGE_PREVIEW_SAMPLE.mimeType,
+      activeFileName: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileName,
+      activeFileLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.activeFileLabel,
+      activeFilePathLabel: SAMPLE_PATH,
+      documentStatsLabel: WRITE_WORKSPACE_TOOLBAR_PREVIEW.documentStatsLabel,
+      saveStatus: 'saved',
+      readOnly: false,
+      reviewActive: false,
+      showInlineAgent: false,
+      fileError: null,
+      exportNotice: null,
+      runtimeBanner: null,
+      fileContent: WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE,
+      fileSize: 12_480,
+    }
+  }
+
   if (mode === 'truncated') {
     return {
       workspaceReady: true,
