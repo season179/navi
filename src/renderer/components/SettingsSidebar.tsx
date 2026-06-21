@@ -7,6 +7,7 @@ import { SettingsControlsPreview } from './SettingsControls'
 import { GeneralSettingsSectionPreview } from './GeneralSettingsSection'
 import { KeyboardShortcutsSettingsSectionPreview } from './KeyboardShortcutsSettingsSection'
 import { EasterEggSettingsSectionPreview } from './EasterEggSettingsSection'
+import { ArchivedThreadsSettingsSectionPreview } from './ArchivedThreadsSettingsSection'
 import {
   Archive,
   AudioLines,
@@ -187,6 +188,10 @@ export function SettingsSidebarPreviewContent({
       ) : category === 'easterEgg' ? (
         <div className="easter-egg-preview-stack">
           <EasterEggSettingsSectionPreview />
+        </div>
+      ) : category === 'archives' ? (
+        <div className="archived-threads-preview-stack">
+          <ArchivedThreadsSettingsSectionPreview />
         </div>
       ) : (
         <div className="settings-sidebar-preview-panel">

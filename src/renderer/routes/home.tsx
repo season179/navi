@@ -248,6 +248,10 @@ import {
   type EasterEggPreviewMode,
 } from '../components/EasterEggSettingsSection'
 import {
+  ArchivedThreadsSettingsSectionPreview,
+  type ArchivedThreadsPreviewMode,
+} from '../components/ArchivedThreadsSettingsSection'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1249,6 +1253,16 @@ function HomePage() {
     return mode as EasterEggPreviewMode
   }, [])
 
+  // Visual preview for the ported ArchivedThreadsSettingsSection (?archivedThreadsPreview=1|empty|search|…).
+  const archivedThreadsPreviewMode = useMemo((): ArchivedThreadsPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('archivedThreadsPreview')) return null
+    const mode = params.get('archivedThreadsPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as ArchivedThreadsPreviewMode
+  }, [])
+
   // Visual preview for the ported SettingsControls (?settingsControlsPreview=1|notices|modelSelect|…).
   const settingsControlsPreviewMode = useMemo((): SettingsControlsPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1403,6 +1417,22 @@ function HomePage() {
           </p>
           <div className="easter-egg-preview-stack">
             <EasterEggSettingsSectionPreview mode={easterEggPreviewMode} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (archivedThreadsPreviewMode) {
+    return (
+      <div className="archived-threads-preview">
+        <div className="archived-threads-preview-inner">
+          <h1 className="archived-threads-preview-title">Archives</h1>
+          <p className="archived-threads-preview-subtitle">
+            Archives category from Kun settings-section-archives.tsx.
+          </p>
+          <div className="archived-threads-preview-stack">
+            <ArchivedThreadsSettingsSectionPreview mode={archivedThreadsPreviewMode} />
           </div>
         </div>
       </div>
