@@ -4,7 +4,13 @@ import { Plus, Settings, Sun, Moon } from 'lucide-react'
 import { useTheme } from '../theme'
 import { SidebarContext } from '../sidebar'
 import { SettingsContext } from '../settings'
-import { useNaviList } from '../flue/NaviChatContext'
+import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
+import {
+  RuntimeStatusBanner,
+  RUNTIME_STATUS_BANNER_PREVIEW,
+  type RuntimeStatusBannerPreviewMode,
+  type RuntimeStatusSnapshot,
+} from '../components/RuntimeStatusBanner'
 import { SidebarProjects } from './SidebarProjects'
 import {
   WorkspaceModeTabs,
@@ -30,6 +36,7 @@ function RootLayout() {
   const closeSettings = useCallback(() => setSettingsOpen(false), [])
   const toggleSettings = useCallback(() => setSettingsOpen((v) => !v), [])
   const { newConversation } = useNaviList()
+  const { status } = useNaviThread()
 
   const handleNew = useCallback(() => {
     closeSettings()
@@ -59,6 +66,30 @@ function RootLayout() {
     [handleNew, toggleSettings],
   )
 
+  const runtimeStatusBannerPreviewMode = useMemo((): RuntimeStatusBannerPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('runtimeStatusBanner')) return null
+    const mode = params.get('runtimeStatusBanner')
+    if (mode === 'restartingAttempt') return 'restartingAttempt'
+    if (mode === 'crashed') return 'crashed'
+    if (mode === 'rolledBack') return 'rolledBack'
+    return 'restarting'
+  }, [])
+
+  const productionRuntimeStatus = useMemo((): RuntimeStatusSnapshot | null => {
+    if (runtimeStatusBannerPreviewMode) {
+      return RUNTIME_STATUS_BANNER_PREVIEW[runtimeStatusBannerPreviewMode]
+    }
+    if (!status.ready && !status.error) {
+      return {
+        state: 'restarting',
+        at: 'flue-connecting',
+      }
+    }
+    return null
+  }, [runtimeStatusBannerPreviewMode, status.error, status.ready])
+
   return (
     <SidebarContext.Provider value={{ collapsed, toggle }}>
       <SettingsContext.Provider
@@ -69,6 +100,9 @@ function RootLayout() {
             <WindowsTitleBar platform={platform} actions={titleBarActions} />
           ) : null}
           <div className="app-shell-body">
+            {productionRuntimeStatus ? (
+              <RuntimeStatusBanner status={productionRuntimeStatus} />
+            ) : null}
             <div
               className="workbench production-workbench"
               style={{ ['--sidebar-width' as string]: collapsed ? '0px' : '264px' }}
