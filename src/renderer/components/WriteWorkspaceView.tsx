@@ -45,6 +45,7 @@ export type WriteWorkspaceViewPreviewMode =
   | 'split'
   | 'live'
   | 'source'
+  | 'rich'
   | 'preview'
   | 'pdf'
   | 'image'
@@ -275,7 +276,11 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
         ? 'preview'
         : mode === 'live'
           ? 'live'
-          : 'split'
+          : mode === 'rich'
+            ? 'live'
+            : 'split'
+
+  const richModeActive = mode === 'rich'
 
   return {
     workspaceReady: true,
@@ -287,7 +292,7 @@ function previewSnapshot(mode: WriteWorkspaceViewPreviewMode): WorkspaceSnapshot
     fileLoading: false,
     previewMode,
     renderSafety: {
-      livePreviewEnabled: previewMode === 'live' || previewMode === 'split',
+      livePreviewEnabled: previewMode === 'live' || previewMode === 'split' || richModeActive,
       markdownPreviewEnabled: true,
       readOnly: false,
       notice: 'none',
@@ -322,6 +327,28 @@ function toolbarPreviewMode(previewMode: WriteDocumentPreviewMode): WritePreview
   return 'live'
 }
 
+function documentPaneLayoutFromToolbar(
+  toolbarMode: WritePreviewMode,
+  fallbackPreviewMode: WriteDocumentPreviewMode,
+): { previewMode: WriteDocumentPreviewMode; richModeActive: boolean } {
+  if (toolbarMode === 'rich') {
+    return { previewMode: 'live', richModeActive: true }
+  }
+  if (toolbarMode === 'source') {
+    return { previewMode: 'source', richModeActive: false }
+  }
+  if (toolbarMode === 'split') {
+    return { previewMode: 'split', richModeActive: false }
+  }
+  if (toolbarMode === 'preview') {
+    return { previewMode: 'preview', richModeActive: false }
+  }
+  if (toolbarMode === 'live') {
+    return { previewMode: 'live', richModeActive: false }
+  }
+  return { previewMode: fallbackPreviewMode, richModeActive: false }
+}
+
 function inlineAgentPosition(): WriteInlineAgentPosition {
   if (typeof window === 'undefined') {
     return { left: 120, width: 420, anchorTop: 360, anchorBottom: 388 }
@@ -342,6 +369,7 @@ type ViewProps = {
   fileContent?: string
   fileSize?: number
   previewMode?: WriteDocumentPreviewMode
+  richModeActive?: boolean
   renderSafety?: WriteRenderSafety
   fileGuardMessage?: string
   fileGuardDetail?: string
@@ -377,6 +405,7 @@ export function WriteWorkspaceView({
   fileContent = WRITE_MARKDOWN_PREVIEW_SAMPLE,
   fileSize = 12_480,
   previewMode = 'split',
+  richModeActive: controlledRichModeActive,
   renderSafety = {
     livePreviewEnabled: true,
     markdownPreviewEnabled: true,
@@ -404,9 +433,10 @@ export function WriteWorkspaceView({
   assistantPanelSnapshot,
 }: ViewProps): ReactElement {
   const [content, setContent] = useState(fileContent)
-  const [toolbarPreviewModeState, setToolbarPreviewModeState] = useState<WritePreviewMode>(
-    toolbarPreviewMode(previewMode),
-  )
+  const [toolbarPreviewModeState, setToolbarPreviewModeState] = useState<WritePreviewMode>(() => {
+    if (controlledRichModeActive) return 'rich'
+    return toolbarPreviewMode(previewMode)
+  })
   const [internalAssistantOpen, setInternalAssistantOpen] = useState(false)
   const assistantOpen = controlledAssistantOpen ?? internalAssistantOpen
   const setAssistantOpen = useCallback(
@@ -433,6 +463,9 @@ export function WriteWorkspaceView({
 
   const liveModeActive = toolbarPreviewModeState === 'live'
   const modeMenuItems = buildModeMenuItems(toolbarPreviewModeState)
+  const documentPaneLayout = documentPaneLayoutFromToolbar(toolbarPreviewModeState, previewMode)
+  const richModeActive = controlledRichModeActive ?? documentPaneLayout.richModeActive
+  const documentPreviewMode = documentPaneLayout.previewMode
   const inlinePosition = useMemo(() => inlineAgentPosition(), [])
   const writeAssistantPanelSnapshot = useMemo(
     (): WriteAssistantPanelSnapshot => ({
@@ -451,7 +484,11 @@ export function WriteWorkspaceView({
 
   useWriteSplitScrollSync({
     enabled:
-      workspaceReady && previewMode === 'split' && activeFileIsText && !fileLoading,
+      workspaceReady &&
+      documentPreviewMode === 'split' &&
+      activeFileIsText &&
+      !fileLoading &&
+      !richModeActive,
     editorRootRef: editorPaneRef,
     previewRef: previewPaneRef,
     rebindKey: activeFilePath ?? 'write-preview',
@@ -513,7 +550,8 @@ export function WriteWorkspaceView({
               renderSafety={renderSafety}
               fileGuardMessage={fileGuardMessage}
               fileGuardDetail={fileGuardDetail}
-              previewMode={previewMode}
+              previewMode={documentPreviewMode}
+              richModeActive={richModeActive}
               imageSrc={imageSrc}
               imageMimeType={imageMimeType}
               onContentChange={setContent}
@@ -685,6 +723,7 @@ export function WriteWorkspaceViewPreview({ mode }: PreviewProps): ReactElement 
         fileContent={snapshot.fileContent}
         fileSize={snapshot.fileSize}
         previewMode={snapshot.previewMode}
+        richModeActive={mode === 'rich'}
         renderSafety={snapshot.renderSafety}
         fileGuardMessage={snapshot.fileGuardMessage}
         fileGuardDetail={snapshot.fileGuardDetail}

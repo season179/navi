@@ -406,6 +406,10 @@ import {
   type WriteMarkdownEditorPreviewMode,
 } from '../components/WriteMarkdownEditor'
 import {
+  WriteRichEditorPreview,
+  type WriteRichEditorPreviewMode,
+} from '../components/WriteRichEditor'
+import {
   WriteWorkspaceDocumentPanePreview,
   type WriteWorkspaceDocumentPanePreviewMode,
 } from '../components/WriteWorkspaceDocumentPane'
@@ -1420,8 +1424,19 @@ function HomePage() {
     return 'default'
   }, [])
 
+  // (?writeRichEditor=1|readonly|fallback).
+  const writeRichEditorPreviewMode = useMemo((): WriteRichEditorPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('writeRichEditor')) return null
+    const value = params.get('writeRichEditor')
+    if (value === 'readonly') return 'readonly'
+    if (value === 'fallback') return 'fallback'
+    return 'default'
+  }, [])
+
   // Visual preview for the ported WriteWorkspaceDocumentPane
-  // (?writeWorkspaceDocumentPane=start|loading|image|pdf|unsupported|source|live|split|preview|largeFile|truncated).
+  // (?writeWorkspaceDocumentPane=start|loading|image|pdf|unsupported|source|live|rich|split|preview|largeFile|truncated).
   const writeWorkspaceDocumentPanePreviewMode =
     useMemo((): WriteWorkspaceDocumentPanePreviewMode | null => {
       if (typeof window === 'undefined') return null
@@ -1435,6 +1450,7 @@ function HomePage() {
       if (value === 'unsupported') return 'unsupported'
       if (value === 'source') return 'source'
       if (value === 'live') return 'live'
+      if (value === 'rich') return 'rich'
       if (value === 'split') return 'split'
       if (value === 'preview') return 'preview'
       if (value === 'largeFile') return 'largeFile'
@@ -1443,7 +1459,7 @@ function HomePage() {
     }, [])
 
   // Visual preview for the ported WriteWorkspaceView
-  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|preview|pdf|image|inlineAgent|assistant|assistantTimeline|assistantQuoted|runtimeBanner|error|exportSuccess|exportError|dirty|saving).
+  // (?writeWorkspaceView=empty|emptyError|start|split|live|source|rich|preview|pdf|image|inlineAgent|assistant|assistantTimeline|assistantQuoted|runtimeBanner|error|exportSuccess|exportError|dirty|saving).
   const writeWorkspaceViewPreviewMode = useMemo((): WriteWorkspaceViewPreviewMode | null => {
     if (typeof window === 'undefined') return null
     const params = new URLSearchParams(window.location.search)
@@ -1454,6 +1470,7 @@ function HomePage() {
     if (value === 'start') return 'start'
     if (value === 'live') return 'live'
     if (value === 'source') return 'source'
+    if (value === 'rich') return 'rich'
     if (value === 'preview') return 'preview'
     if (value === 'pdf') return 'pdf'
     if (value === 'image') return 'image'
@@ -3196,6 +3213,10 @@ function HomePage() {
 
   if (writeMarkdownEditorPreviewMode) {
     return <WriteMarkdownEditorPreview mode={writeMarkdownEditorPreviewMode} />
+  }
+
+  if (writeRichEditorPreviewMode) {
+    return <WriteRichEditorPreview mode={writeRichEditorPreviewMode} />
   }
 
   if (writePdfViewerPreviewMode) {

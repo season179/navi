@@ -1,6 +1,6 @@
 // Write-mode document pane echoing Kun's WriteWorkspaceDocumentPane
 // (../Kun/src/renderer/src/components/write/WriteWorkspaceDocumentPane.tsx).
-// Visual only: composes ported editor/preview surfaces without rich editor or IPC.
+// Visual only: composes ported editor/preview surfaces without TipTap runtime or IPC.
 
 import { useState, type ReactElement, type RefObject } from 'react'
 import { WriteWorkspaceStart, WRITE_WORKSPACE_START_PREVIEW } from './WriteWorkspaceStart'
@@ -10,6 +10,7 @@ import {
   WriteMarkdownEditor,
   WRITE_MARKDOWN_EDITOR_PREVIEW_SAMPLE,
 } from './WriteMarkdownEditor'
+import { WriteRichEditor } from './WriteRichEditor'
 import {
   WriteMarkdownPreview,
   WRITE_MARKDOWN_PREVIEW_SAMPLE,
@@ -47,6 +48,7 @@ export type WriteWorkspaceDocumentPanePreviewMode =
   | 'unsupported'
   | 'source'
   | 'live'
+  | 'rich'
   | 'split'
   | 'preview'
   | 'largeFile'
@@ -69,6 +71,8 @@ type Props = {
   fileGuardMessage?: string
   fileGuardDetail?: string
   previewMode?: WriteDocumentPreviewMode
+  /** Kun rich-mode TipTap surface (toolbar modeMenu rich). */
+  richModeActive?: boolean
   isMarkdown?: boolean
   onAskAssistant?: () => void
   onCreateDraft?: () => void
@@ -133,6 +137,7 @@ export function WriteWorkspaceDocumentPane({
   fileGuardMessage = '',
   fileGuardDetail = '',
   previewMode = 'split',
+  richModeActive = false,
   isMarkdown = true,
   onAskAssistant,
   onCreateDraft,
@@ -193,8 +198,8 @@ export function WriteWorkspaceDocumentPane({
     )
   }
 
-  const showEditor = editorVisible(previewMode)
-  const showPreview = previewVisible(previewMode)
+  const showEditor = richModeActive || editorVisible(previewMode)
+  const showPreview = !richModeActive && previewVisible(previewMode)
   const appearance = editorAppearance(previewMode, renderSafety)
 
   return (
@@ -213,12 +218,27 @@ export function WriteWorkspaceDocumentPane({
             ref={editorPaneRef}
             className={`${editorWidthClass(previewMode)} write-document-pane-editor-scroll-root`}
           >
-            <WriteMarkdownEditor
-              value={fileContent}
-              appearance={appearance}
-              readOnly={renderSafety.readOnly}
-              onChange={renderSafety.readOnly ? undefined : onContentChange}
-            />
+            {richModeActive && renderSafety.livePreviewEnabled ? (
+              <WriteRichEditor
+                value={fileContent}
+                readOnly={renderSafety.readOnly}
+                fallback={
+                  <WriteMarkdownEditor
+                    value={fileContent}
+                    appearance="live"
+                    readOnly={renderSafety.readOnly}
+                    onChange={renderSafety.readOnly ? undefined : onContentChange}
+                  />
+                }
+              />
+            ) : (
+              <WriteMarkdownEditor
+                value={fileContent}
+                appearance={appearance}
+                readOnly={renderSafety.readOnly}
+                onChange={renderSafety.readOnly ? undefined : onContentChange}
+              />
+            )}
           </div>
         ) : null}
         {showPreview ? (
@@ -408,7 +428,9 @@ function previewSnapshot(mode: WriteWorkspaceDocumentPanePreviewMode): {
         ? 'live'
         : mode === 'preview'
           ? 'preview'
-          : 'split'
+          : mode === 'rich'
+            ? 'live'
+            : 'split'
 
   return {
     activeFilePath: samplePath,
@@ -420,7 +442,7 @@ function previewSnapshot(mode: WriteWorkspaceDocumentPanePreviewMode): {
     fileSize: 12_480,
     previewMode,
     renderSafety: {
-      livePreviewEnabled: previewMode === 'live' || previewMode === 'split',
+      livePreviewEnabled: previewMode === 'live' || previewMode === 'split' || mode === 'rich',
       markdownPreviewEnabled: true,
       readOnly: false,
       notice: 'none',
@@ -457,6 +479,7 @@ export function WriteWorkspaceDocumentPanePreview({ mode }: PreviewProps): React
           fileGuardMessage={snapshot.fileGuardMessage}
           fileGuardDetail={snapshot.fileGuardDetail}
           previewMode={snapshot.previewMode}
+          richModeActive={mode === 'rich'}
           imageSrc={snapshot.imageSrc}
           imageMimeType={snapshot.imageMimeType}
           onContentChange={setFileContent}
