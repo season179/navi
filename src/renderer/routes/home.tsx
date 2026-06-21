@@ -389,6 +389,10 @@ import {
   InitialSetupDialogPreview,
   type InitialSetupDialogPreviewMode,
 } from '../components/InitialSetupDialog'
+import {
+  PluginMarketplaceViewPreview,
+  type PluginMarketplacePreviewMode,
+} from '../components/PluginMarketplaceView'
 import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
 import { ChatThread } from '../components/ChatThread'
@@ -1044,6 +1048,26 @@ function HomePage() {
       if (value === 'wireSuccess') return 'wireSuccess'
       if (value === 'wireWarning') return 'wireWarning'
       return value as InitialSetupDialogPreviewMode
+    }, [])
+
+  // Visual preview for the ported PluginMarketplaceView
+  // (?pluginMarketplaceViewPreview=1|skill|empty|customOpen|noticeSuccess|noticeError|mcpOverlayError|skillLoading|installed).
+  const pluginMarketplaceViewPreviewMode =
+    useMemo((): PluginMarketplacePreviewMode | null => {
+      if (typeof window === 'undefined') return null
+      const params = new URLSearchParams(window.location.search)
+      if (!params.has('pluginMarketplaceViewPreview')) return null
+      const value = params.get('pluginMarketplaceViewPreview')
+      if (!value || value === '1' || value === 'default') return 'default'
+      if (value === 'skill') return 'skill'
+      if (value === 'empty') return 'empty'
+      if (value === 'customOpen') return 'customOpen'
+      if (value === 'noticeSuccess') return 'noticeSuccess'
+      if (value === 'noticeError') return 'noticeError'
+      if (value === 'mcpOverlayError') return 'mcpOverlayError'
+      if (value === 'skillLoading') return 'skillLoading'
+      if (value === 'installed') return 'installed'
+      return value as PluginMarketplacePreviewMode
     }, [])
 
   // Visual preview for the ported SettingsView
@@ -2026,6 +2050,10 @@ function HomePage() {
 
   if (initialSetupDialogPreviewMode) {
     return <InitialSetupDialogPreview mode={initialSetupDialogPreviewMode} />
+  }
+
+  if (pluginMarketplaceViewPreviewMode) {
+    return <PluginMarketplaceViewPreview mode={pluginMarketplaceViewPreviewMode} />
   }
 
   if (settingsViewPreviewMode) {
