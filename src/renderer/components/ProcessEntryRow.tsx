@@ -46,6 +46,8 @@ export type ProcessEntrySnapshot = {
   detailFilePath?: string
   nestedBubble?: MessageBubbleSnapshot
   meta?: RuntimeMetaChipsSnapshot
+  /** When false, suppresses inline file-reference links like Kun non-tool blocks. */
+  toolBlock?: boolean
   /** Process block kind — drives system-message expand rules like Kun. */
   blockKind?: 'system'
   /** When set, detailText is block.detail rather than duplicated summary text. */
@@ -411,7 +413,15 @@ export function ProcessEntryRow({
         </span>
         {entry.rest ? (
           <span className="process-entry-row-rest">
-            <ProcessSummaryText summary={entry.rest} filePath={entry.filePath} />
+            <ProcessSummaryText
+              summary={entry.rest}
+              filePath={entry.filePath}
+              enableFileReference={
+                entry.toolBlock !== false &&
+                entry.blockKind !== 'system' &&
+                Boolean(entry.filePath)
+              }
+            />
           </span>
         ) : null}
       </span>

@@ -36,14 +36,17 @@ export function ProcessFileReference({
 type ProcessSummaryTextProps = {
   summary: string
   filePath?: string
+  /** Kun ProcessSummaryText only embeds file links for tool blocks. */
+  enableFileReference?: boolean
 }
 
 /** Inline summary with an embedded file-reference button when filePath appears in summary. */
 export function ProcessSummaryText({
   summary,
   filePath,
+  enableFileReference = false,
 }: ProcessSummaryTextProps): ReactElement {
-  if (!filePath) return <>{summary}</>
+  if (!enableFileReference || !filePath) return <>{summary}</>
   const index = summary.indexOf(filePath)
   if (index < 0) return <>{summary}</>
   const before = summary.slice(0, index)
