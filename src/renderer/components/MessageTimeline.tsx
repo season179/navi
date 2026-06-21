@@ -526,3 +526,11 @@ export function MessageTimelinePreview({
 
 export { summarizeToolBlock, toolFilePath } from '../lib/summarizeToolBlock'
 export type { SummarizeToolBlockInput, ToolSummaryLabelFn } from '../lib/summarizeToolBlock'
+export {
+  groupProcessSections,
+  resolveProcessSectionKind,
+} from '../lib/groupProcessSections'
+export type {
+  GroupProcessBlock,
+  GroupedProcessSection,
+} from '../lib/groupProcessSections'
