@@ -225,6 +225,13 @@ import {
   type GuiUpdateControlPreviewMode,
 } from '../components/GuiUpdateControl'
 import {
+  SettingsSidebar,
+  SettingsSidebarPreviewContent,
+  resolveSettingsSidebarPreviewCategory,
+  type SettingsCategory,
+  type SettingsSidebarPreviewMode,
+} from '../components/SettingsSidebar'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1182,6 +1189,20 @@ function HomePage() {
     return params.get('appErrorBoundaryPreview') === 'message' ? 'message' : 'default'
   }, [])
 
+  // Visual preview for the ported SettingsSidebar (?settingsSidebarPreview=1|providers|updates|…).
+  const settingsSidebarPreviewMode = useMemo((): SettingsSidebarPreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('settingsSidebarPreview')) return null
+    const mode = params.get('settingsSidebarPreview')
+    if (!mode || mode === '1' || mode === 'default') return 'default'
+    return mode as SettingsSidebarPreviewMode
+  }, [])
+  const [settingsSidebarPreviewCategory, setSettingsSidebarPreviewCategory] =
+    useState<SettingsCategory>(() =>
+      resolveSettingsSidebarPreviewCategory(settingsSidebarPreviewMode),
+    )
+
   // Visual preview for the ported GuiUpdateControl (?guiUpdateControlPreview=1|current|downloading|…).
   const guiUpdateControlPreviewMode = useMemo((): GuiUpdateControlPreviewMode | null => {
     if (typeof window === 'undefined') return null
@@ -1281,6 +1302,21 @@ function HomePage() {
   if (appErrorBoundaryPreviewMode) {
     return (
       <AppErrorFallback error={APP_ERROR_BOUNDARY_PREVIEW[appErrorBoundaryPreviewMode]} />
+    )
+  }
+
+  if (settingsSidebarPreviewMode) {
+    return (
+      <div className="settings-sidebar-preview">
+        <SettingsSidebar
+          category={settingsSidebarPreviewCategory}
+          setCategory={setSettingsSidebarPreviewCategory}
+          goBack={() => undefined}
+        />
+        <div className="settings-sidebar-preview-main">
+          <SettingsSidebarPreviewContent category={settingsSidebarPreviewCategory} />
+        </div>
+      </div>
     )
   }
 
