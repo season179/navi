@@ -100,11 +100,13 @@ export type ComposerSlashCommandItem = {
 
 type SlashCommandPreview = ComposerSlashCommandItem
 
-type FileMentionPreview = {
+export type ComposerFileMentionItem = {
   relativePath: string
   isDirectory?: boolean
   active?: boolean
 }
+
+type FileMentionPreview = ComposerFileMentionItem
 
 type FileReferencePreview = {
   relativePath: string
@@ -355,38 +357,54 @@ export function ComposerSlashMenu({
   )
 }
 
-function ComposerFileMentionMenu({ items }: { items: FileMentionPreview[] }): ReactElement {
+export function ComposerFileMentionMenu({
+  items,
+  onPick,
+  onHover,
+  emptyMessage = 'No files match.',
+}: {
+  items: ComposerFileMentionItem[]
+  onPick?: (item: ComposerFileMentionItem) => void
+  onHover?: (index: number) => void
+  emptyMessage?: string
+}): ReactElement {
   return (
     <div className="floating-composer-file-mention-menu">
       <div className="floating-composer-file-mention-title">
         <FileText strokeWidth={1.9} />
         <span>Insert file reference</span>
       </div>
-      <div className="floating-composer-file-mention-list">
-        {items.map((item) => (
-          <button
-            key={item.relativePath}
-            type="button"
-            className={
-              item.active
-                ? 'floating-composer-file-mention-item is-active'
-                : 'floating-composer-file-mention-item'
-            }
-          >
-            {item.isDirectory ? (
-              <Folder strokeWidth={1.8} />
-            ) : (
-              <FileText strokeWidth={1.8} />
-            )}
-            <span className="floating-composer-file-mention-path">
-              {item.isDirectory ? `${item.relativePath}/` : item.relativePath}
-            </span>
-            <span className="floating-composer-file-mention-token">
-              @{item.isDirectory ? `${item.relativePath}/` : item.relativePath}
-            </span>
-          </button>
-        ))}
-      </div>
+      {items.length > 0 ? (
+        <div className="floating-composer-file-mention-list">
+          {items.map((item, index) => (
+            <button
+              key={item.relativePath}
+              type="button"
+              className={
+                item.active
+                  ? 'floating-composer-file-mention-item is-active'
+                  : 'floating-composer-file-mention-item'
+              }
+              onMouseEnter={() => onHover?.(index)}
+              onClick={() => onPick?.(item)}
+            >
+              {item.isDirectory ? (
+                <Folder strokeWidth={1.8} />
+              ) : (
+                <FileText strokeWidth={1.8} />
+              )}
+              <span className="floating-composer-file-mention-path">
+                {item.isDirectory ? `${item.relativePath}/` : item.relativePath}
+              </span>
+              <span className="floating-composer-file-mention-token">
+                @{item.isDirectory ? `${item.relativePath}/` : item.relativePath}
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="floating-composer-slash-empty">{emptyMessage}</div>
+      )}
     </div>
   )
 }

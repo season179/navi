@@ -7,6 +7,7 @@ import {
   CONTEXT_CAPACITY_PREVIEW,
 } from '../components/ContextCapacityPopover'
 import { Composer } from '../components/Composer'
+import { COMPOSER_FILE_MENTION_PREVIEW } from '../lib/composerFileReferences'
 import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
@@ -624,7 +625,13 @@ function HomePage() {
   const { sddDraftActive, closeSddDraft } = useSddDraftMode()
   const { settingsOpen, openSettings, closeSettings } = useSettings()
   const { focusModeEnabled } = useFocusMode()
-  const [draft, setDraft] = useState('')
+  const [draft, setDraft] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    if (new URLSearchParams(window.location.search).has('composerFileMentionPreview')) {
+      return 'Please review @src/ren'
+    }
+    return ''
+  })
   const [settingsCategory, setSettingsCategory] = useState<SettingsCategory>('providers')
   const { messages, status, busy, send, cancel, activeSelection, pickModel, pickReasoning } =
     useNaviThread()
@@ -663,6 +670,15 @@ function HomePage() {
   const contextCapacityPreview = useMemo(() => {
     if (typeof window === 'undefined') return false
     return new URLSearchParams(window.location.search).has('contextCapacityPreview')
+  }, [])
+
+  // Visual preview for the ported ComposerFileMentionMenu (?composerFileMentionPreview=1).
+  const composerFileMentionPreview = useMemo(() => {
+    if (typeof window === 'undefined') return undefined
+    if (!new URLSearchParams(window.location.search).has('composerFileMentionPreview')) {
+      return undefined
+    }
+    return COMPOSER_FILE_MENTION_PREVIEW
   }, [])
 
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
@@ -3705,6 +3721,7 @@ function HomePage() {
             : 'Send a message to Navi…'
       }
       skills={skills}
+      fileMentionCandidates={composerFileMentionPreview}
       modelChip={
         <FloatingModelPicker
           providers={providerProfiles}

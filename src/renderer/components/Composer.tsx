@@ -11,12 +11,25 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
 import { Mic, Plus, Send, Sparkles, Square } from 'lucide-react'
 import { filterSkillSlashCommands } from '../lib/composerSlashCommands'
+import {
+  filterWorkspaceFileMentionSuggestions,
+  getFileMentionAtCursor,
+  isComposerDirectoryReference,
+  replaceFileMentionInInput,
+  type ComposerFileReference,
+} from '../lib/composerFileReferences'
 import { VoiceRecordingStrip } from './VoiceRecordingStrip'
 import {
   FloatingComposerQueuedMessages,
   type QueuedComposerMessage,
 } from './FloatingComposerQueuedMessages'
-import { ComposerPlusMenu, ComposerSlashMenu, type ComposerSlashCommandItem } from './FloatingComposer'
+import {
+  ComposerPlusMenu,
+  ComposerSlashMenu,
+  ComposerFileMentionMenu,
+  type ComposerSlashCommandItem,
+  type ComposerFileMentionItem,
+} from './FloatingComposer'
 import {
   ContextCapacityPopover,
   type ContextCapacity,
@@ -43,6 +56,8 @@ interface ComposerProps {
   modelChip?: ReactNode
   /** Available skills for the `/skill` picker (scoped to active project). */
   skills?: SkillSummary[]
+  /** Workspace files for the `@` mention picker. */
+  fileMentionCandidates?: ComposerFileReference[]
   /** When set, shows Kun's dictation recording strip instead of the send button. */
   voiceRecording?: {
     getLevel: () => number
@@ -83,6 +98,7 @@ export function Composer({
   contextCapacity,
   modelChip,
   skills,
+  fileMentionCandidates,
   voiceRecording,
   queuedMessages,
   onRemoveQueuedMessage,
@@ -97,8 +113,15 @@ export function Composer({
   const [plusMenuOpen, setPlusMenuOpen] = useState(false)
   const [contextCapacityOpen, setContextCapacityOpen] = useState(false)
   const [slashActiveIndex, setSlashActiveIndex] = useState(0)
+  const [fileMentionActiveIndex, setFileMentionActiveIndex] = useState(0)
+  const [cursor, setCursor] = useState(0)
   const plusMenuRef = useRef<HTMLDivElement>(null)
   const slashMenuRef = useRef<HTMLDivElement>(null)
+  const fileMentionMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    syncCursor()
+  }, [])
 
   useEffect(() => {
     if (!contextCapacityOpen) return
@@ -126,6 +149,60 @@ export function Composer({
     if (pickerOpen) setPlusMenuOpen(false)
   }, [pickerOpen])
 
+  const syncCursor = () => {
+    const el = textareaRef.current
+    if (!el) return
+    setCursor(el.selectionStart ?? value.length)
+  }
+
+  // The picker is active when there's a leading /query and skills are provided.
+  const query = useMemo(() => (skills && skills.length > 0 ? skillQuery(value) : null), [value, skills])
+
+  const activeFileMention = useMemo(() => {
+    if (query !== null) return null
+    return getFileMentionAtCursor(value, cursor)
+  }, [value, cursor, query])
+
+  const fileMentionOpen =
+    activeFileMention !== null &&
+    fileMentionCandidates !== undefined &&
+    fileMentionCandidates.length > 0
+
+  const fileMentionSuggestions = useMemo((): ComposerFileReference[] => {
+    if (!activeFileMention || !fileMentionCandidates) return []
+    return filterWorkspaceFileMentionSuggestions(
+      fileMentionCandidates,
+      activeFileMention.query,
+    )
+  }, [activeFileMention, fileMentionCandidates])
+
+  const fileMentionItems = useMemo((): ComposerFileMentionItem[] => {
+    return fileMentionSuggestions.map((reference, index) => ({
+      relativePath: reference.relativePath,
+      isDirectory: isComposerDirectoryReference(reference),
+      active: index === fileMentionActiveIndex,
+    }))
+  }, [fileMentionSuggestions, fileMentionActiveIndex])
+
+  useEffect(() => {
+    if (fileMentionOpen) setPlusMenuOpen(false)
+  }, [fileMentionOpen])
+
+  useEffect(() => {
+    setFileMentionActiveIndex(0)
+  }, [fileMentionSuggestions.length, activeFileMention?.query])
+
+  useEffect(() => {
+    if (!fileMentionOpen) return
+    const onPointerDown = (event: PointerEvent): void => {
+      const target = event.target
+      if (target instanceof Node && fileMentionMenuRef.current?.contains(target)) return
+      textareaRef.current?.focus()
+    }
+    window.addEventListener('pointerdown', onPointerDown)
+    return () => window.removeEventListener('pointerdown', onPointerDown)
+  }, [fileMentionOpen])
+
   useEffect(() => {
     if (!pickerOpen) return
     const onPointerDown = (event: PointerEvent): void => {
@@ -149,8 +226,6 @@ export function Composer({
 
   const canSend = !disabled && value.trim().length > 0
 
-  // The picker is active when there's a leading /query and skills are provided.
-  const query = useMemo(() => (skills && skills.length > 0 ? skillQuery(value) : null), [value, skills])
   const slashCommands = useMemo((): ComposerSlashCommandItem[] => {
     if (query === null || !skills) return []
     return filterSkillSlashCommands(skills, query).map((command, index) => ({
@@ -212,6 +287,23 @@ export function Composer({
     })
   }
 
+  const pickFileMention = (item: ComposerFileMentionItem) => {
+    if (!activeFileMention) return
+    const reference = fileMentionSuggestions.find(
+      (entry) => entry.relativePath === item.relativePath,
+    )
+    if (!reference) return
+    const next = replaceFileMentionInInput(value, activeFileMention, reference)
+    onChange(next.input)
+    requestAnimationFrame(() => {
+      const el = textareaRef.current
+      if (!el) return
+      el.focus()
+      el.setSelectionRange(next.cursor, next.cursor)
+      setCursor(next.cursor)
+    })
+  }
+
   const closeSlashMenu = () => {
     if (value.startsWith('/')) onChange(value.slice(1))
     setPickerOpen(false)
@@ -229,14 +321,33 @@ export function Composer({
   }
 
   useEffect(() => {
-    if (!pickerOpen) return
+    if (!pickerOpen && !fileMentionOpen) return
     const onKey = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault()
-        closeSlashMenu()
+        if (pickerOpen) closeSlashMenu()
         return
       }
-      if (slashCommands.length === 0) return
+      if (fileMentionOpen && fileMentionItems.length > 0) {
+        if (event.key === 'ArrowDown') {
+          event.preventDefault()
+          setFileMentionActiveIndex((index) =>
+            Math.min(index + 1, fileMentionItems.length - 1),
+          )
+          return
+        }
+        if (event.key === 'ArrowUp') {
+          event.preventDefault()
+          setFileMentionActiveIndex((index) => Math.max(index - 1, 0))
+          return
+        }
+        if (event.key === 'Enter' && fileMentionItems[fileMentionActiveIndex]) {
+          event.preventDefault()
+          pickFileMention(fileMentionItems[fileMentionActiveIndex])
+          return
+        }
+      }
+      if (!pickerOpen || slashCommands.length === 0) return
       if (event.key === 'ArrowDown') {
         event.preventDefault()
         setSlashActiveIndex((index) => Math.min(index + 1, slashCommands.length - 1))
@@ -250,13 +361,28 @@ export function Composer({
     }
     window.addEventListener('keydown', onKey, true)
     return () => window.removeEventListener('keydown', onKey, true)
-  }, [pickerOpen, slashCommands, slashActiveIndex, value, skills, onChange])
+  }, [
+    pickerOpen,
+    fileMentionOpen,
+    slashCommands,
+    slashActiveIndex,
+    fileMentionItems,
+    fileMentionActiveIndex,
+    value,
+    skills,
+    onChange,
+  ])
 
   const handleKeyDown = (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
-    // Let the slash menu handle Arrow/Enter/Escape while it's open.
+    // Let overlay menus handle Arrow/Enter/Escape while open.
     if (
-      pickerOpen &&
-      (e.key === 'Escape' || (slashCommands.length > 0 && (e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'ArrowUp')))
+      (pickerOpen || fileMentionOpen) &&
+      (e.key === 'Escape' ||
+        (e.key === 'Enter' &&
+          ((pickerOpen && slashCommands.length > 0) ||
+            (fileMentionOpen && fileMentionItems.length > 0))) ||
+        e.key === 'ArrowDown' ||
+        e.key === 'ArrowUp')
     ) {
       if (e.key === 'Enter') e.preventDefault()
       return
@@ -313,6 +439,20 @@ export function Composer({
             />
           </div>
         ) : null}
+        {!compact && fileMentionOpen ? (
+          <div ref={fileMentionMenuRef}>
+            <ComposerFileMentionMenu
+              items={fileMentionItems}
+              onPick={pickFileMention}
+              onHover={setFileMentionActiveIndex}
+              emptyMessage={
+                activeFileMention?.query.trim()
+                  ? `No files match “${activeFileMention.query.trim()}”.`
+                  : 'No files available.'
+              }
+            />
+          </div>
+        ) : null}
         <div className={shellClass}>
           <textarea
             ref={textareaRef}
@@ -322,8 +462,14 @@ export function Composer({
             value={value}
             disabled={disabled}
             aria-label="Message"
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              onChange(e.target.value)
+              setCursor(e.target.selectionStart ?? e.target.value.length)
+            }}
             onKeyDown={handleKeyDown}
+            onKeyUp={syncCursor}
+            onClick={syncCursor}
+            onSelect={syncCursor}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
           />
