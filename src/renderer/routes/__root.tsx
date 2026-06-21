@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { Plus, Settings, PanelLeft, Sun, Moon } from 'lucide-react'
 import { useTheme } from '../theme'
@@ -6,6 +6,10 @@ import { SidebarContext } from '../sidebar'
 import { SettingsContext } from '../settings'
 import { useNaviList } from '../flue/NaviChatContext'
 import { SidebarProjects } from './SidebarProjects'
+import {
+  WorkspaceModeTabs,
+  type WorkspaceModeView,
+} from '../components/WorkspaceModeTabs'
 
 function RootLayout() {
   const { theme, toggleTheme } = useTheme()
@@ -24,6 +28,16 @@ function RootLayout() {
     closeSettings()
     newConversation()
   }
+
+  // Visual preview for the ported WorkspaceModeTabs (?workspaceModeTabsPreview=1|write).
+  const workspaceModeTabsPreviewMode = useMemo((): WorkspaceModeView | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('workspaceModeTabsPreview')) return null
+    return params.get('workspaceModeTabsPreview') === 'write' ? 'write' : 'chat'
+  }, [])
+  const [workspaceModeTabsPreviewView, setWorkspaceModeTabsPreviewView] =
+    useState<WorkspaceModeView>(() => workspaceModeTabsPreviewMode ?? 'chat')
 
   return (
     <SidebarContext.Provider value={{ collapsed, toggle }}>
@@ -45,6 +59,14 @@ function RootLayout() {
             </div>
 
             <div className="sidebar-body">
+              {workspaceModeTabsPreviewMode ? (
+                <WorkspaceModeTabs
+                  activeView={workspaceModeTabsPreviewView}
+                  onCodeOpen={() => setWorkspaceModeTabsPreviewView('chat')}
+                  onWriteOpen={() => setWorkspaceModeTabsPreviewView('write')}
+                />
+              ) : null}
+
               <button className="cmd-row is-accent" onClick={handleNew}>
                 <Plus />
                 <span className="cmd-label">New conversation</span>
