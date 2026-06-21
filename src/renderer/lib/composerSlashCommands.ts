@@ -3,6 +3,92 @@
 
 import type { SkillSummary, SkillSource } from '../../shared/flue'
 
+/** English copy matching Kun's slashCommandMenuTitle locale string. */
+export const COMPOSER_SLASH_COMMAND_MENU_TITLE = 'Commands'
+
+export type ComposerSlashCommandPreviewIcon =
+  | 'plus'
+  | 'search'
+  | 'listTodo'
+  | 'target'
+  | 'archive'
+  | 'searchCode'
+
+export type ComposerSlashCommandPreviewRow = {
+  id: string
+  title: string
+  description: string
+  badge: string
+  icon: ComposerSlashCommandPreviewIcon
+  active?: boolean
+}
+
+/** Mock slash commands for ?composerSlashCommandsPreview visual verification. */
+export const COMPOSER_SLASH_COMMANDS_PREVIEW: ComposerSlashCommandPreviewRow[] = [
+  {
+    id: 'new',
+    title: 'New session',
+    description: 'Create a new session for the current project immediately.',
+    badge: '/new',
+    icon: 'plus',
+    active: true,
+  },
+  {
+    id: 'research',
+    title: 'Deep research',
+    description:
+      'Prepare an iterative research brief with source tracking, cross-checks, and report-ready output.',
+    badge: '/research',
+    icon: 'search',
+  },
+  {
+    id: 'plan',
+    title: 'Plan',
+    description: 'Add a Plan marker to the composer before sending.',
+    badge: '/plan',
+    icon: 'listTodo',
+  },
+  {
+    id: 'review',
+    title: 'Code review',
+    description: 'Review current changes, a branch diff, a commit, or custom instructions.',
+    badge: '/review',
+    icon: 'searchCode',
+  },
+  {
+    id: 'goal',
+    title: 'Goal',
+    description: 'Set or manage the long-running goal for this thread.',
+    badge: '/goal',
+    icon: 'target',
+  },
+  {
+    id: 'compact',
+    title: 'Compact this thread',
+    description: 'Ask the runtime to summarize context for the active thread.',
+    badge: '/compact',
+    icon: 'archive',
+  },
+]
+
+/** Draft shown when verifying slash-command overlay in production Composer. */
+export const COMPOSER_SLASH_COMMANDS_PREVIEW_DRAFT = '/res'
+
+export type ComposerSlashCommandsPreviewState = {
+  draft: string
+  commands: ComposerSlashCommandPreviewRow[]
+}
+
+/** Routes ?composerSlashCommandsPreview=1 production preview hooks. */
+export function resolveComposerSlashCommandsPreview(
+  _mode: string | null = 'default',
+): ComposerSlashCommandsPreviewState {
+  return {
+    draft: COMPOSER_SLASH_COMMANDS_PREVIEW_DRAFT,
+    commands: COMPOSER_SLASH_COMMANDS_PREVIEW,
+  }
+}
+
 export interface SkillSlashCommandData {
   id: string
   skillName: string

@@ -15,7 +15,13 @@ buildSync({
   format: 'esm',
 })
 
-const { filterSkillSlashCommands } = await import(out)
+const {
+  filterSkillSlashCommands,
+  COMPOSER_SLASH_COMMAND_MENU_TITLE,
+  COMPOSER_SLASH_COMMANDS_PREVIEW,
+  COMPOSER_SLASH_COMMANDS_PREVIEW_DRAFT,
+  resolveComposerSlashCommandsPreview,
+} = await import(out)
 
 const skills = [
   {
@@ -60,4 +66,22 @@ test('filterSkillSlashCommands prefers name prefix matches', () => {
   assert.equal(rows.length, 1)
   assert.equal(rows[0].skillName, 'code-review')
   assert.equal(rows[0].scopeLabel, 'Project')
+})
+
+test('slash command menu title matches Kun slashCommandMenuTitle locale string', () => {
+  assert.equal(COMPOSER_SLASH_COMMAND_MENU_TITLE, 'Commands')
+})
+
+test('COMPOSER_SLASH_COMMANDS_PREVIEW matches Kun slash-command row copy', () => {
+  assert.equal(COMPOSER_SLASH_COMMANDS_PREVIEW.length, 6)
+  assert.equal(COMPOSER_SLASH_COMMANDS_PREVIEW[0].title, 'New session')
+  assert.equal(COMPOSER_SLASH_COMMANDS_PREVIEW[0].badge, '/new')
+  assert.equal(COMPOSER_SLASH_COMMANDS_PREVIEW[1].title, 'Deep research')
+  assert.equal(COMPOSER_SLASH_COMMANDS_PREVIEW[3].title, 'Code review')
+})
+
+test('resolveComposerSlashCommandsPreview returns slash-menu draft and commands', () => {
+  const preview = resolveComposerSlashCommandsPreview('1')
+  assert.equal(preview.draft, COMPOSER_SLASH_COMMANDS_PREVIEW_DRAFT)
+  assert.deepEqual(preview.commands, COMPOSER_SLASH_COMMANDS_PREVIEW)
 })

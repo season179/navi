@@ -128,6 +128,8 @@ interface ComposerProps {
   plusMenuToggles?: ComposerPlusMenuToggles
   /** Footer hint shown beside project/branch pickers (e.g. slash or worktree copy). */
   footerHint?: string | null
+  /** When set, shows Kun's slash-command overlay with these rows instead of skill filtering. */
+  slashCommandsOverride?: ComposerSlashCommandItem[]
 }
 
 /**
@@ -179,6 +181,7 @@ export function Composer({
   defaultPlusMenuOpen = false,
   plusMenuToggles,
   footerHint,
+  slashCommandsOverride,
 }: ComposerProps) {
   const compact = variant === 'compact'
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -231,7 +234,12 @@ export function Composer({
   }
 
   // The picker is active when there's a leading /query and skills are provided.
-  const query = useMemo(() => (skills && skills.length > 0 ? skillQuery(value) : null), [value, skills])
+  const query = useMemo(() => {
+    if (slashCommandsOverride) {
+      return value.startsWith('/') ? value.slice(1) : null
+    }
+    return skills && skills.length > 0 ? skillQuery(value) : null
+  }, [value, skills, slashCommandsOverride])
 
   const activeFileMention = useMemo(() => {
     if (query !== null) return null
@@ -300,17 +308,27 @@ export function Composer({
   const canSend = !disabled && value.trim().length > 0
 
   const slashCommands = useMemo((): ComposerSlashCommandItem[] => {
+    if (slashCommandsOverride) {
+      return slashCommandsOverride.map((command, index) => ({
+        ...command,
+        active: index === slashActiveIndex,
+      }))
+    }
     if (query === null || !skills) return []
     return filterSkillSlashCommands(skills, query).map((command, index) => ({
       ...command,
       icon: <Sparkles strokeWidth={1.9} />,
       active: index === slashActiveIndex,
     }))
-  }, [query, skills, slashActiveIndex])
+  }, [slashCommandsOverride, query, skills, slashActiveIndex])
 
   useEffect(() => {
+    if (slashCommandsOverride) {
+      setPickerOpen(value.startsWith('/'))
+      return
+    }
     setPickerOpen(query !== null)
-  }, [query])
+  }, [query, slashCommandsOverride, value])
 
   useEffect(() => {
     setSlashActiveIndex(0)
@@ -507,14 +525,18 @@ export function Composer({
             />
           </div>
         ) : null}
-        {!compact && pickerOpen && query !== null ? (
+        {!compact && pickerOpen && (slashCommandsOverride || query !== null) ? (
           <div ref={slashMenuRef}>
             <ComposerSlashMenu
               commands={slashCommands}
-              onPick={pickSlashCommand}
+              onPick={slashCommandsOverride ? undefined : pickSlashCommand}
               onHover={setSlashActiveIndex}
               emptyMessage={
-                query.trim() ? `No skills match “${query.trim()}”.` : 'No skills available.'
+                slashCommandsOverride
+                  ? 'No matching command. Keep typing to send the raw text instead.'
+                  : query?.trim()
+                    ? `No skills match “${query.trim()}”.`
+                    : 'No skills available.'
               }
             />
           </div>

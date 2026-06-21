@@ -19,7 +19,6 @@ import {
   ImagePlus,
   ListTodo,
   Loader2,
-  MessageCircleMore,
   Mic,
   PauseCircle,
   Pencil,
@@ -98,6 +97,12 @@ import {
   COMPOSER_VOICE_START_LABEL,
   COMPOSER_VOICE_TRANSCRIBING_LABEL,
 } from '../lib/composerVoiceDictation'
+import {
+  COMPOSER_SLASH_COMMAND_MENU_TITLE,
+  COMPOSER_SLASH_COMMANDS_PREVIEW,
+  type ComposerSlashCommandPreviewIcon,
+  type ComposerSlashCommandPreviewRow,
+} from '../lib/composerSlashCommands'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
@@ -198,44 +203,43 @@ export type FloatingComposerSnapshot = {
   attachmentUploadError: string | null
 }
 
-const SLASH_COMMANDS_PREVIEW: SlashCommandPreview[] = [
-  {
-    id: 'new',
-    title: 'New chat',
-    description: 'Start a fresh conversation thread',
-    badge: '/new',
-    icon: <MessageCircleMore strokeWidth={1.9} />,
-    active: true,
-  },
-  {
-    id: 'compact',
-    title: 'Compact context',
-    description: 'Summarize older turns to free context window',
-    badge: '/compact',
-    icon: <Archive strokeWidth={1.9} />,
-  },
-  {
-    id: 'research',
-    title: 'Deep research',
-    description: 'Run a multi-step research pass on a topic',
-    badge: '/research',
-    icon: <Search strokeWidth={1.9} />,
-  },
-  {
-    id: 'review',
-    title: 'Code review',
-    description: 'Review recent changes in the workspace',
-    badge: '/review',
-    icon: <SearchCode strokeWidth={1.9} />,
-  },
-  {
-    id: 'goal',
-    title: 'Pursue a goal',
-    description: 'Set or manage a thread-level objective',
-    badge: '/goal',
-    icon: <Target strokeWidth={1.9} />,
-  },
-]
+const SLASH_COMMAND_PREVIEW_ICONS: Record<ComposerSlashCommandPreviewIcon, ReactNode> = {
+  plus: <Plus strokeWidth={1.9} />,
+  search: <Search strokeWidth={1.9} />,
+  listTodo: <ListTodo strokeWidth={1.9} />,
+  target: <Target strokeWidth={1.9} />,
+  archive: <Archive strokeWidth={1.9} />,
+  searchCode: <SearchCode strokeWidth={1.9} />,
+}
+
+function mapComposerSlashCommandPreviewRows(
+  rows: ComposerSlashCommandPreviewRow[],
+): SlashCommandPreview[] {
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    badge: row.badge,
+    icon: SLASH_COMMAND_PREVIEW_ICONS[row.icon],
+    active: row.active,
+  }))
+}
+
+export function buildComposerSlashCommandsPreview(
+  activeIndex = 0,
+): ComposerSlashCommandItem[] {
+  return COMPOSER_SLASH_COMMANDS_PREVIEW.map((row, index) => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    badge: row.badge,
+    icon: SLASH_COMMAND_PREVIEW_ICONS[row.icon],
+    active: index === activeIndex,
+  }))
+}
+
+const SLASH_COMMANDS_PREVIEW: SlashCommandPreview[] =
+  mapComposerSlashCommandPreviewRows(COMPOSER_SLASH_COMMANDS_PREVIEW)
 
 const FILE_MENTIONS_PREVIEW: FileMentionPreview[] = [
   { relativePath: 'src/renderer/components/FloatingComposer.tsx', active: true },
@@ -365,7 +369,7 @@ export function ComposerSlashMenu({
 }): ReactElement {
   return (
     <div className="floating-composer-slash-menu">
-      <div className="floating-composer-slash-menu-title">Slash commands</div>
+      <div className="floating-composer-slash-menu-title">{COMPOSER_SLASH_COMMAND_MENU_TITLE}</div>
       {commands.length > 0 ? (
         <div className="floating-composer-slash-menu-list">
           {commands.map((command, index) => (

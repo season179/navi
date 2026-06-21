@@ -28,6 +28,7 @@ import {
 } from '../lib/composerFooterHint'
 import { COMPOSER_DICTATION_ERROR_PREVIEW } from '../lib/composerVoiceDictation'
 import { COMPOSER_QUEUE_PLACEHOLDER } from '../lib/composerBusyState'
+import { resolveComposerSlashCommandsPreview } from '../lib/composerSlashCommands'
 import {
   QUEUED_MESSAGES_PREVIEW,
 } from '../components/FloatingComposerQueuedMessages'
@@ -368,6 +369,7 @@ import {
 import { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
 import {
   FloatingComposerPreview,
+  buildComposerSlashCommandsPreview,
   type FloatingComposerPreviewMode,
 } from '../components/FloatingComposer'
 import {
@@ -655,6 +657,9 @@ function HomePage() {
     if (params.has('composerPlanModePreview')) {
       return COMPOSER_PLAN_MODE_PLACEHOLDER
     }
+    if (params.has('composerSlashCommandsPreview')) {
+      return resolveComposerSlashCommandsPreview(params.get('composerSlashCommandsPreview')).draft
+    }
     return ''
   })
   const [settingsCategory, setSettingsCategory] = useState<SettingsCategory>('providers')
@@ -812,6 +817,15 @@ function HomePage() {
   const composerBusyPreview = useMemo(() => {
     if (typeof window === 'undefined') return false
     return new URLSearchParams(window.location.search).has('composerBusyPreview')
+  }, [])
+
+  // Visual preview for the ported ComposerSlashMenu (?composerSlashCommandsPreview=1).
+  const composerSlashCommandsPreview = useMemo(() => {
+    if (typeof window === 'undefined') return undefined
+    if (!new URLSearchParams(window.location.search).has('composerSlashCommandsPreview')) {
+      return undefined
+    }
+    return buildComposerSlashCommandsPreview()
   }, [])
 
   // Visual preview for the ported FloatingComposerQueuedMessages (?queuedMessagesPreview=1).
@@ -3883,6 +3897,7 @@ function HomePage() {
       footerHint={composerFooterHintPreview}
       dictationError={composerDictationErrorPreview}
       voiceTranscribing={composerVoiceTranscribingPreview}
+      slashCommandsOverride={composerSlashCommandsPreview}
       modelChip={
         <FloatingModelPicker
           providers={providerProfiles}
