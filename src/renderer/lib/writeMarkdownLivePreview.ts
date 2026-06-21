@@ -1,6 +1,7 @@
 import { HighlightStyle, syntaxHighlighting, syntaxTree } from '@codemirror/language'
 import {
   StateField,
+  Facet,
   type ChangeDesc,
   type EditorState,
   type Extension,
@@ -27,7 +28,15 @@ import {
 import {
   isHtmlEmbedSrc,
   parsePendingInfographicImage,
+  type WriteMarkdownPreviewWidgetOverrides,
 } from './writeMarkdownImageWidgets'
+
+export const livePreviewWidgetOverridesFacet = Facet.define<
+  WriteMarkdownPreviewWidgetOverrides | undefined,
+  WriteMarkdownPreviewWidgetOverrides | undefined
+>({
+  combine: (values) => values[values.length - 1],
+})
 
 type DecorationRange = {
   from: number
@@ -594,10 +603,17 @@ function buildMarkdownDecorations(view: EditorView): DecorationSet {
             const source = view.state.doc.sliceString(node.from, node.to)
             const pending = parsePendingInfographicImage(source)
             if (pending) {
+              const infographicOverride = view.state.facet(livePreviewWidgetOverridesFacet)?.infographic
               ranges.push({
                 from: node.from,
                 to: node.to,
-                deco: Decoration.replace({ widget: new InfographicPendingWidget(pending.id) })
+                deco: Decoration.replace({
+                  widget: new InfographicPendingWidget(
+                    pending.id,
+                    infographicOverride?.kind,
+                    infographicOverride?.state,
+                  ),
+                }),
               })
               return false
             }
@@ -700,8 +716,11 @@ const markdownLivePreviewPlugin = ViewPlugin.fromClass(
   }
 )
 
-export function writeMarkdownLivePreviewExtensions(): Extension[] {
+export function writeMarkdownLivePreviewExtensions(
+  widgetOverrides?: WriteMarkdownPreviewWidgetOverrides,
+): Extension[] {
   return [
+    livePreviewWidgetOverridesFacet.of(widgetOverrides),
     EditorView.editorAttributes.of({ class: 'cm-write-live-preview' }),
     syntaxHighlighting(writeMarkdownHighlight),
     writeMarkdownLiveTheme,

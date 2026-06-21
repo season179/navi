@@ -28,7 +28,9 @@ import {
 } from '../lib/writeMarkdownInlineCompletionPreview'
 import {
   editorPreviewContentForImageWidgetMode,
+  editorWidgetOverridesForImageWidgetMode,
   isWriteMarkdownEditorImageWidgetMode,
+  type WriteMarkdownPreviewWidgetOverrides,
 } from '../lib/writeMarkdownImageWidgets'
 import { writeMarkdownLivePreviewExtensions } from '../lib/writeMarkdownLivePreview'
 import { WRITE_MARKDOWN_PREVIEW_SAMPLE } from './WriteMarkdownPreview'
@@ -47,6 +49,9 @@ export type WriteMarkdownEditorPreviewMode =
   | 'inlineCompletion'
   | 'inlineEdit'
   | 'infographic'
+  | 'infographicStale'
+  | 'infographicDesign'
+  | 'infographicPrototype'
   | 'htmlEmbed'
   | 'imageError'
   | 'loadedImage'
@@ -87,6 +92,8 @@ type Props = {
   showDiffReview?: boolean
   /** Static preview: render Kun-matching inline AI completion or edit decorations. */
   inlineCompletionPreview?: WriteMarkdownInlineCompletionPreviewMode
+  /** Static preview: override live-preview widget appearance (infographic kind/state). */
+  livePreviewWidgetOverrides?: WriteMarkdownPreviewWidgetOverrides
   onChange?: (value: string) => void
 }
 
@@ -173,6 +180,7 @@ export function WriteMarkdownEditor({
   readOnly = false,
   showDiffReview = false,
   inlineCompletionPreview,
+  livePreviewWidgetOverrides,
   onChange,
 }: Props): ReactElement {
   const hostRef = useRef<HTMLDivElement | null>(null)
@@ -219,7 +227,9 @@ export function WriteMarkdownEditor({
         themeCompartment.of(buildEditorTheme(appearance)),
         editableCompartment.of(buildInteractionExtensions(readOnly, appearance)),
         livePreviewCompartment.of(
-          appearance === 'live' ? writeMarkdownLivePreviewExtensions() : [],
+          appearance === 'live'
+            ? writeMarkdownLivePreviewExtensions(livePreviewWidgetOverrides)
+            : [],
         ),
         inlineCompletionCompartment.of(
           inlineCompletionPreview
@@ -280,7 +290,9 @@ export function WriteMarkdownEditor({
         themeCompartment.reconfigure(buildEditorTheme(appearance)),
         editableCompartment.reconfigure(buildInteractionExtensions(readOnly, appearance)),
         livePreviewCompartment.reconfigure(
-          appearance === 'live' ? writeMarkdownLivePreviewExtensions() : [],
+          appearance === 'live'
+            ? writeMarkdownLivePreviewExtensions(livePreviewWidgetOverrides)
+            : [],
         ),
         inlineCompletionCompartment.reconfigure(
           inlineCompletionPreview
@@ -289,7 +301,7 @@ export function WriteMarkdownEditor({
         ),
       ],
     })
-  }, [appearance, inlineCompletionPreview, readOnly])
+  }, [appearance, inlineCompletionPreview, livePreviewWidgetOverrides, readOnly])
 
   useEffect(() => {
     if (showDiffReview) return
@@ -341,6 +353,9 @@ export function WriteMarkdownEditorPreview({ mode }: PreviewProps): ReactElement
   const [value, setValue] = useState(() => previewInitialContent(mode))
   const inlineCompletionPreview =
     mode === 'inlineCompletion' ? 'completion' : mode === 'inlineEdit' ? 'edit' : undefined
+  const livePreviewWidgetOverrides = isWriteMarkdownEditorImageWidgetMode(mode)
+    ? editorWidgetOverridesForImageWidgetMode(mode)
+    : undefined
   const readOnly =
     mode === 'readonly' ||
     mode === 'diffReview' ||
@@ -356,6 +371,7 @@ export function WriteMarkdownEditorPreview({ mode }: PreviewProps): ReactElement
         readOnly={readOnly}
         showDiffReview={mode === 'diffReview'}
         inlineCompletionPreview={inlineCompletionPreview}
+        livePreviewWidgetOverrides={livePreviewWidgetOverrides}
         onChange={readOnly ? undefined : setValue}
       />
     </div>

@@ -1,5 +1,27 @@
 // Plain DOM factory for CodeMirror live preview echoing Kun's infographic-pending-dom.ts.
-// Visual only: always renders the active sketch placeholder.
+// Visual only: active/stale sketch placeholder with kind-specific labels.
+
+export type InfographicPendingKind = 'infographic' | 'design' | 'prototype'
+export type InfographicPendingState = 'active' | 'stale'
+
+export type InfographicPendingOptions = {
+  kind?: InfographicPendingKind
+  state?: InfographicPendingState
+}
+
+const COPY = {
+  stale: 'Generation interrupted — placeholder left in document',
+  infographic: 'Drawing infographic',
+  design: 'Drawing design draft',
+  prototype: 'Building prototype',
+}
+
+function labelFor(kind: InfographicPendingKind, state: InfographicPendingState): string {
+  if (state === 'stale') return COPY.stale
+  if (kind === 'design') return COPY.design
+  if (kind === 'prototype') return COPY.prototype
+  return COPY.infographic
+}
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
@@ -73,10 +95,17 @@ function buildSketchSvg(): SVGSVGElement {
 }
 
 /** Build the Kun-matching infographic pending placeholder for CodeMirror widgets. */
-export function createInfographicPendingElement(id: string): HTMLElement {
+export function createInfographicPendingElement(
+  id: string,
+  options?: InfographicPendingOptions,
+): HTMLElement {
+  const kind = options?.kind ?? 'infographic'
+  const state = options?.state ?? 'active'
+  const stale = state === 'stale'
+
   const root = document.createElement('span')
   root.className = 'write-infographic-pending'
-  root.dataset.state = 'active'
+  root.dataset.state = stale ? 'stale' : 'active'
   root.dataset.pendingId = id
   root.contentEditable = 'false'
 
@@ -88,17 +117,19 @@ export function createInfographicPendingElement(id: string): HTMLElement {
   const label = document.createElement('span')
   label.className = 'write-infographic-pending-label'
   const text = document.createElement('span')
-  text.textContent = 'Drawing infographic'
+  text.textContent = labelFor(kind, state)
   label.appendChild(text)
 
-  const dots = document.createElement('span')
-  dots.className = 'write-infographic-pending-dots'
-  for (let index = 0; index < 3; index += 1) {
-    const dot = document.createElement('span')
-    dot.textContent = '.'
-    dots.appendChild(dot)
+  if (!stale) {
+    const dots = document.createElement('span')
+    dots.className = 'write-infographic-pending-dots'
+    for (let index = 0; index < 3; index += 1) {
+      const dot = document.createElement('span')
+      dot.textContent = '.'
+      dots.appendChild(dot)
+    }
+    label.appendChild(dots)
   }
-  label.appendChild(dots)
   root.appendChild(label)
   return root
 }

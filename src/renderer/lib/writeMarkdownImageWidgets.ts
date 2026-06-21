@@ -264,6 +264,9 @@ function example() {
 
 export type WriteMarkdownEditorImageWidgetPreviewMode =
   | 'infographic'
+  | 'infographicStale'
+  | 'infographicDesign'
+  | 'infographicPrototype'
   | 'htmlEmbed'
   | 'imageError'
   | 'loadedImage'
@@ -284,10 +287,28 @@ export function isWriteMarkdownEditorImageWidgetMode(
 ): value is WriteMarkdownEditorImageWidgetPreviewMode {
   return (
     value === 'infographic' ||
+    value === 'infographicStale' ||
+    value === 'infographicDesign' ||
+    value === 'infographicPrototype' ||
     value === 'htmlEmbed' ||
     value === 'imageError' ||
     value === 'loadedImage'
   )
+}
+
+/** Widget overrides for ?writeMarkdownEditor live-preview infographic modes. */
+export function editorWidgetOverridesForImageWidgetMode(
+  mode: WriteMarkdownEditorImageWidgetPreviewMode,
+): WriteMarkdownPreviewWidgetOverrides | undefined {
+  if (
+    mode === 'infographic' ||
+    mode === 'infographicStale' ||
+    mode === 'infographicDesign' ||
+    mode === 'infographicPrototype'
+  ) {
+    return widgetOverridesForPreviewMode(mode)
+  }
+  return undefined
 }
 
 /** Markdown sample for ?writeMarkdownEditor live-preview widget modes. */

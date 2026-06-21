@@ -2,12 +2,16 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   editorPreviewContentForImageWidgetMode,
+  editorWidgetOverridesForImageWidgetMode,
   isWriteMarkdownEditorImageWidgetMode,
 } from '../src/renderer/lib/writeMarkdownImageWidgets.ts'
 import { resolveWriteMarkdownEditorPreviewMode } from '../src/renderer/lib/writeMarkdownInlineCompletionPreview.ts'
 
 test('resolveWriteMarkdownEditorPreviewMode routes live image widget preview params', () => {
   assert.equal(resolveWriteMarkdownEditorPreviewMode('infographic'), 'infographic')
+  assert.equal(resolveWriteMarkdownEditorPreviewMode('infographicStale'), 'infographicStale')
+  assert.equal(resolveWriteMarkdownEditorPreviewMode('infographicDesign'), 'infographicDesign')
+  assert.equal(resolveWriteMarkdownEditorPreviewMode('infographicPrototype'), 'infographicPrototype')
   assert.equal(resolveWriteMarkdownEditorPreviewMode('htmlEmbed'), 'htmlEmbed')
   assert.equal(resolveWriteMarkdownEditorPreviewMode('imageError'), 'imageError')
   assert.equal(resolveWriteMarkdownEditorPreviewMode('loadedImage'), 'loadedImage')
@@ -17,10 +21,29 @@ test('resolveWriteMarkdownEditorPreviewMode routes live image widget preview par
 
 test('isWriteMarkdownEditorImageWidgetMode recognizes editor image widget modes', () => {
   assert.equal(isWriteMarkdownEditorImageWidgetMode('infographic'), true)
+  assert.equal(isWriteMarkdownEditorImageWidgetMode('infographicStale'), true)
+  assert.equal(isWriteMarkdownEditorImageWidgetMode('infographicDesign'), true)
+  assert.equal(isWriteMarkdownEditorImageWidgetMode('infographicPrototype'), true)
   assert.equal(isWriteMarkdownEditorImageWidgetMode('htmlEmbed'), true)
   assert.equal(isWriteMarkdownEditorImageWidgetMode('imageError'), true)
   assert.equal(isWriteMarkdownEditorImageWidgetMode('loadedImage'), true)
   assert.equal(isWriteMarkdownEditorImageWidgetMode('inlineEdit'), false)
+})
+
+test('editorWidgetOverridesForImageWidgetMode returns infographic kind/state overrides', () => {
+  assert.deepEqual(editorWidgetOverridesForImageWidgetMode('infographic'), {
+    infographic: { kind: 'infographic', state: 'active' },
+  })
+  assert.deepEqual(editorWidgetOverridesForImageWidgetMode('infographicStale'), {
+    infographic: { kind: 'infographic', state: 'stale' },
+  })
+  assert.deepEqual(editorWidgetOverridesForImageWidgetMode('infographicDesign'), {
+    infographic: { kind: 'design', state: 'active' },
+  })
+  assert.deepEqual(editorWidgetOverridesForImageWidgetMode('infographicPrototype'), {
+    infographic: { kind: 'prototype', state: 'active' },
+  })
+  assert.equal(editorWidgetOverridesForImageWidgetMode('htmlEmbed'), undefined)
 })
 
 test('editorPreviewContentForImageWidgetMode returns markdown with image tokens', () => {

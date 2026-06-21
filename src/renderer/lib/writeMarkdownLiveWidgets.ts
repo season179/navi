@@ -8,7 +8,11 @@ import {
   renderFallbackCodeHtml,
 } from './code-highlighting'
 import { createHtmlEmbedElement } from './writeHtmlEmbedDom'
-import { createInfographicPendingElement } from './writeInfographicPendingDom'
+import {
+  createInfographicPendingElement,
+  type InfographicPendingKind,
+  type InfographicPendingState,
+} from './writeInfographicPendingDom'
 
 export type BlockRange = {
   from: number
@@ -185,18 +189,28 @@ export class ImageWidget extends WidgetType {
 }
 
 export class InfographicPendingWidget extends WidgetType {
-  constructor(private id: string) {
+  constructor(
+    private id: string,
+    private kind?: InfographicPendingKind,
+    private state?: InfographicPendingState,
+  ) {
     super()
   }
 
   eq(other: InfographicPendingWidget): boolean {
-    return other.id === this.id
+    return (
+      other.id === this.id &&
+      other.kind === this.kind &&
+      other.state === this.state
+    )
   }
 
   toDOM(view: EditorView): HTMLElement {
     const wrapper = document.createElement('span')
     wrapper.className = 'cm-write-md-image-wrap'
-    wrapper.appendChild(createInfographicPendingElement(this.id))
+    wrapper.appendChild(
+      createInfographicPendingElement(this.id, { kind: this.kind, state: this.state }),
+    )
     wrapper.addEventListener('mousedown', (event) => {
       if (!isPrimaryMouseDown(event)) return
       preventEditorMouseHandling(event)
