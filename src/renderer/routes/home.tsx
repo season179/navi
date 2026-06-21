@@ -202,6 +202,19 @@ import {
   type SideConversationSnapshot,
 } from '../components/SideConversationPanel'
 import {
+  WorkspaceFilePreviewPanel,
+  WORKSPACE_FILE_PREVIEW_DIFF_RESULT,
+  WORKSPACE_FILE_PREVIEW_MD_RESULT,
+  WORKSPACE_FILE_PREVIEW_MD_TARGET,
+  WORKSPACE_FILE_PREVIEW_RESULT,
+  WORKSPACE_FILE_PREVIEW_TARGET,
+  WORKSPACE_FILE_PREVIEW_TARGETS,
+  WORKSPACE_FILE_PREVIEW_WORKSPACE,
+  type WorkspaceFilePreviewMode,
+  type WorkspaceFilePreviewResult,
+  type WorkspaceFileTarget,
+} from '../components/WorkspaceFilePreviewPanel'
+import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
 } from '../components/ClawEmptyHero'
@@ -1033,6 +1046,124 @@ function HomePage() {
     setSideConversationPanelPreviewOpen(true)
   }, [sideConversationPanelPreviewProps])
 
+  // Visual preview for the ported WorkspaceFilePreviewPanel (?workspaceFilePreviewPanel=1|markdown|empty|loading|error|multitab).
+  const workspaceFilePreviewPanelMode = useMemo((): WorkspaceFilePreviewMode | null => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('workspaceFilePreviewPanel')) return null
+    const mode = params.get('workspaceFilePreviewPanel')
+    if (
+      mode === 'markdown' ||
+      mode === 'empty' ||
+      mode === 'loading' ||
+      mode === 'error' ||
+      mode === 'multitab'
+    ) {
+      return mode
+    }
+    return 'default'
+  }, [])
+  const workspaceFilePreviewPanelProps = useMemo(() => {
+    if (!workspaceFilePreviewPanelMode) return null
+    if (workspaceFilePreviewPanelMode === 'empty') {
+      return {
+        target: null as WorkspaceFileTarget | null,
+        openTargets: [] as WorkspaceFileTarget[],
+        result: null as WorkspaceFilePreviewResult | null,
+        loading: false,
+      }
+    }
+    if (workspaceFilePreviewPanelMode === 'loading') {
+      return {
+        target: WORKSPACE_FILE_PREVIEW_TARGET,
+        openTargets: [WORKSPACE_FILE_PREVIEW_TARGET],
+        result: null as WorkspaceFilePreviewResult | null,
+        loading: true,
+      }
+    }
+    if (workspaceFilePreviewPanelMode === 'error') {
+      return {
+        target: WORKSPACE_FILE_PREVIEW_TARGET,
+        openTargets: [WORKSPACE_FILE_PREVIEW_TARGET],
+        result: {
+          ok: false,
+          message: 'Could not read workspace file preview.',
+        } as WorkspaceFilePreviewResult,
+        loading: false,
+      }
+    }
+    if (workspaceFilePreviewPanelMode === 'markdown') {
+      return {
+        target: WORKSPACE_FILE_PREVIEW_MD_TARGET,
+        openTargets: [WORKSPACE_FILE_PREVIEW_MD_TARGET],
+        result: WORKSPACE_FILE_PREVIEW_MD_RESULT,
+        loading: false,
+      }
+    }
+    if (workspaceFilePreviewPanelMode === 'multitab') {
+      return {
+        target: WORKSPACE_FILE_PREVIEW_TARGET,
+        openTargets: WORKSPACE_FILE_PREVIEW_TARGETS,
+        result: WORKSPACE_FILE_PREVIEW_RESULT,
+        loading: false,
+      }
+    }
+    return {
+      target: WORKSPACE_FILE_PREVIEW_TARGET,
+      openTargets: [WORKSPACE_FILE_PREVIEW_TARGET],
+      result: WORKSPACE_FILE_PREVIEW_RESULT,
+      loading: false,
+    }
+  }, [workspaceFilePreviewPanelMode])
+  const [workspaceFilePreviewPanelTarget, setWorkspaceFilePreviewPanelTarget] =
+    useState<WorkspaceFileTarget | null>(() => WORKSPACE_FILE_PREVIEW_TARGET)
+  const [workspaceFilePreviewPanelOpenTargets, setWorkspaceFilePreviewPanelOpenTargets] =
+    useState<WorkspaceFileTarget[]>(() => WORKSPACE_FILE_PREVIEW_TARGETS)
+  const [workspaceFilePreviewPanelResult, setWorkspaceFilePreviewPanelResult] =
+    useState<WorkspaceFilePreviewResult | null>(() => WORKSPACE_FILE_PREVIEW_RESULT)
+  const [workspaceFilePreviewPanelOpen, setWorkspaceFilePreviewPanelOpen] = useState(true)
+  useEffect(() => {
+    if (!workspaceFilePreviewPanelProps) return
+    setWorkspaceFilePreviewPanelTarget(workspaceFilePreviewPanelProps.target)
+    setWorkspaceFilePreviewPanelOpenTargets(workspaceFilePreviewPanelProps.openTargets)
+    setWorkspaceFilePreviewPanelResult(workspaceFilePreviewPanelProps.result)
+    setWorkspaceFilePreviewPanelOpen(true)
+  }, [workspaceFilePreviewPanelProps])
+  const handleWorkspaceFilePreviewSelectTarget = useCallback((next: WorkspaceFileTarget) => {
+    setWorkspaceFilePreviewPanelTarget(next)
+    if (next.path.endsWith('.md')) {
+      setWorkspaceFilePreviewPanelResult(WORKSPACE_FILE_PREVIEW_MD_RESULT)
+      return
+    }
+    if (next.path.includes('diff-stats')) {
+      setWorkspaceFilePreviewPanelResult(WORKSPACE_FILE_PREVIEW_DIFF_RESULT)
+      return
+    }
+    setWorkspaceFilePreviewPanelResult(WORKSPACE_FILE_PREVIEW_RESULT)
+  }, [])
+  const handleWorkspaceFilePreviewCloseTarget = useCallback((closing: WorkspaceFileTarget) => {
+    setWorkspaceFilePreviewPanelOpenTargets((current) => {
+      const next = current.filter(
+        (item) =>
+          `${item.workspaceRoot ?? ''}\n${item.path}`.replaceAll('\\', '/').toLowerCase() !==
+          `${closing.workspaceRoot ?? ''}\n${closing.path}`.replaceAll('\\', '/').toLowerCase(),
+      )
+      if (
+        workspaceFilePreviewPanelTarget &&
+        `${workspaceFilePreviewPanelTarget.workspaceRoot ?? ''}\n${workspaceFilePreviewPanelTarget.path}`
+          .replaceAll('\\', '/')
+          .toLowerCase() ===
+          `${closing.workspaceRoot ?? ''}\n${closing.path}`.replaceAll('\\', '/').toLowerCase()
+      ) {
+        setWorkspaceFilePreviewPanelTarget(next[next.length - 1] ?? null)
+        setWorkspaceFilePreviewPanelResult(
+          next.length ? WORKSPACE_FILE_PREVIEW_RESULT : null,
+        )
+      }
+      return next
+    })
+  }, [workspaceFilePreviewPanelTarget])
+
   const renderWorkbenchTopBarPreview = () => {
     if (!workbenchTopBarPreviewMode || !workbenchTopBarPreviewProps) return null
     return (
@@ -1359,6 +1490,23 @@ function HomePage() {
             onNewDraft={() => {
               setSideConversationPanelPreviewActiveId(null)
             }}
+          />
+        </div>
+      ) : null}
+
+      {workspaceFilePreviewPanelMode &&
+      workspaceFilePreviewPanelProps &&
+      workspaceFilePreviewPanelOpen ? (
+        <div className="workspace-file-preview-panel-preview-wrap">
+          <WorkspaceFilePreviewPanel
+            target={workspaceFilePreviewPanelTarget}
+            openTargets={workspaceFilePreviewPanelOpenTargets}
+            workspaceRoot={WORKSPACE_FILE_PREVIEW_WORKSPACE}
+            result={workspaceFilePreviewPanelResult}
+            loading={workspaceFilePreviewPanelProps.loading}
+            onSelectTarget={handleWorkspaceFilePreviewSelectTarget}
+            onCloseTarget={handleWorkspaceFilePreviewCloseTarget}
+            onCollapse={() => setWorkspaceFilePreviewPanelOpen(false)}
           />
         </div>
       ) : null}

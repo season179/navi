@@ -112,6 +112,54 @@ export function extensionForLanguage(language: string): string {
   return DOWNLOAD_EXTENSIONS[normalized] ?? normalized
 }
 
+const FILE_EXTENSION_LANGUAGES: Record<string, string> = {
+  bash: 'bash',
+  c: 'c',
+  cc: 'cpp',
+  cjs: 'js',
+  cpp: 'cpp',
+  cs: 'cs',
+  css: 'css',
+  diff: 'diff',
+  go: 'go',
+  h: 'c',
+  hpp: 'cpp',
+  html: 'html',
+  java: 'java',
+  js: 'js',
+  json: 'json',
+  jsonc: 'jsonc',
+  jsx: 'jsx',
+  md: 'md',
+  mjs: 'js',
+  patch: 'diff',
+  py: 'python',
+  rs: 'rust',
+  scss: 'scss',
+  sh: 'shell',
+  sql: 'sql',
+  toml: 'toml',
+  ts: 'ts',
+  tsx: 'tsx',
+  txt: 'txt',
+  yaml: 'yml',
+  yml: 'yml',
+}
+
+const FILE_NAME_LANGUAGES: Record<string, string> = {
+  dockerfile: 'dockerfile',
+  makefile: 'makefile',
+}
+
+export function languageFromFilePath(path: string): string {
+  const fileName = path.split(/[/\\]/).filter(Boolean).pop()?.toLowerCase() ?? ''
+  const byName = FILE_NAME_LANGUAGES[fileName]
+  if (byName) return byName
+
+  const extension = fileName.includes('.') ? fileName.split('.').pop() ?? '' : ''
+  return FILE_EXTENSION_LANGUAGES[extension] ?? ''
+}
+
 function highlightCacheKey(code: string, normalized: string): string {
   return `${normalized || 'plain'}\u0000${code}`
 }
