@@ -4,9 +4,17 @@
 
 import { Check, Loader2 } from 'lucide-react'
 import { useEffect, useState, type ReactElement } from 'react'
-
-const USER_INPUT_OTHER_LABEL = 'Other'
-const USER_INPUT_FREEFORM_LABEL = 'Answer'
+import {
+  USER_INPUT_BUBBLE_TITLE,
+  USER_INPUT_CANCEL,
+  USER_INPUT_CUSTOM_PLACEHOLDER,
+  USER_INPUT_FREEFORM_LABEL,
+  USER_INPUT_OTHER_DESCRIPTION,
+  USER_INPUT_OTHER_LABEL,
+  USER_INPUT_SUBMIT,
+  formatUserInputBubbleQuestionProgress,
+  resolveUserInputBubbleStatusLabel,
+} from '../lib/userInputBubble'
 
 export type UserInputOption = {
   label: string
@@ -178,14 +186,7 @@ export function UserInputBubble({ block, nested = false }: Props): ReactElement 
     if (!pending) return
   }
 
-  const statusLabel =
-    block.status === 'submitted'
-      ? 'Submitted'
-      : block.status === 'cancelled'
-        ? 'Cancelled'
-        : block.status === 'error'
-          ? 'Submit failed'
-          : 'Waiting for your answer…'
+  const statusLabel = resolveUserInputBubbleStatusLabel(block.status)
 
   const tone =
     block.status === 'error'
@@ -216,7 +217,7 @@ export function UserInputBubble({ block, nested = false }: Props): ReactElement 
             )}
           </span>
           <div className="user-input-bubble-title-wrap">
-            <div className="user-input-bubble-title">Input required</div>
+            <div className="user-input-bubble-title">{USER_INPUT_BUBBLE_TITLE}</div>
             <div className={`user-input-bubble-status tone-${tone}`}>{statusLabel}</div>
           </div>
         </div>
@@ -251,7 +252,10 @@ export function UserInputBubble({ block, nested = false }: Props): ReactElement 
                   </div>
                   {showProgress ? (
                     <div className="user-input-bubble-question-progress">
-                      Question {index + 1} / {block.questions.length}
+                      {formatUserInputBubbleQuestionProgress(
+                        index + 1,
+                        block.questions.length,
+                      )}
                     </div>
                   ) : null}
                 </div>
@@ -328,9 +332,11 @@ export function UserInputBubble({ block, nested = false }: Props): ReactElement 
                       ) : null}
                     </span>
                     <span className="user-input-bubble-option-content">
-                      <span className="user-input-bubble-option-label">Other</span>
+                      <span className="user-input-bubble-option-label">
+                        {USER_INPUT_OTHER_LABEL}
+                      </span>
                       <span className="user-input-bubble-option-description">
-                        Type a custom response
+                        {USER_INPUT_OTHER_DESCRIPTION}
                       </span>
                     </span>
                   </button>
@@ -348,7 +354,7 @@ export function UserInputBubble({ block, nested = false }: Props): ReactElement 
                           submit()
                         }
                       }}
-                      placeholder="Type your answer…"
+                      placeholder={USER_INPUT_CUSTOM_PLACEHOLDER}
                       className="user-input-bubble-textarea is-compact"
                     />
                   ) : null}
@@ -368,7 +374,7 @@ export function UserInputBubble({ block, nested = false }: Props): ReactElement 
                         submit()
                       }
                     }}
-                    placeholder="Type your answer…"
+                    placeholder={USER_INPUT_CUSTOM_PLACEHOLDER}
                     className="user-input-bubble-textarea"
                   />
                 </div>
@@ -391,10 +397,10 @@ export function UserInputBubble({ block, nested = false }: Props): ReactElement 
             onClick={submit}
           >
             <Check className="user-input-bubble-submit-icon" strokeWidth={2} />
-            Submit
+            {USER_INPUT_SUBMIT}
           </button>
           <button type="button" className="user-input-bubble-cancel" onClick={cancel}>
-            Cancel
+            {USER_INPUT_CANCEL}
           </button>
         </div>
       ) : null}
