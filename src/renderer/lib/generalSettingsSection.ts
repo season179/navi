@@ -47,12 +47,12 @@ export const GENERAL_SETTINGS_FONT_SCALE_LARGE = 'Large'
 /** English copy matching Kun's workspaceRoot locale string. */
 export const GENERAL_SETTINGS_WORKSPACE_ROOT_LABEL = 'Default working directory'
 
-/** Navi-branded equivalent of Kun's workspaceRootDesc locale string. */
+/** English copy matching Kun's workspaceRootDesc locale string. */
 export const GENERAL_SETTINGS_WORKSPACE_ROOT_DESC =
-  'First launch uses ~/.navi/default_workspace by default, and you can change it to another directory.'
+  'First launch uses ~/.kun/default_workspace by default, and you can change it to another directory.'
 
-/** Navi-branded equivalent of Kun's workspaceRootPlaceholder locale string. */
-export const GENERAL_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER = '~/.navi/default_workspace'
+/** English copy matching Kun's workspaceRootPlaceholder locale string. */
+export const GENERAL_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER = '~/.kun/default_workspace'
 
 /** English copy matching Kun's restoreWorkspaceDefault locale string. */
 export const GENERAL_SETTINGS_RESTORE_WORKSPACE_DEFAULT = 'Restore default'

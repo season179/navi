@@ -96,9 +96,9 @@ test('general settings section copy matches Kun locale strings', () => {
   assert.equal(GENERAL_SETTINGS_WORKSPACE_ROOT_LABEL, 'Default working directory')
   assert.equal(
     GENERAL_SETTINGS_WORKSPACE_ROOT_DESC,
-    'First launch uses ~/.navi/default_workspace by default, and you can change it to another directory.',
+    'First launch uses ~/.kun/default_workspace by default, and you can change it to another directory.',
   )
-  assert.equal(GENERAL_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER, '~/.navi/default_workspace')
+  assert.equal(GENERAL_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER, '~/.kun/default_workspace')
   assert.equal(GENERAL_SETTINGS_RESTORE_WORKSPACE_DEFAULT, 'Restore default')
   assert.equal(GENERAL_SETTINGS_BROWSE_LABEL, 'Browse')
   assert.equal(GENERAL_SETTINGS_CURSOR_SPOTLIGHT_LABEL, 'Interactive effects')
