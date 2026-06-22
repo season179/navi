@@ -51,6 +51,7 @@ import {
   formatMessageBubbleApprovalTool,
   resolveMessageBubbleApprovalStatusLabel,
 } from '../lib/messageBubbleApproval'
+import { formatMessageDateTime } from '../lib/messageBubble'
 
 export type UserMessageSnapshot = {
   kind: 'user'
@@ -129,17 +130,6 @@ export type MessageBubbleSnapshot =
   | CompactionInlineSnapshot
   | ReviewInlineSnapshot
   | SystemMessageSnapshot
-
-function formatMessageDateTime(input: string): string {
-  const date = new Date(input)
-  if (Number.isNaN(date.getTime())) return input
-  return date.toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  })
-}
 
 function UserAttachmentPreviews({
   attachments,
@@ -394,7 +384,7 @@ function MessageBubbleImpl({
   if (block.kind === 'compaction') {
     return (
       <div className="message-bubble-compaction">
-        {block.detail || block.summary || 'Compacted context'}
+        {block.detail || block.summary}
       </div>
     )
   }
@@ -402,7 +392,7 @@ function MessageBubbleImpl({
   if (block.kind === 'review') {
     return (
       <div className="message-bubble-review">
-        {block.reviewText || block.title || 'Review'}
+        {block.reviewText || block.title}
       </div>
     )
   }
