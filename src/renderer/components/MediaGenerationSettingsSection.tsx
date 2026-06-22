@@ -4,6 +4,86 @@
 
 import { useState, type ReactElement } from 'react'
 import {
+  formatMediaGenerationSettingsModelSelectDefaultOption,
+  formatMediaGenerationSettingsProviderMissingKey,
+  MEDIA_GENERATION_SETTINGS_DESC,
+  MEDIA_GENERATION_SETTINGS_MUSIC_API_KEY_DESC,
+  MEDIA_GENERATION_SETTINGS_MUSIC_API_KEY_LABEL,
+  MEDIA_GENERATION_SETTINGS_MUSIC_BASE_URL_DESC,
+  MEDIA_GENERATION_SETTINGS_MUSIC_BASE_URL_LABEL,
+  MEDIA_GENERATION_SETTINGS_MUSIC_BASE_URL_PLACEHOLDER,
+  MEDIA_GENERATION_SETTINGS_MUSIC_ENABLED_DESC,
+  MEDIA_GENERATION_SETTINGS_MUSIC_ENABLED_LABEL,
+  MEDIA_GENERATION_SETTINGS_MUSIC_FORMAT_DESC,
+  MEDIA_GENERATION_SETTINGS_MUSIC_FORMAT_LABEL,
+  MEDIA_GENERATION_SETTINGS_MUSIC_MODEL_DESC,
+  MEDIA_GENERATION_SETTINGS_MUSIC_MODEL_LABEL,
+  MEDIA_GENERATION_SETTINGS_MUSIC_MODEL_PLACEHOLDER,
+  MEDIA_GENERATION_SETTINGS_MUSIC_PROTOCOL_DESC,
+  MEDIA_GENERATION_SETTINGS_MUSIC_PROTOCOL_LABEL,
+  MEDIA_GENERATION_SETTINGS_MUSIC_PROTOCOL_MINIMAX,
+  MEDIA_GENERATION_SETTINGS_MUSIC_PROVIDER_CUSTOM,
+  MEDIA_GENERATION_SETTINGS_MUSIC_PROVIDER_DESC,
+  MEDIA_GENERATION_SETTINGS_MUSIC_PROVIDER_LABEL,
+  MEDIA_GENERATION_SETTINGS_MUSIC_TIMEOUT_DESC,
+  MEDIA_GENERATION_SETTINGS_MUSIC_TIMEOUT_LABEL,
+  MEDIA_GENERATION_SETTINGS_MUSIC_TITLE,
+  MEDIA_GENERATION_SETTINGS_SPEECH_API_KEY_DESC,
+  MEDIA_GENERATION_SETTINGS_SPEECH_API_KEY_LABEL,
+  MEDIA_GENERATION_SETTINGS_SPEECH_BASE_URL_DESC,
+  MEDIA_GENERATION_SETTINGS_SPEECH_BASE_URL_LABEL,
+  MEDIA_GENERATION_SETTINGS_SPEECH_BASE_URL_PLACEHOLDER,
+  MEDIA_GENERATION_SETTINGS_SPEECH_ENABLED_DESC,
+  MEDIA_GENERATION_SETTINGS_SPEECH_ENABLED_LABEL,
+  MEDIA_GENERATION_SETTINGS_SPEECH_FORMAT_DESC,
+  MEDIA_GENERATION_SETTINGS_SPEECH_FORMAT_LABEL,
+  MEDIA_GENERATION_SETTINGS_SPEECH_MODEL_DESC,
+  MEDIA_GENERATION_SETTINGS_SPEECH_MODEL_LABEL,
+  MEDIA_GENERATION_SETTINGS_SPEECH_MODEL_PLACEHOLDER,
+  MEDIA_GENERATION_SETTINGS_SPEECH_PROTOCOL_DESC,
+  MEDIA_GENERATION_SETTINGS_SPEECH_PROTOCOL_LABEL,
+  MEDIA_GENERATION_SETTINGS_SPEECH_PROVIDER_CUSTOM,
+  MEDIA_GENERATION_SETTINGS_SPEECH_PROVIDER_DESC,
+  MEDIA_GENERATION_SETTINGS_SPEECH_PROVIDER_LABEL,
+  MEDIA_GENERATION_SETTINGS_SPEECH_TIMEOUT_DESC,
+  MEDIA_GENERATION_SETTINGS_SPEECH_TIMEOUT_LABEL,
+  MEDIA_GENERATION_SETTINGS_SPEECH_TITLE,
+  MEDIA_GENERATION_SETTINGS_SPEECH_VOICE_DESC,
+  MEDIA_GENERATION_SETTINGS_SPEECH_VOICE_LABEL,
+  MEDIA_GENERATION_SETTINGS_SPEECH_VOICE_PLACEHOLDER,
+  MEDIA_GENERATION_SETTINGS_TITLE,
+  MEDIA_GENERATION_SETTINGS_VIDEO_API_KEY_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_API_KEY_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_BASE_URL_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_BASE_URL_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_BASE_URL_PLACEHOLDER,
+  MEDIA_GENERATION_SETTINGS_VIDEO_DEFAULT_DURATION_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_DEFAULT_DURATION_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_DEFAULT_RESOLUTION_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_DEFAULT_RESOLUTION_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_ENABLED_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_ENABLED_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_MODEL_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_MODEL_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_MODEL_PLACEHOLDER,
+  MEDIA_GENERATION_SETTINGS_VIDEO_POLL_INTERVAL_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_POLL_INTERVAL_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_PROTOCOL_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_PROTOCOL_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_PROTOCOL_MINIMAX,
+  MEDIA_GENERATION_SETTINGS_VIDEO_PROVIDER_CUSTOM,
+  MEDIA_GENERATION_SETTINGS_VIDEO_PROVIDER_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_PROVIDER_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_TIMEOUT_DESC,
+  MEDIA_GENERATION_SETTINGS_VIDEO_TIMEOUT_LABEL,
+  MEDIA_GENERATION_SETTINGS_VIDEO_TITLE,
+  resolveMediaGenerationSettingsSpeechProtocolLabel,
+} from '../lib/mediaGenerationSettingsSection'
+import {
+  PROVIDERS_SETTINGS_HIDE_SECRET,
+  PROVIDERS_SETTINGS_SHOW_SECRET,
+} from '../lib/providersSettingsSection'
+import {
   ModelSelect,
   SETTINGS_SELECT_CLASS,
   SettingsSecretInput,
@@ -160,105 +240,6 @@ export const MEDIA_GENERATION_PREVIEW_DEFAULT: MediaGenerationSettings = {
   },
 }
 
-const COPY = {
-  mediaGeneration: 'Media generation',
-  mediaGenerationDesc:
-    'Expose speech, music, and video generation as agent tools. When enabled, Kun registers generate_speech, generate_music, and generate_video.',
-  textToSpeech: 'Speech generation',
-  textToSpeechEnabled: 'Enable speech generation',
-  textToSpeechEnabledDesc:
-    'Enables the generate_speech tool in agent chats to synthesize text into audio files.',
-  textToSpeechProvider: 'Speech generation provider',
-  textToSpeechProviderDesc:
-    'Choose a configured provider with TTS models, or use a custom speech generation API.',
-  textToSpeechProviderCustom: 'Custom speech generation API',
-  textToSpeechProviderMissingKey: (provider: string) =>
-    `${provider} has no API key yet. Add it in Providers.`,
-  textToSpeechProtocol: 'Speech generation protocol',
-  textToSpeechProtocolDesc: 'Request shape used by the custom speech generation API.',
-  textToSpeechProtocolOpenAi: 'OpenAI Speech',
-  textToSpeechProtocolMiniMax: 'MiniMax t2a_v2',
-  textToSpeechProtocolMimo: 'Xiaomi MiMo TTS',
-  textToSpeechBaseUrl: 'API base URL',
-  textToSpeechBaseUrlDesc:
-    'Speech generation endpoint root, e.g. https://api.minimax.io or https://api.xiaomimimo.com/v1.',
-  textToSpeechBaseUrlPlaceholder: 'https://api.minimax.io',
-  textToSpeechApiKey: 'API key',
-  textToSpeechApiKeyDesc:
-    'Key for the speech generation provider. Independent from the chat model key.',
-  textToSpeechModel: 'Speech generation model',
-  textToSpeechModelDesc:
-    'Model id sent to the provider, e.g. speech-2.8-hd or mimo-v2.5-tts.',
-  textToSpeechModelPlaceholder: 'speech-2.8-hd',
-  textToSpeechVoice: 'Voice',
-  textToSpeechVoiceDesc:
-    'Optional voice id/name. MiniMax falls back to male-qn-qingse; Xiaomi can use the provider\'s voice value.',
-  textToSpeechVoicePlaceholder: 'male-qn-qingse',
-  textToSpeechFormat: 'Output format',
-  textToSpeechFormatDesc: 'Default format for generated speech files.',
-  textToSpeechTimeout: 'Timeout (ms)',
-  textToSpeechTimeoutDesc: 'Per-request timeout for speech generation.',
-  musicGeneration: 'Music generation',
-  musicGenerationEnabled: 'Enable music generation',
-  musicGenerationEnabledDesc:
-    'Enables the generate_music tool in agent chats to create songs, instrumentals, or covers.',
-  musicGenerationProvider: 'Music provider',
-  musicGenerationProviderDesc:
-    'Choose a configured provider with music models, or use a custom music generation API.',
-  musicGenerationProviderCustom: 'Custom music generation API',
-  musicGenerationProviderMissingKey: (provider: string) =>
-    `${provider} has no API key yet. Add it in Providers.`,
-  musicGenerationProtocol: 'Music generation protocol',
-  musicGenerationProtocolDesc: 'Request shape used by the custom music generation API.',
-  musicGenerationProtocolMiniMax: 'MiniMax music_generation',
-  musicGenerationBaseUrl: 'API base URL',
-  musicGenerationBaseUrlDesc: 'Music generation endpoint root, e.g. https://api.minimax.io.',
-  musicGenerationBaseUrlPlaceholder: 'https://api.minimax.io',
-  musicGenerationApiKey: 'API key',
-  musicGenerationApiKeyDesc:
-    'Key for the music generation provider. Independent from the chat model key.',
-  musicGenerationModel: 'Music model',
-  musicGenerationModelDesc: 'Model id sent to the provider, e.g. music-2.6 or music-cover.',
-  musicGenerationModelPlaceholder: 'music-2.6',
-  musicGenerationFormat: 'Output format',
-  musicGenerationFormatDesc: 'Default format for generated music files.',
-  musicGenerationTimeout: 'Timeout (ms)',
-  musicGenerationTimeoutDesc: 'Per-request timeout for music generation.',
-  videoGeneration: 'Video generation',
-  videoGenerationEnabled: 'Enable video generation',
-  videoGenerationEnabledDesc:
-    'Enables the generate_video tool in agent chats, with text-to-video and optional first/last frame references.',
-  videoGenerationProvider: 'Video provider',
-  videoGenerationProviderDesc:
-    'Choose a configured provider with video models, or use a custom video generation API.',
-  videoGenerationProviderCustom: 'Custom video generation API',
-  videoGenerationProviderMissingKey: (provider: string) =>
-    `${provider} has no API key yet. Add it in Providers.`,
-  videoGenerationProtocol: 'Video generation protocol',
-  videoGenerationProtocolDesc: 'Request shape used by the custom video generation API.',
-  videoGenerationProtocolMiniMax: 'MiniMax video_generation',
-  videoGenerationBaseUrl: 'API base URL',
-  videoGenerationBaseUrlDesc: 'Video generation endpoint root, e.g. https://api.minimax.io.',
-  videoGenerationBaseUrlPlaceholder: 'https://api.minimax.io',
-  videoGenerationApiKey: 'API key',
-  videoGenerationApiKeyDesc:
-    'Key for the video generation provider. Independent from the chat model key.',
-  videoGenerationModel: 'Video model',
-  videoGenerationModelDesc: 'Model id sent to the provider, e.g. MiniMax-Hailuo-2.3.',
-  videoGenerationModelPlaceholder: 'MiniMax-Hailuo-2.3',
-  videoGenerationDefaultDuration: 'Default duration (sec)',
-  videoGenerationDefaultDurationDesc: 'Used when the agent does not specify a duration.',
-  videoGenerationDefaultResolution: 'Default resolution',
-  videoGenerationDefaultResolutionDesc: 'Used when the agent does not specify a resolution.',
-  videoGenerationTimeout: 'Timeout (ms)',
-  videoGenerationTimeoutDesc: 'Total wait time for one video task.',
-  videoGenerationPollInterval: 'Poll interval (ms)',
-  videoGenerationPollIntervalDesc: 'How often the runtime checks asynchronous video task status.',
-  showSecret: 'Show',
-  hideSecret: 'Hide',
-  modelSelectDefaultOption: (model: string) => (model ? `Default (${model})` : 'Default'),
-}
-
 type CapabilityKey = 'textToSpeech' | 'music' | 'video'
 
 function selectedProviderState(input: {
@@ -283,9 +264,7 @@ function selectedProviderState(input: {
 }
 
 function textToSpeechProtocolLabel(protocol: string): string {
-  if (protocol === 'minimax-t2a') return COPY.textToSpeechProtocolMiniMax
-  if (protocol === 'mimo-tts') return COPY.textToSpeechProtocolMimo
-  return COPY.textToSpeechProtocolOpenAi
+  return resolveMediaGenerationSettingsSpeechProtocolLabel(protocol)
 }
 
 type Props = {
@@ -347,14 +326,14 @@ export function MediaGenerationSettingsSection({
 
   return (
     <div className="media-generation-grid">
-      <SettingsCard title={COPY.mediaGeneration}>
-        <div className="media-generation-intro">{COPY.mediaGenerationDesc}</div>
+      <SettingsCard title={MEDIA_GENERATION_SETTINGS_TITLE}>
+        <div className="media-generation-intro">{MEDIA_GENERATION_SETTINGS_DESC}</div>
       </SettingsCard>
 
-      <SettingsCard title={COPY.textToSpeech}>
+      <SettingsCard title={MEDIA_GENERATION_SETTINGS_SPEECH_TITLE}>
         <SettingRow
-          title={COPY.textToSpeechEnabled}
-          description={COPY.textToSpeechEnabledDesc}
+          title={MEDIA_GENERATION_SETTINGS_SPEECH_ENABLED_LABEL}
+          description={MEDIA_GENERATION_SETTINGS_SPEECH_ENABLED_DESC}
           control={
             <Toggle
               checked={settings.textToSpeech.enabled}
@@ -365,14 +344,14 @@ export function MediaGenerationSettingsSection({
         {settings.textToSpeech.enabled ? (
           <>
             {renderProviderRow({
-              title: COPY.textToSpeechProvider,
-              description: COPY.textToSpeechProviderDesc,
+              title: MEDIA_GENERATION_SETTINGS_SPEECH_PROVIDER_LABEL,
+              description: MEDIA_GENERATION_SETTINGS_SPEECH_PROVIDER_DESC,
               providers: textToSpeechProviders,
               selected: selectedTts,
               capabilityKey: 'textToSpeech',
               customProviderId: CUSTOM_TEXT_TO_SPEECH_PROVIDER_ID,
-              customLabel: COPY.textToSpeechProviderCustom,
-              missingKeyLabel: COPY.textToSpeechProviderMissingKey,
+              customLabel: MEDIA_GENERATION_SETTINGS_SPEECH_PROVIDER_CUSTOM,
+              missingKeyLabel: formatMediaGenerationSettingsProviderMissingKey,
               setting: settings.textToSpeech,
               defaultProtocol: DEFAULT_TEXT_TO_SPEECH_PROTOCOL,
               update: updateTextToSpeech,
@@ -380,8 +359,8 @@ export function MediaGenerationSettingsSection({
             {selectedTts.usingCustom ? (
               <>
                 <SettingRow
-                  title={COPY.textToSpeechProtocol}
-                  description={COPY.textToSpeechProtocolDesc}
+                  title={MEDIA_GENERATION_SETTINGS_SPEECH_PROTOCOL_LABEL}
+                  description={MEDIA_GENERATION_SETTINGS_SPEECH_PROTOCOL_DESC}
                   control={
                     <select
                       className={SETTINGS_SELECT_CLASS}
@@ -401,15 +380,15 @@ export function MediaGenerationSettingsSection({
                   }
                 />
                 {renderBaseUrlRow(
-                  COPY.textToSpeechBaseUrl,
-                  COPY.textToSpeechBaseUrlDesc,
+                  MEDIA_GENERATION_SETTINGS_SPEECH_BASE_URL_LABEL,
+                  MEDIA_GENERATION_SETTINGS_SPEECH_BASE_URL_DESC,
                   settings.textToSpeech.baseUrl,
-                  COPY.textToSpeechBaseUrlPlaceholder,
+                  MEDIA_GENERATION_SETTINGS_SPEECH_BASE_URL_PLACEHOLDER,
                   (baseUrl) => updateTextToSpeech({ baseUrl }),
                 )}
                 {renderApiKeyRow({
-                  title: COPY.textToSpeechApiKey,
-                  description: COPY.textToSpeechApiKeyDesc,
+                  title: MEDIA_GENERATION_SETTINGS_SPEECH_API_KEY_LABEL,
+                  description: MEDIA_GENERATION_SETTINGS_SPEECH_API_KEY_DESC,
                   value: settings.textToSpeech.apiKey,
                   visible: showTtsApiKey,
                   setVisible: setShowTtsApiKey,
@@ -418,35 +397,35 @@ export function MediaGenerationSettingsSection({
               </>
             ) : null}
             {renderModelRow({
-              title: COPY.textToSpeechModel,
-              description: COPY.textToSpeechModelDesc,
+              title: MEDIA_GENERATION_SETTINGS_SPEECH_MODEL_LABEL,
+              description: MEDIA_GENERATION_SETTINGS_SPEECH_MODEL_DESC,
               usingCustom: selectedTts.usingCustom,
               model: settings.textToSpeech.model,
               options: selectedTts.capability?.models ?? [],
-              placeholder: COPY.textToSpeechModelPlaceholder,
+              placeholder: MEDIA_GENERATION_SETTINGS_SPEECH_MODEL_PLACEHOLDER,
               update: (model) => updateTextToSpeech({ model }),
             })}
             <SettingRow
-              title={COPY.textToSpeechVoice}
-              description={COPY.textToSpeechVoiceDesc}
+              title={MEDIA_GENERATION_SETTINGS_SPEECH_VOICE_LABEL}
+              description={MEDIA_GENERATION_SETTINGS_SPEECH_VOICE_DESC}
               control={
                 <input
                   className="settings-text-input"
                   value={settings.textToSpeech.voice}
-                  placeholder={COPY.textToSpeechVoicePlaceholder}
+                  placeholder={MEDIA_GENERATION_SETTINGS_SPEECH_VOICE_PLACEHOLDER}
                   onChange={(event) => updateTextToSpeech({ voice: event.target.value })}
                 />
               }
             />
             {renderAudioFormatRow(
-              COPY.textToSpeechFormat,
-              COPY.textToSpeechFormatDesc,
+              MEDIA_GENERATION_SETTINGS_SPEECH_FORMAT_LABEL,
+              MEDIA_GENERATION_SETTINGS_SPEECH_FORMAT_DESC,
               settings.textToSpeech.format,
               (format) => updateTextToSpeech({ format }),
             )}
             {renderTimeoutRow(
-              COPY.textToSpeechTimeout,
-              COPY.textToSpeechTimeoutDesc,
+              MEDIA_GENERATION_SETTINGS_SPEECH_TIMEOUT_LABEL,
+              MEDIA_GENERATION_SETTINGS_SPEECH_TIMEOUT_DESC,
               settings.textToSpeech.timeoutMs,
               10000,
               900000,
@@ -456,10 +435,10 @@ export function MediaGenerationSettingsSection({
         ) : null}
       </SettingsCard>
 
-      <SettingsCard title={COPY.musicGeneration}>
+      <SettingsCard title={MEDIA_GENERATION_SETTINGS_MUSIC_TITLE}>
         <SettingRow
-          title={COPY.musicGenerationEnabled}
-          description={COPY.musicGenerationEnabledDesc}
+          title={MEDIA_GENERATION_SETTINGS_MUSIC_ENABLED_LABEL}
+          description={MEDIA_GENERATION_SETTINGS_MUSIC_ENABLED_DESC}
           control={
             <Toggle
               checked={settings.musicGeneration.enabled}
@@ -470,14 +449,14 @@ export function MediaGenerationSettingsSection({
         {settings.musicGeneration.enabled ? (
           <>
             {renderProviderRow({
-              title: COPY.musicGenerationProvider,
-              description: COPY.musicGenerationProviderDesc,
+              title: MEDIA_GENERATION_SETTINGS_MUSIC_PROVIDER_LABEL,
+              description: MEDIA_GENERATION_SETTINGS_MUSIC_PROVIDER_DESC,
               providers: musicProviders,
               selected: selectedMusic,
               capabilityKey: 'music',
               customProviderId: CUSTOM_MUSIC_GENERATION_PROVIDER_ID,
-              customLabel: COPY.musicGenerationProviderCustom,
-              missingKeyLabel: COPY.musicGenerationProviderMissingKey,
+              customLabel: MEDIA_GENERATION_SETTINGS_MUSIC_PROVIDER_CUSTOM,
+              missingKeyLabel: formatMediaGenerationSettingsProviderMissingKey,
               setting: settings.musicGeneration,
               defaultProtocol: DEFAULT_MUSIC_GENERATION_PROTOCOL,
               update: updateMusicGeneration,
@@ -485,8 +464,8 @@ export function MediaGenerationSettingsSection({
             {selectedMusic.usingCustom ? (
               <>
                 <SettingRow
-                  title={COPY.musicGenerationProtocol}
-                  description={COPY.musicGenerationProtocolDesc}
+                  title={MEDIA_GENERATION_SETTINGS_MUSIC_PROTOCOL_LABEL}
+                  description={MEDIA_GENERATION_SETTINGS_MUSIC_PROTOCOL_DESC}
                   control={
                     <select
                       className={SETTINGS_SELECT_CLASS}
@@ -499,22 +478,22 @@ export function MediaGenerationSettingsSection({
                     >
                       {MUSIC_GENERATION_PROTOCOLS.map((protocol) => (
                         <option key={protocol} value={protocol}>
-                          {COPY.musicGenerationProtocolMiniMax}
+                          {MEDIA_GENERATION_SETTINGS_MUSIC_PROTOCOL_MINIMAX}
                         </option>
                       ))}
                     </select>
                   }
                 />
                 {renderBaseUrlRow(
-                  COPY.musicGenerationBaseUrl,
-                  COPY.musicGenerationBaseUrlDesc,
+                  MEDIA_GENERATION_SETTINGS_MUSIC_BASE_URL_LABEL,
+                  MEDIA_GENERATION_SETTINGS_MUSIC_BASE_URL_DESC,
                   settings.musicGeneration.baseUrl,
-                  COPY.musicGenerationBaseUrlPlaceholder,
+                  MEDIA_GENERATION_SETTINGS_MUSIC_BASE_URL_PLACEHOLDER,
                   (baseUrl) => updateMusicGeneration({ baseUrl }),
                 )}
                 {renderApiKeyRow({
-                  title: COPY.musicGenerationApiKey,
-                  description: COPY.musicGenerationApiKeyDesc,
+                  title: MEDIA_GENERATION_SETTINGS_MUSIC_API_KEY_LABEL,
+                  description: MEDIA_GENERATION_SETTINGS_MUSIC_API_KEY_DESC,
                   value: settings.musicGeneration.apiKey,
                   visible: showMusicApiKey,
                   setVisible: setShowMusicApiKey,
@@ -523,23 +502,23 @@ export function MediaGenerationSettingsSection({
               </>
             ) : null}
             {renderModelRow({
-              title: COPY.musicGenerationModel,
-              description: COPY.musicGenerationModelDesc,
+              title: MEDIA_GENERATION_SETTINGS_MUSIC_MODEL_LABEL,
+              description: MEDIA_GENERATION_SETTINGS_MUSIC_MODEL_DESC,
               usingCustom: selectedMusic.usingCustom,
               model: settings.musicGeneration.model,
               options: selectedMusic.capability?.models ?? [],
-              placeholder: COPY.musicGenerationModelPlaceholder,
+              placeholder: MEDIA_GENERATION_SETTINGS_MUSIC_MODEL_PLACEHOLDER,
               update: (model) => updateMusicGeneration({ model }),
             })}
             {renderAudioFormatRow(
-              COPY.musicGenerationFormat,
-              COPY.musicGenerationFormatDesc,
+              MEDIA_GENERATION_SETTINGS_MUSIC_FORMAT_LABEL,
+              MEDIA_GENERATION_SETTINGS_MUSIC_FORMAT_DESC,
               settings.musicGeneration.format,
               (format) => updateMusicGeneration({ format }),
             )}
             {renderTimeoutRow(
-              COPY.musicGenerationTimeout,
-              COPY.musicGenerationTimeoutDesc,
+              MEDIA_GENERATION_SETTINGS_MUSIC_TIMEOUT_LABEL,
+              MEDIA_GENERATION_SETTINGS_MUSIC_TIMEOUT_DESC,
               settings.musicGeneration.timeoutMs,
               10000,
               1800000,
@@ -549,10 +528,10 @@ export function MediaGenerationSettingsSection({
         ) : null}
       </SettingsCard>
 
-      <SettingsCard title={COPY.videoGeneration}>
+      <SettingsCard title={MEDIA_GENERATION_SETTINGS_VIDEO_TITLE}>
         <SettingRow
-          title={COPY.videoGenerationEnabled}
-          description={COPY.videoGenerationEnabledDesc}
+          title={MEDIA_GENERATION_SETTINGS_VIDEO_ENABLED_LABEL}
+          description={MEDIA_GENERATION_SETTINGS_VIDEO_ENABLED_DESC}
           control={
             <Toggle
               checked={settings.videoGeneration.enabled}
@@ -563,14 +542,14 @@ export function MediaGenerationSettingsSection({
         {settings.videoGeneration.enabled ? (
           <>
             {renderProviderRow({
-              title: COPY.videoGenerationProvider,
-              description: COPY.videoGenerationProviderDesc,
+              title: MEDIA_GENERATION_SETTINGS_VIDEO_PROVIDER_LABEL,
+              description: MEDIA_GENERATION_SETTINGS_VIDEO_PROVIDER_DESC,
               providers: videoProviders,
               selected: selectedVideo,
               capabilityKey: 'video',
               customProviderId: CUSTOM_VIDEO_GENERATION_PROVIDER_ID,
-              customLabel: COPY.videoGenerationProviderCustom,
-              missingKeyLabel: COPY.videoGenerationProviderMissingKey,
+              customLabel: MEDIA_GENERATION_SETTINGS_VIDEO_PROVIDER_CUSTOM,
+              missingKeyLabel: formatMediaGenerationSettingsProviderMissingKey,
               setting: settings.videoGeneration,
               defaultProtocol: DEFAULT_VIDEO_GENERATION_PROTOCOL,
               update: updateVideoGeneration,
@@ -578,8 +557,8 @@ export function MediaGenerationSettingsSection({
             {selectedVideo.usingCustom ? (
               <>
                 <SettingRow
-                  title={COPY.videoGenerationProtocol}
-                  description={COPY.videoGenerationProtocolDesc}
+                  title={MEDIA_GENERATION_SETTINGS_VIDEO_PROTOCOL_LABEL}
+                  description={MEDIA_GENERATION_SETTINGS_VIDEO_PROTOCOL_DESC}
                   control={
                     <select
                       className={SETTINGS_SELECT_CLASS}
@@ -592,22 +571,22 @@ export function MediaGenerationSettingsSection({
                     >
                       {VIDEO_GENERATION_PROTOCOLS.map((protocol) => (
                         <option key={protocol} value={protocol}>
-                          {COPY.videoGenerationProtocolMiniMax}
+                          {MEDIA_GENERATION_SETTINGS_VIDEO_PROTOCOL_MINIMAX}
                         </option>
                       ))}
                     </select>
                   }
                 />
                 {renderBaseUrlRow(
-                  COPY.videoGenerationBaseUrl,
-                  COPY.videoGenerationBaseUrlDesc,
+                  MEDIA_GENERATION_SETTINGS_VIDEO_BASE_URL_LABEL,
+                  MEDIA_GENERATION_SETTINGS_VIDEO_BASE_URL_DESC,
                   settings.videoGeneration.baseUrl,
-                  COPY.videoGenerationBaseUrlPlaceholder,
+                  MEDIA_GENERATION_SETTINGS_VIDEO_BASE_URL_PLACEHOLDER,
                   (baseUrl) => updateVideoGeneration({ baseUrl }),
                 )}
                 {renderApiKeyRow({
-                  title: COPY.videoGenerationApiKey,
-                  description: COPY.videoGenerationApiKeyDesc,
+                  title: MEDIA_GENERATION_SETTINGS_VIDEO_API_KEY_LABEL,
+                  description: MEDIA_GENERATION_SETTINGS_VIDEO_API_KEY_DESC,
                   value: settings.videoGeneration.apiKey,
                   visible: showVideoApiKey,
                   setVisible: setShowVideoApiKey,
@@ -616,17 +595,17 @@ export function MediaGenerationSettingsSection({
               </>
             ) : null}
             {renderModelRow({
-              title: COPY.videoGenerationModel,
-              description: COPY.videoGenerationModelDesc,
+              title: MEDIA_GENERATION_SETTINGS_VIDEO_MODEL_LABEL,
+              description: MEDIA_GENERATION_SETTINGS_VIDEO_MODEL_DESC,
               usingCustom: selectedVideo.usingCustom,
               model: settings.videoGeneration.model,
               options: selectedVideo.capability?.models ?? [],
-              placeholder: COPY.videoGenerationModelPlaceholder,
+              placeholder: MEDIA_GENERATION_SETTINGS_VIDEO_MODEL_PLACEHOLDER,
               update: (model) => updateVideoGeneration({ model }),
             })}
             <SettingRow
-              title={COPY.videoGenerationDefaultDuration}
-              description={COPY.videoGenerationDefaultDurationDesc}
+              title={MEDIA_GENERATION_SETTINGS_VIDEO_DEFAULT_DURATION_LABEL}
+              description={MEDIA_GENERATION_SETTINGS_VIDEO_DEFAULT_DURATION_DESC}
               control={
                 <input
                   type="number"
@@ -642,8 +621,8 @@ export function MediaGenerationSettingsSection({
               }
             />
             <SettingRow
-              title={COPY.videoGenerationDefaultResolution}
-              description={COPY.videoGenerationDefaultResolutionDesc}
+              title={MEDIA_GENERATION_SETTINGS_VIDEO_DEFAULT_RESOLUTION_LABEL}
+              description={MEDIA_GENERATION_SETTINGS_VIDEO_DEFAULT_RESOLUTION_DESC}
               control={
                 <select
                   className={`${SETTINGS_SELECT_CLASS} media-generation-resolution-select`}
@@ -661,16 +640,16 @@ export function MediaGenerationSettingsSection({
               }
             />
             {renderTimeoutRow(
-              COPY.videoGenerationTimeout,
-              COPY.videoGenerationTimeoutDesc,
+              MEDIA_GENERATION_SETTINGS_VIDEO_TIMEOUT_LABEL,
+              MEDIA_GENERATION_SETTINGS_VIDEO_TIMEOUT_DESC,
               settings.videoGeneration.timeoutMs,
               30000,
               3600000,
               (timeoutMs) => updateVideoGeneration({ timeoutMs }),
             )}
             <SettingRow
-              title={COPY.videoGenerationPollInterval}
-              description={COPY.videoGenerationPollIntervalDesc}
+              title={MEDIA_GENERATION_SETTINGS_VIDEO_POLL_INTERVAL_LABEL}
+              description={MEDIA_GENERATION_SETTINGS_VIDEO_POLL_INTERVAL_DESC}
               control={
                 <input
                   type="number"
@@ -797,8 +776,8 @@ function renderApiKeyRow(input: {
           visible={input.visible}
           onToggleVisibility={() => input.setVisible((value) => !value)}
           autoComplete="off"
-          showLabel={COPY.showSecret}
-          hideLabel={COPY.hideSecret}
+          showLabel={PROVIDERS_SETTINGS_SHOW_SECRET}
+          hideLabel={PROVIDERS_SETTINGS_HIDE_SECRET}
           className="media-generation-secret-input"
         />
       }
@@ -832,7 +811,7 @@ function renderModelRow(input: {
             <ModelSelect
               value={input.options.includes(input.model) ? input.model : ''}
               options={input.options}
-              defaultLabel={COPY.modelSelectDefaultOption(input.options[0] ?? '')}
+              defaultLabel={formatMediaGenerationSettingsModelSelectDefaultOption(input.options[0] ?? '')}
               selectClassName={SETTINGS_SELECT_CLASS}
               onChange={input.update}
             />
