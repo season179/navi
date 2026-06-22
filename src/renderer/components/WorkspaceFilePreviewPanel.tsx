@@ -28,6 +28,21 @@ import {
   languageFromFilePath,
   renderFallbackCodeHtml,
 } from '../lib/code-highlighting'
+import {
+  WORKSPACE_FILE_PREVIEW_COLLAPSE_LABEL,
+  WORKSPACE_FILE_PREVIEW_COPY_CONTENT_LABEL,
+  WORKSPACE_FILE_PREVIEW_COPY_SUCCESS_LABEL,
+  WORKSPACE_FILE_PREVIEW_EMPTY_LABEL,
+  WORKSPACE_FILE_PREVIEW_FAILED_LABEL,
+  WORKSPACE_FILE_PREVIEW_LOADING_LABEL,
+  WORKSPACE_FILE_PREVIEW_OPEN_EDITOR_LABEL,
+  WORKSPACE_FILE_PREVIEW_OPEN_FILES_LABEL,
+  WORKSPACE_FILE_PREVIEW_RENDER_MARKDOWN_LABEL,
+  WORKSPACE_FILE_PREVIEW_SHOW_SOURCE_LABEL,
+  WORKSPACE_FILE_PREVIEW_TITLE,
+  WORKSPACE_FILE_PREVIEW_TRUNCATED_LABEL,
+  formatWorkspaceFilePreviewCloseTab,
+} from '../lib/workspaceFilePreviewPanel'
 import { Markdown } from './Markdown'
 
 export type WorkspaceFileTarget = {
@@ -73,22 +88,6 @@ type Props = {
 }
 
 const COPY_RESET_MS = 1400
-
-const COPY = {
-  rightPanelCollapse: 'Collapse panel',
-  filePreviewOpenFiles: 'Open files',
-  filePreviewCloseTab: (file: string) => `Close ${file}`,
-  filePreviewEmpty: 'Select a file to preview',
-  filePreviewTitle: 'File preview',
-  filePreviewShowSource: 'Show source',
-  filePreviewRenderMarkdown: 'Render markdown',
-  filePreviewOpenEditor: 'Open in editor',
-  filePreviewCopyContent: 'Copy content',
-  copySuccess: 'Copied',
-  filePreviewLoading: 'Loading file…',
-  filePreviewTruncated: 'Preview truncated — open in editor for the full file.',
-  filePreviewFailed: 'Could not load file preview.',
-}
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -252,7 +251,7 @@ export function WorkspaceFilePreviewPanel({
     return relativePathSegments(path, target?.workspaceRoot ?? workspaceRoot)
   }, [result, target, workspaceRoot])
 
-  const currentFileName = displayPath ? fileNameFromPath(displayPath) : COPY.filePreviewTitle
+  const currentFileName = displayPath ? fileNameFromPath(displayPath) : WORKSPACE_FILE_PREVIEW_TITLE
   const badge = extensionBadge(result?.ok ? result.path : target?.path ?? '', language)
 
   const activeLine =
@@ -319,7 +318,7 @@ export function WorkspaceFilePreviewPanel({
         <div
           className="ds-code-sidebar-tabs"
           role="tablist"
-          aria-label={COPY.filePreviewOpenFiles}
+          aria-label={WORKSPACE_FILE_PREVIEW_OPEN_FILES_LABEL}
         >
           {(tabs.length ? tabs : target ? [target] : []).map((item) => {
             const active = targetKey(item) === activeTargetKey
@@ -348,8 +347,8 @@ export function WorkspaceFilePreviewPanel({
                 {onCloseTarget ? (
                   <button
                     type="button"
-                    aria-label={COPY.filePreviewCloseTab(itemLabel)}
-                    title={COPY.filePreviewCloseTab(itemLabel)}
+                    aria-label={formatWorkspaceFilePreviewCloseTab(itemLabel)}
+                    title={formatWorkspaceFilePreviewCloseTab(itemLabel)}
                     className="ds-code-sidebar-tab-close"
                     onClick={(event) => {
                       event.stopPropagation()
@@ -373,7 +372,7 @@ export function WorkspaceFilePreviewPanel({
               role="tab"
               aria-selected={false}
               className="ds-code-sidebar-tab"
-              title={COPY.filePreviewEmpty}
+              title={WORKSPACE_FILE_PREVIEW_EMPTY_LABEL}
             >
               <span className="ds-code-sidebar-file-badge">{badge}</span>
               <span className="workspace-file-preview-tab-label">{currentFileName}</span>
@@ -388,9 +387,15 @@ export function WorkspaceFilePreviewPanel({
               onClick={() => setMarkdownRendered((value) => !value)}
               disabled={!result?.ok}
               className="ds-code-sidebar-icon-button"
-              title={markdownRendered ? COPY.filePreviewShowSource : COPY.filePreviewRenderMarkdown}
+              title={
+                markdownRendered
+                  ? WORKSPACE_FILE_PREVIEW_SHOW_SOURCE_LABEL
+                  : WORKSPACE_FILE_PREVIEW_RENDER_MARKDOWN_LABEL
+              }
               aria-label={
-                markdownRendered ? COPY.filePreviewShowSource : COPY.filePreviewRenderMarkdown
+                markdownRendered
+                  ? WORKSPACE_FILE_PREVIEW_SHOW_SOURCE_LABEL
+                  : WORKSPACE_FILE_PREVIEW_RENDER_MARKDOWN_LABEL
               }
               aria-pressed={markdownRendered}
             >
@@ -405,8 +410,8 @@ export function WorkspaceFilePreviewPanel({
             type="button"
             disabled={!target}
             className="ds-code-sidebar-icon-button"
-            title={COPY.filePreviewOpenEditor}
-            aria-label={COPY.filePreviewOpenEditor}
+            title={WORKSPACE_FILE_PREVIEW_OPEN_EDITOR_LABEL}
+            aria-label={WORKSPACE_FILE_PREVIEW_OPEN_EDITOR_LABEL}
           >
             <ExternalLink className="workspace-file-preview-action-icon" strokeWidth={1.75} />
           </button>
@@ -415,8 +420,16 @@ export function WorkspaceFilePreviewPanel({
             onClick={() => void copyContent()}
             disabled={!result?.ok}
             className="ds-code-sidebar-icon-button"
-            title={copied ? COPY.copySuccess : COPY.filePreviewCopyContent}
-            aria-label={copied ? COPY.copySuccess : COPY.filePreviewCopyContent}
+            title={
+              copied
+                ? WORKSPACE_FILE_PREVIEW_COPY_SUCCESS_LABEL
+                : WORKSPACE_FILE_PREVIEW_COPY_CONTENT_LABEL
+            }
+            aria-label={
+              copied
+                ? WORKSPACE_FILE_PREVIEW_COPY_SUCCESS_LABEL
+                : WORKSPACE_FILE_PREVIEW_COPY_CONTENT_LABEL
+            }
           >
             {copied ? (
               <Check className="workspace-file-preview-copy-success-icon" strokeWidth={2} />
@@ -428,8 +441,8 @@ export function WorkspaceFilePreviewPanel({
             type="button"
             onClick={onCollapse}
             className="ds-code-sidebar-icon-button"
-            title={COPY.rightPanelCollapse}
-            aria-label={COPY.rightPanelCollapse}
+            title={WORKSPACE_FILE_PREVIEW_COLLAPSE_LABEL}
+            aria-label={WORKSPACE_FILE_PREVIEW_COLLAPSE_LABEL}
           >
             <PanelRightClose className="workspace-file-preview-action-icon" strokeWidth={1.85} />
           </button>
@@ -460,7 +473,9 @@ export function WorkspaceFilePreviewPanel({
               </span>
             ))
           ) : (
-            <span className="workspace-file-preview-breadcrumb-muted">{COPY.filePreviewEmpty}</span>
+            <span className="workspace-file-preview-breadcrumb-muted">
+              {WORKSPACE_FILE_PREVIEW_EMPTY_LABEL}
+            </span>
           )}
         </div>
         {result?.ok ? (
@@ -478,18 +493,20 @@ export function WorkspaceFilePreviewPanel({
               <div className="workspace-file-preview-empty-icon-wrap">
                 <FileCode2 className="workspace-file-preview-empty-icon" strokeWidth={1.7} />
               </div>
-              {COPY.filePreviewEmpty}
+              {WORKSPACE_FILE_PREVIEW_EMPTY_LABEL}
             </div>
           </div>
         ) : loading ? (
           <div className="workspace-file-preview-loading">
             <Loader2 className="workspace-file-preview-loading-icon" strokeWidth={1.8} />
-            {COPY.filePreviewLoading}
+            {WORKSPACE_FILE_PREVIEW_LOADING_LABEL}
           </div>
         ) : result?.ok ? (
           <div className="workspace-file-preview-content">
             {result.truncated ? (
-              <div className="workspace-file-preview-truncated">{COPY.filePreviewTruncated}</div>
+              <div className="workspace-file-preview-truncated">
+                {WORKSPACE_FILE_PREVIEW_TRUNCATED_LABEL}
+              </div>
             ) : null}
             {isMarkdownFile && markdownRendered ? (
               <div className="ds-file-preview-markdown">
@@ -527,7 +544,7 @@ export function WorkspaceFilePreviewPanel({
           </div>
         ) : (
           <div className="workspace-file-preview-error">
-            {result?.message ?? COPY.filePreviewFailed}
+            {result?.message ?? WORKSPACE_FILE_PREVIEW_FAILED_LABEL}
           </div>
         )}
       </div>
