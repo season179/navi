@@ -35,6 +35,41 @@ import {
   type ClawImProvider,
 } from './ClawSidebar'
 import { type ClawInstallTarget } from './ClawAddImDialog'
+import {
+  CLAW_SIDEBAR_ADD_IM_LABEL,
+  CLAW_SIDEBAR_IM_DISABLED_LABEL,
+  CLAW_SIDEBAR_IM_LABEL,
+  CLAW_SIDEBAR_NO_IM_SUB,
+  CLAW_SIDEBAR_NO_IM_TITLE,
+  CLAW_SIDEBAR_SETTINGS_LABEL,
+} from '../lib/clawSidebar'
+import { SIDEBAR_CLAW_LABEL } from '../lib/sidebar'
+import {
+  CONNECT_PHONE_AUTO_BIND_HINT,
+  CONNECT_PHONE_BINDING_LABEL,
+  CONNECT_PHONE_DISABLED_CONNECTION_HINT,
+  CONNECT_PHONE_DISCONNECTING_LABEL,
+  CONNECT_PHONE_DISCONNECT_LABEL,
+  CONNECT_PHONE_GENERATE_QR_LABEL,
+  CONNECT_PHONE_MANAGE_IM_CONNECTED_LABEL,
+  CONNECT_PHONE_OFFICIAL_QR_FAILED_LABEL,
+  CONNECT_PHONE_OFFICIAL_QR_RETRY_LABEL,
+  CONNECT_PHONE_OFFICIAL_QR_SUCCESS_LABEL,
+  CONNECT_PHONE_PREVIEW_ASSISTANT,
+  CONNECT_PHONE_PREVIEW_DONE_LABEL,
+  CONNECT_PHONE_PREVIEW_INPUT_PLACEHOLDER,
+  CONNECT_PHONE_PREVIEW_USER,
+  CONNECT_PHONE_QR_LOADING_LABEL,
+  CONNECT_PHONE_SCAN_HINT,
+  CONNECT_PHONE_SCAN_HINT_WEIXIN,
+  CONNECT_PHONE_SIDEBAR_EXPAND_LABEL,
+  CONNECT_PHONE_SUBTITLE,
+  CONNECT_PHONE_TITLE,
+  connectPhoneInstallTargetLabel,
+  formatConnectPhoneOfficialQrTimeLeft,
+  formatConnectPhoneUserCode,
+  formatConnectPhoneUserCodeLabel,
+} from '../lib/connectPhoneView'
 
 export type ConnectPhoneQrStatus = 'idle' | 'loading' | 'showing' | 'success' | 'error'
 
@@ -61,56 +96,8 @@ export type ConnectPhoneSidebarPreviewMode =
 
 const CONNECT_PHONE_TARGETS: readonly ClawInstallTarget[] = ['feishu', 'lark', 'weixin']
 
-const COPY = {
-  connectPhoneTitle: 'Use your phone to connect kun',
-  connectPhoneSubtitle:
-    'Access this computer through an IM tool so you can keep working from your phone.',
-  connectPhoneGenerateQr: 'Generate authorization QR',
-  connectPhoneQrLoading: 'Generating QR…',
-  connectPhoneBinding: 'Binding',
-  connectPhoneScanHint: 'Scan with Feishu/Lark to open the authorization page.',
-  connectPhoneScanHintWeixin: 'Scan with WeChat to sign in.',
-  connectPhoneAutoBindHint: 'Confirm authorization on your phone and this will bind automatically.',
-  connectPhoneUserCode: (code: string) => `Code ${code}`,
-  connectPhoneDisabledConnectionHint:
-    'The existing connection is disabled. Manage it in settings to turn it back on.',
-  connectPhonePreviewUser:
-    'Check the latest proposal docs in the "Z project" folder on my computer and send me an outline.',
-  connectPhonePreviewAssistant:
-    'I read 3 documents and drafted the outline, with emphasis on our smart-park technical advantages. Should I turn it into a full draft?',
-  connectPhonePreviewDone: 'Done',
-  connectPhonePreviewInput: 'Send to kun',
-  clawAddImOfficialQrTimeLeft: (seconds: number) => `${seconds}s remaining`,
-  clawAddImOfficialQrSuccess: 'Authorization confirmed',
-  clawAddImOfficialQrFailed: 'Authorization failed',
-  clawAddImOfficialQrRetry: 'Try again',
-  sidebarExpand: 'Expand sidebar',
-  clawSidebarIm: 'Instant messaging',
-  clawAddIm: 'Add channel',
-  clawSettings: 'Claw settings',
-  clawNoImTitle: 'No IM channels yet',
-  clawNoImSub: 'Connect Feishu / Lark or WeChat to chat with this assistant from your phone.',
-  claw: 'Claw',
-  clawManageImConnected: 'Connected and ready',
-  clawImDisabledSidebar: 'Channel disabled',
-  connectPhoneDisconnect: 'Disconnect phone',
-  connectPhoneDisconnecting: 'Disconnecting',
-}
-
-function installTargetLabel(target: ClawInstallTarget): string {
-  if (target === 'weixin') return 'WeChat'
-  return target === 'lark' ? 'Lark' : 'Feishu'
-}
-
 function connectPhoneProviderForTarget(target: ClawInstallTarget): ClawImProvider {
   return target === 'weixin' ? 'weixin' : 'feishu'
-}
-
-function formatConnectPhoneUserCode(userCode: string, deviceCode: string): string {
-  const source = userCode.trim() || deviceCode
-  const compact = source.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 8)
-  if (compact.length <= 4) return compact
-  return `${compact.slice(0, 4)}-${compact.slice(4)}`
 }
 
 function MockQrCode({ className }: { className?: string }): ReactElement {
@@ -200,7 +187,7 @@ function ConnectPhonePreviewDevice(): ReactElement {
           </div>
           <div className="connect-phone-device-chat">
             <div className="connect-phone-device-user-row">
-              <div className="connect-phone-device-user-bubble">{COPY.connectPhonePreviewUser}</div>
+              <div className="connect-phone-device-user-bubble">{CONNECT_PHONE_PREVIEW_USER}</div>
               <div className="connect-phone-device-user-avatar">K</div>
             </div>
             <div className="connect-phone-device-assistant-row">
@@ -208,10 +195,10 @@ function ConnectPhonePreviewDevice(): ReactElement {
               <div className="connect-phone-device-assistant-card">
                 <div className="connect-phone-device-assistant-header">
                   <span className="connect-phone-device-assistant-name">kun</span>
-                  <span className="connect-phone-device-done-badge">{COPY.connectPhonePreviewDone}</span>
+                  <span className="connect-phone-device-done-badge">{CONNECT_PHONE_PREVIEW_DONE_LABEL}</span>
                 </div>
                 <div className="connect-phone-device-assistant-body">
-                  {COPY.connectPhonePreviewAssistant}
+                  {CONNECT_PHONE_PREVIEW_ASSISTANT}
                 </div>
               </div>
             </div>
@@ -219,7 +206,7 @@ function ConnectPhonePreviewDevice(): ReactElement {
           <div className="connect-phone-device-composer">
             <div className="connect-phone-device-input-row">
               <span className="connect-phone-device-input-placeholder">
-                {COPY.connectPhonePreviewInput}
+                {CONNECT_PHONE_PREVIEW_INPUT_PLACEHOLDER}
               </span>
               <Maximize2 className="connect-phone-device-input-expand" strokeWidth={1.8} />
             </div>
@@ -272,8 +259,8 @@ function ConnectPhoneQrPanel({
     <div className={`connect-phone-qr-panel${compact ? ' is-compact' : ''}`}>
       {!compact ? (
         <>
-          <h1 className="connect-phone-title">{COPY.connectPhoneTitle}</h1>
-          <p className="connect-phone-subtitle">{COPY.connectPhoneSubtitle}</p>
+          <h1 className="connect-phone-title">{CONNECT_PHONE_TITLE}</h1>
+          <p className="connect-phone-subtitle">{CONNECT_PHONE_SUBTITLE}</p>
         </>
       ) : null}
 
@@ -295,7 +282,7 @@ function ConnectPhoneQrPanel({
               onClick={() => onTargetChange?.(item)}
             >
               <ClawProviderLogo provider={provider} className="connect-phone-target-tab-logo" />
-              {installTargetLabel(item)}
+              {connectPhoneInstallTargetLabel(item)}
             </button>
           )
         })}
@@ -312,7 +299,7 @@ function ConnectPhoneQrPanel({
               className="connect-phone-generate-btn"
               disabled={hasExistingChannel}
             >
-              {COPY.connectPhoneGenerateQr}
+              {CONNECT_PHONE_GENERATE_QR_LABEL}
             </button>
           </div>
         ) : null}
@@ -320,7 +307,7 @@ function ConnectPhoneQrPanel({
         {qrStatus === 'loading' ? (
           <div className="connect-phone-qr-loading">
             <Loader2 className="connect-phone-qr-spinner" strokeWidth={2} />
-            <span>{COPY.connectPhoneQrLoading}</span>
+            <span>{CONNECT_PHONE_QR_LOADING_LABEL}</span>
           </div>
         ) : null}
 
@@ -330,26 +317,26 @@ function ConnectPhoneQrPanel({
 
         {qrStatus === 'showing' ? (
           <div className="connect-phone-qr-timer">
-            {COPY.clawAddImOfficialQrTimeLeft(qrTimeLeft)}
+            {formatConnectPhoneOfficialQrTimeLeft(qrTimeLeft)}
           </div>
         ) : null}
 
         {qrStatus === 'success' ? (
           <div className="connect-phone-qr-success">
             <CheckCircle2 className="connect-phone-qr-success-icon" strokeWidth={1.9} />
-            {saving ? COPY.connectPhoneBinding : COPY.clawAddImOfficialQrSuccess}
+            {saving ? CONNECT_PHONE_BINDING_LABEL : CONNECT_PHONE_OFFICIAL_QR_SUCCESS_LABEL}
           </div>
         ) : null}
 
         {qrStatus === 'error' ? (
           <div className="connect-phone-qr-error-block">
             <div className="connect-phone-qr-error-text">
-              {qrError || COPY.clawAddImOfficialQrFailed}
+              {qrError || CONNECT_PHONE_OFFICIAL_QR_FAILED_LABEL}
             </div>
             {!hasExistingChannel ? (
               <button type="button" className="connect-phone-qr-retry-btn">
                 <RefreshCw className="connect-phone-qr-retry-icon" strokeWidth={1.8} />
-                {COPY.clawAddImOfficialQrRetry}
+                {CONNECT_PHONE_OFFICIAL_QR_RETRY_LABEL}
               </button>
             ) : null}
           </div>
@@ -359,15 +346,15 @@ function ConnectPhoneQrPanel({
       <div className={`connect-phone-hints${compact ? ' is-compact' : ''}`}>
         <div className="connect-phone-scan-hint">
           <ClawProviderLogo provider={targetProvider} className="connect-phone-hint-logo" />
-          {targetProvider === 'weixin' ? COPY.connectPhoneScanHintWeixin : COPY.connectPhoneScanHint}
+          {targetProvider === 'weixin' ? CONNECT_PHONE_SCAN_HINT_WEIXIN : CONNECT_PHONE_SCAN_HINT}
         </div>
-        <div>{COPY.connectPhoneAutoBindHint}</div>
+        <div>{CONNECT_PHONE_AUTO_BIND_HINT}</div>
         {displayUserCode ? (
           <div className="connect-phone-user-code">
-            {COPY.connectPhoneUserCode(displayUserCode)}
+            {formatConnectPhoneUserCodeLabel(displayUserCode)}
           </div>
         ) : null}
-        {hasDisabledChannels ? <div>{COPY.connectPhoneDisabledConnectionHint}</div> : null}
+        {hasDisabledChannels ? <div>{CONNECT_PHONE_DISABLED_CONNECTION_HINT}</div> : null}
       </div>
     </div>
   )
@@ -411,8 +398,8 @@ export function ConnectPhoneView({
           <button
             type="button"
             className="connect-phone-sidebar-toggle-btn"
-            title={COPY.sidebarExpand}
-            aria-label={COPY.sidebarExpand}
+            title={CONNECT_PHONE_SIDEBAR_EXPAND_LABEL}
+            aria-label={CONNECT_PHONE_SIDEBAR_EXPAND_LABEL}
             onClick={onToggleSidebar}
           >
             <PanelLeft className="connect-phone-sidebar-toggle-icon" strokeWidth={1.9} />
@@ -484,14 +471,14 @@ export function ConnectPhoneSidebarPanel({
     <div className="connect-phone-sidebar-panel">
       <div className="connect-phone-sidebar-panel-main">
         <div className="connect-phone-sidebar-panel-header">
-          <span className="connect-phone-sidebar-panel-label">{COPY.clawSidebarIm}</span>
+          <span className="connect-phone-sidebar-panel-label">{CLAW_SIDEBAR_IM_LABEL}</span>
           <span className="connect-phone-sidebar-panel-actions">
             <button
               type="button"
               className="connect-phone-sidebar-icon-btn"
               disabled={!firstAvailableTarget}
-              aria-label={COPY.clawAddIm}
-              title={COPY.clawAddIm}
+              aria-label={CLAW_SIDEBAR_ADD_IM_LABEL}
+              title={CLAW_SIDEBAR_ADD_IM_LABEL}
               onClick={() => {
                 if (firstAvailableTarget) onTargetChange?.(firstAvailableTarget)
               }}
@@ -501,8 +488,8 @@ export function ConnectPhoneSidebarPanel({
             <button
               type="button"
               className="connect-phone-sidebar-icon-btn"
-              aria-label={COPY.clawSettings}
-              title={COPY.clawSettings}
+              aria-label={CLAW_SIDEBAR_SETTINGS_LABEL}
+              title={CLAW_SIDEBAR_SETTINGS_LABEL}
             >
               <Settings className="connect-phone-sidebar-icon" strokeWidth={1.9} />
             </button>
@@ -512,8 +499,8 @@ export function ConnectPhoneSidebarPanel({
         <div className="connect-phone-sidebar-scroll">
           {sortedChannels.length === 0 ? (
             <div className="connect-phone-sidebar-empty">
-              <p className="connect-phone-sidebar-empty-title">{COPY.clawNoImTitle}</p>
-              <p className="connect-phone-sidebar-empty-sub">{COPY.clawNoImSub}</p>
+              <p className="connect-phone-sidebar-empty-title">{CLAW_SIDEBAR_NO_IM_TITLE}</p>
+              <p className="connect-phone-sidebar-empty-sub">{CLAW_SIDEBAR_NO_IM_SUB}</p>
             </div>
           ) : (
             <div className="connect-phone-sidebar-channel-list">
@@ -536,7 +523,7 @@ export function ConnectPhoneSidebarPanel({
                     key={channel.id}
                     type="button"
                     className={`connect-phone-sidebar-channel-row${active ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`}
-                    title={disabled ? COPY.clawImDisabledSidebar : channel.label}
+                    title={disabled ? CLAW_SIDEBAR_IM_DISABLED_LABEL : channel.label}
                     onClick={() => {
                       onTargetChange?.(providerTarget)
                       onEnterClawRoute?.()
@@ -570,7 +557,7 @@ export function ConnectPhoneSidebarPanel({
       <div className="connect-phone-sidebar-footer">
         <div className="connect-phone-sidebar-footer-label">
           <ClawProviderLogo provider={targetProvider} className="connect-phone-hint-logo" />
-          <span>{COPY.claw}</span>
+          <span>{SIDEBAR_CLAW_LABEL}</span>
         </div>
 
         <div className="connect-phone-sidebar-target-grid">
@@ -586,7 +573,7 @@ export function ConnectPhoneSidebarPanel({
                 onClick={() => onTargetChange?.(item)}
               >
                 <ClawProviderLogo provider={provider} className="connect-phone-sidebar-target-logo" />
-                {installTargetLabel(item)}
+                {connectPhoneInstallTargetLabel(item)}
               </button>
             )
           })}
@@ -604,15 +591,15 @@ export function ConnectPhoneSidebarPanel({
                 </span>
                 <span className="connect-phone-sidebar-connected-sub">
                   {connectedChannel.enabled
-                    ? COPY.clawManageImConnected
-                    : COPY.clawImDisabledSidebar}
+                    ? CONNECT_PHONE_MANAGE_IM_CONNECTED_LABEL
+                    : CLAW_SIDEBAR_IM_DISABLED_LABEL}
                 </span>
               </span>
             </div>
             <div className="connect-phone-sidebar-connected-actions">
               <button type="button" className="connect-phone-sidebar-settings-btn">
                 <Settings className="connect-phone-sidebar-action-icon" strokeWidth={1.8} />
-                {COPY.clawSettings}
+                {CLAW_SIDEBAR_SETTINGS_LABEL}
               </button>
               <button
                 type="button"
@@ -624,7 +611,7 @@ export function ConnectPhoneSidebarPanel({
                 ) : (
                   <LogOut className="connect-phone-sidebar-action-icon" strokeWidth={1.8} />
                 )}
-                {disconnecting ? COPY.connectPhoneDisconnecting : COPY.connectPhoneDisconnect}
+                {disconnecting ? CONNECT_PHONE_DISCONNECTING_LABEL : CONNECT_PHONE_DISCONNECT_LABEL}
               </button>
             </div>
             {disconnectError ? (
