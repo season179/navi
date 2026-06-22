@@ -4,6 +4,14 @@
 
 import type { ReactElement } from 'react'
 import { RefreshCw, Settings } from 'lucide-react'
+import {
+  RUNTIME_WAKE_HERO_KICKER,
+  RUNTIME_WAKE_HERO_OPEN_SETTINGS_LABEL,
+  RUNTIME_WAKE_HERO_RETRY_LABEL,
+  resolveRuntimeWakeHeroDetail,
+  resolveRuntimeWakeHeroTitle,
+  resolveRuntimeWakeHeroWaking,
+} from '../lib/runtimeWakeHero'
 import { RuntimeWakeStage } from './RuntimeWakeStage'
 
 type Props = {
@@ -24,21 +32,15 @@ export function RuntimeWakeHero({
   onRetry,
   onOpenSettings,
 }: Props): ReactElement {
-  const trimmedError = runtimeError?.trim() ?? ''
-  const hasError = trimmedError.length > 0
-  const waking = wakingProp ?? !hasError
-  const title = hasError
-    ? 'Cannot connect to the local runtime'
-    : 'Navi is waking the local agent'
-  const detail = hasError
-    ? trimmedError
-    : 'The workbench is bringing Navi back into this window. When the local service is ready, sessions and the composer resume here.'
+  const waking = wakingProp ?? resolveRuntimeWakeHeroWaking(runtimeError)
+  const title = resolveRuntimeWakeHeroTitle(runtimeError)
+  const detail = resolveRuntimeWakeHeroDetail(runtimeError)
 
   return (
     <div className="runtime-wake-hero">
       <RuntimeWakeStage waking={waking} />
 
-      <p className="runtime-wake-hero-kicker">GUI agent core</p>
+      <p className="runtime-wake-hero-kicker">{RUNTIME_WAKE_HERO_KICKER}</p>
       <h1 className="runtime-wake-hero-title">{title}</h1>
       <p className="runtime-wake-hero-detail">{detail}</p>
       <div className="runtime-wake-hero-actions">
@@ -48,7 +50,7 @@ export function RuntimeWakeHero({
           onClick={onRetry}
         >
           <RefreshCw className="runtime-wake-hero-chip-icon" strokeWidth={1.8} />
-          Retry
+          {RUNTIME_WAKE_HERO_RETRY_LABEL}
         </button>
         <button
           type="button"
@@ -56,7 +58,7 @@ export function RuntimeWakeHero({
           onClick={onOpenSettings}
         >
           <Settings className="runtime-wake-hero-chip-icon" strokeWidth={1.8} />
-          Open settings
+          {RUNTIME_WAKE_HERO_OPEN_SETTINGS_LABEL}
         </button>
       </div>
     </div>
