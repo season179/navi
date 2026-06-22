@@ -4,6 +4,7 @@
 
 import type { ReactElement } from 'react'
 import { File } from 'lucide-react'
+import { formatUserFileReferenceChipsLabel } from '../lib/userFileReferenceChips'
 
 export type UserFileReference = {
   path: string
@@ -54,7 +55,7 @@ export function UserFileReferenceChips({ references }: Props): ReactElement | nu
   return (
     <div className="user-file-reference-chips">
       <div className="user-file-reference-chips-label">
-        Referenced files {references.length}
+        {formatUserFileReferenceChipsLabel(references.length)}
       </div>
       <div className="user-file-reference-chips-list">
         {references.map((reference) => {
