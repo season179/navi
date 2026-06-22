@@ -6,6 +6,21 @@ import type {
   ProcessSectionSnapshot,
   ProcessStackEntrySnapshot,
 } from './ProcessSectionRow'
+import {
+  PROCESS_SECTION_GROUP_APPROVAL,
+  PROCESS_SECTION_GROUP_EDITED_FILE,
+  PROCESS_SECTION_GROUP_RAN_COMMAND,
+  PROCESS_SECTION_GROUP_USED_TOOL,
+  PROCESS_SECTION_THINKING_LABEL,
+  PROCESS_SECTION_THINKING_NOW,
+  formatProcessSectionGroupApprovals,
+  formatProcessSectionGroupEditedFiles,
+  formatProcessSectionGroupRanCommands,
+  formatProcessSectionGroupUsedTools,
+  formatProcessSectionProcessSteps,
+  formatProcessSectionThoughtFor,
+  formatProcessSectionThoughtSteps,
+} from '../lib/processSectionTitleLocale'
 
 export function formatProcessDuration(ms: number): string {
   if (ms < 1000) return `${Math.max(1, Math.round(ms))}ms`
@@ -36,20 +51,20 @@ function describeReasoningSectionTitle(
   },
 ): string {
   if (section.processing === true && section.active === true) {
-    return 'Thinking…'
+    return PROCESS_SECTION_THINKING_NOW
   }
   if (
     opts.singleReasoningSection &&
     typeof opts.reasoningDurationMs === 'number' &&
     opts.reasoningDurationMs >= 1000
   ) {
-    return `Thought for ${formatProcessDuration(opts.reasoningDurationMs)}`
+    return formatProcessSectionThoughtFor(formatProcessDuration(opts.reasoningDurationMs))
   }
   const stepCount = section.reasoningStepCount ?? 1
   if (stepCount > 1) {
-    return `Thought (${stepCount} steps)`
+    return formatProcessSectionThoughtSteps(stepCount)
   }
-  return 'Thinking'
+  return PROCESS_SECTION_THINKING_LABEL
 }
 
 type StackEntrySummaryKind =
@@ -108,20 +123,36 @@ export function summarizeExecutionSection(
 
   const parts: string[] = []
   if (fileCount > 0) {
-    parts.push(fileCount === 1 ? 'Edited 1 file' : `Edited ${fileCount} files`)
+    parts.push(
+      fileCount === 1
+        ? PROCESS_SECTION_GROUP_EDITED_FILE
+        : formatProcessSectionGroupEditedFiles(fileCount),
+    )
   }
   if (commandCount > 0) {
-    parts.push(commandCount === 1 ? 'Ran 1 command' : `Ran ${commandCount} commands`)
+    parts.push(
+      commandCount === 1
+        ? PROCESS_SECTION_GROUP_RAN_COMMAND
+        : formatProcessSectionGroupRanCommands(commandCount),
+    )
   }
   if (toolCount > 0) {
-    parts.push(toolCount === 1 ? 'Used 1 tool' : `Used ${toolCount} tools`)
+    parts.push(
+      toolCount === 1
+        ? PROCESS_SECTION_GROUP_USED_TOOL
+        : formatProcessSectionGroupUsedTools(toolCount),
+    )
   }
   if (approvalCount > 0) {
-    parts.push(approvalCount === 1 ? '1 approval' : `${approvalCount} approvals`)
+    parts.push(
+      approvalCount === 1
+        ? PROCESS_SECTION_GROUP_APPROVAL
+        : formatProcessSectionGroupApprovals(approvalCount),
+    )
   }
 
   if (parts.length > 0) return parts.join(' · ')
-  return `Work process (${entries.length} steps)`
+  return formatProcessSectionProcessSteps(entries.length)
 }
 
 /** Kun describeProcessSection — dynamic section header titles. */
