@@ -18,15 +18,15 @@ export type WriteFontPreset =
 /** English copy matching Kun's sectionWrite locale string. */
 export const WRITE_SETTINGS_SECTION_TITLE = 'Write mode'
 
-/** Navi-branded equivalent of Kun's writeWorkspaceRoot locale string. */
+/** English copy matching Kun's writeWorkspaceRoot locale string. */
 export const WRITE_SETTINGS_WORKSPACE_ROOT_LABEL = 'Default writing workspace'
 
-/** Navi-branded equivalent of Kun's writeWorkspaceRootDesc locale string. */
+/** English copy matching Kun's writeWorkspaceRootDesc locale string. */
 export const WRITE_SETTINGS_WORKSPACE_ROOT_DESC =
   'Writing mode reads Markdown documents from here by default. A welcome.md file is created on first launch.'
 
-/** Navi-branded equivalent of Kun's writeWorkspaceRootPlaceholder locale string. */
-export const WRITE_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER = '~/.navi/write_workspace'
+/** English copy matching Kun's writeWorkspaceRootPlaceholder locale string. */
+export const WRITE_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER = '~/.kun/write_workspace'
 
 /** English copy matching Kun's writeTypography locale string. */
 export const WRITE_SETTINGS_TYPOGRAPHY_TITLE = 'Typography & font'

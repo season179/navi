@@ -5,9 +5,9 @@
 /** English copy matching Kun's mediaGeneration locale string. */
 export const MEDIA_GENERATION_SETTINGS_TITLE = 'Media generation'
 
-/** Navi-branded equivalent of Kun's mediaGenerationDesc locale string. */
+/** English copy matching Kun's mediaGenerationDesc locale string. */
 export const MEDIA_GENERATION_SETTINGS_DESC =
-  'Expose speech, music, and video generation as agent tools. When enabled, navi registers generate_speech, generate_music, and generate_video.'
+  'Expose speech, music, and video generation as agent tools. When enabled, Kun registers generate_speech, generate_music, and generate_video.'
 
 /** English copy matching Kun's textToSpeech locale string. */
 export const MEDIA_GENERATION_SETTINGS_SPEECH_TITLE = 'Speech generation'

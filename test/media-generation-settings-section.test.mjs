@@ -21,7 +21,7 @@ test('media generation settings section shell copy matches Kun locale strings', 
   assert.equal(mod.MEDIA_GENERATION_SETTINGS_TITLE, 'Media generation')
   assert.equal(
     mod.MEDIA_GENERATION_SETTINGS_DESC,
-    'Expose speech, music, and video generation as agent tools. When enabled, navi registers generate_speech, generate_music, and generate_video.',
+    'Expose speech, music, and video generation as agent tools. When enabled, Kun registers generate_speech, generate_music, and generate_video.',
   )
   assert.equal(mod.MEDIA_GENERATION_SETTINGS_SPEECH_TITLE, 'Speech generation')
   assert.equal(mod.MEDIA_GENERATION_SETTINGS_MUSIC_TITLE, 'Music generation')

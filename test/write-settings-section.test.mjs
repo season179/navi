@@ -24,7 +24,7 @@ test('write settings section shell copy matches Kun locale strings', () => {
     mod.WRITE_SETTINGS_WORKSPACE_ROOT_DESC,
     'Writing mode reads Markdown documents from here by default. A welcome.md file is created on first launch.',
   )
-  assert.equal(mod.WRITE_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER, '~/.navi/write_workspace')
+  assert.equal(mod.WRITE_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER, '~/.kun/write_workspace')
   assert.equal(mod.WRITE_SETTINGS_TYPOGRAPHY_TITLE, 'Typography & font')
   assert.equal(mod.WRITE_SETTINGS_FONT_PRESET_LABEL, 'Editor font')
   assert.equal(mod.WRITE_SETTINGS_LINE_HEIGHT_LABEL, 'Line spacing')
