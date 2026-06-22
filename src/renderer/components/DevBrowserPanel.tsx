@@ -16,6 +16,22 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
+import {
+  DEV_BROWSER_ADDRESS_PLACEHOLDER,
+  DEV_BROWSER_AUTO_FOLLOW_LABEL,
+  DEV_BROWSER_BACK_LABEL,
+  DEV_BROWSER_CLOSE_TAB_LABEL,
+  DEV_BROWSER_EMPTY_SUBTITLE,
+  DEV_BROWSER_EMPTY_TITLE,
+  DEV_BROWSER_FORWARD_LABEL,
+  DEV_BROWSER_NEW_TAB_LABEL,
+  DEV_BROWSER_OPEN_EXTERNAL_LABEL,
+  DEV_BROWSER_OPEN_LABEL,
+  DEV_BROWSER_PANEL_COLLAPSE_LABEL,
+  DEV_BROWSER_RELOAD_LABEL,
+  DEV_BROWSER_RESET_LABEL,
+  DEV_BROWSER_SHOW_ALL_LABEL,
+} from '../lib/devBrowserPanel'
 
 export type DevBrowserPreviewMode = 'default' | 'empty' | 'loading' | 'error'
 
@@ -42,24 +58,8 @@ type Props = {
   onSelectDetectedUrl?: (url: string) => void
 }
 
-const COPY = {
-  rightPanelCollapse: 'Collapse panel',
-  browserNewTab: 'New tab',
-  browserCloseTab: 'Close preview',
-  browserBack: 'Back',
-  browserForward: 'Forward',
-  browserReload: 'Reload',
-  browserAddressPlaceholder: 'Enter URL',
-  browserOpen: 'Open',
-  browserAutoFollow: 'Follow local URLs from this thread',
-  browserReset: 'New blank tab',
-  browserOpenExternal: 'Open in browser',
-  browserEmptyTitle: 'No local servers online',
-  browserEmptySubtitle: 'Offline local servers are hidden',
-  browserShowAll: 'Show all',
-  browserLoadFailed: 'Page failed to load',
-  browserPreviewPlaceholder: 'Dev preview',
-}
+/** navi preview-only placeholder — Kun renders a real webview instead. */
+const DEV_BROWSER_PREVIEW_PLACEHOLDER = 'Dev preview'
 
 const PREVIEW_URL = 'http://localhost:5173'
 const PREVIEW_DETECTED_URLS = ['http://localhost:5173', 'http://127.0.0.1:3000']
@@ -132,7 +132,7 @@ export function DevBrowserPanel({
 }: Props): ReactElement {
   const tabLabel = activeUrl
     ? pageTitle || formatDevPreviewUrlLabel(activeUrl)
-    : COPY.browserNewTab
+    : DEV_BROWSER_NEW_TAB_LABEL
   const primaryDetectedUrl = detectedUrls[0] ?? null
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
@@ -151,8 +151,8 @@ export function DevBrowserPanel({
               type="button"
               onClick={onCollapse}
               className="dev-browser-panel-tab-close"
-              aria-label={COPY.browserCloseTab}
-              title={COPY.browserCloseTab}
+              aria-label={DEV_BROWSER_CLOSE_TAB_LABEL}
+              title={DEV_BROWSER_CLOSE_TAB_LABEL}
             >
               <X className="dev-browser-panel-tab-close-icon" strokeWidth={1.85} />
             </button>
@@ -161,8 +161,8 @@ export function DevBrowserPanel({
             type="button"
             onClick={onReset}
             className="dev-browser-panel-new-tab-btn"
-            aria-label={COPY.browserNewTab}
-            title={COPY.browserNewTab}
+            aria-label={DEV_BROWSER_NEW_TAB_LABEL}
+            title={DEV_BROWSER_NEW_TAB_LABEL}
           >
             <Plus className="dev-browser-panel-new-tab-icon" strokeWidth={1.8} />
           </button>
@@ -173,8 +173,8 @@ export function DevBrowserPanel({
             type="button"
             onClick={onCollapse}
             className="ds-sidebar-toggle-button dev-browser-panel-collapse-btn"
-            aria-label={COPY.rightPanelCollapse}
-            title={COPY.rightPanelCollapse}
+            aria-label={DEV_BROWSER_PANEL_COLLAPSE_LABEL}
+            title={DEV_BROWSER_PANEL_COLLAPSE_LABEL}
           >
             <PanelRightClose className="dev-browser-panel-collapse-icon" strokeWidth={1.85} />
           </button>
@@ -185,8 +185,8 @@ export function DevBrowserPanel({
               onClick={onGoBack}
               disabled={!canGoBack}
               className="dev-browser-panel-nav-btn"
-              aria-label={COPY.browserBack}
-              title={COPY.browserBack}
+              aria-label={DEV_BROWSER_BACK_LABEL}
+              title={DEV_BROWSER_BACK_LABEL}
             >
               <ArrowLeft className="dev-browser-panel-nav-icon" strokeWidth={1.8} />
             </button>
@@ -195,8 +195,8 @@ export function DevBrowserPanel({
               onClick={onGoForward}
               disabled={!canGoForward}
               className="dev-browser-panel-nav-btn"
-              aria-label={COPY.browserForward}
-              title={COPY.browserForward}
+              aria-label={DEV_BROWSER_FORWARD_LABEL}
+              title={DEV_BROWSER_FORWARD_LABEL}
             >
               <ArrowRight className="dev-browser-panel-nav-icon" strokeWidth={1.8} />
             </button>
@@ -205,8 +205,8 @@ export function DevBrowserPanel({
               onClick={onReload}
               disabled={!activeUrl}
               className="dev-browser-panel-nav-btn"
-              aria-label={COPY.browserReload}
-              title={COPY.browserReload}
+              aria-label={DEV_BROWSER_RELOAD_LABEL}
+              title={DEV_BROWSER_RELOAD_LABEL}
             >
               {loading ? (
                 <Loader2 className="dev-browser-panel-nav-icon dev-browser-panel-nav-icon-spin" strokeWidth={1.8} />
@@ -222,7 +222,7 @@ export function DevBrowserPanel({
               value={draftUrl}
               onChange={(event) => onDraftUrlChange?.(event.target.value)}
               className="dev-browser-panel-address-input"
-              placeholder={COPY.browserAddressPlaceholder}
+              placeholder={DEV_BROWSER_ADDRESS_PLACEHOLDER}
               spellCheck={false}
             />
           </div>
@@ -231,8 +231,8 @@ export function DevBrowserPanel({
             <button
               type="submit"
               className="dev-browser-panel-action-btn"
-              aria-label={COPY.browserOpen}
-              title={COPY.browserOpen}
+              aria-label={DEV_BROWSER_OPEN_LABEL}
+              title={DEV_BROWSER_OPEN_LABEL}
             >
               <Send className="dev-browser-panel-action-icon" strokeWidth={1.8} />
             </button>
@@ -244,9 +244,9 @@ export function DevBrowserPanel({
                   ? 'dev-browser-panel-action-btn dev-browser-panel-action-btn-auto is-active'
                   : 'dev-browser-panel-action-btn dev-browser-panel-action-btn-auto'
               }
-              aria-label={COPY.browserAutoFollow}
+              aria-label={DEV_BROWSER_AUTO_FOLLOW_LABEL}
               aria-pressed={autoFollow}
-              title={COPY.browserAutoFollow}
+              title={DEV_BROWSER_AUTO_FOLLOW_LABEL}
             >
               <Sparkles className="dev-browser-panel-action-icon" strokeWidth={1.75} />
             </button>
@@ -254,8 +254,8 @@ export function DevBrowserPanel({
               type="button"
               onClick={onReset}
               className="dev-browser-panel-action-btn"
-              aria-label={COPY.browserReset}
-              title={COPY.browserReset}
+              aria-label={DEV_BROWSER_RESET_LABEL}
+              title={DEV_BROWSER_RESET_LABEL}
             >
               <Plus className="dev-browser-panel-action-icon" strokeWidth={1.8} />
             </button>
@@ -264,8 +264,8 @@ export function DevBrowserPanel({
               onClick={onOpenExternal}
               disabled={!activeUrl}
               className="dev-browser-panel-action-btn"
-              aria-label={COPY.browserOpenExternal}
-              title={COPY.browserOpenExternal}
+              aria-label={DEV_BROWSER_OPEN_EXTERNAL_LABEL}
+              title={DEV_BROWSER_OPEN_EXTERNAL_LABEL}
             >
               <ExternalLink className="dev-browser-panel-action-icon" strokeWidth={1.8} />
             </button>
@@ -301,8 +301,8 @@ export function DevBrowserPanel({
         {!activeUrl ? (
           <div className="dev-browser-panel-empty">
             <Globe2 className="dev-browser-panel-empty-icon" strokeWidth={1.45} />
-            <div className="dev-browser-panel-empty-title">{COPY.browserEmptyTitle}</div>
-            <div className="dev-browser-panel-empty-subtitle">{COPY.browserEmptySubtitle}</div>
+            <div className="dev-browser-panel-empty-title">{DEV_BROWSER_EMPTY_TITLE}</div>
+            <div className="dev-browser-panel-empty-subtitle">{DEV_BROWSER_EMPTY_SUBTITLE}</div>
             <button
               type="button"
               onClick={() => {
@@ -314,7 +314,7 @@ export function DevBrowserPanel({
               }}
               className="dev-browser-panel-empty-action"
             >
-              {COPY.browserShowAll}
+              {DEV_BROWSER_SHOW_ALL_LABEL}
             </button>
           </div>
         ) : (
@@ -330,7 +330,7 @@ export function DevBrowserPanel({
                 <Loader2 className="dev-browser-panel-preview-spinner" strokeWidth={1.6} />
               ) : (
                 <>
-                  <div className="dev-browser-panel-preview-kicker">{COPY.browserPreviewPlaceholder}</div>
+                  <div className="dev-browser-panel-preview-kicker">{DEV_BROWSER_PREVIEW_PLACEHOLDER}</div>
                   <div className="dev-browser-panel-preview-host">
                     {formatDevPreviewUrlLabel(activeUrl)}
                   </div>
