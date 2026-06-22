@@ -10,19 +10,7 @@ import {
   type IkunWorkLogoVariant,
   type WorkLogoSwimMode,
 } from './AnimatedWorkLogo'
-
-const WORK_LOGO_SWIM_MODE_LABELS: Record<WorkLogoSwimMode, string> = {
-  propel: 'Working…',
-  sprint: 'Sprinting…',
-  dive: 'Diving…',
-  surf: 'Surfing…',
-}
-
-const IKUN_WORK_LOGO_VARIANT_LABELS: Record<IkunWorkLogoVariant, string> = {
-  dribble: 'Dribbling…',
-  run: 'Fast break…',
-  boba: 'Boba time…',
-}
+import { resolveLiveTurnProgressLabel } from '../lib/liveTurnProgressLocale'
 
 export function liveTurnProgressClass(hasActiveGoal: boolean): string {
   return hasActiveGoal
@@ -66,9 +54,11 @@ export function LiveTurnProgressRow({
 
   const effectiveSwimMode = swimModeOverride ?? swimMode
   const effectiveIkunVariant = ikunVariantOverride ?? ikunVariant
-  const label = ikunModeOn
-    ? IKUN_WORK_LOGO_VARIANT_LABELS[effectiveIkunVariant]
-    : WORK_LOGO_SWIM_MODE_LABELS[effectiveSwimMode]
+  const label = resolveLiveTurnProgressLabel({
+    ikunMode: ikunModeOn,
+    swimMode: effectiveSwimMode,
+    ikunVariant: effectiveIkunVariant,
+  })
 
   return (
     <div
