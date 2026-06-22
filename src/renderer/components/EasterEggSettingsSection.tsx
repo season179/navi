@@ -4,6 +4,20 @@
 
 import { useState, type ReactElement, type ReactNode } from 'react'
 import { FolderPlus, Trash2 } from 'lucide-react'
+import {
+  EASTER_EGG_SETTINGS_TITLE,
+  EASTER_EGG_SETTINGS_UI_MODE_DEFAULT_SUBTITLE,
+  EASTER_EGG_SETTINGS_UI_MODE_DEFAULT_TITLE,
+  EASTER_EGG_SETTINGS_UI_MODE_WORKSHOP_DESC,
+  EASTER_EGG_SETTINGS_UI_MODE_WORKSHOP_TITLE,
+  EASTER_EGG_SETTINGS_UI_PLUGIN_ACTIVATE,
+  EASTER_EGG_SETTINGS_UI_PLUGIN_ACTIVE,
+  EASTER_EGG_SETTINGS_UI_PLUGIN_DOCS_HINT,
+  EASTER_EGG_SETTINGS_UI_PLUGIN_EMPTY,
+  EASTER_EGG_SETTINGS_UI_PLUGIN_INSTALL,
+  EASTER_EGG_SETTINGS_UI_PLUGIN_INSTALL_FAILED,
+  EASTER_EGG_SETTINGS_UI_PLUGIN_REMOVE,
+} from '../lib/easterEggSettingsSection'
 import { GreetingMascot, SleepingMascot } from './Mascot'
 import { SettingRow, SettingsCard } from './SettingsControls'
 
@@ -13,23 +27,6 @@ type ModeCard = {
   subtitle: string
   preview: ReactNode | null
   removable: boolean
-}
-
-const COPY = {
-  easterEggSection: 'Mode workshop',
-  uiModeWorkshopTitle: 'Mascot modes',
-  uiModeWorkshopDesc:
-    'Pick the workspace mascot pack. The built-in iKun mode is itself a pre-installed UI plugin example — build and install your own packs with the developer guide (declarative image packs, no executable code).',
-  uiModeDefaultTitle: 'Default Navi',
-  uiModeDefaultSubtitle: 'The little blue bird',
-  uiPluginInstall: 'Install plugin folder…',
-  uiPluginActivate: 'Use',
-  uiPluginActive: 'Active',
-  uiPluginRemove: 'Remove plugin',
-  uiPluginEmpty:
-    'No UI plugins installed. The bundled iKun example may have been removed; install a plugin folder, or build one with the developer guide.',
-  uiPluginInstallFailed: 'Install failed',
-  uiPluginDocsHint: 'Developer guide: docs/UI_PLUGINS.md',
 }
 
 export const EASTER_EGG_PREVIEW_DEFAULT_MODE = 'default'
@@ -44,8 +41,8 @@ export const EASTER_EGG_PREVIEW_PLUGIN: ModeCard = {
 
 export const EASTER_EGG_PREVIEW_BUILTIN: ModeCard = {
   mode: EASTER_EGG_PREVIEW_DEFAULT_MODE,
-  title: COPY.uiModeDefaultTitle,
-  subtitle: COPY.uiModeDefaultSubtitle,
+  title: EASTER_EGG_SETTINGS_UI_MODE_DEFAULT_TITLE,
+  subtitle: EASTER_EGG_SETTINGS_UI_MODE_DEFAULT_SUBTITLE,
   preview: <GreetingMascot className="easter-egg-mode-card-mascot" />,
   removable: false,
 }
@@ -88,14 +85,14 @@ function ModeCardButton({
             : 'easter-egg-mode-card-action'
         }
       >
-        {active ? COPY.uiPluginActive : COPY.uiPluginActivate}
+        {active ? EASTER_EGG_SETTINGS_UI_PLUGIN_ACTIVE : EASTER_EGG_SETTINGS_UI_PLUGIN_ACTIVATE}
       </button>
       {card.removable && onRemove ? (
         <button
           type="button"
           onClick={onRemove}
-          title={COPY.uiPluginRemove}
-          aria-label={COPY.uiPluginRemove}
+          title={EASTER_EGG_SETTINGS_UI_PLUGIN_REMOVE}
+          aria-label={EASTER_EGG_SETTINGS_UI_PLUGIN_REMOVE}
           className="easter-egg-mode-card-remove"
         >
           <Trash2 className="easter-egg-mode-card-remove-icon" strokeWidth={1.8} />
@@ -129,10 +126,10 @@ export function EasterEggSettingsSection({
   const cards = [EASTER_EGG_PREVIEW_BUILTIN, ...pluginCards]
 
   return (
-    <SettingsCard title={COPY.easterEggSection}>
+    <SettingsCard title={EASTER_EGG_SETTINGS_TITLE}>
       <SettingRow
-        title={COPY.uiModeWorkshopTitle}
-        description={COPY.uiModeWorkshopDesc}
+        title={EASTER_EGG_SETTINGS_UI_MODE_WORKSHOP_TITLE}
+        description={EASTER_EGG_SETTINGS_UI_MODE_WORKSHOP_DESC}
         wideControl
         control={
           <div className="easter-egg-settings-control">
@@ -153,7 +150,7 @@ export function EasterEggSettingsSection({
               ))}
             </div>
             {pluginCards.length === 0 ? (
-              <p className="easter-egg-plugin-empty">{COPY.uiPluginEmpty}</p>
+              <p className="easter-egg-plugin-empty">{EASTER_EGG_SETTINGS_UI_PLUGIN_EMPTY}</p>
             ) : null}
             <div className="easter-egg-install-row">
               <button
@@ -163,9 +160,9 @@ export function EasterEggSettingsSection({
                 className="easter-egg-install-button"
               >
                 <FolderPlus className="easter-egg-install-icon" strokeWidth={1.8} />
-                {COPY.uiPluginInstall}
+                {EASTER_EGG_SETTINGS_UI_PLUGIN_INSTALL}
               </button>
-              <span className="easter-egg-install-hint">{COPY.uiPluginDocsHint}</span>
+              <span className="easter-egg-install-hint">{EASTER_EGG_SETTINGS_UI_PLUGIN_DOCS_HINT}</span>
             </div>
             {installErrors.length > 0 ? (
               <ul className="easter-egg-install-errors">
@@ -210,7 +207,7 @@ export function EasterEggSettingsSectionPreview({
       busy={mode === 'busy'}
       installErrors={
         mode === 'installError'
-          ? [COPY.uiPluginInstallFailed, 'Invalid manifest.json']
+          ? [EASTER_EGG_SETTINGS_UI_PLUGIN_INSTALL_FAILED, 'Invalid manifest.json']
           : []
       }
       lastError={mode === 'lastError' ? 'Could not activate UI plugin pack.' : null}
