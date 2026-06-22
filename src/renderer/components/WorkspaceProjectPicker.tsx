@@ -4,6 +4,14 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
 import { Check, ChevronDown, Folder, FolderPlus, Loader2, Search } from 'lucide-react'
+import {
+  resolveWorkspaceProjectEmptyLabel,
+  WORKSPACE_PROJECT_ADD_LABEL,
+  WORKSPACE_PROJECT_SEARCH_PLACEHOLDER,
+  WORKSPACE_PROJECT_SECTION_LABEL,
+  WORKSPACE_PROJECT_SELECT_LABEL,
+  WORKSPACE_PROJECT_WORKING_DIRECTORY_LABEL,
+} from '../lib/composerWorkspaceProject'
 
 export type WorkspaceProjectOption = {
   root: string
@@ -103,7 +111,7 @@ export function WorkspaceProjectPicker({
 
   const showSearch = options.length > 5
   const isActing = acting || localActing
-  const label = current ? workspaceLabelFromPath(current) : 'Select workspace'
+  const label = current ? workspaceLabelFromPath(current) : WORKSPACE_PROJECT_SELECT_LABEL
 
   useEffect(() => {
     setOpen(false)
@@ -154,7 +162,7 @@ export function WorkspaceProjectPicker({
         type="button"
         className="workspace-project-picker-trigger"
         onClick={() => setOpen((value) => !value)}
-        title="Working directory"
+        title={WORKSPACE_PROJECT_WORKING_DIRECTORY_LABEL}
         aria-expanded={open}
         aria-haspopup="listbox"
         disabled={disabled}
@@ -183,14 +191,16 @@ export function WorkspaceProjectPicker({
                     setOpen(false)
                   }
                 }}
-                placeholder="Search projects…"
-                aria-label="Search projects"
+                placeholder={WORKSPACE_PROJECT_SEARCH_PLACEHOLDER}
+                aria-label={WORKSPACE_PROJECT_SEARCH_PLACEHOLDER}
               />
             </div>
           ) : null}
 
           <div className="workspace-project-picker-list">
-            <div className="workspace-project-picker-section-label">Projects</div>
+            <div className="workspace-project-picker-section-label">
+              {WORKSPACE_PROJECT_SECTION_LABEL}
+            </div>
 
             {filtered.map((option) => {
               const isCurrent = workspaceRootKey(option.root) === workspaceRootKey(current)
@@ -221,7 +231,7 @@ export function WorkspaceProjectPicker({
 
             {filtered.length === 0 ? (
               <div className="workspace-project-picker-empty">
-                {options.length === 0 ? 'No projects yet' : 'No matching projects'}
+                {resolveWorkspaceProjectEmptyLabel({ hasOptions: options.length > 0 })}
               </div>
             ) : null}
           </div>
@@ -234,7 +244,7 @@ export function WorkspaceProjectPicker({
               onClick={handleAdd}
             >
               <FolderPlus strokeWidth={1.9} />
-              <span>Add project…</span>
+              <span>{WORKSPACE_PROJECT_ADD_LABEL}</span>
             </button>
           </div>
         </div>
