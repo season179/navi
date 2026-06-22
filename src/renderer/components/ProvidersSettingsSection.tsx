@@ -32,12 +32,89 @@ import {
   ProviderModelsManager,
   providerModelEntriesFromIds,
 } from './providers/ProviderModelsManager'
+import {
+  PROVIDERS_SETTINGS_ADD_MENU_CUSTOM,
+  PROVIDERS_SETTINGS_ADD_PROVIDER,
+  PROVIDERS_SETTINGS_API_KEY,
+  PROVIDERS_SETTINGS_API_KEY_PLACEHOLDER,
+  PROVIDERS_SETTINGS_BASE_URL,
+  PROVIDERS_SETTINGS_BASE_URL_PLACEHOLDER,
+  PROVIDERS_SETTINGS_CUSTOM_BADGE,
+  PROVIDERS_SETTINGS_CUSTOM_ENDPOINT_DESC,
+  PROVIDERS_SETTINGS_DANGER_HINT,
+  PROVIDERS_SETTINGS_DEFAULT_BADGE,
+  PROVIDERS_SETTINGS_DESC,
+  PROVIDERS_SETTINGS_DRAFT_BADGE,
+  PROVIDERS_SETTINGS_DRAFT_CONFIRM,
+  PROVIDERS_SETTINGS_DRAFT_DISCARD,
+  PROVIDERS_SETTINGS_DRAFT_HINT_NO_KEY,
+  PROVIDERS_SETTINGS_DRAFT_HINT_READY,
+  PROVIDERS_SETTINGS_DRAFT_SECTION,
+  PROVIDERS_SETTINGS_ENDPOINT_FORMAT,
+  PROVIDERS_SETTINGS_ENDPOINT_FORMAT_LABELS,
+  PROVIDERS_SETTINGS_FETCH_MODELS,
+  PROVIDERS_SETTINGS_GROUP_API,
+  PROVIDERS_SETTINGS_GROUP_PLANS,
+  PROVIDERS_SETTINGS_HIDE_SECRET,
+  PROVIDERS_SETTINGS_IMAGE_BASE_URL,
+  PROVIDERS_SETTINGS_IMAGE_BASE_URL_PLACEHOLDER,
+  PROVIDERS_SETTINGS_IMAGE_CAPABILITY,
+  PROVIDERS_SETTINGS_IMAGE_CAPABILITY_DESC,
+  PROVIDERS_SETTINGS_IMAGE_MODEL,
+  PROVIDERS_SETTINGS_IMAGE_PROTOCOL,
+  PROVIDERS_SETTINGS_IN_USE_BADGE,
+  PROVIDERS_SETTINGS_INVALID_URL,
+  PROVIDERS_SETTINGS_MISSING_KEY_BADGE,
+  PROVIDERS_SETTINGS_MODELS,
+  PROVIDERS_SETTINGS_MODELS_PLACEHOLDER,
+  PROVIDERS_SETTINGS_MUSIC_BASE_URL,
+  PROVIDERS_SETTINGS_MUSIC_CAPABILITY,
+  PROVIDERS_SETTINGS_MUSIC_CAPABILITY_DESC,
+  PROVIDERS_SETTINGS_MUSIC_MODEL,
+  PROVIDERS_SETTINGS_MUSIC_PROTOCOL,
+  PROVIDERS_SETTINGS_PLAN_BADGE,
+  PROVIDERS_SETTINGS_PRESET_BADGE,
+  PROVIDERS_SETTINGS_PRESET_UPDATE_TAG,
+  PROVIDERS_SETTINGS_PROXY_ENABLED_LABEL,
+  PROVIDERS_SETTINGS_PROXY_URL_DESC,
+  PROVIDERS_SETTINGS_PROXY_URL_LABEL,
+  PROVIDERS_SETTINGS_PROXY_URL_PLACEHOLDER,
+  PROVIDERS_SETTINGS_PROVIDER_ID,
+  PROVIDERS_SETTINGS_PROVIDER_ID_LOCKED,
+  PROVIDERS_SETTINGS_PROVIDER_NAME,
+  PROVIDERS_SETTINGS_REMOVE_PROVIDER,
+  PROVIDERS_SETTINGS_SECTION_BASICS,
+  PROVIDERS_SETTINGS_SECTION_CONNECTION,
+  PROVIDERS_SETTINGS_SECTION_DANGER,
+  PROVIDERS_SETTINGS_SHOW_SECRET,
+  PROVIDERS_SETTINGS_SPEECH_BASE_URL,
+  PROVIDERS_SETTINGS_SPEECH_CAPABILITY,
+  PROVIDERS_SETTINGS_SPEECH_CAPABILITY_DESC,
+  PROVIDERS_SETTINGS_SPEECH_MODELS,
+  PROVIDERS_SETTINGS_SPEECH_PROTOCOL,
+  PROVIDERS_SETTINGS_TESTING,
+  PROVIDERS_SETTINGS_TEST_CONNECTION,
+  PROVIDERS_SETTINGS_TITLE,
+  PROVIDERS_SETTINGS_TOKEN_PLAN_BADGE,
+  PROVIDERS_SETTINGS_TTS_BASE_URL,
+  PROVIDERS_SETTINGS_TTS_CAPABILITY,
+  PROVIDERS_SETTINGS_TTS_CAPABILITY_DESC,
+  PROVIDERS_SETTINGS_TTS_MODEL,
+  PROVIDERS_SETTINGS_TTS_PROTOCOL,
+  PROVIDERS_SETTINGS_VIDEO_BASE_URL,
+  PROVIDERS_SETTINGS_VIDEO_CAPABILITY,
+  PROVIDERS_SETTINGS_VIDEO_CAPABILITY_DESC,
+  PROVIDERS_SETTINGS_VIDEO_MODEL,
+  PROVIDERS_SETTINGS_VIDEO_PROTOCOL,
+  PROVIDERS_SETTINGS_VISION_BADGE,
+  formatProviderModelCount,
+  formatProviderModelRemove,
+  formatProviderTestFailed,
+  formatProviderTestSuccess,
+  type ModelEndpointFormat,
+} from '../lib/providersSettingsSection'
 
-export type ModelEndpointFormat =
-  | 'chat_completions'
-  | 'responses'
-  | 'messages'
-  | 'custom_endpoint'
+export type { ModelEndpointFormat }
 
 export type ProviderModelSnapshot = {
   id: string
@@ -76,98 +153,6 @@ export type ProvidersSettingsSnapshot = {
   activeProviderId: string
   inUseProviderId: string
   providers: ProviderProfileSnapshot[]
-}
-
-const ENDPOINT_FORMAT_LABELS: Record<ModelEndpointFormat, string> = {
-  chat_completions: 'Chat completions (/v1/chat/completions)',
-  responses: 'Responses API (/v1/responses)',
-  messages: 'Messages API (/v1/messages)',
-  custom_endpoint: 'Custom endpoint',
-}
-
-const COPY = {
-  providers: 'Providers',
-  providersDesc: 'Configure model providers, API keys, and available models.',
-  proxyUrl: 'Proxy',
-  proxyUrlDesc: 'Optional HTTP proxy for provider API requests.',
-  proxyEnabled: 'Enable proxy',
-  proxyUrlPlaceholder: 'http://127.0.0.1:7890',
-  modelProviderAdd: 'Add provider',
-  modelProviderAddMenuCustom: 'Custom provider…',
-  modelProviderGroupPlans: 'Plans & subscriptions',
-  modelProviderGroupApi: 'API providers',
-  modelProviderInUse: 'In use',
-  modelProviderMissingKey: 'No API key',
-  modelProviderDraftBadge: 'Draft',
-  modelProviderDefaultBadge: 'Default',
-  modelProviderPresetBadge: 'Preset',
-  modelProviderPlanBadge: 'Plan',
-  modelProviderCustomBadge: 'Custom',
-  modelProviderTokenPlanBadge: 'Token plan',
-  modelProviderModelCount: (total: number) => `${total} models`,
-  modelProviderVisionBadge: 'Vision',
-  modelProviderSectionBasics: 'Provider basics',
-  modelProviderSectionConnection: 'Provider connection',
-  modelProviderSectionDanger: 'Danger zone',
-  modelProviderTestConnection: 'Test connection',
-  modelProviderFetchModels: 'Fetch from API',
-  modelProviderName: 'Provider name',
-  modelProviderId: 'Provider ID',
-  modelProviderIdLocked: 'Provider ID locked',
-  modelProviderApiKey: 'Provider API key',
-  modelProviderApiKeyPlaceholder: 'Enter provider API key',
-  modelProviderBaseUrl: 'Provider base URL',
-  baseUrlPlaceholder: 'https://api.example.com/v1',
-  modelProviderInvalidUrl: 'Enter a valid http(s) URL.',
-  modelProviderEndpointFormat: 'Endpoint format',
-  modelEndpointCustomEndpointDesc:
-    'Custom endpoint providers use a fully qualified URL path configured per model.',
-  modelProviderModels: 'Provider models',
-  providerModelListDesc: 'Models available for chat and capability routing.',
-  providerModelEmpty: 'No models yet. Add one manually or fetch from the API.',
-  modelProviderModelsPlaceholder: 'Type a model ID and press Enter',
-  modelProviderModelRemove: (model: string) => `Remove ${model}`,
-  modelProviderImageCapability: 'Image capability',
-  modelProviderImageCapabilityDesc: 'Enable image generation models for this provider.',
-  modelProviderSpeechCapability: 'Speech capability',
-  modelProviderSpeechCapabilityDesc: 'Enable speech-to-text models for this provider.',
-  modelProviderTextToSpeechCapability: 'Text-to-speech capability',
-  modelProviderTextToSpeechCapabilityDesc: 'Enable text-to-speech models for this provider.',
-  modelProviderMusicCapability: 'Music capability',
-  modelProviderMusicCapabilityDesc: 'Enable music generation models for this provider.',
-  modelProviderVideoCapability: 'Video capability',
-  modelProviderVideoCapabilityDesc: 'Enable video generation models for this provider.',
-  imageGenProtocol: 'Image protocol',
-  imageGenBaseUrl: 'Image base URL',
-  imageGenBaseUrlPlaceholder: 'https://api.example.com/v1',
-  imageGenModel: 'Image models',
-  speechToTextProtocol: 'Speech protocol',
-  speechToTextBaseUrl: 'Speech base URL',
-  speechToTextModels: 'Speech models',
-  textToSpeechProtocol: 'TTS protocol',
-  textToSpeechBaseUrl: 'TTS base URL',
-  textToSpeechModel: 'TTS models',
-  musicGenerationProtocol: 'Music protocol',
-  musicGenerationBaseUrl: 'Music base URL',
-  musicGenerationModel: 'Music models',
-  videoGenerationProtocol: 'Video protocol',
-  videoGenerationBaseUrl: 'Video base URL',
-  videoGenerationModel: 'Video models',
-  modelProviderDraftSection: 'Draft provider',
-  modelProviderDraftConfirm: 'Add provider',
-  modelProviderDraftDiscard: 'Discard draft',
-  modelProviderDraftHintReady: 'Ready to add — API key is set.',
-  modelProviderDraftHintNoKey: 'Add an API key before saving this provider.',
-  modelProviderRemove: 'Remove provider',
-  modelProviderDangerHint: 'Removing a provider cannot be undone.',
-  modelProviderTesting: 'Testing connection…',
-  modelProviderTestFailed: (message: string) => `Connection failed: ${message}`,
-  modelProviderTestSuccess: (latency: number, total: number) =>
-    `Connected in ${latency}ms · ${total} models available`,
-  modelProviderFetchedModels: (total: number) => `Fetched ${total} models from API`,
-  showSecret: 'Show',
-  hideSecret: 'Hide',
-  modelProviderPresetUpdateTag: 'Update',
 }
 
 const DEEPSEEK_PROVIDER: ProviderProfileSnapshot = {
@@ -271,11 +256,11 @@ function providerModelCount(item: ProviderProfileSnapshot): number {
 }
 
 function providerKindLabel(item: ProviderProfileSnapshot): string {
-  if (item.kind === 'default') return COPY.modelProviderDefaultBadge
-  if (item.kind === 'token-plan') return COPY.modelProviderTokenPlanBadge
-  if (item.kind === 'plan') return COPY.modelProviderPlanBadge
-  if (item.kind === 'preset') return COPY.modelProviderPresetBadge
-  return COPY.modelProviderCustomBadge
+  if (item.kind === 'default') return PROVIDERS_SETTINGS_DEFAULT_BADGE
+  if (item.kind === 'token-plan') return PROVIDERS_SETTINGS_TOKEN_PLAN_BADGE
+  if (item.kind === 'plan') return PROVIDERS_SETTINGS_PLAN_BADGE
+  if (item.kind === 'preset') return PROVIDERS_SETTINGS_PRESET_BADGE
+  return PROVIDERS_SETTINGS_CUSTOM_BADGE
 }
 
 function isPlanProvider(item: ProviderProfileSnapshot): boolean {
@@ -463,15 +448,15 @@ export function ProvidersSettingsSection({
             {item.name.trim() || item.id}
           </span>
           {item.isDraft ? (
-            <ProviderBadge tone="warning">{COPY.modelProviderDraftBadge}</ProviderBadge>
+            <ProviderBadge tone="warning">{PROVIDERS_SETTINGS_DRAFT_BADGE}</ProviderBadge>
           ) : null}
-          {inUse ? <ProviderBadge tone="accent">{COPY.modelProviderInUse}</ProviderBadge> : null}
+          {inUse ? <ProviderBadge tone="accent">{PROVIDERS_SETTINGS_IN_USE_BADGE}</ProviderBadge> : null}
           {!item.isDraft && missingKey ? (
-            <ProviderBadge tone="warning">{COPY.modelProviderMissingKey}</ProviderBadge>
+            <ProviderBadge tone="warning">{PROVIDERS_SETTINGS_MISSING_KEY_BADGE}</ProviderBadge>
           ) : null}
         </div>
         <div className="providers-settings-provider-btn-meta">
-          <span>{COPY.modelProviderModelCount(providerModelCount(item))}</span>
+          <span>{formatProviderModelCount(providerModelCount(item))}</span>
           <span aria-hidden="true">·</span>
           <span>{providerKindLabel(item)}</span>
           {item.apiKey.trim() ? (
@@ -481,7 +466,7 @@ export function ProvidersSettingsSection({
             <ImageIcon className="providers-settings-provider-btn-icon" strokeWidth={1.9} />
           ) : null}
           {hasVision ? (
-            <span className="providers-settings-provider-btn-vision">{COPY.modelProviderVisionBadge}</span>
+            <span className="providers-settings-provider-btn-vision">{PROVIDERS_SETTINGS_VISION_BADGE}</span>
           ) : null}
           {item.speech?.enabled ? (
             <Mic className="providers-settings-provider-btn-icon" strokeWidth={1.9} />
@@ -501,14 +486,14 @@ export function ProvidersSettingsSection({
   }
 
   return (
-    <SettingsCard title={COPY.providers}>
+    <SettingsCard title={PROVIDERS_SETTINGS_TITLE}>
       <SettingRow
-        title={COPY.proxyUrl}
-        description={COPY.proxyUrlDesc}
+        title={PROVIDERS_SETTINGS_PROXY_URL_LABEL}
+        description={PROVIDERS_SETTINGS_PROXY_URL_DESC}
         control={
           <div className="providers-settings-proxy">
             <label className="providers-settings-proxy-toggle">
-              <span>{COPY.proxyEnabled}</span>
+              <span>{PROVIDERS_SETTINGS_PROXY_ENABLED_LABEL}</span>
               <Toggle
                 checked={settings.proxyEnabled}
                 onChange={(enabled) => updateProxy({ proxyEnabled: enabled })}
@@ -516,7 +501,7 @@ export function ProvidersSettingsSection({
             </label>
             <input
               className="settings-text-input"
-              placeholder={COPY.proxyUrlPlaceholder}
+              placeholder={PROVIDERS_SETTINGS_PROXY_URL_PLACEHOLDER}
               value={settings.proxyUrl}
               spellCheck={false}
               onChange={(e) => updateProxy({ proxyUrl: e.target.value })}
@@ -526,20 +511,20 @@ export function ProvidersSettingsSection({
       />
 
       <SettingRow
-        title={COPY.providers}
-        description={COPY.providersDesc}
+        title={PROVIDERS_SETTINGS_TITLE}
+        description={PROVIDERS_SETTINGS_DESC}
         wideControl
         control={
           <div className="providers-settings-layout">
             <div className="providers-settings-sidebar">
               {grouped ? (
                 <>
-                  <ProviderListGroup label={COPY.modelProviderGroupPlans} count={planProviders.length}>
+                  <ProviderListGroup label={PROVIDERS_SETTINGS_GROUP_PLANS} count={planProviders.length}>
                     <div className="providers-settings-provider-list">
                       {planProviders.map(renderProviderButton)}
                     </div>
                   </ProviderListGroup>
-                  <ProviderListGroup label={COPY.modelProviderGroupApi} count={apiProviders.length}>
+                  <ProviderListGroup label={PROVIDERS_SETTINGS_GROUP_API} count={apiProviders.length}>
                     <div className="providers-settings-provider-list">
                       {apiProviders.map(renderProviderButton)}
                     </div>
@@ -560,33 +545,33 @@ export function ProvidersSettingsSection({
                   className="providers-settings-add-btn"
                 >
                   <Plus className="providers-settings-add-btn-icon" strokeWidth={1.9} />
-                  {COPY.modelProviderAdd}
+                  {PROVIDERS_SETTINGS_ADD_PROVIDER}
                   <ChevronDown className="providers-settings-add-btn-icon" strokeWidth={1.9} />
                 </button>
                 {addMenuOpen ? (
                   <div role="menu" className="providers-settings-add-menu">
                     <div className="providers-settings-add-menu-heading">
-                      {COPY.modelProviderGroupPlans}
+                      {PROVIDERS_SETTINGS_GROUP_PLANS}
                     </div>
                     <button type="button" role="menuitem" className="providers-settings-add-menu-item">
                       <span>Claude Code</span>
-                      <span className="providers-settings-add-menu-tag">{COPY.modelProviderPlanBadge}</span>
+                      <span className="providers-settings-add-menu-tag">{PROVIDERS_SETTINGS_PLAN_BADGE}</span>
                     </button>
                     <div className="providers-settings-add-menu-divider" />
                     <div className="providers-settings-add-menu-heading">
-                      {COPY.modelProviderGroupApi}
+                      {PROVIDERS_SETTINGS_GROUP_API}
                     </div>
                     <button type="button" role="menuitem" className="providers-settings-add-menu-item">
                       <span>OpenAI</span>
-                      <span className="providers-settings-add-menu-tag">{COPY.modelProviderPresetBadge}</span>
+                      <span className="providers-settings-add-menu-tag">{PROVIDERS_SETTINGS_PRESET_BADGE}</span>
                     </button>
                     <button type="button" role="menuitem" className="providers-settings-add-menu-item">
                       <span>DeepSeek</span>
-                      <span className="providers-settings-add-menu-tag">{COPY.modelProviderPresetUpdateTag}</span>
+                      <span className="providers-settings-add-menu-tag">{PROVIDERS_SETTINGS_PRESET_UPDATE_TAG}</span>
                     </button>
                     <div className="providers-settings-add-menu-divider" />
                     <button type="button" role="menuitem" className="providers-settings-add-menu-item">
-                      {COPY.modelProviderAddMenuCustom}
+                      {PROVIDERS_SETTINGS_ADD_MENU_CUSTOM}
                     </button>
                   </div>
                 ) : null}
@@ -602,7 +587,7 @@ export function ProvidersSettingsSection({
                     </span>
                     <span className="providers-settings-detail-id">{activeProvider.id}</span>
                     {!canEditActiveProviderId ? (
-                      <span title={COPY.modelProviderIdLocked} className="providers-settings-detail-lock">
+                      <span title={PROVIDERS_SETTINGS_PROVIDER_ID_LOCKED} className="providers-settings-detail-lock">
                         <Lock className="providers-settings-detail-lock-icon" strokeWidth={1.9} />
                       </span>
                     ) : null}
@@ -613,16 +598,16 @@ export function ProvidersSettingsSection({
                     ) : (
                       <PlugZap className="providers-settings-test-btn-icon" strokeWidth={1.9} />
                     )}
-                    {COPY.modelProviderTestConnection}
+                    {PROVIDERS_SETTINGS_TEST_CONNECTION}
                   </button>
                 </div>
 
                 {probeNotice ? <InlineNoticeView notice={probeNotice} /> : null}
 
-                <DetailSection title={COPY.modelProviderSectionBasics}>
+                <DetailSection title={PROVIDERS_SETTINGS_SECTION_BASICS}>
                   <div className="providers-settings-field-grid">
                     <label className="providers-settings-field">
-                      {COPY.modelProviderName}
+                      {PROVIDERS_SETTINGS_PROVIDER_NAME}
                       <input
                         className="settings-text-input"
                         value={activeProvider.name}
@@ -630,7 +615,7 @@ export function ProvidersSettingsSection({
                       />
                     </label>
                     <label className="providers-settings-field">
-                      {COPY.modelProviderId}
+                      {PROVIDERS_SETTINGS_PROVIDER_ID}
                       <span className="providers-settings-id-wrap">
                         <input
                           className={
@@ -643,7 +628,7 @@ export function ProvidersSettingsSection({
                           spellCheck={false}
                         />
                         {!canEditActiveProviderId ? (
-                          <span title={COPY.modelProviderIdLocked} className="providers-settings-id-lock">
+                          <span title={PROVIDERS_SETTINGS_PROVIDER_ID_LOCKED} className="providers-settings-id-lock">
                             <Lock className="providers-settings-detail-lock-icon" strokeWidth={1.9} />
                           </span>
                         ) : null}
@@ -652,35 +637,35 @@ export function ProvidersSettingsSection({
                   </div>
                 </DetailSection>
 
-                <DetailSection title={COPY.modelProviderSectionConnection}>
+                <DetailSection title={PROVIDERS_SETTINGS_SECTION_CONNECTION}>
                   <label className="providers-settings-field">
-                    {COPY.modelProviderApiKey}
+                    {PROVIDERS_SETTINGS_API_KEY}
                     <SettingsSecretInput
                       value={activeProvider.apiKey}
                       onChange={(value) => updateActiveProvider({ apiKey: value })}
                       visible={showApiKey}
                       onToggleVisibility={() => onShowApiKeyChange?.(!showApiKey)}
-                      placeholder={COPY.modelProviderApiKeyPlaceholder}
+                      placeholder={PROVIDERS_SETTINGS_API_KEY_PLACEHOLDER}
                       autoComplete="off"
-                      showLabel={COPY.showSecret}
-                      hideLabel={COPY.hideSecret}
+                      showLabel={PROVIDERS_SETTINGS_SHOW_SECRET}
+                      hideLabel={PROVIDERS_SETTINGS_HIDE_SECRET}
                     />
                   </label>
                   <label className="providers-settings-field">
-                    {COPY.modelProviderBaseUrl}
+                    {PROVIDERS_SETTINGS_BASE_URL}
                     <input
                       className="settings-text-input"
                       value={activeProvider.baseUrl}
-                      placeholder={COPY.baseUrlPlaceholder}
+                      placeholder={PROVIDERS_SETTINGS_BASE_URL_PLACEHOLDER}
                       spellCheck={false}
                       onChange={(e) => updateActiveProvider({ baseUrl: e.target.value })}
                     />
                     {invalidBaseUrl ? (
-                      <span className="providers-settings-url-warning">{COPY.modelProviderInvalidUrl}</span>
+                      <span className="providers-settings-url-warning">{PROVIDERS_SETTINGS_INVALID_URL}</span>
                     ) : null}
                   </label>
                   <label className="providers-settings-field">
-                    {COPY.modelProviderEndpointFormat}
+                    {PROVIDERS_SETTINGS_ENDPOINT_FORMAT}
                     <select
                       className={SETTINGS_SELECT_CLASS}
                       value={activeProvider.endpointFormat}
@@ -690,7 +675,7 @@ export function ProvidersSettingsSection({
                         })
                       }
                     >
-                      {Object.entries(ENDPOINT_FORMAT_LABELS).map(([value, label]) => (
+                      {Object.entries(PROVIDERS_SETTINGS_ENDPOINT_FORMAT_LABELS).map(([value, label]) => (
                         <option key={value} value={value}>
                           {label}
                         </option>
@@ -698,12 +683,12 @@ export function ProvidersSettingsSection({
                     </select>
                   </label>
                   {activeProvider.endpointFormat === 'custom_endpoint' ? (
-                    <p className="providers-settings-muted-copy">{COPY.modelEndpointCustomEndpointDesc}</p>
+                    <p className="providers-settings-muted-copy">{PROVIDERS_SETTINGS_CUSTOM_ENDPOINT_DESC}</p>
                   ) : null}
                 </DetailSection>
 
                 <DetailSection
-                  title={`${COPY.modelProviderModels} · ${providerModelCount(activeProvider)}`}
+                  title={`${PROVIDERS_SETTINGS_MODELS} · ${providerModelCount(activeProvider)}`}
                   action={
                     <button type="button" disabled={probeBusy} className="providers-settings-fetch-btn">
                       {probeBusy && probeMode === 'fetch' ? (
@@ -711,7 +696,7 @@ export function ProvidersSettingsSection({
                       ) : (
                         <Download className="providers-settings-fetch-btn-icon" strokeWidth={1.9} />
                       )}
-                      {COPY.modelProviderFetchModels}
+                      {PROVIDERS_SETTINGS_FETCH_MODELS}
                     </button>
                   }
                 >
@@ -722,25 +707,60 @@ export function ProvidersSettingsSection({
                         activeProvider.modelProfiles,
                       ),
                       providerEndpointFormat:
-                        ENDPOINT_FORMAT_LABELS[activeProvider.endpointFormat],
+                        PROVIDERS_SETTINGS_ENDPOINT_FORMAT_LABELS[activeProvider.endpointFormat],
                     }}
                   />
                 </DetailSection>
 
                 {(
                   [
-                    ['image', COPY.modelProviderImageCapability, COPY.modelProviderImageCapabilityDesc],
-                    ['speech', COPY.modelProviderSpeechCapability, COPY.modelProviderSpeechCapabilityDesc],
+                    ['image', PROVIDERS_SETTINGS_IMAGE_CAPABILITY, PROVIDERS_SETTINGS_IMAGE_CAPABILITY_DESC],
+                    ['speech', PROVIDERS_SETTINGS_SPEECH_CAPABILITY, PROVIDERS_SETTINGS_SPEECH_CAPABILITY_DESC],
                     [
                       'textToSpeech',
-                      COPY.modelProviderTextToSpeechCapability,
-                      COPY.modelProviderTextToSpeechCapabilityDesc,
+                      PROVIDERS_SETTINGS_TTS_CAPABILITY,
+                      PROVIDERS_SETTINGS_TTS_CAPABILITY_DESC,
                     ],
-                    ['music', COPY.modelProviderMusicCapability, COPY.modelProviderMusicCapabilityDesc],
-                    ['video', COPY.modelProviderVideoCapability, COPY.modelProviderVideoCapabilityDesc],
+                    ['music', PROVIDERS_SETTINGS_MUSIC_CAPABILITY, PROVIDERS_SETTINGS_MUSIC_CAPABILITY_DESC],
+                    ['video', PROVIDERS_SETTINGS_VIDEO_CAPABILITY, PROVIDERS_SETTINGS_VIDEO_CAPABILITY_DESC],
                   ] as const
                 ).map(([key, title, desc]) => {
                   const capability = activeProvider[key]
+                  const capabilityFieldLabels =
+                    key === 'image'
+                      ? {
+                          protocol: PROVIDERS_SETTINGS_IMAGE_PROTOCOL,
+                          baseUrl: PROVIDERS_SETTINGS_IMAGE_BASE_URL,
+                          baseUrlPlaceholder: PROVIDERS_SETTINGS_IMAGE_BASE_URL_PLACEHOLDER,
+                          models: PROVIDERS_SETTINGS_IMAGE_MODEL,
+                        }
+                      : key === 'speech'
+                        ? {
+                            protocol: PROVIDERS_SETTINGS_SPEECH_PROTOCOL,
+                            baseUrl: PROVIDERS_SETTINGS_SPEECH_BASE_URL,
+                            baseUrlPlaceholder: PROVIDERS_SETTINGS_BASE_URL_PLACEHOLDER,
+                            models: PROVIDERS_SETTINGS_SPEECH_MODELS,
+                          }
+                        : key === 'textToSpeech'
+                          ? {
+                              protocol: PROVIDERS_SETTINGS_TTS_PROTOCOL,
+                              baseUrl: PROVIDERS_SETTINGS_TTS_BASE_URL,
+                              baseUrlPlaceholder: PROVIDERS_SETTINGS_BASE_URL_PLACEHOLDER,
+                              models: PROVIDERS_SETTINGS_TTS_MODEL,
+                            }
+                          : key === 'music'
+                            ? {
+                                protocol: PROVIDERS_SETTINGS_MUSIC_PROTOCOL,
+                                baseUrl: PROVIDERS_SETTINGS_MUSIC_BASE_URL,
+                                baseUrlPlaceholder: PROVIDERS_SETTINGS_BASE_URL_PLACEHOLDER,
+                                models: PROVIDERS_SETTINGS_MUSIC_MODEL,
+                              }
+                            : {
+                                protocol: PROVIDERS_SETTINGS_VIDEO_PROTOCOL,
+                                baseUrl: PROVIDERS_SETTINGS_VIDEO_BASE_URL,
+                                baseUrlPlaceholder: PROVIDERS_SETTINGS_BASE_URL_PLACEHOLDER,
+                                models: PROVIDERS_SETTINGS_VIDEO_MODEL,
+                              }
                   return (
                     <DetailSection
                       key={key}
@@ -756,30 +776,30 @@ export function ProvidersSettingsSection({
                       {capability?.enabled ? (
                         <div className="providers-settings-field-grid">
                           <label className="providers-settings-field">
-                            {COPY.imageGenProtocol}
+                            {capabilityFieldLabels.protocol}
                             <select className={SETTINGS_SELECT_CLASS} defaultValue={capability.protocol}>
                               <option value={capability.protocol}>{capability.protocol}</option>
                             </select>
                           </label>
                           <label className="providers-settings-field">
-                            {COPY.imageGenBaseUrl}
+                            {capabilityFieldLabels.baseUrl}
                             <input
                               className="settings-text-input"
                               value={capability.baseUrl}
-                              placeholder={COPY.imageGenBaseUrlPlaceholder}
+                              placeholder={capabilityFieldLabels.baseUrlPlaceholder}
                               spellCheck={false}
                               readOnly
                             />
                           </label>
                           <label className="providers-settings-field is-wide">
-                            {COPY.imageGenModel}
+                            {capabilityFieldLabels.models}
                             <ModelChipsInput
                               key={`${activeProvider.id}-${key}`}
                               values={capability.models}
                               onChange={(models) => updateCapabilityModels(key, models)}
-                              placeholder={COPY.modelProviderModelsPlaceholder}
+                              placeholder={PROVIDERS_SETTINGS_MODELS_PLACEHOLDER}
                               inputAriaLabel={title}
-                              removeLabel={COPY.modelProviderModelRemove}
+                              removeLabel={formatProviderModelRemove}
                             />
                           </label>
                         </div>
@@ -789,30 +809,30 @@ export function ProvidersSettingsSection({
                 })}
 
                 {isDraftActive ? (
-                  <DetailSection title={COPY.modelProviderDraftSection}>
+                  <DetailSection title={PROVIDERS_SETTINGS_DRAFT_SECTION}>
                     <div className="providers-settings-draft-actions">
                       <button type="button" className="providers-settings-draft-confirm">
                         <Plus className="providers-settings-draft-confirm-icon" strokeWidth={2} />
-                        {COPY.modelProviderDraftConfirm}
+                        {PROVIDERS_SETTINGS_DRAFT_CONFIRM}
                       </button>
                       <button type="button" className="providers-settings-draft-discard">
-                        {COPY.modelProviderDraftDiscard}
+                        {PROVIDERS_SETTINGS_DRAFT_DISCARD}
                       </button>
                       <span className="providers-settings-draft-hint">
                         {activeProvider.apiKey.trim()
-                          ? COPY.modelProviderDraftHintReady
-                          : COPY.modelProviderDraftHintNoKey}
+                          ? PROVIDERS_SETTINGS_DRAFT_HINT_READY
+                          : PROVIDERS_SETTINGS_DRAFT_HINT_NO_KEY}
                       </span>
                     </div>
                   </DetailSection>
                 ) : activeProvider.kind !== 'default' ? (
-                  <DetailSection title={COPY.modelProviderSectionDanger}>
+                  <DetailSection title={PROVIDERS_SETTINGS_SECTION_DANGER}>
                     <div className="providers-settings-danger-actions">
                       <button type="button" className="providers-settings-remove-btn">
                         <Trash2 className="providers-settings-remove-btn-icon" strokeWidth={1.9} />
-                        {COPY.modelProviderRemove}
+                        {PROVIDERS_SETTINGS_REMOVE_PROVIDER}
                       </button>
-                      <span className="providers-settings-draft-hint">{COPY.modelProviderDangerHint}</span>
+                      <span className="providers-settings-draft-hint">{PROVIDERS_SETTINGS_DANGER_HINT}</span>
                     </div>
                   </DetailSection>
                 ) : null}
@@ -872,11 +892,11 @@ export function ProvidersSettingsSectionPreview({
 
   const probeNotice: InlineNotice | null =
     mode === 'probing'
-      ? { tone: 'info', message: COPY.modelProviderTesting }
+      ? { tone: 'info', message: PROVIDERS_SETTINGS_TESTING }
       : mode === 'probeError'
-        ? { tone: 'error', message: COPY.modelProviderTestFailed('401 Unauthorized') }
+        ? { tone: 'error', message: formatProviderTestFailed('401 Unauthorized') }
         : mode === 'probeSuccess'
-          ? { tone: 'success', message: COPY.modelProviderTestSuccess(142, 12) }
+          ? { tone: 'success', message: formatProviderTestSuccess(142, 12) }
           : null
 
   return (
