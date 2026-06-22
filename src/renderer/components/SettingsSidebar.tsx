@@ -38,6 +38,11 @@ import {
   Smartphone,
   Sparkles,
 } from 'lucide-react'
+import {
+  SETTINGS_SIDEBAR_BACK_LABEL,
+  SETTINGS_SIDEBAR_FOOTER_LABEL,
+  resolveSettingsSidebarCategoryLabel,
+} from '../lib/settingsSidebar'
 
 export type SettingsCategory =
   | 'general'
@@ -56,27 +61,6 @@ export type SettingsCategory =
   | 'claw'
   | 'updates'
   | 'debug'
-
-const COPY: Record<string, string> = {
-  back: 'Back',
-  general: 'General',
-  providers: 'Providers',
-  write: 'Write',
-  imageGen: 'Image generation',
-  mediaGeneration: 'Media generation',
-  speechToText: 'Speech to text',
-  agents: 'Agents',
-  archives: 'Archives',
-  permissions: 'Permissions',
-  worktree: 'Worktree',
-  memory: 'Memory',
-  keyboardShortcuts: 'Keyboard shortcuts',
-  easterEgg: 'Easter egg',
-  updates: 'Updates',
-  claw: 'Claw',
-  debug: 'Debug',
-  settingsFooter: 'Personal settings',
-}
 
 type CategoryItem = {
   id: SettingsCategory
@@ -131,7 +115,7 @@ export function SettingsSidebar({
         <div aria-hidden className="settings-sidebar-titlebar-safe" />
         <button type="button" onClick={goBack} className="settings-sidebar-back">
           <ChevronLeft className="settings-sidebar-back-icon" strokeWidth={1.75} />
-          {COPY.back}
+          {SETTINGS_SIDEBAR_BACK_LABEL}
         </button>
       </div>
 
@@ -147,7 +131,7 @@ export function SettingsSidebar({
               onClick={() => setCategory(item.id)}
             >
               <Icon className="settings-sidebar-category-icon" strokeWidth={1.75} />
-              {COPY[item.labelKey] ?? item.labelKey}
+              {resolveSettingsSidebarCategoryLabel(item.labelKey)}
             </button>
           )
         })}
@@ -160,7 +144,7 @@ export function SettingsSidebar({
           </div>
           <div className="settings-sidebar-footer-copy">
             <div className="settings-sidebar-footer-title">{appName}</div>
-            <div className="settings-sidebar-footer-subtitle">{COPY.settingsFooter}</div>
+            <div className="settings-sidebar-footer-subtitle">{SETTINGS_SIDEBAR_FOOTER_LABEL}</div>
           </div>
         </div>
       </div>
@@ -175,7 +159,9 @@ export function SettingsSidebarPreviewContent({
   category: SettingsCategory
   showHeader?: boolean
 }): ReactElement {
-  const label = COPY[SETTINGS_CATEGORIES.find((item) => item.id === category)?.labelKey ?? ''] ?? category
+  const label = resolveSettingsSidebarCategoryLabel(
+    SETTINGS_CATEGORIES.find((item) => item.id === category)?.labelKey ?? category,
+  )
 
   return (
     <div className="settings-sidebar-preview-content">
