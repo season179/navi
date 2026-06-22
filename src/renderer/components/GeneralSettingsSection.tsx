@@ -5,6 +5,65 @@
 import { useState, type ReactElement } from 'react'
 import { ArchiveRestore, FolderOpen, Loader2 } from 'lucide-react'
 import {
+  GENERAL_SETTINGS_BROWSE_LABEL,
+  GENERAL_SETTINGS_CLOSE_ACTION_DESC,
+  GENERAL_SETTINGS_CLOSE_ACTION_LABEL,
+  GENERAL_SETTINGS_CURSOR_SPOTLIGHT_DESC,
+  GENERAL_SETTINGS_CURSOR_SPOTLIGHT_LABEL,
+  GENERAL_SETTINGS_DESKTOP_BEHAVIOR_TITLE,
+  GENERAL_SETTINGS_FONT_SCALE_DESC,
+  GENERAL_SETTINGS_FONT_SCALE_LABEL,
+  GENERAL_SETTINGS_LANGUAGE_DESC,
+  GENERAL_SETTINGS_LANGUAGE_LABEL,
+  GENERAL_SETTINGS_LEGACY_IMPORT_ALL_PRESENT,
+  GENERAL_SETTINGS_LEGACY_IMPORT_BUTTON,
+  GENERAL_SETTINGS_LEGACY_IMPORT_DESC,
+  GENERAL_SETTINGS_LEGACY_IMPORT_NONE_FOUND,
+  GENERAL_SETTINGS_LEGACY_IMPORT_PICK,
+  GENERAL_SETTINGS_LEGACY_IMPORT_RESTARTING,
+  GENERAL_SETTINGS_LEGACY_IMPORT_SCANNING,
+  GENERAL_SETTINGS_LEGACY_IMPORT_TITLE,
+  GENERAL_SETTINGS_LOG_DIR_DESC,
+  GENERAL_SETTINGS_LOG_DIR_LABEL,
+  GENERAL_SETTINGS_LOG_DIR_OPEN,
+  GENERAL_SETTINGS_LOG_ENABLED_DESC,
+  GENERAL_SETTINGS_LOG_ENABLED_LABEL,
+  GENERAL_SETTINGS_LOG_RETENTION_DESC,
+  GENERAL_SETTINGS_LOG_RETENTION_FIVE,
+  GENERAL_SETTINGS_LOG_RETENTION_LABEL,
+  GENERAL_SETTINGS_LOG_RETENTION_ONE,
+  GENERAL_SETTINGS_LOG_RETENTION_SEVEN,
+  GENERAL_SETTINGS_LOG_RETENTION_THREE,
+  GENERAL_SETTINGS_LOG_RETENTION_TWO,
+  GENERAL_SETTINGS_LOG_TITLE,
+  GENERAL_SETTINGS_ONBOARDING_PREVIEW_DESC,
+  GENERAL_SETTINGS_ONBOARDING_PREVIEW_OPEN,
+  GENERAL_SETTINGS_ONBOARDING_PREVIEW_TITLE,
+  GENERAL_SETTINGS_OPEN_AT_LOGIN_DESC,
+  GENERAL_SETTINGS_OPEN_AT_LOGIN_LABEL,
+  GENERAL_SETTINGS_OPEN_AT_LOGIN_UNSUPPORTED_DESC,
+  GENERAL_SETTINGS_RESTORE_WORKSPACE_DEFAULT,
+  GENERAL_SETTINGS_SECTION_TITLE,
+  GENERAL_SETTINGS_START_MINIMIZED_DESC,
+  GENERAL_SETTINGS_START_MINIMIZED_DISABLED_DESC,
+  GENERAL_SETTINGS_START_MINIMIZED_LABEL,
+  GENERAL_SETTINGS_THEME_DARK,
+  GENERAL_SETTINGS_THEME_DESC,
+  GENERAL_SETTINGS_THEME_LABEL,
+  GENERAL_SETTINGS_THEME_LIGHT,
+  GENERAL_SETTINGS_THEME_SYSTEM,
+  GENERAL_SETTINGS_TURN_COMPLETE_NOTIFICATION_DESC,
+  GENERAL_SETTINGS_TURN_COMPLETE_NOTIFICATION_LABEL,
+  GENERAL_SETTINGS_WORKSPACE_ROOT_DESC,
+  GENERAL_SETTINGS_WORKSPACE_ROOT_LABEL,
+  GENERAL_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER,
+  formatGeneralSettingsFontScaleCurrent,
+  formatGeneralSettingsLegacyImportFound,
+  formatGeneralSettingsLegacyImportSourceCount,
+  resolveGeneralSettingsCloseActionLabel,
+  resolveGeneralSettingsFontScaleLabel,
+} from '../lib/generalSettingsSection'
+import {
   InlineNoticeView,
   SETTINGS_SELECT_CLASS,
   SettingRow,
@@ -61,71 +120,6 @@ export const GENERAL_SETTINGS_PREVIEW_FORM: GeneralSettingsForm = {
 const FONT_SCALE_OPTIONS: FontScale[] = ['small', 'medium', 'large']
 const CLOSE_ACTION_OPTIONS: CloseAction[] = ['ask', 'tray', 'quit']
 
-const COPY = {
-  sectionGeneral: 'General',
-  language: 'Language',
-  languageDesc: 'Interface language for menus and labels.',
-  theme: 'Theme',
-  themeDesc: 'Choose light, dark, or match your system.',
-  themeSystem: 'System',
-  themeLight: 'Light',
-  themeDark: 'Dark',
-  fontScale: 'Font size',
-  fontScaleDesc: 'Adjust interface text size.',
-  fontScaleSmall: 'Small',
-  fontScaleMedium: 'Medium',
-  fontScaleLarge: 'Large',
-  fontScaleCurrent: (value: string) => `Current: ${value}`,
-  workspaceRoot: 'Workspace folder',
-  workspaceRootDesc: 'Default folder for new coding sessions.',
-  workspaceRootPlaceholder: '/path/to/workspace',
-  restoreWorkspaceDefault: 'Reset',
-  browse: 'Browse',
-  cursorSpotlight: 'Cursor spotlight',
-  cursorSpotlightDesc: 'Highlight the pointer with a soft glow.',
-  desktopBehavior: 'Desktop behavior',
-  desktopOpenAtLogin: 'Open at login',
-  desktopOpenAtLoginDesc: 'Launch Navi when you sign in.',
-  desktopOpenAtLoginUnsupportedDesc: 'Not supported on this platform.',
-  desktopStartMinimized: 'Start minimized',
-  desktopStartMinimizedDesc: 'Open to the tray when launching at login.',
-  desktopStartMinimizedDisabledDesc: 'Enable open at login first.',
-  desktopCloseAction: 'When closing the window',
-  desktopCloseActionDesc: 'Choose quit, minimize to tray, or ask each time.',
-  desktopCloseAction_ask: 'Ask every time',
-  desktopCloseAction_tray: 'Minimize to tray',
-  desktopCloseAction_quit: 'Quit',
-  turnCompleteNotification: 'Turn complete notification',
-  turnCompleteNotificationDesc: 'Show a notification when the agent finishes.',
-  onboardingPreview: 'Onboarding preview',
-  onboardingPreviewDesc: 'Open the first-run setup flow for visual review.',
-  onboardingPreviewOpen: 'Open onboarding',
-  logTitle: 'Logs',
-  logEnabled: 'Enable logging',
-  logEnabledDesc: 'Write diagnostic logs to disk.',
-  logRetention: 'Log retention',
-  logRetentionDesc: 'How long to keep log files.',
-  logRetentionOne: '1 day',
-  logRetentionTwo: '2 days',
-  logRetentionThree: '3 days',
-  logRetentionFive: '5 days',
-  logRetentionSeven: '7 days',
-  logDir: 'Log directory',
-  logDirDesc: 'Folder where log files are stored.',
-  logDirOpen: 'Open folder',
-  legacyImportTitle: 'Import legacy sessions',
-  legacyImportDesc: 'Import conversation history from a previous Kun install.',
-  legacyImportScanning: 'Scanning for legacy sessions…',
-  legacyImportFound: (count: number) => `${count} new session${count === 1 ? '' : 's'} ready to import`,
-  legacyImportAllPresent: 'All found sessions are already imported',
-  legacyImportNoneFound: 'No legacy sessions found',
-  legacyImportSourceCount: (newCount: number, total: number) =>
-    `${newCount} new / ${total} total`,
-  legacyImportButton: 'Import detected',
-  legacyImportPick: 'Choose folder',
-  legacyImportRestarting: 'Restarting…',
-}
-
 type LegacySource = {
   id: string
   path: string
@@ -157,9 +151,7 @@ const LEGACY_SOURCES_PREVIEW: LegacySource[] = [
 ]
 
 function fontScaleLabel(scale: FontScale): string {
-  if (scale === 'large') return COPY.fontScaleLarge
-  if (scale === 'medium') return COPY.fontScaleMedium
-  return COPY.fontScaleSmall
+  return resolveGeneralSettingsFontScaleLabel(scale)
 }
 
 function LegacySessionImportCard({
@@ -179,12 +171,12 @@ function LegacySessionImportCard({
   const totalFound = sources.reduce((sum, source) => sum + source.threadCount, 0)
 
   const statusText = detecting
-    ? COPY.legacyImportScanning
+    ? GENERAL_SETTINGS_LEGACY_IMPORT_SCANNING
     : totalNew > 0
-      ? COPY.legacyImportFound(totalNew)
+      ? formatGeneralSettingsLegacyImportFound(totalNew)
       : totalFound > 0
-        ? COPY.legacyImportAllPresent
-        : COPY.legacyImportNoneFound
+        ? GENERAL_SETTINGS_LEGACY_IMPORT_ALL_PRESENT
+        : GENERAL_SETTINGS_LEGACY_IMPORT_NONE_FOUND
 
   const notice: InlineNotice | null =
     state === 'success'
@@ -194,10 +186,10 @@ function LegacySessionImportCard({
         : null
 
   return (
-    <SettingsCard title={COPY.legacyImportTitle} className="settings-card-spaced">
+    <SettingsCard title={GENERAL_SETTINGS_LEGACY_IMPORT_TITLE} className="settings-card-spaced">
       <SettingRow
-        title={COPY.legacyImportTitle}
-        description={COPY.legacyImportDesc}
+        title={GENERAL_SETTINGS_LEGACY_IMPORT_TITLE}
+        description={GENERAL_SETTINGS_LEGACY_IMPORT_DESC}
         wideControl
         control={
           <div className="general-settings-legacy-control">
@@ -213,7 +205,10 @@ function LegacySessionImportCard({
                 {sources.map((source) => (
                   <li key={source.id} className="general-settings-legacy-source">
                     <span className="general-settings-legacy-source-count">
-                      {COPY.legacyImportSourceCount(source.newCount, source.threadCount)}
+                      {formatGeneralSettingsLegacyImportSourceCount(
+                        source.newCount,
+                        source.threadCount,
+                      )}
                     </span>
                     <code className="general-settings-legacy-source-path">{source.path}</code>
                   </li>
@@ -228,11 +223,11 @@ function LegacySessionImportCard({
                 disabled={detecting || totalNew === 0}
               >
                 <ArchiveRestore className="settings-action-button-icon" strokeWidth={1.75} />
-                {COPY.legacyImportButton}
+                {GENERAL_SETTINGS_LEGACY_IMPORT_BUTTON}
               </button>
               <button type="button" className="settings-action-button" disabled={detecting}>
                 <FolderOpen className="settings-action-button-icon" strokeWidth={1.75} />
-                {COPY.legacyImportPick}
+                {GENERAL_SETTINGS_LEGACY_IMPORT_PICK}
               </button>
             </div>
 
@@ -279,10 +274,10 @@ export function GeneralSettingsSection({
 
   return (
     <>
-      <SettingsCard title={COPY.sectionGeneral}>
+      <SettingsCard title={GENERAL_SETTINGS_SECTION_TITLE}>
         <SettingRow
-          title={COPY.language}
-          description={COPY.languageDesc}
+          title={GENERAL_SETTINGS_LANGUAGE_LABEL}
+          description={GENERAL_SETTINGS_LANGUAGE_DESC}
           control={
             <select
               className={SETTINGS_SELECT_CLASS}
@@ -295,23 +290,23 @@ export function GeneralSettingsSection({
           }
         />
         <SettingRow
-          title={COPY.theme}
-          description={COPY.themeDesc}
+          title={GENERAL_SETTINGS_THEME_LABEL}
+          description={GENERAL_SETTINGS_THEME_DESC}
           control={
             <select
               className={SETTINGS_SELECT_CLASS}
               value={form.theme}
               onChange={(e) => onChange({ theme: e.target.value as ThemePref })}
             >
-              <option value="system">{COPY.themeSystem}</option>
-              <option value="light">{COPY.themeLight}</option>
-              <option value="dark">{COPY.themeDark}</option>
+              <option value="system">{GENERAL_SETTINGS_THEME_SYSTEM}</option>
+              <option value="light">{GENERAL_SETTINGS_THEME_LIGHT}</option>
+              <option value="dark">{GENERAL_SETTINGS_THEME_DARK}</option>
             </select>
           }
         />
         <SettingRow
-          title={COPY.fontScale}
-          description={COPY.fontScaleDesc}
+          title={GENERAL_SETTINGS_FONT_SCALE_LABEL}
+          description={GENERAL_SETTINGS_FONT_SCALE_DESC}
           control={
             <div className="general-settings-font-scale">
               <div className="general-settings-font-scale-labels">
@@ -325,7 +320,7 @@ export function GeneralSettingsSection({
                 max={FONT_SCALE_OPTIONS.length - 1}
                 step={1}
                 value={fontScaleIndex}
-                aria-label={COPY.fontScale}
+                aria-label={GENERAL_SETTINGS_FONT_SCALE_LABEL}
                 className="general-settings-font-scale-slider"
                 onChange={(e) => {
                   const nextScale = FONT_SCALE_OPTIONS[Number(e.target.value)] ?? 'medium'
@@ -333,14 +328,14 @@ export function GeneralSettingsSection({
                 }}
               />
               <div className="general-settings-font-scale-current">
-                {COPY.fontScaleCurrent(fontScaleLabel(currentFontScale))}
+                {formatGeneralSettingsFontScaleCurrent(fontScaleLabel(currentFontScale))}
               </div>
             </div>
           }
         />
         <SettingRow
-          title={COPY.workspaceRoot}
-          description={COPY.workspaceRootDesc}
+          title={GENERAL_SETTINGS_WORKSPACE_ROOT_LABEL}
+          description={GENERAL_SETTINGS_WORKSPACE_ROOT_DESC}
           control={
             <div className="general-settings-workspace">
               <div className="general-settings-workspace-row">
@@ -348,13 +343,13 @@ export function GeneralSettingsSection({
                   className="settings-text-input"
                   value={form.workspaceRoot}
                   onChange={(e) => onChange({ workspaceRoot: e.target.value })}
-                  placeholder={COPY.workspaceRootPlaceholder}
+                  placeholder={GENERAL_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER}
                 />
                 <button type="button" className="settings-action-button">
-                  {COPY.restoreWorkspaceDefault}
+                  {GENERAL_SETTINGS_RESTORE_WORKSPACE_DEFAULT}
                 </button>
                 <button type="button" className="settings-action-button">
-                  {COPY.browse}
+                  {GENERAL_SETTINGS_BROWSE_LABEL}
                 </button>
               </div>
               {workspacePickerError ? (
@@ -364,8 +359,8 @@ export function GeneralSettingsSection({
           }
         />
         <SettingRow
-          title={COPY.cursorSpotlight}
-          description={COPY.cursorSpotlightDesc}
+          title={GENERAL_SETTINGS_CURSOR_SPOTLIGHT_LABEL}
+          description={GENERAL_SETTINGS_CURSOR_SPOTLIGHT_DESC}
           control={
             <Toggle
               checked={form.cursorSpotlight}
@@ -375,13 +370,13 @@ export function GeneralSettingsSection({
         />
       </SettingsCard>
 
-      <SettingsCard title={COPY.desktopBehavior} className="settings-card-spaced">
+      <SettingsCard title={GENERAL_SETTINGS_DESKTOP_BEHAVIOR_TITLE} className="settings-card-spaced">
         <SettingRow
-          title={COPY.desktopOpenAtLogin}
+          title={GENERAL_SETTINGS_OPEN_AT_LOGIN_LABEL}
           description={
             openAtLoginSupported
-              ? COPY.desktopOpenAtLoginDesc
-              : COPY.desktopOpenAtLoginUnsupportedDesc
+              ? GENERAL_SETTINGS_OPEN_AT_LOGIN_DESC
+              : GENERAL_SETTINGS_OPEN_AT_LOGIN_UNSUPPORTED_DESC
           }
           control={
             <Toggle
@@ -397,11 +392,11 @@ export function GeneralSettingsSection({
           }
         />
         <SettingRow
-          title={COPY.desktopStartMinimized}
+          title={GENERAL_SETTINGS_START_MINIMIZED_LABEL}
           description={
             form.appBehavior.openAtLogin && startMinimizedSupported
-              ? COPY.desktopStartMinimizedDesc
-              : COPY.desktopStartMinimizedDisabledDesc
+              ? GENERAL_SETTINGS_START_MINIMIZED_DESC
+              : GENERAL_SETTINGS_START_MINIMIZED_DISABLED_DESC
           }
           control={
             <Toggle
@@ -412,8 +407,8 @@ export function GeneralSettingsSection({
           }
         />
         <SettingRow
-          title={COPY.desktopCloseAction}
-          description={COPY.desktopCloseActionDesc}
+          title={GENERAL_SETTINGS_CLOSE_ACTION_LABEL}
+          description={GENERAL_SETTINGS_CLOSE_ACTION_DESC}
           control={
             <select
               className={SETTINGS_SELECT_CLASS}
@@ -424,15 +419,15 @@ export function GeneralSettingsSection({
             >
               {CLOSE_ACTION_OPTIONS.map((option) => (
                 <option key={option} value={option}>
-                  {COPY[`desktopCloseAction_${option}`]}
+                  {resolveGeneralSettingsCloseActionLabel(option)}
                 </option>
               ))}
             </select>
           }
         />
         <SettingRow
-          title={COPY.turnCompleteNotification}
-          description={COPY.turnCompleteNotificationDesc}
+          title={GENERAL_SETTINGS_TURN_COMPLETE_NOTIFICATION_LABEL}
+          description={GENERAL_SETTINGS_TURN_COMPLETE_NOTIFICATION_DESC}
           control={
             <Toggle
               checked={form.notifications.turnComplete}
@@ -444,13 +439,13 @@ export function GeneralSettingsSection({
         />
       </SettingsCard>
 
-      <SettingsCard title={COPY.onboardingPreview} className="settings-card-spaced">
+      <SettingsCard title={GENERAL_SETTINGS_ONBOARDING_PREVIEW_TITLE} className="settings-card-spaced">
         <SettingRow
-          title={COPY.onboardingPreview}
-          description={COPY.onboardingPreviewDesc}
+          title={GENERAL_SETTINGS_ONBOARDING_PREVIEW_TITLE}
+          description={GENERAL_SETTINGS_ONBOARDING_PREVIEW_DESC}
           control={
             <button type="button" className="settings-action-button is-inline">
-              {COPY.onboardingPreviewOpen}
+              {GENERAL_SETTINGS_ONBOARDING_PREVIEW_OPEN}
             </button>
           }
         />
@@ -458,10 +453,10 @@ export function GeneralSettingsSection({
 
       <LegacySessionImportCard state={legacyImportState} />
 
-      <SettingsCard title={COPY.logTitle} className="settings-card-spaced">
+      <SettingsCard title={GENERAL_SETTINGS_LOG_TITLE} className="settings-card-spaced">
         <SettingRow
-          title={COPY.logEnabled}
-          description={COPY.logEnabledDesc}
+          title={GENERAL_SETTINGS_LOG_ENABLED_LABEL}
+          description={GENERAL_SETTINGS_LOG_ENABLED_DESC}
           control={
             <Toggle
               checked={form.log.enabled}
@@ -470,25 +465,25 @@ export function GeneralSettingsSection({
           }
         />
         <SettingRow
-          title={COPY.logRetention}
-          description={COPY.logRetentionDesc}
+          title={GENERAL_SETTINGS_LOG_RETENTION_LABEL}
+          description={GENERAL_SETTINGS_LOG_RETENTION_DESC}
           control={
             <select
               className={SETTINGS_SELECT_CLASS}
               value={form.log.retentionDays}
               onChange={(e) => updateLog({ retentionDays: Number(e.target.value) })}
             >
-              <option value={1}>{COPY.logRetentionOne}</option>
-              <option value={2}>{COPY.logRetentionTwo}</option>
-              <option value={3}>{COPY.logRetentionThree}</option>
-              <option value={5}>{COPY.logRetentionFive}</option>
-              <option value={7}>{COPY.logRetentionSeven}</option>
+              <option value={1}>{GENERAL_SETTINGS_LOG_RETENTION_ONE}</option>
+              <option value={2}>{GENERAL_SETTINGS_LOG_RETENTION_TWO}</option>
+              <option value={3}>{GENERAL_SETTINGS_LOG_RETENTION_THREE}</option>
+              <option value={5}>{GENERAL_SETTINGS_LOG_RETENTION_FIVE}</option>
+              <option value={7}>{GENERAL_SETTINGS_LOG_RETENTION_SEVEN}</option>
             </select>
           }
         />
         <SettingRow
-          title={COPY.logDir}
-          description={COPY.logDirDesc}
+          title={GENERAL_SETTINGS_LOG_DIR_LABEL}
+          description={GENERAL_SETTINGS_LOG_DIR_DESC}
           wideControl
           control={
             <div className="general-settings-log-control">
@@ -499,7 +494,7 @@ export function GeneralSettingsSection({
               )}
               <button type="button" className="settings-action-button is-compact">
                 <FolderOpen className="settings-action-button-icon" strokeWidth={1.75} />
-                {COPY.logDirOpen}
+                {GENERAL_SETTINGS_LOG_DIR_OPEN}
               </button>
               {logDirOpenError ? (
                 <p className="general-settings-log-error">{logDirOpenError}</p>
