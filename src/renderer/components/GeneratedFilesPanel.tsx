@@ -3,6 +3,7 @@
 // Visual only: parent supplies media snapshots for the conversation gallery.
 
 import type { ReactElement } from 'react'
+import { GENERATED_FILES_PANEL_TITLE } from '../lib/generatedFilesPanel'
 import {
   MediaAttachmentGallery,
   MEDIA_ATTACHMENT_GALLERY_PREVIEW,
@@ -35,7 +36,7 @@ export function GeneratedFilesPanel({ media }: Props): ReactElement | null {
 
   return (
     <div className="generated-files-panel">
-      <div className="generated-files-panel-title">Generated files</div>
+      <div className="generated-files-panel-title">{GENERATED_FILES_PANEL_TITLE}</div>
       <MediaAttachmentGallery media={media} variant="conversation" />
     </div>
   )
