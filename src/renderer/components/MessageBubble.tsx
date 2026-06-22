@@ -44,6 +44,13 @@ import {
   MESSAGE_BUBBLE_REWIND_HINT,
   MESSAGE_BUBBLE_REWIND_RESEND,
 } from '../lib/messageBubbleUserEdit'
+import {
+  MESSAGE_BUBBLE_APPROVAL_ALLOW,
+  MESSAGE_BUBBLE_APPROVAL_DENY,
+  MESSAGE_BUBBLE_APPROVAL_TITLE,
+  formatMessageBubbleApprovalTool,
+  resolveMessageBubbleApprovalStatusLabel,
+} from '../lib/messageBubbleApproval'
 
 export type UserMessageSnapshot = {
   kind: 'user'
@@ -350,14 +357,7 @@ function MessageBubbleImpl({
 
   if (block.kind === 'approval') {
     const done = block.status !== 'pending'
-    const statusLabel =
-      block.status === 'allowed'
-        ? 'Allowed'
-        : block.status === 'denied'
-          ? 'Denied'
-          : block.status === 'error'
-            ? 'Approval failed'
-            : 'Pending approval'
+    const statusLabel = resolveMessageBubbleApprovalStatusLabel(block.status)
 
     return (
       <div
@@ -365,9 +365,11 @@ function MessageBubbleImpl({
           block.status === 'error' ? ' is-error' : ''
         }`}
       >
-        <div className="message-bubble-approval-title">Approval required</div>
+        <div className="message-bubble-approval-title">{MESSAGE_BUBBLE_APPROVAL_TITLE}</div>
         {block.toolName ? (
-          <div className="message-bubble-approval-tool">Tool: {block.toolName}</div>
+          <div className="message-bubble-approval-tool">
+            {formatMessageBubbleApprovalTool(block.toolName)}
+          </div>
         ) : null}
         <p className="message-bubble-approval-summary">{block.summary}</p>
         {block.errorMessage ? (
@@ -376,10 +378,10 @@ function MessageBubbleImpl({
         {!done ? (
           <div className="message-bubble-approval-actions">
             <button type="button" className="message-bubble-approval-allow">
-              Allow
+              {MESSAGE_BUBBLE_APPROVAL_ALLOW}
             </button>
             <button type="button" className="message-bubble-approval-deny">
-              Deny
+              {MESSAGE_BUBBLE_APPROVAL_DENY}
             </button>
           </div>
         ) : (
