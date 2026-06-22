@@ -4,6 +4,11 @@
 
 import type { ReactElement } from 'react'
 import { Clock3, X } from 'lucide-react'
+import {
+  formatQueuedMessagesTitle,
+  QUEUED_MESSAGE_REMOVE_LABEL,
+  QUEUED_MESSAGES_HINT,
+} from '../lib/composerQueuedMessages'
 
 export type QueuedComposerMessage = {
   id: string
@@ -46,13 +51,9 @@ export function FloatingComposerQueuedMessages({
       <div className="composer-queued-header">
         <div className="composer-queued-title">
           <Clock3 strokeWidth={1.9} />
-          <span>
-            {count} queued
-          </span>
+          <span>{formatQueuedMessagesTitle(count)}</span>
         </div>
-        <div className="composer-queued-hint">
-          These messages will send automatically after the current reply finishes.
-        </div>
+        <div className="composer-queued-hint">{QUEUED_MESSAGES_HINT}</div>
       </div>
       <div className="composer-queued-list">
         {messages.map((message, index) => (
@@ -63,8 +64,8 @@ export function FloatingComposerQueuedMessages({
               type="button"
               onClick={() => onRemove?.(message.id)}
               className="composer-queued-remove"
-              aria-label="Remove queued message"
-              title="Remove queued message"
+              aria-label={QUEUED_MESSAGE_REMOVE_LABEL}
+              title={QUEUED_MESSAGE_REMOVE_LABEL}
             >
               <X strokeWidth={2} />
             </button>
