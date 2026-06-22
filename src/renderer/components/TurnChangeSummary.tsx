@@ -12,6 +12,10 @@ import {
 import { ChevronDown, ChevronRight, FileEdit } from 'lucide-react'
 import { useDeferredRender } from '../hooks/use-deferred-render'
 import { countDiffStats, sumDiffStats } from '../lib/diff-stats'
+import {
+  resolveTurnChangeFileLabel,
+  resolveTurnChangeSummaryTitle,
+} from '../lib/turnChangeSummary'
 import { DiffView } from './DiffView'
 
 export type TurnChangeSnapshot = {
@@ -97,10 +101,7 @@ export function TurnChangeSummary({
     () => sumDiffStats(changes.map((change) => change.detail)),
     [changes],
   )
-  const title =
-    changes.length === 1
-      ? '1 file changed'
-      : `${changes.length} files changed`
+  const title = resolveTurnChangeSummaryTitle(changes.length)
   const { ref: deferredBodyRef, shouldRender: shouldRenderBody } =
     useDeferredRender<HTMLDivElement>({
       enabled: expanded,
@@ -148,7 +149,7 @@ export function TurnChangeSummary({
             ? changes.map((change) => {
             const stats = countDiffStats(change.detail)
             const open = activeId === change.id
-            const primary = change.filePath ?? 'File'
+            const primary = resolveTurnChangeFileLabel(change.filePath)
 
             return (
               <div key={change.id} className="turn-change-summary-item">
