@@ -11,11 +11,17 @@ import {
   MEDIA_ATTACHMENT_GALLERY_PREVIEW,
   type MediaReference,
 } from './MediaPreviewTile'
+import {
+  resolveToolEntryKindLabel,
+  resolveToolEntrySessionStatusLabel,
+  TOOL_ENTRY_STATUS_RUNNING,
+  type ToolEntryKind,
+} from '../lib/toolEntry'
 import { RuntimeMetaChips, type RuntimeMetaChipsSnapshot } from './RuntimeMetaChips'
 
 export type ToolBlockStatus = 'done' | 'running' | 'error'
 
-export type ToolBlockKind = 'file_change' | 'command_execution' | 'generic'
+export type ToolBlockKind = ToolEntryKind
 
 export type ToolBlockSnapshot = {
   id: string
@@ -137,12 +143,6 @@ type Props = {
   defaultExpanded?: boolean
 }
 
-function toolKindLabel(kind: ToolBlockKind): string {
-  if (kind === 'file_change') return 'File'
-  if (kind === 'command_execution') return 'Command'
-  return 'Tool'
-}
-
 function ToolAttachmentPreviews({
   attachments,
 }: {
@@ -209,9 +209,9 @@ export function ToolEntry({
         <Icon className="tool-entry-icon" strokeWidth={1.75} />
         <div className="tool-entry-main">
           <div className="tool-entry-badges">
-            <span className="tool-entry-kind">{toolKindLabel(block.toolKind)}</span>
+            <span className="tool-entry-kind">{resolveToolEntryKindLabel(block.toolKind)}</span>
             {block.status === 'running' ? (
-              <span className="tool-entry-badge is-running">Running</span>
+              <span className="tool-entry-badge is-running">{TOOL_ENTRY_STATUS_RUNNING}</span>
             ) : null}
             {typeof exitCode === 'number' ? (
               <span
@@ -227,7 +227,7 @@ export function ToolEntry({
                 className="tool-entry-badge is-session"
                 title={sessionId}
               >
-                {sessionStatus === 'running' ? 'Running' : sessionStatus || 'session'}{' '}
+                {resolveToolEntrySessionStatusLabel(sessionStatus)}{' '}
                 {sessionId.slice(0, 12)}
               </span>
             ) : null}
