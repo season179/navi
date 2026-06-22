@@ -4,6 +4,24 @@
 
 import type { ReactElement } from 'react'
 import { AlertCircle, CheckCircle2, Download, Loader2, RefreshCw } from 'lucide-react'
+import {
+  formatGuiUpdateAvailable,
+  formatGuiUpdateAvailableManual,
+  formatGuiUpdateCurrent,
+  formatGuiUpdateDownloaded,
+  formatGuiUpdateDownloading,
+  formatGuiUpdateDownloadProgress,
+  GUI_UPDATE_CHECK,
+  GUI_UPDATE_CHECK_FAILED,
+  GUI_UPDATE_CHECKING,
+  GUI_UPDATE_DOWNLOAD,
+  GUI_UPDATE_DOWNLOADED_DESC,
+  GUI_UPDATE_ERR_NOT_CONFIGURED,
+  GUI_UPDATE_INSTALL,
+  GUI_UPDATE_INSTALLING,
+  GUI_UPDATE_NOT_CONFIGURED_TITLE,
+  GUI_UPDATE_OPEN_RELEASE,
+} from '../lib/updatesSettingsSection'
 
 export type GuiUpdateProgress = {
   total: number
@@ -45,28 +63,6 @@ type Props = {
   onInstall: () => Promise<void>
 }
 
-const COPY = {
-  guiUpdateChecking: 'Checking for GUI updates…',
-  guiUpdateCheckFailed: 'Could not check for GUI updates',
-  guiUpdateNotConfiguredTitle: "Can't check for updates",
-  guiUpdateErrNotConfigured: 'Unable to reach the update source right now.',
-  guiUpdateCurrent: (version: string) => `You're up to date: ${version}`,
-  guiUpdateAvailable: (current: string, latest: string) =>
-    `Update available: ${current} → ${latest}`,
-  guiUpdateAvailableManual: (current: string, latest: string) =>
-    `Update available: ${current} → ${latest}. Download manually from the release page.`,
-  guiUpdateDownloading: (percent: number) => `Downloading update… ${percent}%`,
-  guiUpdateDownloadProgress: (transferred: string, total: string, speed: string) =>
-    `${transferred} / ${total}, ${speed}/s`,
-  guiUpdateDownloaded: (version: string) => `Update ${version} downloaded`,
-  guiUpdateDownloadedDesc: 'Restart the app to install the new version.',
-  guiUpdateInstalling: 'Restarting to install update…',
-  guiUpdateCheck: 'Check for updates',
-  guiUpdateDownload: 'Download update',
-  guiUpdateInstall: 'Restart to install',
-  guiUpdateOpenRelease: 'Open release page',
-} as const
-
 function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) return '0 B'
   const units = ['B', 'KB', 'MB', 'GB']
@@ -95,9 +91,9 @@ function resolvePanelState(input: {
 
   if (downloading) {
     return {
-      title: COPY.guiUpdateDownloading(Math.max(0, Math.round(progress?.percent ?? 0))),
+      title: formatGuiUpdateDownloading(Math.max(0, Math.round(progress?.percent ?? 0))),
       detail: progress
-        ? COPY.guiUpdateDownloadProgress(
+        ? formatGuiUpdateDownloadProgress(
             formatBytes(progress.transferred),
             formatBytes(progress.total),
             formatBytes(progress.bytesPerSecond),
@@ -107,40 +103,40 @@ function resolvePanelState(input: {
     }
   }
   if (installing) {
-    return { title: COPY.guiUpdateInstalling, detail: null, tone: 'warn' }
+    return { title: GUI_UPDATE_INSTALLING, detail: null, tone: 'warn' }
   }
   if (downloaded && info?.ok) {
     return {
-      title: COPY.guiUpdateDownloaded(info.latestVersion),
-      detail: COPY.guiUpdateDownloadedDesc,
+      title: formatGuiUpdateDownloaded(info.latestVersion),
+      detail: GUI_UPDATE_DOWNLOADED_DESC,
       tone: 'warn',
     }
   }
   if (checking && !info) {
-    return { title: COPY.guiUpdateChecking, detail: null, tone: 'neutral' }
+    return { title: GUI_UPDATE_CHECKING, detail: null, tone: 'neutral' }
   }
   if (error) {
-    return { title: COPY.guiUpdateCheckFailed, detail: error, tone: 'error' }
+    return { title: GUI_UPDATE_CHECK_FAILED, detail: error, tone: 'error' }
   }
   if (info && !info.ok && info.code === 'not_configured') {
     return {
-      title: COPY.guiUpdateNotConfiguredTitle,
-      detail: COPY.guiUpdateErrNotConfigured,
+      title: GUI_UPDATE_NOT_CONFIGURED_TITLE,
+      detail: GUI_UPDATE_ERR_NOT_CONFIGURED,
       tone: 'warn',
     }
   }
   if (info?.ok && info.hasUpdate) {
     return {
       title: info.manualOnly
-        ? COPY.guiUpdateAvailableManual(info.currentVersion, info.latestVersion)
-        : COPY.guiUpdateAvailable(info.currentVersion, info.latestVersion),
+        ? formatGuiUpdateAvailableManual(info.currentVersion, info.latestVersion)
+        : formatGuiUpdateAvailable(info.currentVersion, info.latestVersion),
       detail: null,
       tone: 'warn',
     }
   }
   if (info?.ok) {
     return {
-      title: COPY.guiUpdateCurrent(info.currentVersion),
+      title: formatGuiUpdateCurrent(info.currentVersion),
       detail: null,
       tone: 'good',
     }
@@ -208,7 +204,7 @@ export function GuiUpdateControl({
             className={`gui-update-control-button-icon${checking ? ' is-spin' : ''}`}
             strokeWidth={1.75}
           />
-          {COPY.guiUpdateCheck}
+          {GUI_UPDATE_CHECK}
         </button>
         {canDownload || downloading ? (
           <button
@@ -222,7 +218,7 @@ export function GuiUpdateControl({
             ) : (
               <Download className="gui-update-control-button-icon" strokeWidth={1.75} />
             )}
-            {COPY.guiUpdateDownload}
+            {GUI_UPDATE_DOWNLOAD}
           </button>
         ) : null}
         {canInstall || installing ? (
@@ -237,7 +233,7 @@ export function GuiUpdateControl({
             ) : (
               <RefreshCw className="gui-update-control-button-icon" strokeWidth={1.75} />
             )}
-            {COPY.guiUpdateInstall}
+            {GUI_UPDATE_INSTALL}
           </button>
         ) : null}
         {releaseUrl ? (
@@ -246,7 +242,7 @@ export function GuiUpdateControl({
             onClick={() => window.open(releaseUrl, '_blank', 'noopener,noreferrer')}
             className="gui-update-control-button gui-update-control-button-primary"
           >
-            {COPY.guiUpdateOpenRelease}
+            {GUI_UPDATE_OPEN_RELEASE}
           </button>
         ) : null}
       </div>
@@ -284,7 +280,7 @@ const PREVIEW_INFO_MANUAL: GuiUpdateInfo = {
 const PREVIEW_INFO_NOT_CONFIGURED: GuiUpdateInfo = {
   ok: false,
   currentVersion: '0.0.1',
-  message: COPY.guiUpdateErrNotConfigured,
+  message: GUI_UPDATE_ERR_NOT_CONFIGURED,
   code: 'not_configured',
 }
 

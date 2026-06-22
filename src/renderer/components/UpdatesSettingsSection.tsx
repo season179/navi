@@ -10,6 +10,15 @@ import {
   type GuiUpdateInfo,
   type GuiUpdateProgress,
 } from './GuiUpdateControl'
+import {
+  UPDATES_SETTINGS_CHANNEL_DESC,
+  UPDATES_SETTINGS_CHANNEL_FRONTIER,
+  UPDATES_SETTINGS_CHANNEL_LABEL,
+  UPDATES_SETTINGS_CHANNEL_STABLE,
+  UPDATES_SETTINGS_GUI_UPDATE_DESC,
+  UPDATES_SETTINGS_GUI_UPDATE_LABEL,
+  UPDATES_SETTINGS_SECTION_TITLE,
+} from '../lib/updatesSettingsSection'
 import { SETTINGS_SELECT_CLASS, SettingRow, SettingsCard } from './SettingsControls'
 
 export type GuiUpdateChannel = 'frontier' | 'stable'
@@ -24,18 +33,6 @@ export const UPDATES_SETTINGS_PREVIEW_FORM: UpdatesSettingsForm = {
   guiUpdate: {
     channel: 'stable',
   },
-}
-
-const COPY = {
-  sectionUpdates: 'Version & updates',
-  guiUpdateChannel: 'Update channel',
-  guiUpdateChannelDesc:
-    'Stable is the default; Frontier is only used after you switch to it. Stable only receives formal stable releases.',
-  guiUpdateChannelFrontier: 'Frontier',
-  guiUpdateChannelStable: 'Stable',
-  guiUpdate: 'GUI updates',
-  guiUpdateDesc:
-    'Check the selected release channel for GUI updates, then download and install in the app.',
 }
 
 type GuiUpdateControlProps = {
@@ -71,10 +68,10 @@ export function UpdatesSettingsSection({
   onInstall,
 }: Props): ReactElement {
   return (
-    <SettingsCard title={COPY.sectionUpdates}>
+    <SettingsCard title={UPDATES_SETTINGS_SECTION_TITLE}>
       <SettingRow
-        title={COPY.guiUpdateChannel}
-        description={COPY.guiUpdateChannelDesc}
+        title={UPDATES_SETTINGS_CHANNEL_LABEL}
+        description={UPDATES_SETTINGS_CHANNEL_DESC}
         control={
           <select
             className={SETTINGS_SELECT_CLASS}
@@ -86,14 +83,14 @@ export function UpdatesSettingsSection({
               })
             }
           >
-            <option value="frontier">{COPY.guiUpdateChannelFrontier}</option>
-            <option value="stable">{COPY.guiUpdateChannelStable}</option>
+            <option value="frontier">{UPDATES_SETTINGS_CHANNEL_FRONTIER}</option>
+            <option value="stable">{UPDATES_SETTINGS_CHANNEL_STABLE}</option>
           </select>
         }
       />
       <SettingRow
-        title={COPY.guiUpdate}
-        description={COPY.guiUpdateDesc}
+        title={UPDATES_SETTINGS_GUI_UPDATE_LABEL}
+        description={UPDATES_SETTINGS_GUI_UPDATE_DESC}
         control={
           <GuiUpdateControl
             info={info}
