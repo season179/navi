@@ -32,6 +32,64 @@ import {
   SCHEDULE_DEFAULTS_PREVIEW,
   SCHEDULE_DEFAULTS_PREVIEW_PROVIDERS,
 } from './ScheduleDefaultsDialog'
+import {
+  SCHEDULE_ADVANCED_SETTINGS_LABEL,
+  SCHEDULE_AWAKE_NOTICE,
+  SCHEDULE_CANCEL_LABEL,
+  SCHEDULE_CHANGE_WORKSPACE_LABEL,
+  SCHEDULE_CLIENT_MODE_CODE_LABEL,
+  SCHEDULE_CLIENT_MODE_IM_LABEL,
+  SCHEDULE_CLIENT_MODE_LABEL,
+  SCHEDULE_CLOSE_LABEL,
+  SCHEDULE_COLLAPSE_RESULT_LABEL,
+  SCHEDULE_CONFIRM_LABEL,
+  SCHEDULE_CREATE_TASK_TITLE,
+  SCHEDULE_CURRENT_STATUS_LABEL,
+  SCHEDULE_DAILY_TIME_LABEL,
+  SCHEDULE_DEFAULTS_TITLE,
+  SCHEDULE_DELETE_TASK_LABEL,
+  SCHEDULE_EDIT_TASK_TITLE,
+  SCHEDULE_EMPTY_TEXT,
+  SCHEDULE_EXPAND_RESULT_LABEL,
+  SCHEDULE_FILTER_EMPTY_TEXT,
+  SCHEDULE_KEEP_AWAKE_LABEL,
+  SCHEDULE_LAST_ERROR_LABEL,
+  SCHEDULE_LAST_RESULT_LABEL,
+  SCHEDULE_LAST_RUN_LABEL,
+  SCHEDULE_LOADING_LABEL,
+  SCHEDULE_MODEL_LABEL,
+  SCHEDULE_NEVER_RUN_LABEL,
+  SCHEDULE_NEW_TASK_LABEL,
+  SCHEDULE_NEXT_RUN_LABEL,
+  SCHEDULE_NOT_SCHEDULED_LABEL,
+  SCHEDULE_OPEN_LAST_THREAD_LABEL,
+  SCHEDULE_PROVIDER_LABEL,
+  SCHEDULE_REASONING_LABEL,
+  SCHEDULE_RUN_AT_LABEL,
+  SCHEDULE_RUN_NOW_LABEL,
+  SCHEDULE_SELECT_WORKSPACE_LABEL,
+  SCHEDULE_SIDEBAR_COLLAPSE_LABEL,
+  SCHEDULE_SIDEBAR_EXPAND_LABEL,
+  SCHEDULE_TASK_ENABLED_LABEL,
+  SCHEDULE_TASK_NAME_LABEL,
+  SCHEDULE_TASK_NAME_PLACEHOLDER,
+  SCHEDULE_TASK_PROMPT_LABEL,
+  SCHEDULE_TASK_PROMPT_PLACEHOLDER,
+  SCHEDULE_TASK_SECTION_CONTENT,
+  SCHEDULE_TASK_SECTION_ENVIRONMENT,
+  SCHEDULE_TASK_SECTION_MODEL,
+  SCHEDULE_TASK_SECTION_TIMING,
+  SCHEDULE_TASKS_SUBTITLE,
+  SCHEDULE_TASKS_TITLE,
+  SCHEDULE_UNTITLED_TASK_LABEL,
+  SCHEDULE_WORKSPACE_LABEL,
+  SCHEDULE_WORKSPACE_PLACEHOLDER,
+  formatScheduleTaskSummary,
+  resolveScheduleFilterLabel,
+  resolveScheduleKindLabel,
+  resolveScheduleReasoningLabel,
+  resolveScheduleStatusLabel,
+} from '../lib/scheduleTasksView'
 
 export type ScheduleKind = 'daily' | 'at' | 'interval' | 'manual'
 export type ScheduleLastStatus = 'idle' | 'running' | 'success' | 'error'
@@ -72,82 +130,6 @@ export type ScheduleTasksPreviewMode =
   | 'createDialog'
   | 'editDialog'
   | 'settingsDialog'
-
-const COPY = {
-  schedule: 'Scheduled tasks',
-  scheduleSubtitle: 'Design scheduled tasks, or start them whenever you need.',
-  scheduleNewTask: 'New task',
-  scheduleAwakeNotice: 'Scheduled tasks only run while this computer is awake.',
-  scheduleKeepAwake: 'Keep awake',
-  scheduleFilter_all: 'All',
-  scheduleFilter_enabled: 'Enabled',
-  scheduleFilter_running: 'Running',
-  scheduleFilter_done: 'Done',
-  scheduleEmpty: 'No scheduled tasks yet.',
-  scheduleFilterEmpty: 'No tasks match this filter.',
-  loading: 'Loading…',
-  scheduleCreateTask: 'Create task',
-  scheduleEditTask: 'Edit task',
-  scheduleDeleteTask: 'Delete task',
-  scheduleRunNow: 'Run once',
-  scheduleOpenLastThread: 'Open last run',
-  scheduleUntitled: 'Untitled task',
-  scheduleNextRun: 'Next run',
-  scheduleLastRun: 'Last run',
-  scheduleNotScheduled: 'Not scheduled',
-  scheduleNeverRun: 'Never',
-  scheduleLastResult: 'Last result',
-  scheduleLastError: 'Last error',
-  scheduleCurrentStatus: 'Current status',
-  scheduleExpandResult: 'Expand',
-  scheduleCollapseResult: 'Collapse',
-  scheduleStatus_idle: 'Idle',
-  scheduleStatus_running: 'Running',
-  scheduleStatus_success: 'Success',
-  scheduleStatus_error: 'Error',
-  scheduleDefaultsTitle: 'Schedule defaults',
-  sidebarExpand: 'Expand sidebar',
-  sidebarCollapse: 'Collapse sidebar',
-  scheduleCreateTaskBtn: 'New task',
-  scheduleTaskSectionContent: 'Task content',
-  scheduleTaskSectionModel: 'Model settings',
-  scheduleTaskSectionTiming: 'Run plan',
-  scheduleTaskSectionEnvironment: 'Environment',
-  scheduleTaskName: 'Name',
-  scheduleTaskNamePlaceholder: 'Give this task a name',
-  scheduleTaskPrompt: 'Instruction',
-  scheduleTaskPromptPlaceholder: 'Describe what you want the agent to do…',
-  scheduleClientMode: 'Run client',
-  scheduleClientModeCode: 'Code',
-  scheduleClientModeIm: 'IM',
-  scheduleClientModeImUnavailable:
-    'Add and enable an IM connection before using IM mode.',
-  scheduleProvider: 'Provider',
-  scheduleModel: 'Model',
-  scheduleReasoning: 'Reasoning effort',
-  scheduleReasoning_auto: 'Auto',
-  scheduleReasoning_off: 'Off',
-  scheduleReasoning_low: 'Low',
-  scheduleReasoning_medium: 'Med',
-  scheduleReasoning_high: 'High',
-  scheduleReasoning_max: 'Ultra',
-  scheduleRunAt: 'Run time',
-  scheduleKind_daily: 'Daily',
-  scheduleKind_at: 'One-time',
-  scheduleKind_interval: 'Interval',
-  scheduleKind_manual: 'Manual',
-  scheduleDailyTime: 'Daily time',
-  scheduleManualHint: 'Manual tasks only run when you press Run once.',
-  scheduleWorkspace: 'Workspace',
-  scheduleWorkspacePlaceholder: 'Use Schedule default workspace',
-  scheduleTaskEnabled: 'Enable task',
-  scheduleAdvancedSettings: 'Schedule settings',
-  cancel: 'Cancel',
-  confirm: 'Confirm',
-  close: 'Close',
-  changeWorkspace: 'Change workspace',
-  selectWorkspace: 'Select workspace',
-}
 
 const SCHEDULE_FILTERS: TaskFilter[] = ['all', 'enabled', 'running', 'done']
 const SCHEDULE_KIND_OPTIONS: ScheduleKind[] = ['daily', 'at', 'interval', 'manual']
@@ -272,26 +254,6 @@ const EDIT_DRAFT: ScheduledTaskSnapshot = {
     'Summarize git status and create a backup commit if there are uncommitted changes.',
 }
 
-function scheduleTaskSummary(task: ScheduledTaskSnapshot): string {
-  if (task.schedule.kind === 'at') {
-    const datetime = task.schedule.atTime
-      ? new Date(task.schedule.atTime).toLocaleString()
-      : '-'
-    return `One-time · ${datetime}`
-  }
-  if (task.schedule.kind === 'interval') {
-    return `Every ${task.schedule.everyMinutes} min`
-  }
-  if (task.schedule.kind === 'daily') {
-    return `Daily at ${task.schedule.timeOfDay}`
-  }
-  return 'Manual'
-}
-
-function scheduleReasoningLabel(value: ScheduleReasoningEffort): string {
-  return COPY[`scheduleReasoning_${value}` as keyof typeof COPY]
-}
-
 function formatDateTime(value: string, fallback: string): string {
   if (!value.trim()) return fallback
   const date = new Date(value)
@@ -387,12 +349,20 @@ export function ScheduleTasksView({
                 type="button"
                 className="sidebar-titlebar-toggle"
                 onClick={onToggleLeftSidebar}
-                title={leftSidebarCollapsed ? COPY.sidebarExpand : COPY.sidebarCollapse}
-                aria-label={leftSidebarCollapsed ? COPY.sidebarExpand : COPY.sidebarCollapse}
+                title={
+                  leftSidebarCollapsed
+                    ? SCHEDULE_SIDEBAR_EXPAND_LABEL
+                    : SCHEDULE_SIDEBAR_COLLAPSE_LABEL
+                }
+                aria-label={
+                  leftSidebarCollapsed
+                    ? SCHEDULE_SIDEBAR_EXPAND_LABEL
+                    : SCHEDULE_SIDEBAR_COLLAPSE_LABEL
+                }
               >
                 <PanelLeft strokeWidth={1.55} />
               </button>
-              <h1 className="schedule-tasks-view-title">{COPY.schedule}</h1>
+              <h1 className="schedule-tasks-view-title">{SCHEDULE_TASKS_TITLE}</h1>
             </div>
           </div>
         </header>
@@ -401,7 +371,7 @@ export function ScheduleTasksView({
       <main className="schedule-tasks-view-main ds-no-drag">
         <div className="schedule-tasks-view-content">
           <div className="schedule-tasks-view-toolbar">
-            <p className="schedule-tasks-view-subtitle">{COPY.scheduleSubtitle}</p>
+            <p className="schedule-tasks-view-subtitle">{SCHEDULE_TASKS_SUBTITLE}</p>
             <div className="schedule-tasks-view-toolbar-actions">
               <select
                 value={filter}
@@ -410,21 +380,21 @@ export function ScheduleTasksView({
               >
                 {SCHEDULE_FILTERS.map((item) => (
                   <option key={item} value={item}>
-                    {COPY[`scheduleFilter_${item}` as keyof typeof COPY]}
+                    {resolveScheduleFilterLabel(item)}
                   </option>
                 ))}
               </select>
               <button
                 type="button"
                 className="schedule-tasks-view-icon-btn"
-                title={COPY.scheduleDefaultsTitle}
-                aria-label={COPY.scheduleDefaultsTitle}
+                title={SCHEDULE_DEFAULTS_TITLE}
+                aria-label={SCHEDULE_DEFAULTS_TITLE}
               >
                 <MoreHorizontal className="schedule-tasks-view-icon" strokeWidth={1.8} />
               </button>
               <button type="button" className="schedule-tasks-view-new-btn">
                 <Plus className="schedule-tasks-view-new-btn-icon" strokeWidth={2} />
-                {COPY.scheduleNewTask}
+                {SCHEDULE_NEW_TASK_LABEL}
               </button>
             </div>
           </div>
@@ -432,10 +402,10 @@ export function ScheduleTasksView({
           <div className="schedule-tasks-view-awake">
             <div className="schedule-tasks-view-awake-copy">
               <Clock3 className="schedule-tasks-view-awake-icon" strokeWidth={1.75} />
-              <span>{COPY.scheduleAwakeNotice}</span>
+              <span>{SCHEDULE_AWAKE_NOTICE}</span>
             </div>
             <label className="schedule-tasks-view-awake-toggle">
-              {COPY.scheduleKeepAwake}
+              {SCHEDULE_KEEP_AWAKE_LABEL}
               <input
                 type="checkbox"
                 checked={keepAwake}
@@ -453,12 +423,12 @@ export function ScheduleTasksView({
           </div>
 
           {loading ? (
-            <div className="schedule-tasks-view-loading">{COPY.loading}</div>
+            <div className="schedule-tasks-view-loading">{SCHEDULE_LOADING_LABEL}</div>
           ) : error ? (
             <div className="schedule-tasks-view-error">{error}</div>
           ) : visibleTasks.length === 0 ? (
             <div className="schedule-tasks-view-empty">
-              {tasks.length === 0 ? COPY.scheduleEmpty : COPY.scheduleFilterEmpty}
+              {tasks.length === 0 ? SCHEDULE_EMPTY_TEXT : SCHEDULE_FILTER_EMPTY_TEXT}
             </div>
           ) : (
             <div className="schedule-tasks-view-list">
@@ -473,28 +443,29 @@ export function ScheduleTasksView({
                       <div className="schedule-task-card-copy">
                         <div className="schedule-task-card-title-row">
                           <h2 className="schedule-task-card-title">
-                            {task.title || COPY.scheduleUntitled}
+                            {task.title || SCHEDULE_UNTITLED_TASK_LABEL}
                           </h2>
                           <span
                             className={`schedule-task-status ${statusToneClass(task.lastStatus, running)}`}
                           >
                             {running
-                              ? COPY.scheduleStatus_running
-                              : COPY[`scheduleStatus_${task.lastStatus}` as keyof typeof COPY]}
+                              ? resolveScheduleStatusLabel('running')
+                              : resolveScheduleStatusLabel(task.lastStatus)}
                           </span>
                         </div>
                         <div className="schedule-task-card-meta">
-                          <span>{scheduleTaskSummary(task)}</span>
+                          <span>{formatScheduleTaskSummary(task.schedule)}</span>
                           <span>
-                            {COPY.scheduleNextRun}:{' '}
-                            {formatDateTime(task.nextRunAt, COPY.scheduleNotScheduled)}
+                            {SCHEDULE_NEXT_RUN_LABEL}:{' '}
+                            {formatDateTime(task.nextRunAt, SCHEDULE_NOT_SCHEDULED_LABEL)}
                           </span>
                           <span>
-                            {COPY.scheduleLastRun}:{' '}
-                            {formatDateTime(task.lastRunAt, COPY.scheduleNeverRun)}
+                            {SCHEDULE_LAST_RUN_LABEL}:{' '}
+                            {formatDateTime(task.lastRunAt, SCHEDULE_NEVER_RUN_LABEL)}
                           </span>
                           <span>
-                            {providerLabel(task)} · {scheduleReasoningLabel(task.reasoningEffort)}
+                            {providerLabel(task)} ·{' '}
+                            {resolveScheduleReasoningLabel(task.reasoningEffort)}
                           </span>
                         </div>
                       </div>
@@ -503,8 +474,8 @@ export function ScheduleTasksView({
                           <button
                             type="button"
                             className="schedule-task-card-action"
-                            title={COPY.scheduleOpenLastThread}
-                            aria-label={COPY.scheduleOpenLastThread}
+                            title={SCHEDULE_OPEN_LAST_THREAD_LABEL}
+                            aria-label={SCHEDULE_OPEN_LAST_THREAD_LABEL}
                           >
                             <MessageSquare className="schedule-task-card-action-icon" strokeWidth={1.8} />
                           </button>
@@ -513,24 +484,24 @@ export function ScheduleTasksView({
                           type="button"
                           className="schedule-task-card-action"
                           disabled={running}
-                          title={COPY.scheduleRunNow}
-                          aria-label={COPY.scheduleRunNow}
+                          title={SCHEDULE_RUN_NOW_LABEL}
+                          aria-label={SCHEDULE_RUN_NOW_LABEL}
                         >
                           <Play className="schedule-task-card-action-icon" strokeWidth={1.8} />
                         </button>
                         <button
                           type="button"
                           className="schedule-task-card-action"
-                          title={COPY.scheduleEditTask}
-                          aria-label={COPY.scheduleEditTask}
+                          title={SCHEDULE_EDIT_TASK_TITLE}
+                          aria-label={SCHEDULE_EDIT_TASK_TITLE}
                         >
                           <PencilLine className="schedule-task-card-action-icon" strokeWidth={1.8} />
                         </button>
                         <button
                           type="button"
                           className="schedule-task-card-action schedule-task-card-action--danger"
-                          title={COPY.scheduleDeleteTask}
-                          aria-label={COPY.scheduleDeleteTask}
+                          title={SCHEDULE_DELETE_TASK_LABEL}
+                          aria-label={SCHEDULE_DELETE_TASK_LABEL}
                         >
                           <Trash2 className="schedule-task-card-action-icon" strokeWidth={1.8} />
                         </button>
@@ -556,10 +527,10 @@ export function ScheduleTasksView({
                         <div className="schedule-task-result-header">
                           <span className="schedule-task-result-label">
                             {task.lastStatus === 'error'
-                              ? COPY.scheduleLastError
+                              ? SCHEDULE_LAST_ERROR_LABEL
                               : task.lastStatus === 'running'
-                                ? COPY.scheduleCurrentStatus
-                                : COPY.scheduleLastResult}
+                                ? SCHEDULE_CURRENT_STATUS_LABEL
+                                : SCHEDULE_LAST_RESULT_LABEL}
                           </span>
                           {expandable ? (
                             <button
@@ -573,7 +544,9 @@ export function ScheduleTasksView({
                               ) : (
                                 <ChevronDown className="schedule-task-result-expand-icon" strokeWidth={1.8} />
                               )}
-                              {expanded ? COPY.scheduleCollapseResult : COPY.scheduleExpandResult}
+                              {expanded
+                                ? SCHEDULE_COLLAPSE_RESULT_LABEL
+                                : SCHEDULE_EXPAND_RESULT_LABEL}
                             </button>
                           ) : null}
                         </div>
@@ -623,7 +596,7 @@ function ScheduleTaskDialog({
   draft: ScheduledTaskSnapshot
   onClose: () => void
 }): ReactElement {
-  const title = mode === 'create' ? COPY.scheduleCreateTask : COPY.scheduleEditTask
+  const title = mode === 'create' ? SCHEDULE_CREATE_TASK_TITLE : SCHEDULE_EDIT_TASK_TITLE
 
   return (
     <div className="schedule-task-dialog-overlay ds-no-drag" onMouseDown={onClose}>
@@ -638,8 +611,8 @@ function ScheduleTaskDialog({
             type="button"
             onClick={onClose}
             className="schedule-task-dialog-close"
-            aria-label={COPY.close}
-            title={COPY.close}
+            aria-label={SCHEDULE_CLOSE_LABEL}
+            title={SCHEDULE_CLOSE_LABEL}
           >
             <X className="schedule-task-dialog-close-icon" strokeWidth={1.7} />
           </button>
@@ -648,27 +621,27 @@ function ScheduleTaskDialog({
         <div className="schedule-task-dialog-body">
           <ScheduleDialogSection
             icon={<Timer className="schedule-task-dialog-section-icon" strokeWidth={1.8} />}
-            title={COPY.scheduleTaskSectionContent}
+            title={SCHEDULE_TASK_SECTION_CONTENT}
           >
             <label className="schedule-task-dialog-field">
-              <FieldLabel required>{COPY.scheduleTaskName}</FieldLabel>
+              <FieldLabel required>{SCHEDULE_TASK_NAME_LABEL}</FieldLabel>
               <div className="schedule-task-dialog-input-wrap">
                 <input
                   defaultValue={draft.title}
                   maxLength={50}
-                  placeholder={COPY.scheduleTaskNamePlaceholder}
+                  placeholder={SCHEDULE_TASK_NAME_PLACEHOLDER}
                   className="schedule-task-dialog-input schedule-task-dialog-input--counter"
                 />
                 <span className="schedule-task-dialog-counter">{draft.title.length}/50</span>
               </div>
             </label>
             <label className="schedule-task-dialog-field">
-              <FieldLabel required>{COPY.scheduleTaskPrompt}</FieldLabel>
+              <FieldLabel required>{SCHEDULE_TASK_PROMPT_LABEL}</FieldLabel>
               <div className="schedule-task-dialog-textarea-wrap">
                 <textarea
                   defaultValue={draft.prompt}
                   maxLength={8000}
-                  placeholder={COPY.scheduleTaskPromptPlaceholder}
+                  placeholder={SCHEDULE_TASK_PROMPT_PLACEHOLDER}
                   className="schedule-task-dialog-textarea"
                 />
                 <span className="schedule-task-dialog-counter schedule-task-dialog-counter--bottom">
@@ -680,36 +653,36 @@ function ScheduleTaskDialog({
 
           <ScheduleDialogSection
             icon={<Brain className="schedule-task-dialog-section-icon" strokeWidth={1.8} />}
-            title={COPY.scheduleTaskSectionModel}
+            title={SCHEDULE_TASK_SECTION_MODEL}
           >
             <div className="schedule-task-dialog-field">
-              <FieldLabel>{COPY.scheduleClientMode}</FieldLabel>
+              <FieldLabel>{SCHEDULE_CLIENT_MODE_LABEL}</FieldLabel>
               <div className="schedule-task-dialog-segments schedule-task-dialog-segments--two">
-                <SegmentButton selected>{COPY.scheduleClientModeCode}</SegmentButton>
-                <SegmentButton>{COPY.scheduleClientModeIm}</SegmentButton>
+                <SegmentButton selected>{SCHEDULE_CLIENT_MODE_CODE_LABEL}</SegmentButton>
+                <SegmentButton>{SCHEDULE_CLIENT_MODE_IM_LABEL}</SegmentButton>
               </div>
             </div>
             <div className="schedule-task-dialog-model-grid">
               <label className="schedule-task-dialog-field">
-                <FieldLabel required>{COPY.scheduleProvider}</FieldLabel>
+                <FieldLabel required>{SCHEDULE_PROVIDER_LABEL}</FieldLabel>
                 <select defaultValue={draft.providerId} className="schedule-task-dialog-input">
                   <option value="deepseek">DeepSeek</option>
                   <option value="openai">OpenAI</option>
                 </select>
               </label>
               <label className="schedule-task-dialog-field">
-                <FieldLabel required>{COPY.scheduleModel}</FieldLabel>
+                <FieldLabel required>{SCHEDULE_MODEL_LABEL}</FieldLabel>
                 <select defaultValue={draft.model} className="schedule-task-dialog-input">
                   <option value="deepseek-chat">deepseek-chat</option>
                   <option value="deepseek-reasoner">deepseek-reasoner</option>
                 </select>
               </label>
               <div className="schedule-task-dialog-field schedule-task-dialog-field--reasoning">
-                <FieldLabel>{COPY.scheduleReasoning}</FieldLabel>
+                <FieldLabel>{SCHEDULE_REASONING_LABEL}</FieldLabel>
                 <div className="schedule-task-dialog-segments schedule-task-dialog-segments--reasoning">
                   {REASONING_OPTIONS.map((effort) => (
                     <SegmentButton key={effort} selected={draft.reasoningEffort === effort}>
-                      {scheduleReasoningLabel(effort)}
+                      {resolveScheduleReasoningLabel(effort)}
                     </SegmentButton>
                   ))}
                 </div>
@@ -719,21 +692,21 @@ function ScheduleTaskDialog({
 
           <ScheduleDialogSection
             icon={<CalendarClock className="schedule-task-dialog-section-icon" strokeWidth={1.8} />}
-            title={COPY.scheduleTaskSectionTiming}
+            title={SCHEDULE_TASK_SECTION_TIMING}
           >
             <div className="schedule-task-dialog-timing-grid">
               <div className="schedule-task-dialog-field">
-                <FieldLabel required>{COPY.scheduleRunAt}</FieldLabel>
+                <FieldLabel required>{SCHEDULE_RUN_AT_LABEL}</FieldLabel>
                 <div className="schedule-task-dialog-segments schedule-task-dialog-segments--kinds">
                   {SCHEDULE_KIND_OPTIONS.map((kind) => (
                     <SegmentButton key={kind} selected={draft.schedule.kind === kind}>
-                      {COPY[`scheduleKind_${kind}` as keyof typeof COPY]}
+                      {resolveScheduleKindLabel(kind)}
                     </SegmentButton>
                   ))}
                 </div>
               </div>
               <div className="schedule-task-dialog-field">
-                <FieldLabel>{COPY.scheduleDailyTime}</FieldLabel>
+                <FieldLabel>{SCHEDULE_DAILY_TIME_LABEL}</FieldLabel>
                 <div className="schedule-task-dialog-time-grid">
                   <select defaultValue="09" className="schedule-task-dialog-input">
                     <option value="09">09</option>
@@ -750,25 +723,27 @@ function ScheduleTaskDialog({
 
           <ScheduleDialogSection
             icon={<Folder className="schedule-task-dialog-section-icon" strokeWidth={1.8} />}
-            title={COPY.scheduleTaskSectionEnvironment}
+            title={SCHEDULE_TASK_SECTION_ENVIRONMENT}
           >
             <div className="schedule-task-dialog-env-grid">
               <label className="schedule-task-dialog-field">
-                <FieldLabel>{COPY.scheduleWorkspace}</FieldLabel>
+                <FieldLabel>{SCHEDULE_WORKSPACE_LABEL}</FieldLabel>
                 <div className="schedule-task-dialog-workspace-grid">
                   <input
                     defaultValue={draft.workspaceRoot}
-                    placeholder={COPY.scheduleWorkspacePlaceholder}
+                    placeholder={SCHEDULE_WORKSPACE_PLACEHOLDER}
                     className="schedule-task-dialog-input"
                   />
                   <button type="button" className="schedule-task-dialog-workspace-btn">
                     <FolderOpen className="schedule-task-dialog-workspace-btn-icon" strokeWidth={1.75} />
-                    {draft.workspaceRoot.trim() ? COPY.changeWorkspace : COPY.selectWorkspace}
+                    {draft.workspaceRoot.trim()
+                      ? SCHEDULE_CHANGE_WORKSPACE_LABEL
+                      : SCHEDULE_SELECT_WORKSPACE_LABEL}
                   </button>
                 </div>
               </label>
               <div className="schedule-task-dialog-field">
-                <FieldLabel>{COPY.scheduleTaskEnabled}</FieldLabel>
+                <FieldLabel>{SCHEDULE_TASK_ENABLED_LABEL}</FieldLabel>
                 <button
                   type="button"
                   className="schedule-task-dialog-enable-btn"
@@ -776,7 +751,7 @@ function ScheduleTaskDialog({
                 >
                   <span className="schedule-task-dialog-enable-copy">
                     <Power className="schedule-task-dialog-enable-icon" strokeWidth={1.8} />
-                    {COPY.scheduleTaskEnabled}
+                    {SCHEDULE_TASK_ENABLED_LABEL}
                   </span>
                   <span
                     className={`schedule-tasks-view-toggle-track${
@@ -794,14 +769,14 @@ function ScheduleTaskDialog({
         <div className="schedule-task-dialog-footer">
           <button type="button" className="schedule-task-dialog-footer-link">
             <MoreHorizontal className="schedule-task-dialog-footer-link-icon" strokeWidth={1.8} />
-            {COPY.scheduleAdvancedSettings}
+            {SCHEDULE_ADVANCED_SETTINGS_LABEL}
           </button>
           <div className="schedule-task-dialog-footer-actions">
             <button type="button" onClick={onClose} className="schedule-task-dialog-btn schedule-task-dialog-btn--secondary">
-              {COPY.cancel}
+              {SCHEDULE_CANCEL_LABEL}
             </button>
             <button type="submit" className="schedule-task-dialog-btn schedule-task-dialog-btn--primary">
-              {COPY.confirm}
+              {SCHEDULE_CONFIRM_LABEL}
             </button>
           </div>
         </div>
