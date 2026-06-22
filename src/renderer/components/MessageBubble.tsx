@@ -38,6 +38,12 @@ import {
   USER_INPUT_BUBBLE_PREVIEW,
   type UserInputSnapshot,
 } from './UserInputBubble'
+import {
+  MESSAGE_BUBBLE_REWIND_CANCEL,
+  MESSAGE_BUBBLE_REWIND_EDIT_MESSAGE,
+  MESSAGE_BUBBLE_REWIND_HINT,
+  MESSAGE_BUBBLE_REWIND_RESEND,
+} from '../lib/messageBubbleUserEdit'
 
 export type UserMessageSnapshot = {
   kind: 'user'
@@ -217,11 +223,11 @@ function UserMessageBubble({
           />
           <div className="message-bubble-user-edit-footer">
             <span className="message-bubble-user-edit-hint">
-              Press Esc to cancel · ⌘↵ to resend
+              {MESSAGE_BUBBLE_REWIND_HINT}
             </span>
             <div className="message-bubble-user-edit-actions">
               <button type="button" className="message-bubble-user-edit-cancel" onClick={cancelEdit}>
-                Cancel
+                {MESSAGE_BUBBLE_REWIND_CANCEL}
               </button>
               <button
                 type="button"
@@ -229,7 +235,7 @@ function UserMessageBubble({
                 disabled={!draft.trim()}
                 onClick={() => setEditing(false)}
               >
-                Resend
+                {MESSAGE_BUBBLE_REWIND_RESEND}
               </button>
             </div>
           </div>
@@ -275,8 +281,8 @@ function UserMessageBubble({
             <button
               type="button"
               onClick={startEdit}
-              title="Edit message"
-              aria-label="Edit message"
+              title={MESSAGE_BUBBLE_REWIND_EDIT_MESSAGE}
+              aria-label={MESSAGE_BUBBLE_REWIND_EDIT_MESSAGE}
               className="message-bubble-user-edit-button"
             >
               <PencilLine className="message-bubble-user-edit-icon" strokeWidth={1.8} />
