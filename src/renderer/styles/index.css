@@ -43,6 +43,7 @@
   --color-ds-skill-soft: var(--ds-skill-soft);
   --color-ds-userbubble: var(--ds-bubble-user);
   --color-ds-userbubble-fg: var(--ds-bubble-user-fg);
+  --color-ds-userbubbleFg: var(--ds-bubble-user-fg);
 
   --shadow-composer: var(--ds-shadow-composer);
   --shadow-shell: var(--ds-shadow-shell);

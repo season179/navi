@@ -4334,7 +4334,7 @@ a.runtime-meta-chip:hover {
   transition: opacity 150ms ease;
 }
 
-.message-bubble-assistant.group/message:hover .message-bubble-assistant-footer {
+.message-bubble-assistant.group\/message:hover .message-bubble-assistant-footer {
   opacity: 1;
 }
 
