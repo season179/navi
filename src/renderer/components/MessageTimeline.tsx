@@ -82,11 +82,10 @@ export type MessageTimelineSnapshot = {
 
 type MessageTimelineProps = MessageTimelineSnapshot
 
+import { formatTimelineTurnPreview } from '../lib/timelineJumpRail'
+
 function turnPreviewLabel(turn: MessageTurnSnapshot, index: number): string {
-  const text = turn.user?.text.trim() ?? ''
-  if (!text) return `Question ${index}`
-  const oneLine = text.replace(/\s+/g, ' ')
-  return oneLine.length > 48 ? `${oneLine.slice(0, 47).trimEnd()}…` : oneLine
+  return formatTimelineTurnPreview(turn.user?.text ?? '', index)
 }
 
 export { applyTimelineLiveStreamToTurn } from '../lib/applyTimelineLiveStream'

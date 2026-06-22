@@ -100,12 +100,11 @@ function groupMessagesIntoTurns(messages: ChatMessage[]): ChatTurn[] {
   return turns
 }
 
+import { formatTimelineTurnPreview } from '../lib/timelineJumpRail'
+
 function turnPreviewLabel(turn: ChatTurn, index: number): string {
   const user = turn.messages.find((message) => message.role === 'user')
-  const text = user?.text.trim() ?? ''
-  if (!text) return `Question ${index}`
-  const oneLine = text.replace(/\s+/g, ' ')
-  return oneLine.length > 48 ? `${oneLine.slice(0, 47).trimEnd()}…` : oneLine
+  return formatTimelineTurnPreview(user?.text ?? '', index)
 }
 
 type TurnOverlayProps = {

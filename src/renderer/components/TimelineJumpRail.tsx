@@ -3,16 +3,13 @@
 // Visual only: parent supplies turn anchor snapshots and optional jump handler.
 
 import type { ReactElement } from 'react'
+import { TIMELINE_JUMP_RAIL_LABEL } from '../lib/timelineJumpRail'
 
 export type TimelineJumpAnchor = {
   key: string
   label: string
   title: string
 }
-
-const COPY = {
-  railLabel: 'Jump to question',
-} as const
 
 /** Sample anchors for ?timelineJumpRailPreview visual verification. */
 export const TIMELINE_JUMP_RAIL_PREVIEW_ANCHORS: TimelineJumpAnchor[] = [
@@ -36,7 +33,7 @@ export function TimelineJumpRail({ anchors, onJump }: Props): ReactElement | nul
   if (anchors.length <= 2) return null
 
   return (
-    <nav aria-label={COPY.railLabel} className="timeline-jump-rail">
+    <nav aria-label={TIMELINE_JUMP_RAIL_LABEL} className="timeline-jump-rail">
       {anchors.map((anchor) => (
         <button
           key={anchor.key}
