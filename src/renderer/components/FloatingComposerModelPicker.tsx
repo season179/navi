@@ -21,6 +21,22 @@ import {
   Search,
   Type as TypeIcon,
 } from 'lucide-react'
+import {
+  COMPOSER_AUTO_LABEL,
+  COMPOSER_CONFIGURE_PROVIDERS_LABEL,
+  COMPOSER_MODEL_CONTROLS_LABEL,
+  COMPOSER_MODEL_LABEL,
+  COMPOSER_MODEL_SEARCH_PLACEHOLDER,
+  COMPOSER_MODEL_TEXT_ONLY_LABEL,
+  COMPOSER_MODEL_VISION_LABEL,
+  COMPOSER_NO_MATCHING_MODELS_LABEL,
+  COMPOSER_NO_PROVIDERS_LABEL,
+  COMPOSER_NO_PROVIDERS_SHORT_LABEL,
+  COMPOSER_REASONING_OPTIONS,
+  COMPOSER_REASONING_SECTION_LABEL,
+  formatComposerModelControlsTitle,
+  getComposerReasoningLabel,
+} from '../lib/composerModelPicker'
 
 export type ComposerReasoningEffort = 'auto' | 'off' | 'low' | 'medium' | 'high' | 'max'
 
@@ -53,15 +69,6 @@ type Props = {
   onChange?: (patch: Partial<ComposerModelPickerSettings>) => void
   onConfigureProviders?: () => void
 }
-
-const REASONING_OPTIONS: Array<{ id: ComposerReasoningEffort; label: string }> = [
-  { id: 'auto', label: 'Auto' },
-  { id: 'off', label: 'Off' },
-  { id: 'low', label: 'Low' },
-  { id: 'medium', label: 'Medium' },
-  { id: 'high', label: 'High' },
-  { id: 'max', label: 'Max' },
-]
 
 /** Sample settings for ?floatingComposerModelPickerPreview visual verification. */
 export const COMPOSER_MODEL_PICKER_PREVIEW: ComposerModelPickerSettings = {
@@ -102,10 +109,6 @@ export const COMPOSER_MODEL_PICKER_GROUPS_PREVIEW: ComposerModelProviderGroup[] 
   },
 ]
 
-function reasoningLabel(effort: ComposerReasoningEffort): string {
-  return REASONING_OPTIONS.find((option) => option.id === effort)?.label ?? 'Max'
-}
-
 function modelSupportsVision(
   group: ComposerModelProviderGroup,
   modelId: string,
@@ -118,7 +121,7 @@ function ComposerModelCapabilityBadge({
 }: {
   vision: boolean
 }): ReactElement {
-  const label = vision ? 'Vision' : 'Text'
+  const label = vision ? COMPOSER_MODEL_VISION_LABEL : COMPOSER_MODEL_TEXT_ONLY_LABEL
   const Icon = vision ? ImageIcon : TypeIcon
   return (
     <span
@@ -127,7 +130,7 @@ function ComposerModelCapabilityBadge({
           ? 'composer-model-cap-badge is-vision'
           : 'composer-model-cap-badge is-text'
       }
-      title={vision ? 'Vision — accepts text and images' : 'Text only'}
+      title={label}
     >
       <Icon strokeWidth={1.9} />
       <span>{label}</span>
@@ -174,10 +177,10 @@ export function FloatingComposerModelPicker({
     : []
 
   const modelLabel = needsProviderSetup
-    ? 'No providers'
-    : value.modelId.trim() || 'Auto'
-  const reasoningLabelText = reasoningLabel(value.reasoningEffort)
-  const controlsTitle = `${modelLabel} / ${reasoningLabelText}`
+    ? COMPOSER_NO_PROVIDERS_SHORT_LABEL
+    : value.modelId.trim() || COMPOSER_AUTO_LABEL
+  const reasoningLabelText = getComposerReasoningLabel(value.reasoningEffort)
+  const controlsTitle = formatComposerModelControlsTitle(modelLabel, reasoningLabelText)
 
   useEffect(() => {
     if (!menuOpen || menuOpenProp !== undefined) return
@@ -297,10 +300,10 @@ export function FloatingComposerModelPicker({
             <>
               <div className="composer-model-picker-section-title">
                 <Brain strokeWidth={1.9} />
-                <span>Reasoning</span>
+                <span>{COMPOSER_REASONING_SECTION_LABEL}</span>
               </div>
               <div className="composer-model-picker-reasoning-list">
-                {REASONING_OPTIONS.map((option) => (
+                {COMPOSER_REASONING_OPTIONS.map((option) => (
                   <button
                     key={option.id}
                     type="button"
@@ -326,12 +329,12 @@ export function FloatingComposerModelPicker({
 
           <div className="composer-model-picker-section-title">
             <Gauge strokeWidth={1.9} />
-            <span>Model</span>
+            <span>{COMPOSER_MODEL_LABEL}</span>
           </div>
 
           {needsProviderSetup ? (
             <div className="composer-model-picker-empty">
-              <p>No providers configured yet. Add an API key in Settings to pick a model.</p>
+              <p>{COMPOSER_NO_PROVIDERS_LABEL}</p>
               {onConfigureProviders ? (
                 <button
                   type="button"
@@ -341,7 +344,7 @@ export function FloatingComposerModelPicker({
                     onConfigureProviders()
                   }}
                 >
-                  Configure providers
+                  {COMPOSER_CONFIGURE_PROVIDERS_LABEL}
                 </button>
               ) : null}
             </div>
@@ -409,14 +412,14 @@ export function FloatingComposerModelPicker({
             className="composer-model-picker-submenu"
             style={submenuStyle}
           >
-            <div className="composer-model-picker-submenu-title">Model</div>
+            <div className="composer-model-picker-submenu-title">{COMPOSER_MODEL_LABEL}</div>
             <label className="composer-model-picker-search">
               <Search strokeWidth={1.8} />
               <input
                 type="search"
                 value={modelFilter}
                 onChange={(event) => setModelFilter(event.target.value)}
-                placeholder="Search models…"
+                placeholder={COMPOSER_MODEL_SEARCH_PLACEHOLDER}
               />
             </label>
             {filteredModelIds.length > 0 ? (
@@ -447,7 +450,7 @@ export function FloatingComposerModelPicker({
                 )
               })
             ) : (
-              <div className="composer-model-picker-no-match">No matching models</div>
+              <div className="composer-model-picker-no-match">{COMPOSER_NO_MATCHING_MODELS_LABEL}</div>
             )}
           </div>
         ) : null}
@@ -473,7 +476,7 @@ export function FloatingComposerModelPicker({
         className="composer-model-picker-trigger"
         aria-expanded={menuOpen}
         aria-haspopup="menu"
-        aria-label="Model controls"
+        aria-label={COMPOSER_MODEL_CONTROLS_LABEL}
       >
         <span className="composer-model-picker-model-label">{modelLabel}</span>
         {!needsProviderSetup ? (

@@ -32,6 +32,20 @@ import type {
   ReasoningLevel,
 } from '../../shared/flue'
 import { REASONING_LEVELS } from '../../shared/flue'
+import {
+  COMPOSER_CONFIGURE_PROVIDERS_LABEL,
+  COMPOSER_MODEL_CONTROLS_LABEL,
+  COMPOSER_MODEL_LABEL,
+  COMPOSER_MODEL_SEARCH_PLACEHOLDER,
+  COMPOSER_MODEL_TEXT_ONLY_LABEL,
+  COMPOSER_MODEL_VISION_LABEL,
+  COMPOSER_NAVI_REASONING_LABELS,
+  COMPOSER_NO_MATCHING_MODELS_LABEL,
+  COMPOSER_NO_PROVIDERS_LABEL,
+  COMPOSER_NO_PROVIDERS_SHORT_LABEL,
+  COMPOSER_REASONING_SECTION_LABEL,
+  formatComposerModelControlsTitle,
+} from '../lib/composerModelPicker'
 
 interface FloatingModelPickerProps {
   providers: ProviderProfile[]
@@ -55,12 +69,20 @@ type ProviderGroup = {
   modelVision: Record<string, boolean>
 }
 
-const REASONING_LABELS: Record<ReasoningLevel, string> = {
-  minimal: 'Minimal',
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  xhigh: 'X-High',
+function ComposerModelCapabilityBadge({ vision }: { vision: boolean }): ReactElement {
+  const label = vision ? COMPOSER_MODEL_VISION_LABEL : COMPOSER_MODEL_TEXT_ONLY_LABEL
+  const Icon = vision ? ImageIcon : TypeIcon
+  return (
+    <span
+      className={
+        vision ? 'composer-model-cap-badge is-vision' : 'composer-model-cap-badge is-text'
+      }
+      title={label}
+    >
+      <Icon strokeWidth={1.9} />
+      <span>{label}</span>
+    </span>
+  )
 }
 
 function modelLabel(providers: ProviderProfile[], active?: DefaultSelection): string {
@@ -80,22 +102,6 @@ function groupsFromProviders(providers: ProviderProfile[]): ProviderGroup[] {
       provider.models.map((model) => [model.id, Boolean(model.vision)]),
     ),
   }))
-}
-
-function ComposerModelCapabilityBadge({ vision }: { vision: boolean }): ReactElement {
-  const label = vision ? 'Vision' : 'Text'
-  const Icon = vision ? ImageIcon : TypeIcon
-  return (
-    <span
-      className={
-        vision ? 'composer-model-cap-badge is-vision' : 'composer-model-cap-badge is-text'
-      }
-      title={vision ? 'Vision — accepts text and images' : 'Text only'}
-    >
-      <Icon strokeWidth={1.9} />
-      <span>{label}</span>
-    </span>
-  )
 }
 
 export function FloatingModelPicker({
@@ -146,10 +152,10 @@ export function FloatingModelPicker({
       )
     : []
 
-  const chipModelLabel = needsProviderSetup ? 'No providers' : modelLabel(providers, active)
+  const chipModelLabel = needsProviderSetup ? COMPOSER_NO_PROVIDERS_SHORT_LABEL : modelLabel(providers, active)
   const reasoning = active?.reasoning ?? 'medium'
-  const reasoningLabel = REASONING_LABELS[reasoning]
-  const controlsTitle = `${chipModelLabel} / ${reasoningLabel}`
+  const reasoningLabel = COMPOSER_NAVI_REASONING_LABELS[reasoning]
+  const controlsTitle = formatComposerModelControlsTitle(chipModelLabel, reasoningLabel)
 
   useEffect(() => {
     if (!menuOpen) return
@@ -271,7 +277,7 @@ export function FloatingModelPicker({
             <>
               <div className="composer-model-picker-section-title">
                 <Brain strokeWidth={1.9} />
-                <span>Reasoning</span>
+                <span>{COMPOSER_REASONING_SECTION_LABEL}</span>
               </div>
               <div className="composer-model-picker-reasoning-list">
                 {REASONING_LEVELS.map((level) => (
@@ -287,7 +293,9 @@ export function FloatingModelPicker({
                     }
                     onClick={() => selectReasoning(level)}
                   >
-                    <span className="composer-model-picker-row-label">{REASONING_LABELS[level]}</span>
+                    <span className="composer-model-picker-row-label">
+                      {COMPOSER_NAVI_REASONING_LABELS[level]}
+                    </span>
                     {reasoning === level ? (
                       <Check className="composer-model-picker-check" strokeWidth={2} />
                     ) : null}
@@ -300,12 +308,12 @@ export function FloatingModelPicker({
 
           <div className="composer-model-picker-section-title">
             <Gauge strokeWidth={1.9} />
-            <span>Model</span>
+            <span>{COMPOSER_MODEL_LABEL}</span>
           </div>
 
           {needsProviderSetup ? (
             <div className="composer-model-picker-empty">
-              <p>No providers configured yet. Add an API key in Settings to pick a model.</p>
+              <p>{COMPOSER_NO_PROVIDERS_LABEL}</p>
               <button
                 type="button"
                 className="composer-model-picker-configure"
@@ -314,7 +322,7 @@ export function FloatingModelPicker({
                   onConfigure()
                 }}
               >
-                Configure providers
+                {COMPOSER_CONFIGURE_PROVIDERS_LABEL}
               </button>
             </div>
           ) : (
@@ -381,14 +389,14 @@ export function FloatingModelPicker({
             className="composer-model-picker-submenu"
             style={submenuStyle}
           >
-            <div className="composer-model-picker-submenu-title">Model</div>
+            <div className="composer-model-picker-submenu-title">{COMPOSER_MODEL_LABEL}</div>
             <label className="composer-model-picker-search">
               <Search strokeWidth={1.8} />
               <input
                 type="search"
                 value={modelFilter}
                 onChange={(event) => setModelFilter(event.target.value)}
-                placeholder="Search models…"
+                placeholder={COMPOSER_MODEL_SEARCH_PLACEHOLDER}
               />
             </label>
             {filteredModelIds.length > 0 ? (
@@ -417,7 +425,7 @@ export function FloatingModelPicker({
                 )
               })
             ) : (
-              <div className="composer-model-picker-no-match">No matching models</div>
+              <div className="composer-model-picker-no-match">{COMPOSER_NO_MATCHING_MODELS_LABEL}</div>
             )}
           </div>
         ) : null}
@@ -443,7 +451,7 @@ export function FloatingModelPicker({
         className="composer-model-picker-trigger"
         aria-expanded={menuOpen}
         aria-haspopup="menu"
-        aria-label="Model controls"
+        aria-label={COMPOSER_MODEL_CONTROLS_LABEL}
       >
         <span className="composer-model-picker-model-label">{chipModelLabel}</span>
         {!needsProviderSetup ? (
