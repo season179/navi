@@ -4,6 +4,17 @@
 
 import { useState, type ReactElement } from 'react'
 import { RefreshCw } from 'lucide-react'
+import {
+  LLM_DEBUG_SETTINGS_DESC,
+  LLM_DEBUG_SETTINGS_EMPTY,
+  LLM_DEBUG_SETTINGS_OUTPUT,
+  LLM_DEBUG_SETTINGS_REASONING,
+  LLM_DEBUG_SETTINGS_REFRESH_LABEL,
+  LLM_DEBUG_SETTINGS_REQUEST,
+  LLM_DEBUG_SETTINGS_TITLE,
+  LLM_DEBUG_SETTINGS_TOOL_CALLS,
+  LLM_DEBUG_SETTINGS_USAGE,
+} from '../lib/llmDebugSettingsSection'
 import { SettingsCard } from './SettingsControls'
 
 export type LlmDebugToolCall = {
@@ -31,19 +42,6 @@ export type LlmDebugRound = {
     stopReason?: string
     error?: string
   }
-}
-
-const COPY = {
-  sectionLlmDebug: 'LLM request troubleshooting',
-  llmDebugDesc:
-    'Inspect the last 25 raw request bodies sent to the model (system prompt, messages, tools) and their raw output. Kept in memory only and cleared on restart.',
-  llmDebugEmpty: 'No records yet. Send a message, then click Refresh.',
-  llmDebugRequest: 'Request (HTTP body sent to the model)',
-  llmDebugOutput: 'Output',
-  llmDebugReasoning: 'Reasoning',
-  llmDebugToolCalls: 'Tool calls',
-  llmDebugUsage: 'Usage',
-  refresh: 'Refresh',
 }
 
 function pretty(value: unknown): string {
@@ -91,30 +89,30 @@ function RoundCard({
           </div>
 
           <div className="llm-debug-round-section">
-            <div className="llm-debug-round-section-label">{COPY.llmDebugRequest}</div>
+            <div className="llm-debug-round-section-label">{LLM_DEBUG_SETTINGS_REQUEST}</div>
             <pre className="llm-debug-pre">
               {round.requestBody ? pretty(round.requestBody) : '—'}
             </pre>
           </div>
 
           <div className="llm-debug-round-section">
-            <div className="llm-debug-round-section-label">{COPY.llmDebugOutput}</div>
+            <div className="llm-debug-round-section-label">{LLM_DEBUG_SETTINGS_OUTPUT}</div>
             {out.text ? <pre className="llm-debug-pre">{out.text}</pre> : null}
             {out.reasoning ? (
               <>
-                <div className="llm-debug-round-sub-label">{COPY.llmDebugReasoning}</div>
+                <div className="llm-debug-round-sub-label">{LLM_DEBUG_SETTINGS_REASONING}</div>
                 <pre className="llm-debug-pre">{out.reasoning}</pre>
               </>
             ) : null}
             {out.toolCalls.length > 0 ? (
               <>
-                <div className="llm-debug-round-sub-label">{COPY.llmDebugToolCalls}</div>
+                <div className="llm-debug-round-sub-label">{LLM_DEBUG_SETTINGS_TOOL_CALLS}</div>
                 <pre className="llm-debug-pre">{pretty(out.toolCalls)}</pre>
               </>
             ) : null}
             {out.usage ? (
               <>
-                <div className="llm-debug-round-sub-label">{COPY.llmDebugUsage}</div>
+                <div className="llm-debug-round-sub-label">{LLM_DEBUG_SETTINGS_USAGE}</div>
                 <pre className="llm-debug-pre">{pretty(out.usage)}</pre>
               </>
             ) : null}
@@ -145,10 +143,10 @@ export function LlmDebugSettingsSection({
   onRefresh,
 }: Props): ReactElement {
   return (
-    <SettingsCard title={COPY.sectionLlmDebug}>
+    <SettingsCard title={LLM_DEBUG_SETTINGS_TITLE}>
       <div className="llm-debug-section">
         <div className="llm-debug-header">
-          <p className="llm-debug-desc">{COPY.llmDebugDesc}</p>
+          <p className="llm-debug-desc">{LLM_DEBUG_SETTINGS_DESC}</p>
           <button
             type="button"
             disabled={loading}
@@ -159,14 +157,14 @@ export function LlmDebugSettingsSection({
               className={loading ? 'llm-debug-refresh-icon is-spinning' : 'llm-debug-refresh-icon'}
               strokeWidth={1.8}
             />
-            {COPY.refresh}
+            {LLM_DEBUG_SETTINGS_REFRESH_LABEL}
           </button>
         </div>
 
         {error ? <p className="llm-debug-error">{error}</p> : null}
 
         {rounds.length === 0 ? (
-          <p className="llm-debug-empty">{COPY.llmDebugEmpty}</p>
+          <p className="llm-debug-empty">{LLM_DEBUG_SETTINGS_EMPTY}</p>
         ) : (
           <div className="llm-debug-rounds">
             {rounds.map((round) => (
