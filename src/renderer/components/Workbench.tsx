@@ -11,6 +11,7 @@ import {
   SESSION_HEADER_PREVIEW,
   type SessionHeaderSnapshot,
 } from './SessionHeader'
+import { SESSION_HEADER_RUNNING_LABEL } from '../lib/sessionHeader'
 import {
   WorkbenchTopBar,
   type RightPanelMode,
@@ -489,7 +490,7 @@ export function Workbench({
                     </div>
                     <div className="chat-topbar-actions">
                       {snapshot.busy ? (
-                        <span className="workbench-running-pill">Running</span>
+                        <span className="workbench-running-pill">{SESSION_HEADER_RUNNING_LABEL}</span>
                       ) : null}
                       <WorkbenchTopBar
                         rightPanelMode={rightPanelMode}

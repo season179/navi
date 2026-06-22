@@ -35,6 +35,7 @@ import {
 } from '../lib/composerFooterHint'
 import { resolveComposerDictationErrorPreview } from '../lib/composerVoiceDictation'
 import { COMPOSER_QUEUE_PLACEHOLDER } from '../lib/composerBusyState'
+import { SESSION_HEADER_RUNNING_LABEL } from '../lib/sessionHeader'
 import { resolveComposerSlashCommandsPreview } from '../lib/composerSlashCommands'
 import { resolveComposerContextCapacityPreview } from '../lib/composerContextCapacity'
 import {
@@ -4186,7 +4187,7 @@ function HomePage() {
                       />
                     </div>
                     <div className="chat-topbar-actions">
-                      {busy ? <span className="workbench-running-pill">Running</span> : null}
+                      {busy ? <span className="workbench-running-pill">{SESSION_HEADER_RUNNING_LABEL}</span> : null}
                       <WorkbenchTopBar
                         planPanelEnabled
                         rightPanelMode={productionRightPanelMode}

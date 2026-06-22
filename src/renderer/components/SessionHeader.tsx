@@ -5,6 +5,20 @@
 import { useEffect, useState, type ReactElement } from 'react'
 import { GitFork } from 'lucide-react'
 import { formatRelativeTime } from '../lib/format-relative-time'
+import {
+  SESSION_HEADER_EMPTY_HINT,
+  SESSION_HEADER_FORKED_LABEL,
+  SESSION_HEADER_NO_THREAD_SELECTED,
+  SESSION_HEADER_RENAME_THREAD_HINT,
+  SESSION_HEADER_RUNNING_LABEL,
+  formatSessionForkedFrom,
+  formatSessionForkedFromCompact,
+  formatSessionUsageCache,
+  formatSessionUsageCacheTitle,
+  formatSessionUsageCost,
+  formatSessionUsageTitle,
+  formatSessionUsageTokens,
+} from '../lib/sessionHeader'
 
 export type SessionHeaderUsageSnapshot = {
   totalTokens: number
@@ -36,20 +50,6 @@ type Props = {
   className?: string
   forceEditing?: boolean
   onRename?: (title: string) => void
-}
-
-const COPY = {
-  noSessionSelected: 'No session selected',
-  sessionHeaderHint: 'Pick a conversation from the sidebar to get started.',
-  renameThreadHint: 'Rename conversation',
-  running: 'Running',
-  sessionForked: 'Forked conversation',
-  sessionForkedFrom: (title: string) => `Forked from ${title}`,
-  sessionForkedFromCompact: (title: string) => `from ${title}`,
-  sessionUsageTokens: (tokens: string) => `${tokens} tokens`,
-  sessionUsageCost: (cost: string) => cost,
-  sessionUsageCache: (cache: string) => `${cache} cache`,
-  sessionUsageTitle: (turns: number) => `${turns} turns`,
 }
 
 function formatCompactNumber(value: number): string {
@@ -155,8 +155,8 @@ export function SessionHeader({
   const forkedFromTitle = snapshot?.forkedFromTitle?.trim() ?? ''
   const forkLabel = snapshot?.forkedFromThreadId
     ? forkedFromTitle
-      ? COPY.sessionForkedFrom(forkedFromTitle)
-      : COPY.sessionForked
+      ? formatSessionForkedFrom(forkedFromTitle)
+      : SESSION_HEADER_FORKED_LABEL
     : ''
 
   const commitTitle = (): void => {
@@ -197,8 +197,8 @@ export function SessionHeader({
                     <GitFork className="session-meta-fork-icon" strokeWidth={1.8} aria-hidden="true" />
                     <span className="session-meta-fork-label">
                       {forkedFromTitle
-                        ? COPY.sessionForkedFromCompact(forkedFromTitle)
-                        : COPY.sessionForked}
+                        ? formatSessionForkedFromCompact(forkedFromTitle)
+                        : SESSION_HEADER_FORKED_LABEL}
                     </span>
                   </span>
                 </>
@@ -243,14 +243,14 @@ export function SessionHeader({
                       setEditing(false)
                     }
                   }}
-                  aria-label={COPY.renameThreadHint}
+                  aria-label={SESSION_HEADER_RENAME_THREAD_HINT}
                   autoFocus
                 />
               ) : (
                 <button
                   type="button"
                   className="session-header-title-button"
-                  title={COPY.renameThreadHint}
+                  title={SESSION_HEADER_RENAME_THREAD_HINT}
                   onClick={() => setEditing(true)}
                 >
                   {snapshot.title}
@@ -276,20 +276,28 @@ export function SessionHeader({
                 <>
                   <span
                     className="session-header-badge session-header-badge-subtle"
-                    title={COPY.sessionUsageTitle(snapshot.usage.turns)}
+                    title={formatSessionUsageTitle(snapshot.usage.turns)}
                   >
-                    {COPY.sessionUsageTokens(formatCompactNumber(snapshot.usage.totalTokens))}
+                    {formatSessionUsageTokens(formatCompactNumber(snapshot.usage.totalTokens))}
                   </span>
                   <span className="session-header-badge session-header-badge-card">
-                    {COPY.sessionUsageCost(
+                    {formatSessionUsageCost(
                       formatCost(snapshot.usage.costUsd, snapshot.usage.costCny),
                     )}
                   </span>
                   <span
                     className="session-header-badge session-header-badge-card"
-                    title={`${formatPercent(snapshot.usage.cacheHitRate)} overall · ${formatCompactNumber(snapshot.usage.cachedTokens)} cached · ${formatCompactNumber(snapshot.usage.cacheMissTokens)} miss`}
+                    title={formatSessionUsageCacheTitle({
+                      cache: formatPercent(snapshot.usage.cacheHitRate),
+                      cached: formatCompactNumber(snapshot.usage.cachedTokens),
+                      miss: formatCompactNumber(snapshot.usage.cacheMissTokens),
+                      latestCache:
+                        snapshot.usage.lastTurnCacheHitRate != null
+                          ? formatPercent(snapshot.usage.lastTurnCacheHitRate)
+                          : null,
+                    })}
                   >
-                    {COPY.sessionUsageCache(formatPercent(primaryCacheHitRate(snapshot.usage)))}
+                    {formatSessionUsageCache(formatPercent(primaryCacheHitRate(snapshot.usage)))}
                   </span>
                 </>
               ) : null}
@@ -299,11 +307,11 @@ export function SessionHeader({
       ) : (
         <div className="session-header-empty">
           <div className="session-header-empty-kicker">{workspaceLabel}</div>
-          <div className="session-header-empty-title">{COPY.noSessionSelected}</div>
-          <div className="session-header-empty-hint">{COPY.sessionHeaderHint}</div>
+          <div className="session-header-empty-title">{SESSION_HEADER_NO_THREAD_SELECTED}</div>
+          <div className="session-header-empty-hint">{SESSION_HEADER_EMPTY_HINT}</div>
         </div>
       )}
-      {busy ? <span className="session-header-busy">{COPY.running}</span> : null}
+      {busy ? <span className="session-header-busy">{SESSION_HEADER_RUNNING_LABEL}</span> : null}
     </div>
   )
 }
