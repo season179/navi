@@ -9,6 +9,15 @@ import {
   type ReactNode,
 } from 'react'
 import { MessageSquare, Plus, RefreshCw, Settings } from 'lucide-react'
+import {
+  CLAW_SIDEBAR_ADD_IM_LABEL,
+  CLAW_SIDEBAR_CLEAR_SESSION_LABEL,
+  CLAW_SIDEBAR_IM_DISABLED_LABEL,
+  CLAW_SIDEBAR_IM_LABEL,
+  CLAW_SIDEBAR_NO_IM_SUB,
+  CLAW_SIDEBAR_NO_IM_TITLE,
+  CLAW_SIDEBAR_SETTINGS_LABEL,
+} from '../lib/clawSidebar'
 
 export type ClawImProvider = 'feishu' | 'weixin'
 
@@ -31,16 +40,6 @@ export type ClawImChannelSidebarSnapshot = {
 }
 
 export type ClawSidebarPreviewMode = 'default' | 'empty' | 'disabled' | 'running'
-
-const COPY = {
-  clawSidebarIm: 'Instant messaging',
-  clawAddIm: 'Add channel',
-  clawSettings: 'Claw settings',
-  clawNoImTitle: 'No IM channels yet',
-  clawNoImSub: 'Connect Feishu / Lark or WeChat to chat with this assistant from your phone.',
-  clawClearSession: 'Clear session',
-  clawImDisabledSidebar: 'Channel disabled',
-}
 
 export function clawProviderDisplayLabel(provider: ClawImProvider): string {
   if (provider === 'weixin') return 'WeChat'
@@ -228,13 +227,13 @@ export function ClawSidebarContent({
   return (
     <div className="claw-sidebar-content">
       <div className="claw-sidebar-section-header">
-        <span className="claw-sidebar-section-label">{COPY.clawSidebarIm}</span>
+        <span className="claw-sidebar-section-label">{CLAW_SIDEBAR_IM_LABEL}</span>
         <div className="claw-sidebar-section-actions">
-          <SidebarIconButton title={COPY.clawAddIm} onClick={onAddChannel}>
+          <SidebarIconButton title={CLAW_SIDEBAR_ADD_IM_LABEL} onClick={onAddChannel}>
             <Plus className="claw-sidebar-icon" strokeWidth={1.75} />
           </SidebarIconButton>
           <SidebarIconButton
-            title={COPY.clawSettings}
+            title={CLAW_SIDEBAR_SETTINGS_LABEL}
             onClick={onOpenSettings}
             disabled={channels.length === 0}
           >
@@ -246,11 +245,11 @@ export function ClawSidebarContent({
       <div className="claw-sidebar-scroll">
         {channels.length === 0 ? (
           <div className="claw-sidebar-empty">
-            <p className="claw-sidebar-empty-title">{COPY.clawNoImTitle}</p>
-            <p className="claw-sidebar-empty-sub">{COPY.clawNoImSub}</p>
+            <p className="claw-sidebar-empty-title">{CLAW_SIDEBAR_NO_IM_TITLE}</p>
+            <p className="claw-sidebar-empty-sub">{CLAW_SIDEBAR_NO_IM_SUB}</p>
             <button type="button" className="claw-sidebar-empty-btn" onClick={onAddChannel}>
               <Plus className="claw-sidebar-empty-btn-icon" strokeWidth={1.9} />
-              {COPY.clawAddIm}
+              {CLAW_SIDEBAR_ADD_IM_LABEL}
             </button>
           </div>
         ) : (
@@ -276,7 +275,7 @@ export function ClawSidebarContent({
                   <SidebarTreeRow
                     active={active}
                     dimmed={disabled}
-                    title={disabled ? COPY.clawImDisabledSidebar : channel.label}
+                    title={disabled ? CLAW_SIDEBAR_IM_DISABLED_LABEL : channel.label}
                     disabled={!runtimeReady || disabled}
                     onClick={() => onSelectChannel?.(channel.id)}
                     trailing={
@@ -293,7 +292,7 @@ export function ClawSidebarContent({
                     }
                     actions={
                       <SidebarIconButton
-                        title={COPY.clawClearSession}
+                        title={CLAW_SIDEBAR_CLEAR_SESSION_LABEL}
                         disabled={!runtimeReady || disabled}
                         stopPropagation
                         onClick={() => onResetChannel?.(channel.id)}
