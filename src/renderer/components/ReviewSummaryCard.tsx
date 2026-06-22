@@ -11,6 +11,7 @@ import {
   SearchCode,
   TriangleAlert,
 } from 'lucide-react'
+import { resolveReviewSummaryCardStatusLabel } from '../lib/reviewSummaryCard'
 
 export type ReviewFinding = {
   title: string
@@ -125,13 +126,11 @@ export function ReviewSummaryCard({ review }: Props): ReactElement {
     <CheckCircle2 strokeWidth={1.9} />
   )
 
-  const statusText = running
-    ? 'Reviewing changes…'
-    : failed
-      ? 'Review failed'
-      : findings.length === 0
-        ? 'No findings'
-        : `${findings.length} findings`
+  const statusText = resolveReviewSummaryCardStatusLabel({
+    running,
+    failed,
+    findingsCount: findings.length,
+  })
 
   const iconTone =
     failed || incorrect ? 'is-error' : running ? 'is-running' : 'is-success'
