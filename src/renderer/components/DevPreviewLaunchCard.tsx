@@ -4,14 +4,12 @@
 
 import type { ReactElement } from 'react'
 import { Check, Globe2 } from 'lucide-react'
-
-function formatDevPreviewUrlLabel(url: string): string {
-  try {
-    return new URL(url).host
-  } catch {
-    return url
-  }
-}
+import {
+  DEV_PREVIEW_CARD_OPEN,
+  DEV_PREVIEW_CARD_OPENED,
+  DEV_PREVIEW_CARD_TITLE,
+  formatDevPreviewCardSubtitle,
+} from '../lib/devPreviewLaunchCard'
 
 type Props = {
   url: string
@@ -35,27 +33,27 @@ export function DevPreviewLaunchCard({
         <Globe2 strokeWidth={1.9} />
       </div>
       <div className="dev-preview-launch-card-body">
-        <div className="dev-preview-launch-card-title">Web preview</div>
+        <div className="dev-preview-launch-card-title">{DEV_PREVIEW_CARD_TITLE}</div>
         <div className="dev-preview-launch-card-subtitle" title={url}>
           <span className="dev-preview-launch-card-dot" aria-hidden />
           <span className="dev-preview-launch-card-url">
-            Website · {formatDevPreviewUrlLabel(url)}
+            {formatDevPreviewCardSubtitle(url)}
           </span>
         </div>
       </div>
       {opened ? (
         <div className="dev-preview-launch-card-opened">
           <Check strokeWidth={2} />
-          <span>Preview opened on the right</span>
+          <span>{DEV_PREVIEW_CARD_OPENED}</span>
         </div>
       ) : (
         <button
           type="button"
           onClick={onOpen}
           className="dev-preview-launch-card-open-btn"
-          title="Open preview"
+          title={DEV_PREVIEW_CARD_OPEN}
         >
-          Open preview
+          {DEV_PREVIEW_CARD_OPEN}
         </button>
       )}
     </div>
