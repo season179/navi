@@ -19,17 +19,66 @@ import {
   Search,
   Settings,
 } from 'lucide-react'
+import {
+  PLUGIN_ADD_CUSTOM_LABEL,
+  PLUGIN_ADDED_LABEL,
+  PLUGIN_ADD_LABEL,
+  PLUGIN_BUILT_IN_SECTION_TITLE,
+  PLUGIN_CREATE_LABEL,
+  PLUGIN_CUSTOM_ARGS_PLACEHOLDER,
+  PLUGIN_CUSTOM_COMMAND_PLACEHOLDER,
+  PLUGIN_CUSTOM_DESCRIPTION_PLACEHOLDER,
+  PLUGIN_CUSTOM_MCP_CONFIG_PLACEHOLDER,
+  PLUGIN_CUSTOM_NAME_PLACEHOLDER,
+  PLUGIN_CUSTOM_SKILL_BODY_PLACEHOLDER,
+  PLUGIN_FILTER_ALL_LABEL,
+  PLUGIN_FILTER_INSTALLED_LABEL,
+  PLUGIN_FILTER_RECOMMENDED_LABEL,
+  PLUGIN_MANAGE_LABEL,
+  PLUGIN_MCP_DISABLE_LABEL,
+  PLUGIN_MCP_ENABLE_LABEL,
+  PLUGIN_MCP_RESTART_HINT,
+  PLUGIN_MCP_RUNTIME_OVERLAY_LABEL,
+  PLUGIN_MCP_RUNTIME_REFRESH_LABEL,
+  PLUGIN_MCP_RUNTIME_SEARCH_ACTIVE_LABEL,
+  PLUGIN_MCP_RUNTIME_SEARCH_INACTIVE_LABEL,
+  PLUGIN_MCP_SOURCE_CONFIGURED_LABEL,
+  PLUGIN_MCP_SOURCE_CONNECTED_LABEL,
+  PLUGIN_MCP_STATUS_DISABLED_LABEL,
+  PLUGIN_MCP_TITLE,
+  PLUGIN_NO_RESULTS_TEXT,
+  PLUGIN_OPEN_LOCATION_LABEL,
+  PLUGIN_PERSONAL_EMPTY_TEXT,
+  PLUGIN_PERSONAL_SECTION_TITLE,
+  PLUGIN_RECOMMENDED_SECTION_TITLE,
+  PLUGIN_SEARCH_MCP_PLACEHOLDER,
+  PLUGIN_SEARCH_SKILL_PLACEHOLDER,
+  PLUGIN_SKILL_DISABLE_LABEL,
+  PLUGIN_SKILL_ENABLE_LABEL,
+  PLUGIN_SKILL_REFRESH_LABEL,
+  PLUGIN_SKILL_ROOT_GLOBAL_AGENTS_LABEL,
+  PLUGIN_SKILL_ROOT_NONE_LABEL,
+  PLUGIN_SKILL_ROOT_WORKSPACE_AGENTS_LABEL,
+  PLUGIN_SKILL_SOURCE_GLOBAL_LABEL,
+  PLUGIN_SKILL_SOURCE_PROJECT_LABEL,
+  PLUGIN_SKILL_STATUS_DISABLED_LABEL,
+  PLUGIN_SKILL_TITLE,
+  PLUGIN_TAB_MCP_LABEL,
+  PLUGIN_TAB_SKILL_LABEL,
+  formatPluginMcpRuntimeDrift,
+  formatPluginMcpRuntimeLastError,
+  formatPluginMcpRuntimeSearch,
+  formatPluginMcpRuntimeServers,
+  formatPluginMcpRuntimeTools,
+  formatPluginSkillDiscoveredCountWithEnabled,
+  resolvePluginMcpRuntimeStatusLabel,
+  type PluginMcpRuntimeOverlayStatus,
+} from '../lib/pluginMarketplaceView'
 
 export type PluginKind = 'mcp' | 'skill'
 export type PluginFilter = 'all' | 'recommended' | 'installed'
 export type MarketplaceNoticeTone = 'success' | 'error' | 'info'
-export type McpRuntimeOverlayStatus =
-  | 'connected'
-  | 'configured'
-  | 'drift'
-  | 'error'
-  | 'disabled'
-  | 'offline'
+export type McpRuntimeOverlayStatus = PluginMcpRuntimeOverlayStatus
 
 export type MarketplaceNotice = {
   tone: MarketplaceNoticeTone
@@ -104,76 +153,6 @@ export type PluginMarketplacePreviewMode =
   | 'mcpOverlayError'
   | 'skillLoading'
   | 'installed'
-
-const COPY = {
-  pluginTabMcp: 'MCP',
-  pluginTabSkill: 'Skill',
-  pluginManage: 'Manage',
-  pluginCreate: 'Create',
-  pluginMcpTitle: 'Connect external tools to the agent',
-  pluginSkillTitle: 'Make the agent work your way',
-  pluginSearchMcp: 'Search MCP',
-  pluginSearchSkill: 'Search Skill',
-  pluginFilterAll: 'All',
-  pluginFilterRecommended: 'Recommended',
-  pluginFilterInstalled: 'Added',
-  pluginBuiltIn: 'Built-in',
-  pluginRecommended: 'Recommended',
-  pluginPersonal: 'Personal',
-  pluginNoResults: 'No matching plugins.',
-  pluginPersonalEmpty: 'No matching added plugins yet.',
-  pluginAdd: 'Add',
-  pluginAdded: 'Added',
-  pluginMcpEnable: 'Enable',
-  pluginMcpDisable: 'Disable',
-  pluginMcpStatusDisabled: 'Disabled',
-  pluginSkillEnable: 'Enable',
-  pluginSkillDisable: 'Disable',
-  pluginSkillStatusDisabled: 'Disabled',
-  pluginMcpRestartHint:
-    'After saving MCP config, a running local runtime may need a restart before the change fully applies.',
-  pluginMcpRuntimeOverlay: 'Runtime overlay',
-  pluginMcpRuntimeRefresh: 'Refresh',
-  pluginMcpRuntimeConnected: 'Connected',
-  pluginMcpRuntimeConfigured: 'Configured',
-  pluginMcpRuntimeDrifted: 'Drift',
-  pluginMcpRuntimeError: 'Error',
-  pluginMcpRuntimeDisabled: 'Disabled',
-  pluginMcpRuntimeOffline: 'Offline',
-  pluginMcpRuntimeServers: (connected: number, configured: number) =>
-    `${connected}/${configured} servers`,
-  pluginMcpRuntimeTools: (count: number) => `${count} tools`,
-  pluginMcpRuntimeSearch: (
-    status: string,
-    mode: string,
-    indexed: number,
-    advertised: number,
-  ) => `Search ${status} · ${mode} · ${indexed}/${advertised} indexed`,
-  pluginMcpRuntimeSearchActive: 'active',
-  pluginMcpRuntimeSearchInactive: 'inactive',
-  pluginMcpRuntimeDrift: (count: number) => `${count} drift signal(s)`,
-  pluginMcpRuntimeLastError: (message: string) => `Last error: ${message}`,
-  pluginMcpSourceConfigured: 'Configured',
-  pluginMcpSourceConnected: 'Connected',
-  pluginMcpSourceError: 'Error',
-  pluginMcpSourceDisabled: 'Disabled',
-  pluginOpenLocation: 'Open location',
-  pluginSkillRootWorkspaceAgents: 'Workspace · .agents/skills',
-  pluginSkillRootGlobalAgents: 'Global · ~/.agents/skills',
-  pluginSkillRootNone: 'No skill directory detected',
-  pluginSkillRefresh: 'Refresh',
-  pluginSkillDiscoveredCountWithEnabled: (count: number, enabled: number) =>
-    `${count} discovered, ${enabled} enabled`,
-  pluginSkillSourceProject: 'Project',
-  pluginSkillSourceGlobal: 'Global',
-  pluginCustomName: 'Name, e.g. my-plugin',
-  pluginCustomDescription: 'Basic description',
-  pluginCustomCommand: 'Command, e.g. npx',
-  pluginCustomArgs: 'Arguments, one per line',
-  pluginCustomMcpConfig: 'Or paste a complete MCP JSON config snippet',
-  pluginCustomSkillBody: 'Skill instructions for the agent',
-  pluginAddCustom: 'Add custom',
-}
 
 const MCP_RECOMMENDED: MarketplaceItem[] = [
   {
@@ -267,7 +246,7 @@ const MCP_PERSONAL: MarketplaceItem[] = [
     description: 'Automate real browsers and inspect page state.',
     detail: 'connected · stdio · npx · 12 tools',
     group: 'personal',
-    sourceLabel: COPY.pluginMcpSourceConnected,
+    sourceLabel: PLUGIN_MCP_SOURCE_CONNECTED_LABEL,
     statusTone: 'success',
   },
   {
@@ -277,7 +256,7 @@ const MCP_PERSONAL: MarketplaceItem[] = [
     description: 'Read and write workspace files through MCP.',
     detail: 'configured · stdio · npx',
     group: 'personal',
-    sourceLabel: COPY.pluginMcpSourceConfigured,
+    sourceLabel: PLUGIN_MCP_SOURCE_CONFIGURED_LABEL,
     statusTone: 'default',
   },
 ]
@@ -289,7 +268,7 @@ const SKILL_PERSONAL: MarketplaceItem[] = [
     title: 'design-review',
     description: 'Review UI changes against the product design system.',
     group: 'personal',
-    sourceLabel: COPY.pluginSkillSourceProject,
+    sourceLabel: PLUGIN_SKILL_SOURCE_PROJECT_LABEL,
   },
   {
     id: 'flue-debug',
@@ -297,13 +276,13 @@ const SKILL_PERSONAL: MarketplaceItem[] = [
     title: 'flue-debug',
     description: 'Trace Flue agent harness issues and runtime logs.',
     group: 'personal',
-    sourceLabel: COPY.pluginSkillSourceGlobal,
+    sourceLabel: PLUGIN_SKILL_SOURCE_GLOBAL_LABEL,
   },
 ]
 
 const DEFAULT_SKILL_ROOTS: SkillRootOption[] = [
-  { id: 'workspace-agents', label: COPY.pluginSkillRootWorkspaceAgents, enabled: true },
-  { id: 'global-agents', label: COPY.pluginSkillRootGlobalAgents, enabled: true },
+  { id: 'workspace-agents', label: PLUGIN_SKILL_ROOT_WORKSPACE_AGENTS_LABEL, enabled: true },
+  { id: 'global-agents', label: PLUGIN_SKILL_ROOT_GLOBAL_AGENTS_LABEL, enabled: true },
 ]
 
 const DEFAULT_MCP_OVERLAY: McpRuntimeOverlaySnapshot = {
@@ -334,20 +313,7 @@ function marketplaceSourceTone(tone: MarketplaceItem['statusTone']): string {
 }
 
 function mcpRuntimeStatusLabel(status: McpRuntimeOverlayStatus): string {
-  switch (status) {
-    case 'connected':
-      return COPY.pluginMcpRuntimeConnected
-    case 'configured':
-      return COPY.pluginMcpRuntimeConfigured
-    case 'drift':
-      return COPY.pluginMcpRuntimeDrifted
-    case 'error':
-      return COPY.pluginMcpRuntimeError
-    case 'disabled':
-      return COPY.pluginMcpRuntimeDisabled
-    case 'offline':
-      return COPY.pluginMcpRuntimeOffline
-  }
+  return resolvePluginMcpRuntimeStatusLabel(status)
 }
 
 function mcpRuntimeStatusTone(status: McpRuntimeOverlayStatus): string {
@@ -417,30 +383,30 @@ function McpRuntimeOverlayPanel({
           <div className="plugin-marketplace-runtime-panel-body">
             <div className="plugin-marketplace-runtime-panel-title-row">
               <span className="plugin-marketplace-runtime-panel-title">
-                {COPY.pluginMcpRuntimeOverlay}
+                {PLUGIN_MCP_RUNTIME_OVERLAY_LABEL}
               </span>
               <span className={mcpRuntimeStatusTone(overlay.status)}>{status}</span>
             </div>
             <div className="plugin-marketplace-runtime-meta">
               <span>
-                {COPY.pluginMcpRuntimeServers(
+                {formatPluginMcpRuntimeServers(
                   overlay.connectedServers,
                   overlay.configuredServers,
                 )}
               </span>
-              <span>{COPY.pluginMcpRuntimeTools(overlay.toolCount)}</span>
+              <span>{formatPluginMcpRuntimeTools(overlay.toolCount)}</span>
               <span>
-                {COPY.pluginMcpRuntimeSearch(
+                {formatPluginMcpRuntimeSearch(
                   overlay.searchActive
-                    ? COPY.pluginMcpRuntimeSearchActive
-                    : COPY.pluginMcpRuntimeSearchInactive,
+                    ? PLUGIN_MCP_RUNTIME_SEARCH_ACTIVE_LABEL
+                    : PLUGIN_MCP_RUNTIME_SEARCH_INACTIVE_LABEL,
                   overlay.searchMode,
                   overlay.indexedToolCount,
                   overlay.advertisedToolCount,
                 )}
               </span>
               {overlay.driftCount > 0 ? (
-                <span>{COPY.pluginMcpRuntimeDrift(overlay.driftCount)}</span>
+                <span>{formatPluginMcpRuntimeDrift(overlay.driftCount)}</span>
               ) : null}
             </div>
             {overlay.driftSignals.length > 0 ? (
@@ -454,7 +420,7 @@ function McpRuntimeOverlayPanel({
             ) : null}
             {overlay.lastError ? (
               <div className="plugin-marketplace-runtime-error">
-                {COPY.pluginMcpRuntimeLastError(overlay.lastError)}
+                {formatPluginMcpRuntimeLastError(overlay.lastError)}
               </div>
             ) : null}
             {error ? <div className="plugin-marketplace-runtime-error">{error}</div> : null}
@@ -466,7 +432,7 @@ function McpRuntimeOverlayPanel({
           ) : (
             <RefreshCw className="plugin-marketplace-runtime-refresh-icon" strokeWidth={2} />
           )}
-          {COPY.pluginMcpRuntimeRefresh}
+          {PLUGIN_MCP_RUNTIME_REFRESH_LABEL}
         </button>
       </div>
     </section>
@@ -481,13 +447,13 @@ function CustomPluginPanel({ activeKind }: { activeKind: PluginKind }): ReactEle
           readOnly
           defaultValue=""
           className="plugin-marketplace-input"
-          placeholder={COPY.pluginCustomName}
+          placeholder={PLUGIN_CUSTOM_NAME_PLACEHOLDER}
         />
         <input
           readOnly
           defaultValue=""
           className="plugin-marketplace-input"
-          placeholder={COPY.pluginCustomDescription}
+          placeholder={PLUGIN_CUSTOM_DESCRIPTION_PLACEHOLDER}
         />
       </div>
       {activeKind === 'mcp' ? (
@@ -497,13 +463,13 @@ function CustomPluginPanel({ activeKind }: { activeKind: PluginKind }): ReactEle
               readOnly
               defaultValue="npx"
               className="plugin-marketplace-input"
-              placeholder={COPY.pluginCustomCommand}
+              placeholder={PLUGIN_CUSTOM_COMMAND_PLACEHOLDER}
             />
             <textarea
               readOnly
               defaultValue={'-y\n@playwright/mcp@latest'}
               className="plugin-marketplace-textarea plugin-marketplace-textarea--mono"
-              placeholder={COPY.pluginCustomArgs}
+              placeholder={PLUGIN_CUSTOM_ARGS_PLACEHOLDER}
               spellCheck={false}
             />
           </div>
@@ -511,7 +477,7 @@ function CustomPluginPanel({ activeKind }: { activeKind: PluginKind }): ReactEle
             readOnly
             defaultValue=""
             className="plugin-marketplace-textarea plugin-marketplace-textarea--mono plugin-marketplace-textarea--tall"
-            placeholder={COPY.pluginCustomMcpConfig}
+            placeholder={PLUGIN_CUSTOM_MCP_CONFIG_PLACEHOLDER}
             spellCheck={false}
           />
         </div>
@@ -520,14 +486,14 @@ function CustomPluginPanel({ activeKind }: { activeKind: PluginKind }): ReactEle
           readOnly
           defaultValue=""
           className="plugin-marketplace-textarea plugin-marketplace-textarea--mono plugin-marketplace-textarea--skill"
-          placeholder={COPY.pluginCustomSkillBody}
+          placeholder={PLUGIN_CUSTOM_SKILL_BODY_PLACEHOLDER}
           spellCheck={false}
         />
       )}
       <div className="plugin-marketplace-custom-footer">
         <button type="button" className="plugin-marketplace-primary-btn">
           <Plus className="plugin-marketplace-primary-btn-icon" strokeWidth={2} />
-          {COPY.pluginAddCustom}
+          {PLUGIN_ADD_CUSTOM_LABEL}
         </button>
       </div>
     </section>
@@ -589,12 +555,12 @@ function PluginSection({
                     ) : null}
                     {skillDisabled ? (
                       <span className="plugin-marketplace-disabled-badge">
-                        {COPY.pluginSkillStatusDisabled}
+                        {PLUGIN_SKILL_STATUS_DISABLED_LABEL}
                       </span>
                     ) : null}
                     {mcpDisabled ? (
                       <span className="plugin-marketplace-disabled-badge">
-                        {COPY.pluginMcpStatusDisabled}
+                        {PLUGIN_MCP_STATUS_DISABLED_LABEL}
                       </span>
                     ) : null}
                   </div>
@@ -614,9 +580,9 @@ function PluginSection({
                     {toggleBusy ? (
                       <Loader2 className="plugin-marketplace-spin" strokeWidth={2} />
                     ) : skillDisabled ? (
-                      COPY.pluginSkillEnable
+                      PLUGIN_SKILL_ENABLE_LABEL
                     ) : (
-                      COPY.pluginSkillDisable
+                      PLUGIN_SKILL_DISABLE_LABEL
                     )}
                   </button>
                 ) : canToggleMcp ? (
@@ -628,9 +594,9 @@ function PluginSection({
                     {toggleBusy ? (
                       <Loader2 className="plugin-marketplace-spin" strokeWidth={2} />
                     ) : mcpDisabled ? (
-                      COPY.pluginMcpEnable
+                      PLUGIN_MCP_ENABLE_LABEL
                     ) : (
-                      COPY.pluginMcpDisable
+                      PLUGIN_MCP_DISABLE_LABEL
                     )}
                   </button>
                 ) : (
@@ -638,7 +604,7 @@ function PluginSection({
                     type="button"
                     disabled={installed || addBusy}
                     className={`plugin-marketplace-add-btn ${installed ? 'is-added' : ''}`}
-                    title={installed ? COPY.pluginAdded : COPY.pluginAdd}
+                    title={installed ? PLUGIN_ADDED_LABEL : PLUGIN_ADD_LABEL}
                   >
                     {addBusy ? (
                       <Loader2 className="plugin-marketplace-spin" strokeWidth={2} />
@@ -765,20 +731,20 @@ export function PluginMarketplaceView({
         <div className="plugin-marketplace-toolbar">
           <div className="plugin-marketplace-tabs">
             <TabButton active={activeKind === 'mcp'} onClick={() => onActiveKindChange('mcp')}>
-              {COPY.pluginTabMcp}
+              {PLUGIN_TAB_MCP_LABEL}
             </TabButton>
             <TabButton
               active={activeKind === 'skill'}
               tone="skill"
               onClick={() => onActiveKindChange('skill')}
             >
-              {COPY.pluginTabSkill}
+              {PLUGIN_TAB_SKILL_LABEL}
             </TabButton>
           </div>
           <div className="plugin-marketplace-toolbar-actions">
             <button type="button" className="plugin-marketplace-secondary-btn">
               <Settings className="plugin-marketplace-btn-icon" strokeWidth={1.75} />
-              {COPY.pluginManage}
+              {PLUGIN_MANAGE_LABEL}
             </button>
             <button
               type="button"
@@ -786,14 +752,14 @@ export function PluginMarketplaceView({
               onClick={() => onCustomOpenChange(!customOpen)}
             >
               <Plus className="plugin-marketplace-primary-btn-icon" strokeWidth={1.9} />
-              {COPY.pluginCreate}
+              {PLUGIN_CREATE_LABEL}
             </button>
           </div>
         </div>
 
         <div className="plugin-marketplace-hero">
           <h1 className="plugin-marketplace-title">
-            {activeKind === 'mcp' ? COPY.pluginMcpTitle : COPY.pluginSkillTitle}
+            {activeKind === 'mcp' ? PLUGIN_MCP_TITLE : PLUGIN_SKILL_TITLE}
           </h1>
         </div>
 
@@ -805,7 +771,7 @@ export function PluginMarketplaceView({
               onChange={(event) => onQueryChange(event.target.value)}
               className="plugin-marketplace-search-input"
               placeholder={
-                activeKind === 'mcp' ? COPY.pluginSearchMcp : COPY.pluginSearchSkill
+                activeKind === 'mcp' ? PLUGIN_SEARCH_MCP_PLACEHOLDER : PLUGIN_SEARCH_SKILL_PLACEHOLDER
               }
             />
           </label>
@@ -815,9 +781,9 @@ export function PluginMarketplaceView({
               onChange={(event) => onFilterChange(event.target.value as PluginFilter)}
               className="plugin-marketplace-filter-select"
             >
-              <option value="all">{COPY.pluginFilterAll}</option>
-              <option value="recommended">{COPY.pluginFilterRecommended}</option>
-              <option value="installed">{COPY.pluginFilterInstalled}</option>
+              <option value="all">{PLUGIN_FILTER_ALL_LABEL}</option>
+              <option value="recommended">{PLUGIN_FILTER_RECOMMENDED_LABEL}</option>
+              <option value="installed">{PLUGIN_FILTER_INSTALLED_LABEL}</option>
             </select>
             <ChevronDown className="plugin-marketplace-filter-chevron" strokeWidth={2} />
           </label>
@@ -830,20 +796,20 @@ export function PluginMarketplaceView({
               className="plugin-marketplace-skill-root-select"
             >
               {snapshot.skillRootOptions.length === 0 ? (
-                <option value="">{COPY.pluginSkillRootNone}</option>
+                <option value="">{PLUGIN_SKILL_ROOT_NONE_LABEL}</option>
               ) : (
                 snapshot.skillRootOptions.map((option) => (
                   <option key={option.id} value={option.id}>
                     {option.enabled
                       ? option.label
-                      : `${option.label} · ${COPY.pluginSkillStatusDisabled}`}
+                      : `${option.label} · ${PLUGIN_SKILL_STATUS_DISABLED_LABEL}`}
                   </option>
                 ))
               )}
             </select>
             <button type="button" className="plugin-marketplace-skill-action-btn">
               <FolderOpen className="plugin-marketplace-btn-icon" strokeWidth={2} />
-              {COPY.pluginOpenLocation}
+              {PLUGIN_OPEN_LOCATION_LABEL}
             </button>
             <button
               type="button"
@@ -855,13 +821,13 @@ export function PluginMarketplaceView({
               ) : (
                 <RefreshCw className="plugin-marketplace-btn-icon" strokeWidth={2} />
               )}
-              {COPY.pluginSkillRefresh}
+              {PLUGIN_SKILL_REFRESH_LABEL}
             </button>
             {snapshot.skillListError ? (
               <span className="plugin-marketplace-skill-error">{snapshot.skillListError}</span>
             ) : (
               <span className="plugin-marketplace-skill-meta">
-                {COPY.pluginSkillDiscoveredCountWithEnabled(
+                {formatPluginSkillDiscoveredCountWithEnabled(
                   snapshot.discoveredSkillCount,
                   snapshot.enabledSkillCount,
                 )}
@@ -884,8 +850,8 @@ export function PluginMarketplaceView({
 
         {activeKind === 'mcp' ? (
           <PluginSection
-            title={COPY.pluginBuiltIn}
-            emptyText={COPY.pluginNoResults}
+            title={PLUGIN_BUILT_IN_SECTION_TITLE}
+            emptyText={PLUGIN_NO_RESULTS_TEXT}
             items={visibleBuiltIn}
             activeKind={activeKind}
             installedIds={snapshot.installedIds}
@@ -898,8 +864,8 @@ export function PluginMarketplaceView({
         ) : null}
 
         <PluginSection
-          title={COPY.pluginRecommended}
-          emptyText={COPY.pluginNoResults}
+          title={PLUGIN_RECOMMENDED_SECTION_TITLE}
+          emptyText={PLUGIN_NO_RESULTS_TEXT}
           items={visibleRecommended}
           activeKind={activeKind}
           installedIds={snapshot.installedIds}
@@ -911,8 +877,8 @@ export function PluginMarketplaceView({
         />
 
         <PluginSection
-          title={COPY.pluginPersonal}
-          emptyText={COPY.pluginPersonalEmpty}
+          title={PLUGIN_PERSONAL_SECTION_TITLE}
+          emptyText={PLUGIN_PERSONAL_EMPTY_TEXT}
           items={visiblePersonal}
           activeKind={activeKind}
           installedIds={snapshot.installedIds}
@@ -926,7 +892,7 @@ export function PluginMarketplaceView({
         {activeKind === 'mcp' ? (
           <div className="plugin-marketplace-restart-hint">
             <RefreshCw className="plugin-marketplace-restart-hint-icon" strokeWidth={2} />
-            <span>{COPY.pluginMcpRestartHint}</span>
+            <span>{PLUGIN_MCP_RESTART_HINT}</span>
           </div>
         ) : null}
       </div>
