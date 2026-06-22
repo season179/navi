@@ -400,10 +400,13 @@ export function ChatThread({
   }, [messages])
 
   return (
-    <div ref={containerRef} className="message-timeline ds-no-drag">
+    <div
+      ref={containerRef}
+      className="message-timeline ds-no-drag relative flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden"
+    >
       <TimelineJumpRail anchors={anchors} onJump={jumpToTurn} />
       <div
-        className={`message-timeline-content ds-message-timeline-content ds-chat-column-inset ${goalTimelinePaddingClass(
+        className={`message-timeline-content ds-message-timeline-content ds-chat-column-inset mx-auto flex w-full min-w-0 max-w-4xl flex-col gap-8 pt-8 ${goalTimelinePaddingClass(
           'chat',
           hasActiveGoal,
         )}`}

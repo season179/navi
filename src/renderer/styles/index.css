@@ -57,6 +57,6 @@
 /* streamdown ships Tailwind classes in compiled JS — scan it explicitly. */
 @source '../../../node_modules/streamdown/dist';
 
-@import './tokens.css';
-@import './app.css';
-@import './markdown.css';
+@import './tokens.css' layer(components);
+@import './app.css' layer(components);
+@import './markdown.css' layer(components);
