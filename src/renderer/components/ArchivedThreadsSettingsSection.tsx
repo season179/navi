@@ -4,6 +4,21 @@
 
 import { useMemo, useState, type ReactElement } from 'react'
 import { Archive, Folder, RotateCcw, Search, Trash2 } from 'lucide-react'
+import {
+  ARCHIVED_THREADS_SETTINGS_DELETE_LABEL,
+  ARCHIVED_THREADS_SETTINGS_EMPTY,
+  ARCHIVED_THREADS_SETTINGS_OFFLINE,
+  ARCHIVED_THREADS_SETTINGS_OVERVIEW_DESC,
+  ARCHIVED_THREADS_SETTINGS_OVERVIEW_TITLE,
+  ARCHIVED_THREADS_SETTINGS_RESTORE_LABEL,
+  ARCHIVED_THREADS_SETTINGS_SEARCH_EMPTY,
+  ARCHIVED_THREADS_SETTINGS_SEARCH_PLACEHOLDER,
+  ARCHIVED_THREADS_SETTINGS_TITLE,
+  ARCHIVED_THREADS_SETTINGS_UNTITLED,
+  formatArchivedThreadsSettingsCount,
+  formatArchivedThreadsSettingsFooterHint,
+  formatArchivedThreadsSettingsWorkspaceCount,
+} from '../lib/archivedThreadsSettingsSection'
 import { formatRelativeTime } from '../lib/format-relative-time'
 import { SettingRow, SettingsCard } from './SettingsControls'
 
@@ -16,23 +31,6 @@ export type ArchivedThreadSnapshot = {
   mode?: string
   updatedAt: number
   archived: boolean
-}
-
-const COPY = {
-  archivesTitle: 'Archives',
-  archivesOverview: 'Archived conversations',
-  archivesOverviewDesc:
-    'Browse, search, and restore conversations you archived from the sidebar.',
-  archivesSearchPlaceholder: 'Search archived conversations…',
-  archivesCount: (count: number) => `${count} archived`,
-  archivesWorkspaceCount: (count: number) => `${count} conversation${count === 1 ? '' : 's'}`,
-  archivesUntitled: 'Untitled conversation',
-  archivesRestore: 'Restore',
-  archivesDelete: 'Delete',
-  archivesEmpty: 'No archived conversations yet.',
-  archivesSearchEmpty: 'No archived conversations match your search.',
-  archivesOffline: 'Connect a provider to browse archived conversations.',
-  archivesFooterHint: 'Restore / Delete from the sidebar thread menu.',
 }
 
 function workspaceLabelFromPath(path: string): string {
@@ -177,16 +175,16 @@ export function ArchivedThreadsSettingsSection({
   }
 
   const emptyMessage = !runtimeReady
-    ? COPY.archivesOffline
+    ? ARCHIVED_THREADS_SETTINGS_OFFLINE
     : query.trim()
-      ? COPY.archivesSearchEmpty
-      : COPY.archivesEmpty
+      ? ARCHIVED_THREADS_SETTINGS_SEARCH_EMPTY
+      : ARCHIVED_THREADS_SETTINGS_EMPTY
 
   return (
-    <SettingsCard title={COPY.archivesTitle}>
+    <SettingsCard title={ARCHIVED_THREADS_SETTINGS_TITLE}>
       <SettingRow
-        title={COPY.archivesOverview}
-        description={COPY.archivesOverviewDesc}
+        title={ARCHIVED_THREADS_SETTINGS_OVERVIEW_TITLE}
+        description={ARCHIVED_THREADS_SETTINGS_OVERVIEW_DESC}
         wideControl
         control={
           <div className="archived-threads-control">
@@ -197,13 +195,13 @@ export function ArchivedThreadsSettingsSection({
                   type="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder={COPY.archivesSearchPlaceholder}
+                  placeholder={ARCHIVED_THREADS_SETTINGS_SEARCH_PLACEHOLDER}
                   className="archived-threads-search-input"
                 />
               </label>
               <div className="archived-threads-count">
                 <Archive className="archived-threads-count-icon" strokeWidth={1.75} />
-                {COPY.archivesCount(totalArchived)}
+                {formatArchivedThreadsSettingsCount(totalArchived)}
               </div>
             </div>
 
@@ -223,7 +221,7 @@ export function ArchivedThreadsSettingsSection({
                           {workspaceLabelFromPath(workspace)}
                         </span>
                       </div>
-                      <span>{COPY.archivesWorkspaceCount(items.length)}</span>
+                      <span>{formatArchivedThreadsSettingsWorkspaceCount(items.length)}</span>
                     </div>
                     {items.map((thread) => {
                       const busy = busyThreadIds[thread.id] === true
@@ -237,7 +235,7 @@ export function ArchivedThreadsSettingsSection({
                             }
                           >
                             <div className="archived-threads-row-title">
-                              {thread.title || COPY.archivesUntitled}
+                              {thread.title || ARCHIVED_THREADS_SETTINGS_UNTITLED}
                             </div>
                             <div className="archived-threads-row-meta">
                               <span>{formatRelativeTime(thread.updatedAt, locale)}</span>
@@ -262,7 +260,7 @@ export function ArchivedThreadsSettingsSection({
                               className="archived-threads-restore"
                             >
                               <RotateCcw className="archived-threads-restore-icon" strokeWidth={1.8} />
-                              {COPY.archivesRestore}
+                              {ARCHIVED_THREADS_SETTINGS_RESTORE_LABEL}
                             </button>
                             <button
                               type="button"
@@ -270,8 +268,8 @@ export function ArchivedThreadsSettingsSection({
                               onClick={() =>
                                 void runThreadAction(thread.id, () => onDeleteThread?.(thread))
                               }
-                              aria-label={COPY.archivesDelete}
-                              title={COPY.archivesDelete}
+                              aria-label={ARCHIVED_THREADS_SETTINGS_DELETE_LABEL}
+                              title={ARCHIVED_THREADS_SETTINGS_DELETE_LABEL}
                               className="archived-threads-delete"
                             >
                               <Trash2 className="archived-threads-delete-icon" strokeWidth={1.8} />
@@ -285,7 +283,7 @@ export function ArchivedThreadsSettingsSection({
               </div>
             )}
 
-            <p className="archived-threads-footer">{COPY.archivesFooterHint}</p>
+            <p className="archived-threads-footer">{formatArchivedThreadsSettingsFooterHint()}</p>
           </div>
         }
       />
