@@ -13,6 +13,8 @@ export type TimelineChatBlock = {
   meta?: Record<string, unknown>
   severity?: string
   auto?: boolean
+  messagesBefore?: number
+  messagesAfter?: number
 }
 
 export type Turn = {

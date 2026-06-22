@@ -3,7 +3,8 @@
 
 import { extractUnifiedDiffText } from './diff-stats'
 import { splitThink, type TimelineChatBlock } from './messageTimelineTurns'
-import { summarizeToolBlock, toolFilePath } from './summarizeToolBlock'
+import { resolveProcessBlockLabel } from './processBlockLabel'
+import { toolFilePath } from './summarizeToolBlock'
 
 export type ProcessBlockDetail =
   | { kind: 'none' }
@@ -135,26 +136,7 @@ export function getProcessDetailFromBlock(
 }
 
 export function describeProcessBlockLabel(block: TimelineChatBlock): string {
-  if (block.kind === 'reasoning') return 'Thinking'
-  if (block.kind === 'assistant') return 'Process text'
-  if (block.kind === 'tool') {
-    return summarizeToolBlock({
-      summary: block.summary ?? '',
-      detail: block.detail,
-      filePath: block.filePath,
-      toolKind: block.toolKind as 'file_change' | 'command_execution' | 'generic' | undefined,
-      meta: block.meta,
-    })
-  }
-  if (block.kind === 'compaction') {
-    if (block.status === 'running') return 'Compacting context…'
-    if (block.status === 'error') return block.summary || 'Compaction failed'
-    return block.auto === true ? 'Context compacted automatically' : 'Context compacted'
-  }
-  if (block.kind === 'approval') return block.summary || 'Approval required'
-  if (block.kind === 'user_input') return 'User input'
-  if (block.kind === 'system') return block.text ?? 'System message'
-  return block.text ?? 'Processed'
+  return resolveProcessBlockLabel(block)
 }
 
 export function stackEntryFilePath(block: TimelineChatBlock): string | undefined {
