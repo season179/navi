@@ -4,6 +4,13 @@
 
 import type { ReactElement } from 'react'
 import {
+  RUNTIME_META_CHILD_AGENT,
+  formatRuntimeMetaActiveSkillsLabel,
+  formatRuntimeMetaAttachmentsLabel,
+  formatRuntimeMetaInjectedMemoriesLabel,
+  formatRuntimeMetaSourcesLabel,
+} from '../lib/runtimeMetaChips'
+import {
   type RuntimeMetaChipsSnapshot,
   RUNTIME_META_CHIPS_PREVIEW,
 } from './RuntimeMetaChips'
@@ -36,7 +43,7 @@ export function RuntimeMetaBadges({ meta }: Props): ReactElement | null {
     <div className="runtime-meta-badges">
       {childLabel ? (
         <span className="runtime-meta-chip" title={childLabel}>
-          Child agent{' '}
+          {RUNTIME_META_CHILD_AGENT}{' '}
           <span className="runtime-meta-chip-mono is-child">{childLabel}</span>
         </span>
       ) : null}
@@ -45,7 +52,7 @@ export function RuntimeMetaBadges({ meta }: Props): ReactElement | null {
           className="runtime-meta-chip"
           title={activeSkillIds.join(', ')}
         >
-          Skills {activeSkillIds.length}
+          {formatRuntimeMetaActiveSkillsLabel(activeSkillIds.length)}
         </span>
       ) : null}
       {injectedMemoryIds.length > 0 ? (
@@ -53,7 +60,7 @@ export function RuntimeMetaBadges({ meta }: Props): ReactElement | null {
           className="runtime-meta-chip"
           title={injectedMemoryIds.join(', ')}
         >
-          Memories {injectedMemoryIds.length}
+          {formatRuntimeMetaInjectedMemoriesLabel(injectedMemoryIds.length)}
         </span>
       ) : null}
       {attachmentIds.length > 0 ? (
@@ -61,7 +68,7 @@ export function RuntimeMetaBadges({ meta }: Props): ReactElement | null {
           className="runtime-meta-chip"
           title={attachmentIds.join(', ')}
         >
-          Attachments {attachmentIds.length}
+          {formatRuntimeMetaAttachmentsLabel(attachmentIds.length)}
         </span>
       ) : null}
       {sources.slice(0, 4).map((source, index) =>
@@ -74,7 +81,7 @@ export function RuntimeMetaBadges({ meta }: Props): ReactElement | null {
             className="runtime-meta-chip"
             title={source.url}
           >
-            Sources {index + 1}
+            {formatRuntimeMetaSourcesLabel(index)}
             <span className="runtime-meta-badge-source-title">
               {source.title || source.url}
             </span>
@@ -85,7 +92,7 @@ export function RuntimeMetaBadges({ meta }: Props): ReactElement | null {
             className="runtime-meta-chip"
             title={source.title}
           >
-            Sources {index + 1}
+            {formatRuntimeMetaSourcesLabel(index)}
           </span>
         ),
       )}

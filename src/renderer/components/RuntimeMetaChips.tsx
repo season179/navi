@@ -3,6 +3,13 @@
 // Process-entry badges use RuntimeMetaBadges instead.
 
 import type { ReactElement } from 'react'
+import {
+  RUNTIME_META_CHILD_AGENT,
+  formatRuntimeMetaActiveSkillsLabel,
+  formatRuntimeMetaAttachmentsLabel,
+  formatRuntimeMetaInjectedMemoriesLabel,
+  formatRuntimeMetaSourcesLabel,
+} from '../lib/runtimeMetaChips'
 
 export type RuntimeMetaSource = {
   title?: string
@@ -77,7 +84,7 @@ export function RuntimeMetaChips({
           className="runtime-meta-chip"
           title={attachmentIds.join(', ')}
         >
-          Attachments {attachmentIds.length}
+          {formatRuntimeMetaAttachmentsLabel(attachmentIds.length)}
         </span>
       ) : null}
       {activeSkillIds.length > 0 ? (
@@ -85,7 +92,7 @@ export function RuntimeMetaChips({
           className="runtime-meta-chip"
           title={activeSkillIds.join(', ')}
         >
-          Skills {activeSkillIds.length}
+          {formatRuntimeMetaActiveSkillsLabel(activeSkillIds.length)}
         </span>
       ) : null}
       {injectedMemoryIds.length > 0 ? (
@@ -93,12 +100,12 @@ export function RuntimeMetaChips({
           className="runtime-meta-chip"
           title={injectedMemoryIds.join(', ')}
         >
-          Memories {injectedMemoryIds.length}
+          {formatRuntimeMetaInjectedMemoriesLabel(injectedMemoryIds.length)}
         </span>
       ) : null}
       {childLabel ? (
         <span className="runtime-meta-chip" title={childLabel}>
-          Child agent{' '}
+          {RUNTIME_META_CHILD_AGENT}{' '}
           <span className="runtime-meta-chip-mono">{childLabel}</span>
         </span>
       ) : null}
@@ -112,7 +119,7 @@ export function RuntimeMetaChips({
             className="runtime-meta-chip"
             title={source.url}
           >
-            Sources {index + 1}
+            {formatRuntimeMetaSourcesLabel(index)}
           </a>
         ) : (
           <span
@@ -120,7 +127,7 @@ export function RuntimeMetaChips({
             className="runtime-meta-chip"
             title={source.title}
           >
-            Sources {index + 1}
+            {formatRuntimeMetaSourcesLabel(index)}
           </span>
         ),
       )}
