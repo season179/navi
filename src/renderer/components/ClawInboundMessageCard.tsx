@@ -4,27 +4,17 @@
 
 import type { ReactElement } from 'react'
 import { MessageSquareQuote } from 'lucide-react'
+import {
+  formatClawInboundHeader,
+  formatClawInboundMetaChips,
+  type ClawInboundMessageDisplay,
+} from '../lib/clawInboundMessageCard'
 
-export type ClawInboundMessageDisplay = {
-  sourceLabel?: string
-  sender?: string
-  chatType?: string
-  messageType?: string
-  mentions?: string
-}
+export type { ClawInboundMessageDisplay }
 
 type Props = {
   display: ClawInboundMessageDisplay
   text: string
-}
-
-function formatMetaChips(display: ClawInboundMessageDisplay): string[] {
-  const chips: string[] = []
-  if (display.sender) chips.push(`Sender ${display.sender}`)
-  if (display.chatType) chips.push(`${display.chatType} chat`)
-  if (display.messageType) chips.push(`${display.messageType} message`)
-  if (display.mentions) chips.push(`Mentions ${display.mentions}`)
-  return chips
 }
 
 /** Sample data for ?clawInboundMessageCard=1 visual verification. */
@@ -41,21 +31,18 @@ export const CLAW_INBOUND_MESSAGE_CARD_PREVIEW = {
 
 /** Minimal sample without meta chips for ?clawInboundMessageCard=minimal. */
 export const CLAW_INBOUND_MESSAGE_CARD_PREVIEW_MINIMAL = {
-  display: {
-    sourceLabel: 'Claw',
-  },
+  display: {},
   text: 'Ping — are you there?',
 }
 
 export function ClawInboundMessageCard({ display, text }: Props): ReactElement {
-  const meta = formatMetaChips(display)
-  const source = display.sourceLabel ?? 'Claw'
+  const meta = formatClawInboundMetaChips(display)
 
   return (
     <div className="claw-inbound-message-card">
       <div className="claw-inbound-message-card-header">
         <MessageSquareQuote className="claw-inbound-message-card-icon" strokeWidth={1.8} />
-        <span>From {source}</span>
+        <span>{formatClawInboundHeader(display.sourceLabel)}</span>
       </div>
       <div className="claw-inbound-message-card-text">{text}</div>
       {meta.length > 0 ? (
