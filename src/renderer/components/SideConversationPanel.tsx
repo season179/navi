@@ -24,6 +24,23 @@ import {
   Wrench,
   X,
 } from 'lucide-react'
+import {
+  SIDE_PANEL_COMPOSER_PLACEHOLDER,
+  SIDE_PANEL_DISCARD_TITLE,
+  SIDE_PANEL_DRAFT_EMPTY,
+  SIDE_PANEL_EMPTY,
+  SIDE_PANEL_EXPAND_LABEL,
+  SIDE_PANEL_HIDE_LABEL,
+  SIDE_PANEL_MINIMIZE_LABEL,
+  SIDE_PANEL_MORE_LABEL,
+  SIDE_PANEL_NEW_LABEL,
+  SIDE_PANEL_PARENT_MISSING,
+  SIDE_PANEL_PROMOTE_LABEL,
+  SIDE_PANEL_THINKING_LABEL,
+  SIDE_PANEL_TITLE,
+  formatSidePanelInheritedAt,
+  formatSidePanelParentLabel,
+} from '../lib/sideConversationPanel'
 import { Markdown } from './Markdown'
 
 export type SideChatBlockKind =
@@ -80,25 +97,6 @@ type Props = {
   onExpand?: () => void
   onClose?: () => void
   onNewDraft?: () => void
-}
-
-const COPY = {
-  sidePanelTitle: 'Side conversations',
-  sidePanelNew: 'New side chat',
-  sidePanelParentLabel: (title: string) => `From "${title}"`,
-  sidePanelParentMissing: 'Side panel',
-  sidePanelHide: 'Hide side panel',
-  sidePanelMinimize: 'Minimize side chat',
-  sidePanelExpand: 'Expand side panel',
-  sidePanelMore: 'More side chat actions',
-  sidePanelPromote: 'Promote',
-  sidePanelDiscardTitle: 'Delete the underlying side thread.',
-  sidePanelInheritedAt: (time: string) => `Context from ${time}`,
-  sidePanelThinking: 'Thinking...',
-  sidePanelEmpty: 'No side conversation yet. Use /btw to open one.',
-  sidePanelDraftEmpty:
-    'Ask a temporary question. A side thread is created only after you send.',
-  sidePanelComposerPlaceholder: 'Ask in side chat',
 }
 
 const NOW = new Date().toISOString()
@@ -242,7 +240,7 @@ function SideChatComposer({
           onKeyDown={handleKeyDown}
           disabled={disabled || busy}
           rows={1}
-          placeholder={COPY.sidePanelComposerPlaceholder}
+          placeholder={SIDE_PANEL_COMPOSER_PLACEHOLDER}
           className="side-conversation-composer-input"
         />
         <button
@@ -250,8 +248,8 @@ function SideChatComposer({
           onClick={onSend}
           disabled={sendDisabled}
           className="side-conversation-composer-send"
-          aria-label={COPY.sidePanelComposerPlaceholder}
-          title={COPY.sidePanelComposerPlaceholder}
+          aria-label={SIDE_PANEL_COMPOSER_PLACEHOLDER}
+          title={SIDE_PANEL_COMPOSER_PLACEHOLDER}
         >
           {busy ? (
             <Loader2 className="side-conversation-composer-send-icon is-spinning" strokeWidth={1.9} />
@@ -360,10 +358,10 @@ export function SideConversationPanel({
   const runningCount = sides.reduce((count, side) => count + (side.busy ? 1 : 0), 0)
   const rightStyle = overlayStyle(rightOffset)
   const titleCount = sideIds.length > 0 ? ` · ${sideIds.length}` : ''
-  const title = `${COPY.sidePanelTitle}${titleCount}`
+  const title = `${SIDE_PANEL_TITLE}${titleCount}`
   const subtitle = parentTitle
-    ? COPY.sidePanelParentLabel(parentTitle)
-    : COPY.sidePanelParentMissing
+    ? formatSidePanelParentLabel(parentTitle)
+    : SIDE_PANEL_PARENT_MISSING
 
   const handleDraftChange = useCallback(
     (value: string) => {
@@ -401,8 +399,8 @@ export function SideConversationPanel({
         onClick={onExpand}
         className={`side-conversation-panel-mini ${className}`.trim()}
         style={rightStyle}
-        aria-label={COPY.sidePanelExpand}
-        title={COPY.sidePanelExpand}
+        aria-label={SIDE_PANEL_EXPAND_LABEL}
+        title={SIDE_PANEL_EXPAND_LABEL}
       >
         <MessageCircleMore className="side-conversation-panel-mini-icon" strokeWidth={1.85} />
         <span className="side-conversation-panel-mini-count">{Math.max(sideIds.length, 1)}</span>
@@ -416,7 +414,7 @@ export function SideConversationPanel({
       return (
         <div className="side-conversation-empty-state">
           <MessageCircleMore className="side-conversation-empty-icon" strokeWidth={1.7} />
-          <p>{COPY.sidePanelDraftEmpty}</p>
+          <p>{SIDE_PANEL_DRAFT_EMPTY}</p>
         </div>
       )
     }
@@ -429,12 +427,12 @@ export function SideConversationPanel({
     return (
       <>
         <div className="side-conversation-inherited-at">
-          {COPY.sidePanelInheritedAt(formatInheritedTime(activeSide.inheritedAt))}
+          {formatSidePanelInheritedAt(formatInheritedTime(activeSide.inheritedAt))}
         </div>
         {!hasContent ? (
           <div className="side-conversation-empty-state is-compact">
             <MessageCircleMore className="side-conversation-empty-icon" strokeWidth={1.7} />
-            <p>{COPY.sidePanelEmpty}</p>
+            <p>{SIDE_PANEL_EMPTY}</p>
           </div>
         ) : null}
         {activeSide.blocks.map((block) => (
@@ -461,7 +459,7 @@ export function SideConversationPanel({
         {activeSide.busy ? (
           <div className="side-conversation-thinking">
             <Loader2 className="side-conversation-thinking-icon is-spinning" strokeWidth={1.9} />
-            <span>{COPY.sidePanelThinking}</span>
+            <span>{SIDE_PANEL_THINKING_LABEL}</span>
           </div>
         ) : null}
         {activeSide.error ? (
@@ -475,7 +473,7 @@ export function SideConversationPanel({
     <aside
       className={`side-conversation-panel ${className}`.trim()}
       style={rightStyle}
-      aria-label={COPY.sidePanelTitle}
+      aria-label={SIDE_PANEL_TITLE}
     >
       <header className="side-conversation-header">
         <MessageCircleMore className="side-conversation-header-icon" strokeWidth={1.85} />
@@ -527,8 +525,8 @@ export function SideConversationPanel({
             type="button"
             onClick={onNewDraft}
             className="side-conversation-header-btn"
-            aria-label={COPY.sidePanelNew}
-            title={COPY.sidePanelNew}
+            aria-label={SIDE_PANEL_NEW_LABEL}
+            title={SIDE_PANEL_NEW_LABEL}
           >
             <Plus className="side-conversation-header-btn-icon" strokeWidth={1.9} />
           </button>
@@ -536,8 +534,8 @@ export function SideConversationPanel({
             <button
               type="button"
               className="side-conversation-header-btn is-danger-hover"
-              aria-label={COPY.sidePanelDiscardTitle}
-              title={COPY.sidePanelDiscardTitle}
+              aria-label={SIDE_PANEL_DISCARD_TITLE}
+              title={SIDE_PANEL_DISCARD_TITLE}
             >
               <Trash2 className="side-conversation-header-btn-icon" strokeWidth={1.9} />
             </button>
@@ -548,8 +546,8 @@ export function SideConversationPanel({
               onClick={() => setMoreMenuOpen((open) => !open)}
               disabled={!activeSide}
               className="side-conversation-header-btn"
-              aria-label={COPY.sidePanelMore}
-              title={COPY.sidePanelMore}
+              aria-label={SIDE_PANEL_MORE_LABEL}
+              title={SIDE_PANEL_MORE_LABEL}
               aria-expanded={moreMenuOpen}
             >
               <MoreHorizontal className="side-conversation-header-btn-icon" strokeWidth={1.9} />
@@ -562,7 +560,7 @@ export function SideConversationPanel({
                   onClick={() => setMoreMenuOpen(false)}
                 >
                   <ArrowDownToLine className="side-conversation-more-icon" strokeWidth={1.8} />
-                  <span className="side-conversation-more-label">{COPY.sidePanelPromote}</span>
+                  <span className="side-conversation-more-label">{SIDE_PANEL_PROMOTE_LABEL}</span>
                 </button>
               </div>
             ) : null}
@@ -571,8 +569,8 @@ export function SideConversationPanel({
             type="button"
             onClick={onMinimize}
             className="side-conversation-header-btn"
-            aria-label={COPY.sidePanelMinimize}
-            title={COPY.sidePanelMinimize}
+            aria-label={SIDE_PANEL_MINIMIZE_LABEL}
+            title={SIDE_PANEL_MINIMIZE_LABEL}
           >
             <Minus className="side-conversation-header-btn-icon" strokeWidth={1.9} />
           </button>
@@ -580,8 +578,8 @@ export function SideConversationPanel({
             type="button"
             onClick={onClose}
             className="side-conversation-header-btn"
-            aria-label={COPY.sidePanelHide}
-            title={COPY.sidePanelHide}
+            aria-label={SIDE_PANEL_HIDE_LABEL}
+            title={SIDE_PANEL_HIDE_LABEL}
           >
             <X className="side-conversation-header-btn-icon" strokeWidth={1.9} />
           </button>
