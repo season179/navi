@@ -2,6 +2,10 @@
 // (../Kun/src/renderer/src/components/chat/message-timeline-process.tsx)
 // and formatToolTitle (../Kun/src/renderer/src/components/chat/message-timeline-tools.ts).
 
+import {
+  resolveToolSummaryLabel,
+} from './toolSummaryLocale'
+
 export type SummarizeToolBlockInput = {
   summary: string
   detail?: string
@@ -10,23 +14,10 @@ export type SummarizeToolBlockInput = {
   meta?: Record<string, unknown>
 }
 
-const DEFAULT_LABELS: Record<string, string> = {
-  toolActionFile: 'Edited file',
-  toolActionCommand: 'Ran command',
-  toolActionTool: 'Called tool',
-  toolBuiltinRead: 'Read',
-  toolBuiltinWrite: 'Write',
-  toolBuiltinEdit: 'Edit',
-  toolBuiltinGrep: 'Search',
-  toolBuiltinFind: 'Find',
-  toolBuiltinLs: 'List',
-  toolBuiltinBash: 'Bash',
-}
-
 export type ToolSummaryLabelFn = (key: string, opts?: Record<string, unknown>) => string
 
 export function defaultToolSummaryLabel(key: string): string {
-  return DEFAULT_LABELS[key] ?? key
+  return resolveToolSummaryLabel(key)
 }
 
 function summarizeProcessText(text: string, max = 96): string {
