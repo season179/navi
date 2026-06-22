@@ -23,6 +23,18 @@ import {
   Plus,
   RefreshCw,
 } from 'lucide-react'
+import {
+  FILE_TREE_ADD_FILE_REFERENCE_LABEL,
+  FILE_TREE_ADD_FOLDER_REFERENCE_LABEL,
+  FILE_TREE_COPY_ABSOLUTE_PATH_LABEL,
+  FILE_TREE_COPY_RELATIVE_PATH_LABEL,
+  FILE_TREE_EMPTY,
+  FILE_TREE_LOADING_LABEL,
+  FILE_TREE_REFRESH_LABEL,
+  FILE_TREE_TITLE,
+  formatChatFileTreeUnsupportedMessage,
+  resolveChatFileTreeRevealLabel,
+} from '../lib/chatFileTreePanel'
 
 export type ChatFileTreeEntry = {
   name: string
@@ -58,20 +70,6 @@ type ContextMenuState = {
   y: number
   entry: ChatFileTreeEntry
 } | null
-
-const COPY = {
-  fileTreeTitle: 'Files',
-  fileTreeRefresh: 'Refresh file tree',
-  fileTreeLoading: 'Loading files…',
-  fileTreeEmpty: 'This workspace has no files yet.',
-  fileTreeAddFileReference: 'Add file reference',
-  fileTreeAddFolderReference: 'Add folder reference',
-  fileTreeCopyAbsolutePath: 'Copy absolute path',
-  fileTreeCopyRelativePath: 'Copy relative path',
-  fileTreeRevealInFinder: 'Reveal in Finder',
-  fileTreeRevealInFileManager: 'Reveal in file manager',
-  fileTreeUnsupported: (name: string) => `${name} is not a supported text preview.`,
-}
 
 const PREVIEW_WORKSPACE = '/Users/season/Personal/navi'
 
@@ -271,7 +269,7 @@ export function ChatFileTreePanel({
           style={{ paddingLeft: depth * 14 + 10 }}
         >
           <Loader2 className="chat-file-tree-spinner" strokeWidth={1.8} />
-          {COPY.fileTreeLoading}
+          {FILE_TREE_LOADING_LABEL}
         </div>,
       ]
     }
@@ -296,7 +294,7 @@ export function ChatFileTreePanel({
       return depth === 0
         ? [
             <div key={`${path}-empty`} className="chat-file-tree-empty">
-              {COPY.fileTreeEmpty}
+              {FILE_TREE_EMPTY}
             </div>,
           ]
         : []
@@ -322,7 +320,7 @@ export function ChatFileTreePanel({
           key={entry.path}
           className={`chat-file-tree-row${active ? ' is-active' : ''}`}
           title={
-            previewable || isDirectory ? entry.path : COPY.fileTreeUnsupported(entry.name)
+            previewable || isDirectory ? entry.path : formatChatFileTreeUnsupportedMessage(entry.name)
           }
           onContextMenu={(event) => openContextMenu(event, entry)}
         >
@@ -369,21 +367,25 @@ export function ChatFileTreePanel({
   const contextEntry = contextMenu?.entry
   const contextLabel =
     contextEntry?.type === 'directory'
-      ? COPY.fileTreeAddFolderReference
-      : COPY.fileTreeAddFileReference
+      ? FILE_TREE_ADD_FOLDER_REFERENCE_LABEL
+      : FILE_TREE_ADD_FILE_REFERENCE_LABEL
+
+  const revealLabel = resolveChatFileTreeRevealLabel(
+    typeof window !== 'undefined' ? window.navigator.platform : 'darwin',
+  )
 
   return (
     <div className={`chat-file-tree-panel ds-no-drag${fill ? ' is-fill' : ''} ${className}`.trim()}>
       <div className="chat-file-tree-section-header">
         <span className="chat-file-tree-section-label" title={root}>
-          {rootName || COPY.fileTreeTitle}
+          {rootName || FILE_TREE_TITLE}
         </span>
         <div className="chat-file-tree-section-actions">
           <button
             type="button"
             className="chat-file-tree-icon-btn"
-            title={COPY.fileTreeRefresh}
-            aria-label={COPY.fileTreeRefresh}
+            title={FILE_TREE_REFRESH_LABEL}
+            aria-label={FILE_TREE_REFRESH_LABEL}
             onClick={refresh}
           >
             <RefreshCw className="chat-file-tree-action-icon" strokeWidth={1.8} />
@@ -419,7 +421,7 @@ export function ChatFileTreePanel({
             onClick={() => setContextMenu(null)}
           >
             <Copy className="chat-file-tree-context-icon" strokeWidth={1.9} />
-            <span className="chat-file-tree-context-label">{COPY.fileTreeCopyAbsolutePath}</span>
+            <span className="chat-file-tree-context-label">{FILE_TREE_COPY_ABSOLUTE_PATH_LABEL}</span>
           </button>
           <button
             type="button"
@@ -428,7 +430,7 @@ export function ChatFileTreePanel({
             onClick={() => setContextMenu(null)}
           >
             <Copy className="chat-file-tree-context-icon" strokeWidth={1.9} />
-            <span className="chat-file-tree-context-label">{COPY.fileTreeCopyRelativePath}</span>
+            <span className="chat-file-tree-context-label">{FILE_TREE_COPY_RELATIVE_PATH_LABEL}</span>
           </button>
           <button
             type="button"
@@ -437,7 +439,7 @@ export function ChatFileTreePanel({
             onClick={() => setContextMenu(null)}
           >
             <FolderSearch className="chat-file-tree-context-icon" strokeWidth={1.9} />
-            <span className="chat-file-tree-context-label">{COPY.fileTreeRevealInFinder}</span>
+            <span className="chat-file-tree-context-label">{revealLabel}</span>
           </button>
         </div>
       ) : null}
