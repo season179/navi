@@ -4,6 +4,10 @@
 
 import type { ReactElement } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
+import {
+  formatWorkMetaRowThoughtFor,
+  resolveWorkMetaRowMainLabel,
+} from '../lib/workMetaRow'
 
 function formatDuration(ms: number): string {
   if (ms < 1000) return `${Math.max(1, Math.round(ms))}ms`
@@ -79,13 +83,12 @@ export function WorkMetaRow({
   onToggle,
   collapsible = true,
 }: Props): ReactElement {
-  const mainLabel = processing
-    ? typeof durationMs === 'number'
-      ? `Processing ${formatDuration(durationMs)}`
-      : 'Processing'
-    : typeof durationMs === 'number'
-      ? `Processed ${formatDuration(durationMs)}`
-      : `Work process (${stepCount} steps)`
+  const mainLabel = resolveWorkMetaRowMainLabel({
+    processing,
+    stepCount,
+    durationLabel:
+      typeof durationMs === 'number' ? formatDuration(durationMs) : undefined,
+  })
 
   const showThoughtSuffix =
     !processing &&
@@ -99,7 +102,7 @@ export function WorkMetaRow({
       </span>
       {showThoughtSuffix ? (
         <span className="work-meta-row-thought">
-          · Thought for {formatDuration(reasoningDurationMs!)}
+          · {formatWorkMetaRowThoughtFor(formatDuration(reasoningDurationMs!))}
         </span>
       ) : null}
       {collapsible ? (
