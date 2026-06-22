@@ -3,11 +3,10 @@
 // Visual only: parent supplies counts and optional click handlers.
 
 import type { ReactElement } from 'react'
-
-const COPY = {
-  showEarlier: (count: number) => `Show ${count} earlier turn${count === 1 ? '' : 's'}`,
-  collapseEarlier: 'Collapse earlier turns',
-} as const
+import {
+  TIMELINE_COLLAPSE_EARLIER_TURNS_LABEL,
+  formatTimelineShowEarlierTurns,
+} from '../lib/timelinePaginationControls'
 
 type ShowEarlierProps = {
   hiddenCount: number
@@ -31,7 +30,7 @@ export function TimelineShowEarlierButton({
         className="timeline-show-earlier-button"
         onClick={() => onShowEarlier?.()}
       >
-        {COPY.showEarlier(count)}
+        {formatTimelineShowEarlierTurns(count)}
       </button>
     </div>
   )
@@ -63,7 +62,7 @@ export function TimelineCollapseEarlierButton({
         className="timeline-collapse-earlier-button"
         onClick={() => onCollapseEarlier?.()}
       >
-        {COPY.collapseEarlier}
+        {TIMELINE_COLLAPSE_EARLIER_TURNS_LABEL}
       </button>
     </div>
   )
