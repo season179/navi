@@ -4,6 +4,40 @@
 
 import { useMemo, useState, type ReactElement } from 'react'
 import { Ban, BrainCircuit, Pencil, Plus, Trash2 } from 'lucide-react'
+import {
+  MEMORY_SETTINGS_ACTIVE_COUNT_LABEL,
+  MEMORY_SETTINGS_CANCEL_LABEL,
+  MEMORY_SETTINGS_CONFIDENCE_LABEL,
+  MEMORY_SETTINGS_CONTENT_PLACEHOLDER,
+  MEMORY_SETTINGS_CREATE_LABEL,
+  MEMORY_SETTINGS_CREATE_TITLE,
+  MEMORY_SETTINGS_DELETE_LABEL,
+  MEMORY_SETTINGS_DISABLE_LABEL,
+  MEMORY_SETTINGS_DISABLED_HINT,
+  MEMORY_SETTINGS_DISABLED_LABEL,
+  MEMORY_SETTINGS_EDIT_LABEL,
+  MEMORY_SETTINGS_EDIT_TITLE,
+  MEMORY_SETTINGS_EMPTY_TEXT,
+  MEMORY_SETTINGS_ENABLE_DESC,
+  MEMORY_SETTINGS_ENABLE_LABEL,
+  MEMORY_SETTINGS_ENABLED_LABEL,
+  MEMORY_SETTINGS_LAST_INJECTED_DESC,
+  MEMORY_SETTINGS_LAST_INJECTED_LABEL,
+  MEMORY_SETTINGS_OFF_LABEL,
+  MEMORY_SETTINGS_ON_LABEL,
+  MEMORY_SETTINGS_OVERVIEW_DESC,
+  MEMORY_SETTINGS_OVERVIEW_LABEL,
+  MEMORY_SETTINGS_RECORDS_DESC,
+  MEMORY_SETTINGS_RECORDS_LABEL,
+  MEMORY_SETTINGS_SAVE_LABEL,
+  MEMORY_SETTINGS_SCOPE_PROJECT,
+  MEMORY_SETTINGS_SCOPE_USER,
+  MEMORY_SETTINGS_SCOPE_WORKSPACE,
+  MEMORY_SETTINGS_SECTION_TITLE,
+  MEMORY_SETTINGS_TAGS_PLACEHOLDER,
+  MEMORY_SETTINGS_TOMBSTONE_COUNT_LABEL,
+  resolveMemorySettingsScopeLabel,
+} from '../lib/memorySettingsSection'
 import { SettingRow, SettingsCard, Toggle } from './SettingsControls'
 
 export type MemoryScope = 'user' | 'workspace' | 'project'
@@ -36,47 +70,6 @@ const EMPTY_DRAFT: MemoryDraft = {
   scope: 'workspace',
   tags: '',
   confidence: 1,
-}
-
-const COPY = {
-  sectionMemory: 'Long-term memory',
-  memoryEnable: 'Enable memory',
-  memoryEnableDesc:
-    'When enabled, the assistant persists facts and preferences across sessions and injects them into context automatically. Changes apply on the next turn.',
-  memoryOverview: 'Overview',
-  memoryOverviewDesc:
-    'Memory records persist facts and preferences across sessions. They are injected into the assistant\'s context automatically and can be edited here.',
-  memoryActiveCount: 'Active',
-  memoryTombstoneCount: 'Deleted',
-  memoryEnabled: 'Status',
-  memoryOn: 'On',
-  memoryOff: 'Off',
-  memoryRecords: 'Memory records',
-  memoryRecordsDesc:
-    'Create, edit, disable or delete memory records. Changes take effect on the next turn.',
-  memoryCreate: 'New',
-  memoryCreateTitle: 'Create memory',
-  memoryEditTitle: 'Edit memory',
-  memoryEdit: 'Edit',
-  memoryDisable: 'Disable',
-  memoryDelete: 'Delete',
-  memoryDisabled: 'disabled',
-  memorySave: 'Save',
-  memoryCancel: 'Cancel',
-  memoryEmpty:
-    'No memory records yet. The assistant will create them automatically as it learns your preferences, or add one manually.',
-  memoryContentPlaceholder:
-    'What should the assistant remember? e.g. "Prefer TypeScript with 2-space indentation."',
-  memoryTagsPlaceholder: 'Tags, comma-separated',
-  memoryConfidence: 'Confidence',
-  memoryScope_all: 'All',
-  memoryScope_user: 'User',
-  memoryScope_workspace: 'Workspace',
-  memoryScope_project: 'Project',
-  memoryLastInjected: 'Last injected',
-  memoryLastInjectedDesc: 'Memory record IDs that were injected into the most recent turn.',
-  memoryDisabledHint:
-    'Memory is currently disabled. Enable it in the runtime configuration to create and use memory records.',
 }
 
 export const MEMORY_PREVIEW_RECORDS: MemoryRecordSnapshot[] = [
@@ -227,34 +220,34 @@ export function MemorySettingsSection({
   const memoryDisabled = diagnostics?.enabled === false || !enabled
 
   return (
-    <SettingsCard title={COPY.sectionMemory}>
+    <SettingsCard title={MEMORY_SETTINGS_SECTION_TITLE}>
       <SettingRow
-        title={COPY.memoryEnable}
-        description={COPY.memoryEnableDesc}
+        title={MEMORY_SETTINGS_ENABLE_LABEL}
+        description={MEMORY_SETTINGS_ENABLE_DESC}
         control={
           <Toggle checked={enabled} onChange={handleEnabledChange} />
         }
       />
       <SettingRow
-        title={COPY.memoryOverview}
-        description={COPY.memoryOverviewDesc}
+        title={MEMORY_SETTINGS_OVERVIEW_LABEL}
+        description={MEMORY_SETTINGS_OVERVIEW_DESC}
         wideControl
         control={
           <div className="memory-overview-grid">
             <div className="memory-stat-card">
-              <div className="memory-stat-label">{COPY.memoryActiveCount}</div>
+              <div className="memory-stat-label">{MEMORY_SETTINGS_ACTIVE_COUNT_LABEL}</div>
               <div className="memory-stat-value">
                 {diagnostics?.activeCount ?? localRecords.length}
               </div>
             </div>
             <div className="memory-stat-card">
-              <div className="memory-stat-label">{COPY.memoryTombstoneCount}</div>
+              <div className="memory-stat-label">{MEMORY_SETTINGS_TOMBSTONE_COUNT_LABEL}</div>
               <div className="memory-stat-value">{diagnostics?.tombstoneCount ?? 0}</div>
             </div>
             <div className="memory-stat-card">
-              <div className="memory-stat-label">{COPY.memoryEnabled}</div>
+              <div className="memory-stat-label">{MEMORY_SETTINGS_ENABLED_LABEL}</div>
               <div className="memory-stat-value">
-                {memoryDisabled ? COPY.memoryOff : COPY.memoryOn}
+                {memoryDisabled ? MEMORY_SETTINGS_OFF_LABEL : MEMORY_SETTINGS_ON_LABEL}
               </div>
             </div>
           </div>
@@ -262,13 +255,13 @@ export function MemorySettingsSection({
       />
 
       <SettingRow
-        title={COPY.memoryRecords}
-        description={COPY.memoryRecordsDesc}
+        title={MEMORY_SETTINGS_RECORDS_LABEL}
+        description={MEMORY_SETTINGS_RECORDS_DESC}
         wideControl
         control={
           <div className="memory-records-panel">
             {memoryDisabled ? (
-              <div className="memory-disabled-hint">{COPY.memoryDisabledHint}</div>
+              <div className="memory-disabled-hint">{MEMORY_SETTINGS_DISABLED_HINT}</div>
             ) : null}
 
             <div className="memory-records-toolbar">
@@ -284,13 +277,13 @@ export function MemorySettingsSection({
                         : 'memory-scope-filter'
                     }
                   >
-                    {COPY[`memoryScope_${scope}`]}
+                    {resolveMemorySettingsScopeLabel(scope)}
                   </button>
                 ))}
               </div>
               <button type="button" onClick={beginCreate} className="memory-create-btn">
                 <Plus className="memory-create-icon" strokeWidth={2} />
-                {COPY.memoryCreate}
+                {MEMORY_SETTINGS_CREATE_LABEL}
               </button>
             </div>
 
@@ -298,13 +291,13 @@ export function MemorySettingsSection({
               <div className="memory-editor">
                 <div className="memory-editor-title">
                   <Pencil className="memory-editor-icon" strokeWidth={1.8} />
-                  {creating ? COPY.memoryCreateTitle : COPY.memoryEditTitle}
+                  {creating ? MEMORY_SETTINGS_CREATE_TITLE : MEMORY_SETTINGS_EDIT_TITLE}
                 </div>
                 <textarea
                   value={draft.content}
                   onChange={(e) => setDraft((prev) => ({ ...prev, content: e.target.value }))}
                   rows={3}
-                  placeholder={COPY.memoryContentPlaceholder}
+                  placeholder={MEMORY_SETTINGS_CONTENT_PLACEHOLDER}
                   className="memory-editor-textarea"
                 />
                 <div className="memory-editor-fields">
@@ -319,20 +312,20 @@ export function MemorySettingsSection({
                       }
                       className="memory-editor-select"
                     >
-                      <option value="user">{COPY.memoryScope_user}</option>
-                      <option value="workspace">{COPY.memoryScope_workspace}</option>
-                      <option value="project">{COPY.memoryScope_project}</option>
+                      <option value="user">{MEMORY_SETTINGS_SCOPE_USER}</option>
+                      <option value="workspace">{MEMORY_SETTINGS_SCOPE_WORKSPACE}</option>
+                      <option value="project">{MEMORY_SETTINGS_SCOPE_PROJECT}</option>
                     </select>
                   ) : null}
                   <input
                     type="text"
                     value={draft.tags}
                     onChange={(e) => setDraft((prev) => ({ ...prev, tags: e.target.value }))}
-                    placeholder={COPY.memoryTagsPlaceholder}
+                    placeholder={MEMORY_SETTINGS_TAGS_PLACEHOLDER}
                     className="memory-editor-tags"
                   />
                   <div className="memory-editor-confidence">
-                    <span>{COPY.memoryConfidence}</span>
+                    <span>{MEMORY_SETTINGS_CONFIDENCE_LABEL}</span>
                     <input
                       type="number"
                       min={0}
@@ -351,7 +344,7 @@ export function MemorySettingsSection({
                 </div>
                 <div className="memory-editor-actions">
                   <button type="button" onClick={cancelEditor} className="memory-editor-cancel">
-                    {COPY.memoryCancel}
+                    {MEMORY_SETTINGS_CANCEL_LABEL}
                   </button>
                   <button
                     type="button"
@@ -359,7 +352,7 @@ export function MemorySettingsSection({
                     disabled={!draft.content.trim()}
                     className="memory-editor-save"
                   >
-                    {COPY.memorySave}
+                    {MEMORY_SETTINGS_SAVE_LABEL}
                   </button>
                 </div>
               </div>
@@ -368,7 +361,7 @@ export function MemorySettingsSection({
             {filteredRecords.length === 0 && !creating && editingId === null ? (
               <div className="memory-empty">
                 <BrainCircuit className="memory-empty-icon" strokeWidth={1.5} />
-                <div className="memory-empty-text">{COPY.memoryEmpty}</div>
+                <div className="memory-empty-text">{MEMORY_SETTINGS_EMPTY_TEXT}</div>
               </div>
             ) : (
               filteredRecords.map((memory) =>
@@ -394,7 +387,7 @@ export function MemorySettingsSection({
                           <span>{memory.tags.join(' · ')}</span>
                         ) : null}
                         {memory.disabledAt ? (
-                          <span className="memory-record-disabled-label">{COPY.memoryDisabled}</span>
+                          <span className="memory-record-disabled-label">{MEMORY_SETTINGS_DISABLED_LABEL}</span>
                         ) : null}
                         <span className="memory-record-id">{memory.id.slice(0, 8)}</span>
                       </div>
@@ -404,8 +397,8 @@ export function MemorySettingsSection({
                         type="button"
                         onClick={() => beginEdit(memory)}
                         className="memory-record-action"
-                        aria-label={COPY.memoryEdit}
-                        title={COPY.memoryEdit}
+                        aria-label={MEMORY_SETTINGS_EDIT_LABEL}
+                        title={MEMORY_SETTINGS_EDIT_LABEL}
                       >
                         <Pencil className="memory-record-action-icon" strokeWidth={1.8} />
                       </button>
@@ -414,8 +407,8 @@ export function MemorySettingsSection({
                         disabled={Boolean(memory.disabledAt)}
                         onClick={() => disableRecord(memory.id)}
                         className="memory-record-action"
-                        aria-label={COPY.memoryDisable}
-                        title={COPY.memoryDisable}
+                        aria-label={MEMORY_SETTINGS_DISABLE_LABEL}
+                        title={MEMORY_SETTINGS_DISABLE_LABEL}
                       >
                         <Ban className="memory-record-action-icon" strokeWidth={1.8} />
                       </button>
@@ -423,8 +416,8 @@ export function MemorySettingsSection({
                         type="button"
                         onClick={() => deleteRecord(memory.id)}
                         className="memory-record-action memory-record-action-delete"
-                        aria-label={COPY.memoryDelete}
-                        title={COPY.memoryDelete}
+                        aria-label={MEMORY_SETTINGS_DELETE_LABEL}
+                        title={MEMORY_SETTINGS_DELETE_LABEL}
                       >
                         <Trash2 className="memory-record-action-icon" strokeWidth={1.8} />
                       </button>
@@ -439,8 +432,8 @@ export function MemorySettingsSection({
 
       {diagnostics?.lastInjectedIds?.length ? (
         <SettingRow
-          title={COPY.memoryLastInjected}
-          description={COPY.memoryLastInjectedDesc}
+          title={MEMORY_SETTINGS_LAST_INJECTED_LABEL}
+          description={MEMORY_SETTINGS_LAST_INJECTED_DESC}
           wideControl
           control={
             <div className="memory-injected-ids">
