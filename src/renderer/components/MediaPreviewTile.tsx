@@ -5,6 +5,13 @@
 import { useState, type ReactElement } from 'react'
 import { Check, Download, File, ImageIcon, Loader2, Video } from 'lucide-react'
 import {
+  formatMediaPreviewTileImageOpen,
+  MEDIA_PREVIEW_TILE_DOWNLOAD,
+  MEDIA_PREVIEW_TILE_OPEN_EDITOR,
+  MEDIA_PREVIEW_TILE_PREVIEW_UNAVAILABLE,
+  resolveMediaPreviewTileSaveLabel,
+} from '../lib/mediaPreviewTile'
+import {
   ImagePreviewLightbox,
   IMAGE_PREVIEW_LIGHTBOX_SAMPLE,
 } from './ImagePreviewLightbox'
@@ -136,14 +143,8 @@ export function MediaPreviewTile({
     }, 400)
   }
 
-  const saveLabel =
-    saveState === 'saving'
-      ? 'Saving…'
-      : saveState === 'saved'
-        ? 'Saved'
-        : saveState === 'error'
-          ? 'Save failed'
-          : 'Download'
+  const saveLabel = resolveMediaPreviewTileSaveLabel(saveState)
+  const imageOpenLabel = formatMediaPreviewTileImageOpen(title)
 
   const saveIcon =
     saveState === 'saving' ? (
@@ -175,8 +176,8 @@ export function MediaPreviewTile({
           type="button"
           onClick={() => setImagePreviewOpen(true)}
           className="media-preview-tile-zoom-trigger"
-          title={`Open ${title}`}
-          aria-label={`Open ${title}`}
+          title={imageOpenLabel}
+          aria-label={imageOpenLabel}
         >
           <img src={previewUrl} alt={title} className="media-preview-tile-media" loading="lazy" />
         </button>
@@ -241,7 +242,8 @@ export function MediaPreviewTile({
         <div className="media-preview-tile-file-copy">
           <div className="media-preview-tile-file-title">{title}</div>
           <div className="media-preview-tile-file-meta">
-            {[mimeType, byteSize].filter(Boolean).join(' · ') || 'Preview unavailable'}
+            {[mimeType, byteSize].filter(Boolean).join(' · ') ||
+              MEDIA_PREVIEW_TILE_PREVIEW_UNAVAILABLE}
           </div>
         </div>
       </div>
@@ -254,11 +256,11 @@ export function MediaPreviewTile({
           title={saveLabel}
         >
           <span className="media-preview-tile-save-btn-icon">{saveIcon}</span>
-          Download
+          {MEDIA_PREVIEW_TILE_DOWNLOAD}
         </button>
         {filePath ? (
           <button type="button" className="media-preview-tile-save-btn">
-            Open in editor
+            {MEDIA_PREVIEW_TILE_OPEN_EDITOR}
           </button>
         ) : null}
       </div>
