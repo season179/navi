@@ -4,6 +4,38 @@
 
 import { useState, type ReactElement } from 'react'
 import {
+  CLAW_SETTINGS_DEFAULT_WORKSPACE_DESC,
+  CLAW_SETTINGS_DEFAULT_WORKSPACE_LABEL,
+  CLAW_SETTINGS_DEFAULT_WORKSPACE_RESET_LABEL,
+  CLAW_SETTINGS_ENABLED_DESC,
+  CLAW_SETTINGS_ENABLED_LABEL,
+  CLAW_SETTINGS_FEISHU_STREAM_DESC,
+  CLAW_SETTINGS_FEISHU_STREAM_LABEL,
+  CLAW_SETTINGS_MANAGE_AGENT_DESCRIPTION_LABEL,
+  CLAW_SETTINGS_MANAGE_AGENT_DESCRIPTION_PLACEHOLDER,
+  CLAW_SETTINGS_MANAGE_AGENT_DISABLED_LABEL,
+  CLAW_SETTINGS_MANAGE_AGENT_ENABLED_LABEL,
+  CLAW_SETTINGS_MANAGE_AGENT_IDENTITY_LABEL,
+  CLAW_SETTINGS_MANAGE_AGENT_IDENTITY_PLACEHOLDER,
+  CLAW_SETTINGS_MANAGE_AGENT_NAME_LABEL,
+  CLAW_SETTINGS_MANAGE_AGENT_NAME_PLACEHOLDER,
+  CLAW_SETTINGS_MANAGE_AGENT_PERSONALITY_LABEL,
+  CLAW_SETTINGS_MANAGE_AGENT_PERSONALITY_PLACEHOLDER,
+  CLAW_SETTINGS_MANAGE_AGENT_REPLY_RULES_LABEL,
+  CLAW_SETTINGS_MANAGE_AGENT_REPLY_RULES_PLACEHOLDER,
+  CLAW_SETTINGS_MANAGE_AGENT_USER_CONTEXT_LABEL,
+  CLAW_SETTINGS_MANAGE_AGENT_USER_CONTEXT_PLACEHOLDER,
+  CLAW_SETTINGS_MANAGE_AGENTS_EMPTY,
+  CLAW_SETTINGS_MANAGE_AGENTS_TITLE,
+  CLAW_SETTINGS_MODEL_LABEL,
+  CLAW_SETTINGS_RUNTIME_TITLE,
+  CLAW_SETTINGS_WORKSPACE_OVERRIDE_LABEL,
+  formatClawSettingsDefaultWorkspacePlaceholder,
+  formatClawSettingsManageAgentMeta,
+  formatClawSettingsWorkspaceInherit,
+} from '../lib/clawSettingsSection'
+import { GENERAL_SETTINGS_BROWSE_LABEL } from '../lib/generalSettingsSection'
+import {
   SETTINGS_SELECT_CLASS,
   SettingRow,
   SettingsCard,
@@ -51,77 +83,35 @@ const PROFILE_FIELDS: Array<{
 }> = [
   {
     key: 'description',
-    label: 'Short description',
-    placeholder: 'Example: Handles project questions in the team chat',
+    label: CLAW_SETTINGS_MANAGE_AGENT_DESCRIPTION_LABEL,
+    placeholder: CLAW_SETTINGS_MANAGE_AGENT_DESCRIPTION_PLACEHOLDER,
     rows: 2,
   },
   {
     key: 'identity',
-    label: 'Role definition',
-    placeholder: 'Define who this agent is, its role, scope, and boundaries.',
+    label: CLAW_SETTINGS_MANAGE_AGENT_IDENTITY_LABEL,
+    placeholder: CLAW_SETTINGS_MANAGE_AGENT_IDENTITY_PLACEHOLDER,
     rows: 4,
   },
   {
     key: 'personality',
-    label: 'Personality',
-    placeholder: 'Define tone, style, patience, and when it should ask follow-up questions.',
+    label: CLAW_SETTINGS_MANAGE_AGENT_PERSONALITY_LABEL,
+    placeholder: CLAW_SETTINGS_MANAGE_AGENT_PERSONALITY_PLACEHOLDER,
     rows: 3,
   },
   {
     key: 'userContext',
-    label: 'User context',
-    placeholder: 'Long-lived user, team, or workflow context this phone agent should remember.',
+    label: CLAW_SETTINGS_MANAGE_AGENT_USER_CONTEXT_LABEL,
+    placeholder: CLAW_SETTINGS_MANAGE_AGENT_USER_CONTEXT_PLACEHOLDER,
     rows: 3,
   },
   {
     key: 'replyRules',
-    label: 'Reply rules',
-    placeholder: 'Define reply format, length, risk checks, or confirmation rules.',
+    label: CLAW_SETTINGS_MANAGE_AGENT_REPLY_RULES_LABEL,
+    placeholder: CLAW_SETTINGS_MANAGE_AGENT_REPLY_RULES_PLACEHOLDER,
     rows: 4,
   },
 ]
-
-const COPY = {
-  clawRuntime: 'Phone connection',
-  clawEnabled: 'Enable phone connection',
-  clawEnabledDesc:
-    'When enabled, the Feishu / Lark phone bridge and local IM webhook can run in the background. Turning it off does not affect normal GUI chats.',
-  clawDefaultWorkspace: 'Default phone workspace',
-  clawDefaultWorkspaceDesc:
-    'Leave this empty to use the GUI default working directory. Individual phone connections can still override it.',
-  clawDefaultWorkspacePlaceholder: (path: string) => `Leave empty to inherit: ${path}`,
-  clawDefaultWorkspaceReset: 'Use GUI default',
-  browse: 'Browse',
-  clawManageAgents: 'Connected phone agents',
-  clawManageAgentsEmpty:
-    'No phone agent has been connected yet. Use Connect phone to bind Feishu / Lark first.',
-  clawManageAgentMeta: (provider: string, model: string, workspace: string) =>
-    `${provider} · ${model} · ${workspace}`,
-  clawManageAgentEnabled: 'Enabled',
-  clawManageAgentDisabled: 'Disabled',
-  clawFeishuStream: 'Enable streaming output',
-  clawFeishuStreamDesc:
-    'Stream the reply character-by-character in a live SDK card, instead of sending a one-shot message after the run completes.',
-  clawManageAgentName: 'Agent name',
-  clawManageAgentNamePlaceholder: 'Name shown in the IM sidebar',
-  clawModel: 'Model',
-  clawWorkspaceOverride: 'Workspace override',
-  clawWorkspaceInherit: (path: string) => `Use default workspace: ${path}`,
-  clawManageAgentDescription: 'Short description',
-  clawManageAgentDescriptionPlaceholder: 'Example: Handles project questions in the team chat',
-  clawManageAgentIdentity: 'Role definition',
-  clawManageAgentIdentityPlaceholder:
-    'Define who this agent is, its role, scope, and boundaries.',
-  clawManageAgentPersonality: 'Personality',
-  clawManageAgentPersonalityPlaceholder:
-    'Define tone, style, patience, and when it should ask follow-up questions.',
-  clawManageAgentUserContext: 'User context',
-  clawManageAgentUserContextPlaceholder:
-    'Long-lived user, team, or workflow context this phone agent should remember.',
-  clawManageAgentReplyRules: 'Reply rules',
-  clawManageAgentReplyRulesPlaceholder:
-    'Define reply format, length, risk checks, or confirmation rules.',
-}
 
 export const CLAW_SETTINGS_PREVIEW_DEFAULT: ClawSettingsSnapshot = {
   enabled: true,
@@ -228,10 +218,10 @@ export function ClawSettingsSection({
 
   return (
     <>
-      <SettingsCard title={COPY.clawRuntime}>
+      <SettingsCard title={CLAW_SETTINGS_RUNTIME_TITLE}>
         <SettingRow
-          title={COPY.clawEnabled}
-          description={COPY.clawEnabledDesc}
+          title={CLAW_SETTINGS_ENABLED_LABEL}
+          description={CLAW_SETTINGS_ENABLED_DESC}
           control={
             <Toggle
               checked={settings.enabled}
@@ -240,8 +230,8 @@ export function ClawSettingsSection({
           }
         />
         <SettingRow
-          title={COPY.clawDefaultWorkspace}
-          description={COPY.clawDefaultWorkspaceDesc}
+          title={CLAW_SETTINGS_DEFAULT_WORKSPACE_LABEL}
+          description={CLAW_SETTINGS_DEFAULT_WORKSPACE_DESC}
           control={
             <div className="claw-settings-workspace">
               <div className="claw-settings-workspace-row">
@@ -249,17 +239,19 @@ export function ClawSettingsSection({
                   className="settings-text-input"
                   value={settings.workspaceRoot}
                   onChange={(e) => updateSettings({ workspaceRoot: e.target.value })}
-                  placeholder={COPY.clawDefaultWorkspacePlaceholder(settings.defaultWorkspaceRoot)}
+                  placeholder={formatClawSettingsDefaultWorkspacePlaceholder(
+                    settings.defaultWorkspaceRoot,
+                  )}
                 />
                 <button
                   type="button"
                   className="settings-action-button"
                   onClick={() => updateSettings({ workspaceRoot: '' })}
                 >
-                  {COPY.clawDefaultWorkspaceReset}
+                  {CLAW_SETTINGS_DEFAULT_WORKSPACE_RESET_LABEL}
                 </button>
                 <button type="button" className="settings-action-button">
-                  {COPY.browse}
+                  {GENERAL_SETTINGS_BROWSE_LABEL}
                 </button>
               </div>
               {workspacePickerError ? (
@@ -270,9 +262,9 @@ export function ClawSettingsSection({
         />
       </SettingsCard>
 
-      <SettingsCard title={COPY.clawManageAgents} className="settings-card-spaced">
+      <SettingsCard title={CLAW_SETTINGS_MANAGE_AGENTS_TITLE} className="settings-card-spaced">
         {settings.channels.length === 0 ? (
-          <div className="claw-settings-agents-empty">{COPY.clawManageAgentsEmpty}</div>
+          <div className="claw-settings-agents-empty">{CLAW_SETTINGS_MANAGE_AGENTS_EMPTY}</div>
         ) : (
           settings.channels.map((channel) => {
             const name = channel.agentProfile.name.trim() || channel.label
@@ -283,12 +275,14 @@ export function ClawSettingsSection({
                   <div className="claw-settings-agent-header-copy">
                     <div className="claw-settings-agent-name">{name}</div>
                     <div className="claw-settings-agent-meta">
-                      {COPY.clawManageAgentMeta('Feishu / Lark', channel.model, workspace)}
+                      {formatClawSettingsManageAgentMeta('Feishu / Lark', channel.model, workspace)}
                     </div>
                   </div>
                   <div className="claw-settings-agent-toggle">
                     <span className="claw-settings-agent-toggle-label">
-                      {channel.enabled ? COPY.clawManageAgentEnabled : COPY.clawManageAgentDisabled}
+                      {channel.enabled
+                        ? CLAW_SETTINGS_MANAGE_AGENT_ENABLED_LABEL
+                        : CLAW_SETTINGS_MANAGE_AGENT_DISABLED_LABEL}
                     </span>
                     <Toggle
                       checked={channel.enabled}
@@ -299,14 +293,14 @@ export function ClawSettingsSection({
 
                 {channel.provider === 'feishu' ? (
                   <SettingRow
-                    title={COPY.clawFeishuStream}
-                    description={COPY.clawFeishuStreamDesc}
+                    title={CLAW_SETTINGS_FEISHU_STREAM_LABEL}
+                    description={CLAW_SETTINGS_FEISHU_STREAM_DESC}
                     control={
                       <div className="claw-settings-agent-toggle">
                         <span className="claw-settings-agent-toggle-label">
                           {channel.feishuStream
-                            ? COPY.clawManageAgentEnabled
-                            : COPY.clawManageAgentDisabled}
+                            ? CLAW_SETTINGS_MANAGE_AGENT_ENABLED_LABEL
+                            : CLAW_SETTINGS_MANAGE_AGENT_DISABLED_LABEL}
                         </span>
                         <Toggle
                           checked={channel.feishuStream === true}
@@ -319,16 +313,18 @@ export function ClawSettingsSection({
 
                 <div className="claw-settings-agent-grid">
                   <label className="claw-settings-field">
-                    <span className="claw-settings-field-label">{COPY.clawManageAgentName}</span>
+                    <span className="claw-settings-field-label">
+                      {CLAW_SETTINGS_MANAGE_AGENT_NAME_LABEL}
+                    </span>
                     <input
                       className="settings-text-input"
                       value={channel.agentProfile.name}
                       onChange={(e) => updateChannelProfile(channel, { name: e.target.value })}
-                      placeholder={COPY.clawManageAgentNamePlaceholder}
+                      placeholder={CLAW_SETTINGS_MANAGE_AGENT_NAME_PLACEHOLDER}
                     />
                   </label>
                   <label className="claw-settings-field">
-                    <span className="claw-settings-field-label">{COPY.clawModel}</span>
+                    <span className="claw-settings-field-label">{CLAW_SETTINGS_MODEL_LABEL}</span>
                     <select
                       className={SETTINGS_SELECT_CLASS}
                       value={channel.model}
@@ -342,12 +338,14 @@ export function ClawSettingsSection({
                     </select>
                   </label>
                   <label className="claw-settings-field is-wide">
-                    <span className="claw-settings-field-label">{COPY.clawWorkspaceOverride}</span>
+                    <span className="claw-settings-field-label">
+                      {CLAW_SETTINGS_WORKSPACE_OVERRIDE_LABEL}
+                    </span>
                     <input
                       className="settings-text-input"
                       value={channel.workspaceRoot}
                       onChange={(e) => updateChannel(channel.id, { workspaceRoot: e.target.value })}
-                      placeholder={COPY.clawWorkspaceInherit(
+                      placeholder={formatClawSettingsWorkspaceInherit(
                         settings.workspaceRoot.trim() || settings.defaultWorkspaceRoot,
                       )}
                     />
