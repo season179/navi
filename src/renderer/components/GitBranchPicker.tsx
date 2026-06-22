@@ -4,6 +4,17 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
 import { AlertCircle, Check, ChevronDown, GitBranch, Loader2, Plus, Search } from 'lucide-react'
+import {
+  formatGitCreateNamedBranchLabel,
+  formatGitDirtyFilesLabel,
+  GIT_BRANCH_LABEL,
+  GIT_BRANCH_LOADING_LABEL,
+  GIT_BRANCHES_SECTION_LABEL,
+  GIT_CREATE_BRANCH_LABEL,
+  GIT_NO_BRANCHES_LABEL,
+  GIT_SEARCH_BRANCHES_PLACEHOLDER,
+  resolveGitBranchTriggerLabel,
+} from '../lib/composerGitBranch'
 
 export type GitBranchEntry = {
   name: string
@@ -75,9 +86,10 @@ export function GitBranchPicker({
   const exactBranchExists = branches.some((branch) => branch.name === query.trim())
   const canCreate = query.trim().length > 0 && !exactBranchExists
   const currentBranch = snapshot?.ok ? snapshot.currentBranch : null
-  const label = loading
-    ? 'Loading…'
-    : currentBranch || (snapshot?.ok ? 'Detached HEAD' : 'Branch unavailable')
+  const label = resolveGitBranchTriggerLabel({
+    currentBranch,
+    snapshotOk: snapshot?.ok === true,
+  })
 
   useEffect(() => {
     if (!snapshot) return
@@ -129,7 +141,7 @@ export function GitBranchPicker({
         type="button"
         className="git-branch-picker-trigger"
         onClick={() => setOpen((value) => !value)}
-        title="Git branch"
+        title={GIT_BRANCH_LABEL}
         aria-expanded={open}
         aria-haspopup="listbox"
       >
@@ -160,18 +172,18 @@ export function GitBranchPicker({
                   createBranch()
                 }
               }}
-              placeholder="Search branches…"
-              aria-label="Search branches"
+              placeholder={GIT_SEARCH_BRANCHES_PLACEHOLDER}
+              aria-label={GIT_SEARCH_BRANCHES_PLACEHOLDER}
             />
           </div>
 
           <div className="git-branch-picker-list">
-            <div className="git-branch-picker-section-label">Branches</div>
+            <div className="git-branch-picker-section-label">{GIT_BRANCHES_SECTION_LABEL}</div>
 
             {loading && (!snapshot || !snapshot.ok) ? (
               <div className="git-branch-picker-loading">
                 <Loader2 strokeWidth={2} />
-                Loading branches…
+                {GIT_BRANCH_LOADING_LABEL}
               </div>
             ) : null}
 
@@ -197,8 +209,7 @@ export function GitBranchPicker({
                   <span className="git-branch-picker-row-name">{branch.name}</span>
                   {branch.current && snapshot?.ok && (snapshot.dirtyCount ?? 0) > 0 ? (
                     <span className="git-branch-picker-row-meta">
-                      {snapshot.dirtyCount} uncommitted change
-                      {(snapshot.dirtyCount ?? 0) === 1 ? '' : 's'}
+                      {formatGitDirtyFilesLabel(snapshot.dirtyCount ?? 0)}
                     </span>
                   ) : null}
                 </span>
@@ -211,7 +222,7 @@ export function GitBranchPicker({
             ))}
 
             {!loading && snapshot?.ok && filteredBranches.length === 0 ? (
-              <div className="git-branch-picker-empty">No branches found</div>
+              <div className="git-branch-picker-empty">{GIT_NO_BRANCHES_LABEL}</div>
             ) : null}
           </div>
 
@@ -228,7 +239,9 @@ export function GitBranchPicker({
                 <Plus strokeWidth={1.9} />
               )}
               <span>
-                {query.trim() ? `Create branch “${query.trim()}”` : 'Create branch'}
+                {query.trim()
+                  ? formatGitCreateNamedBranchLabel(query.trim())
+                  : GIT_CREATE_BRANCH_LABEL}
               </span>
             </button>
           </div>
