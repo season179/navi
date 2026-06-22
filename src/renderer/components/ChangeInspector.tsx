@@ -10,6 +10,16 @@ import {
   formatFilePathForDisplay,
 } from '../lib/diff-stats'
 import { DiffView } from './DiffView'
+import {
+  CHANGE_INSPECTOR_COLLAPSE_LABEL,
+  CHANGE_INSPECTOR_EMPTY_LABEL,
+  CHANGE_INSPECTOR_EMPTY_TITLE,
+  CHANGE_INSPECTOR_FILE_FALLBACK_LABEL,
+  CHANGE_INSPECTOR_SELECT_HINT,
+  CHANGE_INSPECTOR_STATUS_RUNNING_LABEL,
+  CHANGE_INSPECTOR_TITLE,
+  formatChangeInspectorSummaryFiles,
+} from '../lib/changeInspector'
 
 export type ChangeInspectorStatus = 'done' | 'running' | 'error'
 
@@ -27,18 +37,6 @@ type Props = {
   className?: string
   onCollapse?: () => void
   onSelect?: (id: string | null) => void
-}
-
-const COPY = {
-  rightPanelCollapse: 'Collapse panel',
-  inspectorTitle: 'Changes',
-  inspectorEmpty: 'No file changes in this thread yet.',
-  inspectorEmptyTitle: 'No changes yet',
-  inspectorSummaryFiles: (count: number) =>
-    count === 1 ? '1 file change' : `${count} file changes`,
-  inspectorSelectHint: 'Select a changed file to view its diff.',
-  inspectorStatusRunning: 'running',
-  toolActionFile: 'Edited file',
 }
 
 const PREVIEW_PATCH_AUTH = `--- a/src/auth/middleware.ts
@@ -138,17 +136,17 @@ export function ChangeInspector({
           type="button"
           onClick={onCollapse}
           className="ds-sidebar-toggle-button change-inspector-collapse-btn"
-          aria-label={COPY.rightPanelCollapse}
-          title={COPY.rightPanelCollapse}
+          aria-label={CHANGE_INSPECTOR_COLLAPSE_LABEL}
+          title={CHANGE_INSPECTOR_COLLAPSE_LABEL}
         >
           <PanelRightClose className="change-inspector-collapse-icon" strokeWidth={1.85} />
         </button>
         <div className="change-inspector-heading">
-          <div className="change-inspector-title">{COPY.inspectorTitle}</div>
+          <div className="change-inspector-title">{CHANGE_INSPECTOR_TITLE}</div>
           <div className="change-inspector-summary">
             {fileChanges.length > 0
-              ? COPY.inspectorSummaryFiles(fileChanges.length)
-              : COPY.inspectorEmpty}
+              ? formatChangeInspectorSummaryFiles(fileChanges.length)
+              : CHANGE_INSPECTOR_EMPTY_LABEL}
           </div>
         </div>
       </div>
@@ -157,8 +155,8 @@ export function ChangeInspector({
         {fileChanges.length === 0 ? (
           <div className="change-inspector-empty">
             <FileEdit className="change-inspector-empty-icon" strokeWidth={1.25} />
-            <div className="change-inspector-empty-title">{COPY.inspectorEmptyTitle}</div>
-            <div className="change-inspector-empty-copy">{COPY.inspectorEmpty}</div>
+            <div className="change-inspector-empty-title">{CHANGE_INSPECTOR_EMPTY_TITLE}</div>
+            <div className="change-inspector-empty-copy">{CHANGE_INSPECTOR_EMPTY_LABEL}</div>
           </div>
         ) : (
           <>
@@ -189,7 +187,7 @@ export function ChangeInspector({
                         />
                         <div className="change-inspector-row-content">
                           <div className="change-inspector-row-path">
-                            {displayPath ?? COPY.toolActionFile}
+                            {displayPath ?? CHANGE_INSPECTOR_FILE_FALLBACK_LABEL}
                           </div>
                           {stats ? (
                             <div className="change-inspector-row-stats">
@@ -200,7 +198,7 @@ export function ChangeInspector({
                         </div>
                         {item.status === 'running' ? (
                           <span className="change-inspector-running-badge">
-                            {COPY.inspectorStatusRunning}
+                            {CHANGE_INSPECTOR_STATUS_RUNNING_LABEL}
                           </span>
                         ) : null}
                       </button>
@@ -219,7 +217,7 @@ export function ChangeInspector({
                 />
               ) : (
                 <div className="change-inspector-diff-placeholder ds-surface-soft">
-                  {COPY.inspectorSelectHint}
+                  {CHANGE_INSPECTOR_SELECT_HINT}
                 </div>
               )}
             </div>
