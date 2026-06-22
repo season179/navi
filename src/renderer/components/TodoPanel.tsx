@@ -12,6 +12,19 @@ import {
   PlayCircle,
   Trash2,
 } from 'lucide-react'
+import {
+  TODO_MARK_COMPLETED_LABEL,
+  TODO_MARK_PENDING_LABEL,
+  TODO_PANEL_CLEAR_LABEL,
+  TODO_PANEL_COLLAPSE_LABEL,
+  TODO_PANEL_EMPTY_DESCRIPTION,
+  TODO_PANEL_EMPTY_TITLE,
+  TODO_PANEL_TITLE,
+  TODO_STATUS_COMPLETED_LABEL,
+  TODO_STATUS_IN_PROGRESS_LABEL,
+  TODO_STATUS_PENDING_LABEL,
+  resolveTodoRowStatusLabel,
+} from '../lib/todoPanel'
 
 export type ThreadTodoStatus = 'pending' | 'in_progress' | 'completed'
 
@@ -42,25 +55,6 @@ type Props = {
 }
 
 const STATUS_ORDER: ThreadTodoStatus[] = ['pending', 'in_progress', 'completed']
-
-const COPY = {
-  rightPanelCollapse: 'Collapse panel',
-  todoPanelTitle: 'Thread Todo',
-  todoClear: 'Clear todos',
-  todoStatusPending: 'Pending',
-  todoStatusInProgress: 'Active',
-  todoStatusCompleted: 'Done',
-  todoEmptyTitle: 'No todos yet',
-  todoEmptyDescription:
-    'Plan checklists and model-written todos for this thread will appear here.',
-  todoMarkPending: 'Mark pending',
-  todoMarkCompleted: 'Mark complete',
-  todoStatus: {
-    pending: 'Pending',
-    in_progress: 'Active',
-    completed: 'Done',
-  },
-}
 
 const NOW = new Date().toISOString()
 
@@ -132,31 +126,31 @@ export function TodoPanel({
             type="button"
             onClick={onCollapse}
             className="ds-sidebar-toggle-button todo-panel-collapse-btn"
-            aria-label={COPY.rightPanelCollapse}
-            title={COPY.rightPanelCollapse}
+            aria-label={TODO_PANEL_COLLAPSE_LABEL}
+            title={TODO_PANEL_COLLAPSE_LABEL}
           >
             <PanelRightClose className="todo-panel-collapse-icon" strokeWidth={1.85} />
           </button>
           <div className="todo-panel-title-wrap">
             <ListTodo className="todo-panel-title-icon" strokeWidth={1.85} />
-            <span className="todo-panel-title">{COPY.todoPanelTitle}</span>
+            <span className="todo-panel-title">{TODO_PANEL_TITLE}</span>
           </div>
           {items.length > 0 ? (
             <button
               type="button"
               onClick={onClear}
               className="todo-panel-clear-btn"
-              aria-label={COPY.todoClear}
-              title={COPY.todoClear}
+              aria-label={TODO_PANEL_CLEAR_LABEL}
+              title={TODO_PANEL_CLEAR_LABEL}
             >
               <Trash2 className="todo-panel-clear-icon" strokeWidth={1.75} />
             </button>
           ) : null}
         </div>
         <div className="todo-panel-stats">
-          <TodoStat label={COPY.todoStatusPending} value={pending} />
-          <TodoStat label={COPY.todoStatusInProgress} value={inProgress} />
-          <TodoStat label={COPY.todoStatusCompleted} value={completed} />
+          <TodoStat label={TODO_STATUS_PENDING_LABEL} value={pending} />
+          <TodoStat label={TODO_STATUS_IN_PROGRESS_LABEL} value={inProgress} />
+          <TodoStat label={TODO_STATUS_COMPLETED_LABEL} value={completed} />
         </div>
       </div>
 
@@ -167,8 +161,8 @@ export function TodoPanel({
               <ListTodo className="todo-panel-empty-icon" strokeWidth={1.65} />
             </div>
             <div>
-              <div className="todo-panel-empty-title">{COPY.todoEmptyTitle}</div>
-              <div className="todo-panel-empty-description">{COPY.todoEmptyDescription}</div>
+              <div className="todo-panel-empty-title">{TODO_PANEL_EMPTY_TITLE}</div>
+              <div className="todo-panel-empty-description">{TODO_PANEL_EMPTY_DESCRIPTION}</div>
             </div>
           </div>
         ) : (
@@ -214,10 +208,10 @@ function TodoRow({
           onClick={() => onStatus(item.status === 'completed' ? 'pending' : 'completed')}
           className="todo-panel-row-toggle"
           aria-label={
-            item.status === 'completed' ? COPY.todoMarkPending : COPY.todoMarkCompleted
+            item.status === 'completed' ? TODO_MARK_PENDING_LABEL : TODO_MARK_COMPLETED_LABEL
           }
           title={
-            item.status === 'completed' ? COPY.todoMarkPending : COPY.todoMarkCompleted
+            item.status === 'completed' ? TODO_MARK_PENDING_LABEL : TODO_MARK_COMPLETED_LABEL
           }
         >
           {item.status === 'completed' ? (
@@ -264,7 +258,7 @@ function TodoRow({
             }
             aria-current={item.status === status ? 'true' : undefined}
           >
-            {COPY.todoStatus[status]}
+            {resolveTodoRowStatusLabel(status)}
           </button>
         ))}
       </div>
