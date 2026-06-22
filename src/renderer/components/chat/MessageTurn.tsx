@@ -102,11 +102,11 @@ function MessageTurnImpl({
   const showLiveProgress = resolved.showLiveProgress === true
 
   return (
-    <div className="message-timeline-turn">
+    <div className="message-timeline-turn flex min-w-0 flex-col gap-4">
       {resolved.user ? <MessageBubble block={resolved.user} /> : null}
 
       {hasProcess && workMeta ? (
-        <div className="message-timeline-turn-process">
+        <div className="message-timeline-turn-process flex flex-col gap-1 pb-2">
           <WorkMetaRow
             processing={workMeta.processing}
             stepCount={workMeta.stepCount}
@@ -117,7 +117,7 @@ function MessageTurnImpl({
             onToggle={() => setWorkExpandedOverride((value) => !(value ?? processing))}
           />
           {workExpanded && processSections.length > 0 ? (
-            <div className="message-timeline-turn-process-sections">
+            <div className="message-timeline-turn-process-sections flex flex-col gap-1">
               {processSections.map((section, index) => (
                 <ProcessSectionRow
                   key={

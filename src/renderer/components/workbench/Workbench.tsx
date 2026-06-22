@@ -435,13 +435,13 @@ export function Workbench({
         </>
       ) : null}
 
-      <main className="ds-stage-surface workbench-main">
+      <main className="ds-stage-surface workbench-main relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         {snapshot.runtimeError ? (
           <RuntimeBanner snapshot={RUNTIME_BANNER_PREVIEW.default} />
         ) : null}
 
-        <div className="workbench-main-row">
-          <div className="workbench-chat-column">
+        <div className="workbench-main-row flex min-h-0 flex-1">
+          <div className="workbench-chat-column flex min-h-0 min-w-0 flex-1">
             {isSddDraftStage ? (
               <SddDraftEditorView
                 draft={sddDraft}
@@ -468,8 +468,8 @@ export function Workbench({
               />
             ) : (
               <>
-            <section className="ds-chat-stage workbench-chat-stage">
-              <div className="ds-stage-inset workbench-chat-stage-inset">
+            <section className="ds-chat-stage ds-drag workbench-chat-stage flex min-h-0 min-w-0 flex-1 flex-col">
+              <div className="ds-stage-inset workbench-chat-stage-inset flex min-h-0 min-w-0 flex-1 flex-col">
                 <header className="chat-topbar ds-topbar-surface workbench-chat-topbar relative z-10 mt-3 flex min-h-[46px] w-full shrink-0 items-stretch overflow-visible rounded-[24px]">
                   <div className="chat-topbar-grid grid w-full min-w-0 items-start gap-2.5 px-3 py-2 sm:px-4 md:pl-5 md:pr-2">
                     <div
@@ -485,12 +485,14 @@ export function Workbench({
                         snapshot={snapshot.sessionHeader}
                         compact
                         busy={snapshot.busy}
-                        className="workbench-session-header"
+                        className="workbench-session-header min-w-0 flex-1"
                       />
                     </div>
                     <div className="chat-topbar-actions flex min-w-0 flex-wrap items-center justify-end gap-2 self-start">
                       {snapshot.busy ? (
-                        <span className="workbench-running-pill">{SESSION_HEADER_RUNNING_LABEL}</span>
+                        <span className="workbench-running-pill inline-flex shrink-0 rounded-full bg-amber-500/16 px-2.5 py-1 text-[11.5px] font-semibold text-amber-950 dark:text-amber-100">
+                          {SESSION_HEADER_RUNNING_LABEL}
+                        </span>
                       ) : null}
                       <WorkbenchTopBar
                         rightPanelMode={rightPanelMode}
@@ -511,7 +513,7 @@ export function Workbench({
                   </div>
                 </header>
 
-                <div className="workbench-timeline-wrap">
+                <div className="workbench-timeline-wrap relative flex min-h-0 min-w-0 flex-1 flex-col">
                   <MessageTimeline {...timelineSnapshot} busy={snapshot.busy} />
                   {!focusModeEnabled ? (
                     <>
@@ -521,7 +523,7 @@ export function Workbench({
                   ) : null}
                 </div>
 
-                <div className="workbench-composer-wrap">
+                <div className="workbench-composer-wrap ds-no-drag flex shrink-0 justify-center px-2 pb-3 pt-0 sm:px-4 md:px-6 lg:px-8">
                   <WorkbenchComposer busy={snapshot.busy} rightPanelMode={rightPanelMode} />
                 </div>
               </div>

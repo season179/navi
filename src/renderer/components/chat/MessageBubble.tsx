@@ -199,7 +199,7 @@ function UserMessageBubble({
     return (
       <div className="ds-user-message">
         <UserAttachmentPreviews attachments={block.attachments} />
-        <div className="ds-user-message-bubble message-bubble-user-editing">
+        <div className="ds-user-message-bubble message-bubble-user-editing min-w-0 border border-accent/35 ring-1 ring-accent/15">
           <textarea
             ref={textareaRef}
             value={draft}
@@ -237,7 +237,7 @@ function UserMessageBubble({
             </div>
           </div>
         </div>
-        <div className="message-bubble-user-model-row is-right-only">
+        <div className="message-bubble-user-model-row is-right-only mt-2 flex min-w-0 items-center justify-end">
           <ModelMetaTag label={block.modelLabel} />
         </div>
       </div>
@@ -245,7 +245,7 @@ function UserMessageBubble({
   }
 
   return (
-    <div className="ds-user-message message-bubble-user group">
+    <div className="ds-user-message message-bubble-user group relative">
       <UserAttachmentPreviews attachments={block.attachments} />
       {showClawInboundCard && block.clawInbound ? (
         <ClawInboundMessageCard
@@ -253,8 +253,10 @@ function UserMessageBubble({
           text={block.clawInbound.text}
         />
       ) : (
-        <div className="ds-user-message-bubble">
-          <div className="message-bubble-user-text">{displayText}</div>
+        <div className="ds-user-message-bubble min-w-0">
+          <div className="message-bubble-user-text whitespace-pre-wrap break-words text-left [overflow-wrap:anywhere]">
+            {displayText}
+          </div>
           {block.writePrompt ? (
             <WritePromptMetaDisclosure
               display={block.writePrompt}
@@ -270,9 +272,9 @@ function UserMessageBubble({
           ) : null}
         </div>
       )}
-      <div className="message-bubble-user-footer">
-        <ModelMetaTag label={block.modelLabel} align="left" />
-        <div className="message-bubble-user-actions">
+      <div className="message-bubble-user-footer mt-2 flex min-w-0 items-center justify-between gap-3 text-ds-faint opacity-90 transition group-hover:opacity-100">
+        <ModelMetaTag label={block.modelLabel} align="left" className="flex-1 justify-start text-left" />
+        <div className="message-bubble-user-actions flex items-center justify-end gap-3">
           <CopyFeedbackButton text={displayText} iconOnly />
           {canEdit ? (
             <button
@@ -280,9 +282,9 @@ function UserMessageBubble({
               onClick={startEdit}
               title={MESSAGE_BUBBLE_REWIND_EDIT_MESSAGE}
               aria-label={MESSAGE_BUBBLE_REWIND_EDIT_MESSAGE}
-              className="message-bubble-user-edit-button"
+              className="message-bubble-user-edit-button rounded-md p-1 transition hover:bg-ds-hover hover:text-ds-muted disabled:cursor-not-allowed disabled:hover:text-ds-faint"
             >
-              <PencilLine className="message-bubble-user-edit-icon" strokeWidth={1.8} />
+              <PencilLine className="message-bubble-user-edit-icon h-4 w-4" strokeWidth={1.8} />
             </button>
           ) : null}
         </div>
@@ -311,13 +313,13 @@ function MessageBubbleImpl({
     const createdAtLabel = block.createdAt ? formatMessageDateTime(block.createdAt) : null
 
     return (
-      <div className="message-bubble-assistant group/message">
-        <div className="ds-markdown ds-chat-answer message-bubble-assistant-body">
+      <div className="message-bubble-assistant group/message flex min-w-0 max-w-full flex-col">
+        <div className="ds-markdown ds-chat-answer message-bubble-assistant-body min-w-0 max-w-full text-ds-ink">
           <Markdown text={block.text} streaming={streaming} />
         </div>
         {!streaming ? (
-          <div className="message-bubble-assistant-footer">
-            <span className="message-bubble-assistant-timestamp">{createdAtLabel ?? ''}</span>
+          <div className="message-bubble-assistant-footer mt-1 flex min-h-5 min-w-0 items-center justify-between gap-3 text-[11.5px] text-ds-faint opacity-0 transition duration-150 group-hover/message:opacity-100">
+            <span className="message-bubble-assistant-timestamp min-w-0 truncate">{createdAtLabel ?? ''}</span>
             <CopyFeedbackButton text={block.text} />
           </div>
         ) : null}
