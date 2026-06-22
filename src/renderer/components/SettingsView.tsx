@@ -13,8 +13,19 @@ import {
   WriteDebugLogModal,
   type WriteInlineCompletionDebugEntry,
 } from './WriteDebugLogModal'
+import {
+  SETTINGS_VIEW_API_KEY_REQUIRED_BODY,
+  SETTINGS_VIEW_API_KEY_REQUIRED_TITLE,
+  SETTINGS_VIEW_APPLY_FAILED_LABEL,
+  SETTINGS_VIEW_PREVIEW_APPLY_ERROR_MESSAGE,
+  SETTINGS_VIEW_RETRY_SAVE_LABEL,
+  SETTINGS_VIEW_SUBTITLE,
+  SETTINGS_VIEW_TITLE,
+  resolveSettingsViewSaveStatusLabel,
+  type SettingsViewSaveStatus,
+} from '../lib/settingsView'
 
-export type SettingsViewSaveStatus = 'idle' | 'saving' | 'saved' | 'error'
+export type { SettingsViewSaveStatus }
 
 export type SettingsViewPreviewMode =
   | SettingsCategory
@@ -25,21 +36,6 @@ export type SettingsViewPreviewMode =
   | 'error'
   | 'portError'
   | 'writeDebugModal'
-
-const COPY = {
-  title: 'Settings',
-  subtitle: 'Manage API access, interface preferences, default folders, and assistant behavior.',
-  autoApplyHint: 'Changes apply automatically',
-  applying: 'Applying…',
-  applied: 'Applied',
-  applyFailed: 'Could not apply',
-  autoApplyBlocked: 'Fix the port to apply changes',
-  retrySave: 'Retry',
-  apiKeyRequiredTitle: 'API key required',
-  apiKeyRequiredBody:
-    'Add an API key in Providers first. Once entered, the app can start the local AI assistant service for you.',
-  applyErrorMessage: 'Could not write settings to disk. Check permissions and try again.',
-}
 
 const WRITE_DEBUG_ENTRIES: WriteInlineCompletionDebugEntry[] = [
   {
@@ -116,15 +112,7 @@ export function SettingsView({
   onCloseWriteDebugModal,
   onGoBack,
 }: SettingsViewProps): ReactElement {
-  const statusLabel = portError
-    ? COPY.autoApplyBlocked
-    : saveStatus === 'saving'
-      ? COPY.applying
-      : saveStatus === 'saved'
-        ? COPY.applied
-        : saveStatus === 'error'
-          ? COPY.applyFailed
-          : COPY.autoApplyHint
+  const statusLabel = resolveSettingsViewSaveStatusLabel(saveStatus, portError)
 
   const statusClass =
     portError || saveStatus === 'error'
@@ -143,15 +131,19 @@ export function SettingsView({
         <div className="settings-view-inner">
           {!hasApiKey ? (
             <div className="settings-view-api-key-banner" role="status">
-              <div className="settings-view-api-key-banner-title">{COPY.apiKeyRequiredTitle}</div>
-              <p className="settings-view-api-key-banner-body">{COPY.apiKeyRequiredBody}</p>
+              <div className="settings-view-api-key-banner-title">
+                {SETTINGS_VIEW_API_KEY_REQUIRED_TITLE}
+              </div>
+              <p className="settings-view-api-key-banner-body">
+                {SETTINGS_VIEW_API_KEY_REQUIRED_BODY}
+              </p>
             </div>
           ) : null}
 
           <div className="settings-view-header">
             <div>
-              <h1 className="settings-view-title">{COPY.title}</h1>
-              <p className="settings-view-subtitle">{COPY.subtitle}</p>
+              <h1 className="settings-view-title">{SETTINGS_VIEW_TITLE}</h1>
+              <p className="settings-view-subtitle">{SETTINGS_VIEW_SUBTITLE}</p>
             </div>
             <span
               className={`settings-view-save-status ${statusClass}`}
@@ -174,7 +166,7 @@ export function SettingsView({
       {saveStatus === 'error' && saveError ? (
         <div className="settings-view-error-toast ds-no-drag" role="alert">
           <div className="settings-view-error-toast-copy">
-            <div className="settings-view-error-toast-title">{COPY.applyFailed}</div>
+            <div className="settings-view-error-toast-title">{SETTINGS_VIEW_APPLY_FAILED_LABEL}</div>
             <div className="settings-view-error-toast-message">{saveError}</div>
           </div>
           <button
@@ -182,7 +174,7 @@ export function SettingsView({
             className="settings-view-error-toast-retry"
             disabled={portError}
           >
-            {COPY.retrySave}
+            {SETTINGS_VIEW_RETRY_SAVE_LABEL}
           </button>
         </div>
       ) : null}
@@ -215,7 +207,7 @@ export function SettingsViewPreview({
   const saveStatus = useMemo(() => resolvePreviewSaveStatus(mode), [mode])
   const hasApiKey = useMemo(() => resolvePreviewHasApiKey(mode), [mode])
   const portError = useMemo(() => resolvePreviewPortError(mode), [mode])
-  const saveError = saveStatus === 'error' ? COPY.applyErrorMessage : null
+  const saveError = saveStatus === 'error' ? SETTINGS_VIEW_PREVIEW_APPLY_ERROR_MESSAGE : null
 
   return (
     <SettingsView
