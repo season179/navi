@@ -15,6 +15,212 @@ import {
   SettingsSecretInput,
   Toggle,
 } from './SettingsControls'
+import {
+  AGENTS_SETTINGS_AGENTS_QUICK_BASE,
+  AGENTS_SETTINGS_AGENTS_QUICK_SKILL,
+  AGENTS_SETTINGS_AGENTS_QUICK_MCP,
+  AGENTS_SETTINGS_AGENTS_QUICK_PERMISSIONS,
+  AGENTS_SETTINGS_AGENTS,
+  AGENTS_SETTINGS_AUTO_START,
+  AGENTS_SETTINGS_AUTO_START_DESC,
+  AGENTS_SETTINGS_KUN_PROVIDER,
+  AGENTS_SETTINGS_KUN_PROVIDER_SELECT_DESC,
+  AGENTS_SETTINGS_KUN_MODEL,
+  AGENTS_SETTINGS_KUN_MODEL_DESC,
+  AGENTS_SETTINGS_MODEL_SELECT_CUSTOM_OPTION,
+  AGENTS_SETTINGS_MODEL_SELECT_CUSTOM_PLACEHOLDER,
+  AGENTS_SETTINGS_CODE_PROMPT_PREFIX,
+  AGENTS_SETTINGS_CODE_PROMPT_PREFIX_DESC,
+  AGENTS_SETTINGS_CODE_PROMPT_PREFIX_PLACEHOLDER,
+  AGENTS_SETTINGS_KUN_ASSISTANT_ADVANCED,
+  AGENTS_SETTINGS_KUN_ASSISTANT_ADVANCED_DESC,
+  AGENTS_SETTINGS_PORT,
+  AGENTS_SETTINGS_PORT_DESC,
+  AGENTS_SETTINGS_KUN_BINARY,
+  AGENTS_SETTINGS_KUN_BINARY_DESC,
+  AGENTS_SETTINGS_KUN_BINARY_PLACEHOLDER,
+  AGENTS_SETTINGS_KUN_DATA_DIR,
+  AGENTS_SETTINGS_KUN_DATA_DIR_DESC,
+  AGENTS_SETTINGS_RUNTIME_TOKEN,
+  AGENTS_SETTINGS_RUNTIME_TOKEN_DESC,
+  AGENTS_SETTINGS_SHOW_SECRET,
+  AGENTS_SETTINGS_HIDE_SECRET,
+  AGENTS_SETTINGS_KUN_INSECURE,
+  AGENTS_SETTINGS_KUN_INSECURE_DESC,
+  AGENTS_SETTINGS_KUN_INSECURE_FORCED_DESC,
+  AGENTS_SETTINGS_KUN_TOKEN_ECONOMY,
+  AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_DESC,
+  AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_SAVINGS_LOADING,
+  AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_SAVINGS_EMPTY,
+  AGENTS_SETTINGS_PERMISSIONS,
+  AGENTS_SETTINGS_PERMISSIONS_BEHAVIOR_HINT,
+  AGENTS_SETTINGS_APPROVAL_POLICY,
+  AGENTS_SETTINGS_APPROVAL_POLICY_DESC,
+  AGENTS_SETTINGS_APPROVAL_AUTO,
+  AGENTS_SETTINGS_APPROVAL_ON_REQUEST,
+  AGENTS_SETTINGS_APPROVAL_UNTRUSTED,
+  AGENTS_SETTINGS_APPROVAL_SUGGEST,
+  AGENTS_SETTINGS_APPROVAL_NEVER,
+  AGENTS_SETTINGS_SANDBOX_MODE,
+  AGENTS_SETTINGS_SANDBOX_MODE_DESC,
+  AGENTS_SETTINGS_SANDBOX_WORKSPACE_WRITE,
+  AGENTS_SETTINGS_SANDBOX_READ_ONLY,
+  AGENTS_SETTINGS_SANDBOX_FULL_ACCESS,
+  AGENTS_SETTINGS_SANDBOX_EXTERNAL,
+  AGENTS_SETTINGS_COMPUTER_USE_TITLE,
+  AGENTS_SETTINGS_COMPUTER_USE_HINT,
+  AGENTS_SETTINGS_COMPUTER_USE_MODEL_QUALITY_TITLE,
+  AGENTS_SETTINGS_COMPUTER_USE_MODEL_QUALITY_BODY,
+  AGENTS_SETTINGS_COMPUTER_USE_ENABLE,
+  AGENTS_SETTINGS_COMPUTER_USE_ENABLE_DESC,
+  AGENTS_SETTINGS_COMPUTER_USE_MODE,
+  AGENTS_SETTINGS_COMPUTER_USE_MODE_DESC,
+  AGENTS_SETTINGS_COMPUTER_USE_MODE_AUTO,
+  AGENTS_SETTINGS_COMPUTER_USE_MODE_ALWAYS,
+  AGENTS_SETTINGS_COMPUTER_USE_MODE_OFF,
+  AGENTS_SETTINGS_COMPUTER_USE_PERMISSIONS,
+  AGENTS_SETTINGS_COMPUTER_USE_PERMISSIONS_DESC,
+  AGENTS_SETTINGS_COMPUTER_USE_ACCESSIBILITY,
+  AGENTS_SETTINGS_COMPUTER_USE_SCREEN_RECORDING,
+  AGENTS_SETTINGS_COMPUTER_USE_GRANT_ACCESSIBILITY,
+  AGENTS_SETTINGS_COMPUTER_USE_GRANT_SCREEN_RECORDING,
+  AGENTS_SETTINGS_COMPUTER_USE_RECHECK,
+  AGENTS_SETTINGS_COMPUTER_USE_PERMISSION_GRANTED,
+  AGENTS_SETTINGS_COMPUTER_USE_PERMISSION_DENIED,
+  AGENTS_SETTINGS_DESIGN_QUALITY_TITLE,
+  AGENTS_SETTINGS_DESIGN_QUALITY_HINT,
+  AGENTS_SETTINGS_DESIGN_QUALITY_ENABLE,
+  AGENTS_SETTINGS_DESIGN_QUALITY_ENABLE_DESC,
+  AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS,
+  AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS_DESC,
+  AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS_RELAXED,
+  AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS_STANDARD,
+  AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS_STRICT,
+  AGENTS_SETTINGS_SKILL,
+  AGENTS_SETTINGS_SKILLS_DETECTED_DIRS,
+  AGENTS_SETTINGS_SKILLS_DETECTED_DIRS_DESC,
+  AGENTS_SETTINGS_SKILLS_DETECTED_DIRS_EMPTY,
+  AGENTS_SETTINGS_LOADING,
+  AGENTS_SETTINGS_SKILLS_SCOPE_PROJECT,
+  AGENTS_SETTINGS_SKILLS_SCOPE_GLOBAL,
+  AGENTS_SETTINGS_SKILLS_DIR_NOT_FOUND,
+  AGENTS_SETTINGS_SKILLS_OPEN_ROOT,
+  AGENTS_SETTINGS_SKILLS_SCAN_DIRS,
+  AGENTS_SETTINGS_SKILLS_SCAN_DIRS_DESC,
+  AGENTS_SETTINGS_SKILLS_ACTIONS,
+  AGENTS_SETTINGS_SKILLS_ACTIONS_DESC,
+  AGENTS_SETTINGS_SKILLS_OPEN_PLUGINS,
+  AGENTS_SETTINGS_MCP,
+  AGENTS_SETTINGS_MCP_SEARCH_ENABLED,
+  AGENTS_SETTINGS_MCP_SEARCH_ENABLED_DESC,
+  AGENTS_SETTINGS_MCP_ADVANCED,
+  AGENTS_SETTINGS_MCP_ADVANCED_DESC,
+  AGENTS_SETTINGS_MCP_SEARCH_MODE,
+  AGENTS_SETTINGS_MCP_SEARCH_MODE_DESC,
+  AGENTS_SETTINGS_MCP_SEARCH_MODE_AUTO,
+  AGENTS_SETTINGS_MCP_SEARCH_MODE_SEARCH,
+  AGENTS_SETTINGS_MCP_SEARCH_MODE_DIRECT,
+  AGENTS_SETTINGS_MCP_SEARCH_LIMITS,
+  AGENTS_SETTINGS_MCP_SEARCH_LIMITS_DESC,
+  AGENTS_SETTINGS_MCP_SEARCH_AUTO_THRESHOLD,
+  AGENTS_SETTINGS_MCP_SEARCH_TOP_K_DEFAULT,
+  AGENTS_SETTINGS_MCP_SEARCH_TOP_K_MAX,
+  AGENTS_SETTINGS_MCP_SEARCH_MIN_SCORE,
+  AGENTS_SETTINGS_MCP_SEARCH_DIAGNOSTICS,
+  AGENTS_SETTINGS_MCP_SEARCH_DIAGNOSTICS_DESC,
+  AGENTS_SETTINGS_MCP_SEARCH_STATUS,
+  AGENTS_SETTINGS_MCP_SEARCH_ACTIVE,
+  AGENTS_SETTINGS_MCP_SEARCH_INACTIVE,
+  AGENTS_SETTINGS_MCP_SEARCH_INDEXED,
+  AGENTS_SETTINGS_MCP_SEARCH_ADVERTISED,
+  AGENTS_SETTINGS_CONFIG_FILE_PATH,
+  AGENTS_SETTINGS_MCP_PATH_DESC,
+  AGENTS_SETTINGS_MCP_EDITOR,
+  AGENTS_SETTINGS_MCP_EDITOR_DESC,
+  AGENTS_SETTINGS_MCP_FILE_STATUS_READY,
+  AGENTS_SETTINGS_MCP_FILE_STATUS_MISSING,
+  AGENTS_SETTINGS_MCP_ACTIONS,
+  AGENTS_SETTINGS_MCP_RUNTIME_HINT,
+  AGENTS_SETTINGS_MCP_SAVE,
+  AGENTS_SETTINGS_MCP_RELOAD,
+  AGENTS_SETTINGS_MCP_OPEN_DIR,
+  AGENTS_SETTINGS_KUN_ADVANCED,
+  AGENTS_SETTINGS_KUN_ADVANCED_DETAILS,
+  AGENTS_SETTINGS_KUN_ADVANCED_DETAILS_DESC,
+  AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_OPTIONS,
+  AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_OPTIONS_DESC,
+  AGENTS_SETTINGS_KUN_COMPRESS_TOOL_DESCRIPTIONS,
+  AGENTS_SETTINGS_KUN_COMPRESS_TOOL_RESULTS,
+  AGENTS_SETTINGS_KUN_CONCISE_RESPONSES,
+  AGENTS_SETTINGS_KUN_HISTORY_HYGIENE,
+  AGENTS_SETTINGS_KUN_HISTORY_HYGIENE_DESC,
+  AGENTS_SETTINGS_KUN_HISTORY_MAX_RESULT_LINES,
+  AGENTS_SETTINGS_KUN_HISTORY_MAX_RESULT_BYTES,
+  AGENTS_SETTINGS_KUN_HISTORY_MAX_RESULT_TOKENS,
+  AGENTS_SETTINGS_KUN_HISTORY_MAX_ARGUMENT_BYTES,
+  AGENTS_SETTINGS_KUN_HISTORY_MAX_ARGUMENT_TOKENS,
+  AGENTS_SETTINGS_KUN_HISTORY_MAX_ARRAY_ITEMS,
+  AGENTS_SETTINGS_KUN_MODEL_CONTEXT_PROFILE,
+  AGENTS_SETTINGS_KUN_MODEL_CONTEXT_PROFILE_DESC,
+  AGENTS_SETTINGS_KUN_MODEL_CONTEXT_MODEL,
+  AGENTS_SETTINGS_KUN_MODEL_CONTEXT_WINDOW,
+  AGENTS_SETTINGS_KUN_MODEL_CONTEXT_SOFT,
+  AGENTS_SETTINGS_KUN_MODEL_CONTEXT_HARD,
+  AGENTS_SETTINGS_KUN_MODEL_CONTEXT_SOURCE_BUILT_IN,
+  AGENTS_SETTINGS_KUN_STORAGE_BACKEND,
+  AGENTS_SETTINGS_KUN_STORAGE_BACKEND_DESC,
+  AGENTS_SETTINGS_KUN_STORAGE_HYBRID,
+  AGENTS_SETTINGS_KUN_STORAGE_FILE,
+  AGENTS_SETTINGS_KUN_STORAGE_SQLITE_PATH,
+  AGENTS_SETTINGS_KUN_STORAGE_SQLITE_PATH_DESC,
+  AGENTS_SETTINGS_KUN_STORAGE_SQLITE_PATH_PLACEHOLDER,
+  AGENTS_SETTINGS_KUN_COMPACTION_THRESHOLDS,
+  AGENTS_SETTINGS_KUN_COMPACTION_THRESHOLDS_DESC,
+  AGENTS_SETTINGS_KUN_COMPACTION_SOFT_THRESHOLD,
+  AGENTS_SETTINGS_KUN_COMPACTION_HARD_THRESHOLD,
+  AGENTS_SETTINGS_KUN_COMPACTION_SUMMARY,
+  AGENTS_SETTINGS_KUN_COMPACTION_SUMMARY_DESC,
+  AGENTS_SETTINGS_KUN_COMPACTION_SUMMARY_MODE,
+  AGENTS_SETTINGS_KUN_COMPACTION_SUMMARY_HEURISTIC,
+  AGENTS_SETTINGS_KUN_COMPACTION_SUMMARY_MODEL,
+  AGENTS_SETTINGS_KUN_COMPACTION_SUMMARY_TIMEOUT,
+  AGENTS_SETTINGS_KUN_COMPACTION_SUMMARY_MAX_TOKENS,
+  AGENTS_SETTINGS_KUN_COMPACTION_SUMMARY_INPUT_BYTES,
+  AGENTS_SETTINGS_KUN_STREAM_IDLE_TIMEOUT,
+  AGENTS_SETTINGS_KUN_STREAM_IDLE_TIMEOUT_DESC,
+  AGENTS_SETTINGS_KUN_TOOL_STORM,
+  AGENTS_SETTINGS_KUN_TOOL_STORM_DESC,
+  AGENTS_SETTINGS_KUN_TOOL_STORM_LIMITS,
+  AGENTS_SETTINGS_KUN_TOOL_STORM_LIMITS_DESC,
+  AGENTS_SETTINGS_KUN_TOOL_STORM_WINDOW_SIZE,
+  AGENTS_SETTINGS_KUN_TOOL_STORM_THRESHOLD,
+  AGENTS_SETTINGS_KUN_TOOL_ARGUMENT_REPAIR,
+  AGENTS_SETTINGS_KUN_TOOL_ARGUMENT_REPAIR_DESC,
+  AGENTS_SETTINGS_KUN_DIAGNOSTICS,
+  AGENTS_SETTINGS_KUN_DIAGNOSTICS_ADVANCED,
+  AGENTS_SETTINGS_KUN_DIAGNOSTICS_ADVANCED_DESC,
+  AGENTS_SETTINGS_KUN_RUNTIME_CAPABILITIES,
+  AGENTS_SETTINGS_KUN_RUNTIME_CAPABILITIES_DESC,
+  AGENTS_SETTINGS_KUN_RUNTIME_MODEL,
+  AGENTS_SETTINGS_KUN_RUNTIME_PID,
+  AGENTS_SETTINGS_KUN_DIAGNOSTICS_REFRESH,
+  AGENTS_SETTINGS_KUN_TOOL_DIAGNOSTICS,
+  AGENTS_SETTINGS_KUN_TOOL_DIAGNOSTICS_DESC,
+  AGENTS_SETTINGS_KUN_DIAGNOSTICS_PROVIDERS,
+  AGENTS_SETTINGS_KUN_DIAGNOSTICS_MCP_SERVERS,
+  AGENTS_SETTINGS_KUN_DIAGNOSTICS_SKILLS,
+  AGENTS_SETTINGS_KUN_DIAGNOSTICS_ATTACHMENTS,
+  AGENTS_SETTINGS_KUN_MEMORY_RECORDS,
+  AGENTS_SETTINGS_KUN_MEMORY_RECORDS_DESC,
+  AGENTS_SETTINGS_KUN_MEMORY_EMPTY,
+  AGENTS_SETTINGS_KUN_MEMORY_DISABLED,
+  AGENTS_SETTINGS_KUN_MEMORY_DISABLE,
+  AGENTS_SETTINGS_KUN_MEMORY_DELETE,
+  formatAgentsSettingsModelSelectDefaultSuffix,
+  formatAgentsSettingsTokenEconomySavings,
+  formatAgentsSettingsSkillsDirSkillCount,
+} from '../lib/agentsSettingsSection'
+
 
 export type ApprovalPolicy = 'auto' | 'on-request' | 'untrusted' | 'suggest' | 'never'
 export type SandboxMode = 'workspace-write' | 'read-only' | 'danger-full-access' | 'external-sandbox'
@@ -242,253 +448,6 @@ export const AGENTS_SETTINGS_PREVIEW_DEFAULT: AgentsSettingsSnapshot = {
   diagnosticsBusy: false,
 }
 
-const COPY = {
-  agentsQuickBase: 'Assistant',
-  agentsQuickSkill: 'Skills',
-  agentsQuickMcp: 'External tools',
-  agentsQuickPermissions: 'Access',
-  agents: 'AI assistant',
-  autoStart: 'Auto-start AI assistant service',
-  autoStartDesc:
-    'Recommended. The app starts the local assistant service automatically when chats, writing, or phone connections need it.',
-  kunProvider: 'Model provider',
-  kunProviderSelectDesc: 'Choose one of the configured providers from the Providers tab.',
-  kunModel: 'Default model',
-  kunModelDesc: 'Default model ID used by the AI assistant when a request does not choose one.',
-  modelSelectDefaultSuffix: (model: string) => `${model} (default)`,
-  modelSelectCustomOption: 'Custom model…',
-  modelSelectCustomPlaceholder: 'Enter a model ID',
-  codePromptPrefix: 'Code prompt prefix',
-  codePromptPrefixDesc:
-    'These instructions are injected before every Code mode conversation. Use for global rules, coding conventions, or persistent preferences.',
-  codePromptPrefixPlaceholder:
-    'Example: Always write unit tests for new code. Prefer functional components over class components. Use TypeScript strict mode conventions.',
-  kunAssistantAdvanced: 'Assistant advanced settings',
-  kunAssistantAdvancedDesc:
-    'Model, assistant-only API, local port, and data path settings for advanced users.',
-  port: 'Local port',
-  portDesc: 'Port used by the local AI assistant service. Most users do not need to change it.',
-  kunBinary: 'Custom assistant program path',
-  kunBinaryDesc:
-    'Usually leave this empty so the app uses the bundled assistant service. Set a path only for local development or debugging.',
-  kunBinaryPlaceholder: 'e.g. /usr/local/bin/kun (optional)',
-  kunDataDir: 'Assistant data folder',
-  kunDataDirDesc:
-    'Stores sessions, cache data, and the configuration synced from the app to the assistant service.',
-  runtimeToken: 'Local access token (optional)',
-  runtimeTokenDesc: 'Optional token required for other local programs to connect to the assistant service.',
-  showSecret: 'Show',
-  hideSecret: 'Hide',
-  kunInsecure: 'Allow local access without a token',
-  kunInsecureDesc:
-    'For local development only. Other local programs can connect to the assistant service without an access token.',
-  kunInsecureForcedDesc:
-    'Local access protection is off because no access token is set. Add a token to control this switch again.',
-  kunTokenEconomy: 'Reduce context usage',
-  kunTokenEconomyDesc:
-    'Reduce model context use by compacting safe tool descriptions and tool results without changing stored chat history.',
-  kunTokenEconomySavings: (tokens: string) => `Saved about ${tokens} tokens`,
-  kunTokenEconomySavingsLoading: 'Loading savings…',
-  kunTokenEconomySavingsEmpty: 'Saved tokens will start accumulating after the next request.',
-  permissions: 'Permissions',
-  permissionsBehaviorHint:
-    'Full access only controls which files and commands the AI assistant may reach. Confirmation is separate. By default, full access + automatic execution auto-allows approval requests.',
-  approvalPolicy: 'Confirm before tool actions',
-  approvalPolicyDesc:
-    'Controls whether the AI assistant must ask before editing files, running commands, or using other tools. Changes apply on the next turn.',
-  approvalAuto: 'Run automatically',
-  approvalOnRequest: 'Ask when needed',
-  approvalUntrusted: 'Ask for sensitive actions',
-  approvalSuggest: 'Suggest only; do not change files',
-  approvalNever: 'Do not run tools',
-  sandboxMode: 'File access range',
-  sandboxModeDesc:
-    'Controls which local files the AI assistant can read or change, and whether it can run terminal commands.',
-  sandboxWorkspaceWrite: 'Can edit workspace',
-  sandboxReadOnly: 'Can only read files',
-  sandboxFullAccess: 'Can access all files',
-  sandboxExternal: 'External sandbox',
-  computerUseTitle: 'Computer use (screen control)',
-  computerUseHint:
-    'Lets the agent see your screen and move the mouse / type on your behalf. It controls your real computer — enable only when you intend to supervise it, and you can stop a run at any time.',
-  computerUseModelQualityTitle: 'Model quality note',
-  computerUseModelQualityBody:
-    'Chinese-mainland multimodal models currently struggle with screenshot-driven visual grounding and multi-step desktop control. For real use, prefer Claude or GPT-class vision models.',
-  computerUseEnable: 'Enable computer use',
-  computerUseEnableDesc:
-    'Registers the computer_use tool so the agent can take screenshots and drive the mouse and keyboard.',
-  computerUseMode: 'Availability',
-  computerUseModeDesc:
-    'Auto exposes the tool only to vision models. Always exposes it to every model. Off keeps it registered but hidden.',
-  computerUseModeAuto: 'Auto (vision models only)',
-  computerUseModeAlways: 'Always',
-  computerUseModeOff: 'Off',
-  computerUsePermissions: 'System permissions',
-  computerUsePermissionsDesc:
-    'macOS requires Accessibility (for mouse/keyboard) and Screen Recording (for screenshots). Grant both, then re-check.',
-  computerUseAccessibility: 'Accessibility',
-  computerUseScreenRecording: 'Screen Recording',
-  computerUseGrantAccessibility: 'Grant Accessibility',
-  computerUseGrantScreenRecording: 'Open Screen Recording settings',
-  computerUseRecheck: 'Re-check',
-  computerUsePermissionGranted: 'granted',
-  computerUsePermissionDenied: 'not granted',
-  designQualityTitle: 'Design quality',
-  designQualityHint:
-    'After the agent writes or edits a frontend file, Kun automatically scans for AI-generated design tells and craft issues and folds the findings back to the model.',
-  designQualityEnable: 'Enable design self-check',
-  designQualityEnableDesc: 'On by default. When off, writing/editing frontend files runs no design-quality scan.',
-  designQualityStrictness: 'Strictness',
-  designQualityStrictnessDesc:
-    'Relaxed: only the most reliable AI tells. Standard: tells + general craft issues. Strict: adds heuristic rules.',
-  designQualityStrictnessRelaxed: 'Relaxed',
-  designQualityStrictnessStandard: 'Standard',
-  designQualityStrictnessStrict: 'Strict',
-  skill: 'Skills',
-  skillsDetectedDirs: 'Skill directories',
-  skillsDetectedDirsDesc:
-    'Auto-detected .agents / .claude / .codex / skills folders (workspace + global) plus your extra folders below.',
-  skillsDetectedDirsEmpty: 'No skill directories detected. Set a workspace, or add a folder below.',
-  loading: 'Loading…',
-  skillsScopeProject: 'Workspace',
-  skillsScopeGlobal: 'Global',
-  skillsDirNotFound: 'Not found',
-  skillsDirSkillCount: (count: number) => `${count} skills`,
-  skillsOpenRoot: 'Open directory',
-  skillsScanDirs: 'Extra skill folders',
-  skillsScanDirsDesc:
-    'One local path per line. Phone connections and scheduled tasks can also use skills from these folders.',
-  skillsActions: 'Skill management',
-  skillsActionsDesc:
-    'Create, install, and edit skills from Plugins > Skills. Settings keeps only folder-level options.',
-  skillsOpenPlugins: 'Open Plugins',
-  mcp: 'External tools',
-  mcpSearchEnabled: 'Smart external tool selection',
-  mcpSearchEnabledDesc:
-    'When many external tools are connected, give the model only the most relevant tools to reduce pauses and context use.',
-  mcpAdvanced: 'External tools advanced settings',
-  mcpAdvancedDesc: 'Selection mode, candidate counts, connection config file, and save actions.',
-  mcpSearchMode: 'Tool selection method',
-  mcpSearchModeDesc:
-    'Auto filters when many tools are connected; Always filter searches every time; Direct gives every tool to the model.',
-  mcpSearchModeAuto: 'Auto (recommended)',
-  mcpSearchModeSearch: 'Always filter',
-  mcpSearchModeDirect: 'Direct (all tools)',
-  mcpSearchLimits: 'Filter counts',
-  mcpSearchLimitsDesc:
-    'Control how many tools trigger filtering and how many candidate tools are offered each time.',
-  mcpSearchAutoThreshold: 'Start filtering after this many tools',
-  mcpSearchTopKDefault: 'Default candidates',
-  mcpSearchTopKMax: 'Maximum candidates',
-  mcpSearchMinScore: 'Minimum match',
-  mcpSearchDiagnostics: 'Tool selection status',
-  mcpSearchDiagnosticsDesc: 'See whether external tool filtering is active and how many tools are available.',
-  mcpSearchStatus: 'Status',
-  mcpSearchActive: 'active',
-  mcpSearchInactive: 'inactive',
-  mcpSearchIndexed: 'Filterable tools',
-  mcpSearchAdvertised: 'Offered to model',
-  configFilePath: 'Config file path',
-  mcpPathDesc: 'Location of the external tool connection config file.',
-  mcpEditor: 'External tool config',
-  mcpEditorDesc:
-    'Edit MCP external tool server connections here. Model, API key, and service URL do not live in this file.',
-  mcpFileStatusReady: 'The current content was loaded from the config file.',
-  mcpFileStatusMissing: 'The config file does not exist yet. It will be created on first save.',
-  mcpActions: 'External tool actions',
-  mcpRuntimeHint: 'If saved changes do not take effect, restart the local assistant service or reopen the app.',
-  mcpSave: 'Save config',
-  mcpReload: 'Reload',
-  mcpOpenDir: 'Open config directory',
-  kunAdvanced: 'Advanced runtime settings',
-  kunAdvancedDetails: 'Storage, model context, and tool guards',
-  kunAdvancedDetailsDesc:
-    'These options affect how the assistant runs internally. Per-model context policy comes from models.profiles.',
-  kunTokenEconomyOptions: 'What to compact',
-  kunTokenEconomyOptionsDesc:
-    'When context reduction is on, choose which request content is compacted before it reaches the model.',
-  kunCompressToolDescriptions: 'Tool descriptions',
-  kunCompressToolResults: 'Tool results',
-  kunConciseResponses: 'Shorter replies',
-  kunHistoryHygiene: 'Long history guard',
-  kunHistoryHygieneDesc:
-    'Before each model request, cap long tool results and tool arguments. Original chat history is kept unchanged.',
-  kunHistoryMaxResultLines: 'Tool result lines',
-  kunHistoryMaxResultBytes: 'Tool result bytes',
-  kunHistoryMaxResultTokens: 'Tool result tokens',
-  kunHistoryMaxArgumentBytes: 'Tool argument bytes',
-  kunHistoryMaxArgumentTokens: 'Tool argument tokens',
-  kunHistoryMaxArrayItems: 'Array items kept',
-  kunModelContextProfile: 'Current model context policy',
-  kunModelContextProfileDesc:
-    'Model windows and per-model compaction thresholds come from models.profiles in local config.json.',
-  kunModelContextModel: 'Model',
-  kunModelContextWindow: 'Context window tokens',
-  kunModelContextSoft: 'Model start compaction tokens',
-  kunModelContextHard: 'Model force compaction tokens',
-  kunModelContextSourceBuiltIn: 'Built-in model config',
-  kunStorageBackend: 'Conversation storage',
-  kunStorageBackendDesc:
-    'Hybrid storage uses SQLite to speed up indexes. Pure JSONL does not use SQLite.',
-  kunStorageHybrid: 'Hybrid storage (recommended)',
-  kunStorageFile: 'Pure JSONL file storage',
-  kunStorageSqlitePath: 'SQLite index path',
-  kunStorageSqlitePathDesc:
-    'Optional. Leave empty to create the index under the assistant data folder.',
-  kunStorageSqlitePathPlaceholder: 'Leave empty to manage automatically',
-  kunCompactionThresholds: 'Unknown-model fallback compaction thresholds',
-  kunCompactionThresholdsDesc:
-    'These values are used only when the current model does not match models.profiles.',
-  kunCompactionSoftThreshold: 'Fallback start compaction tokens',
-  kunCompactionHardThreshold: 'Fallback force compaction tokens',
-  kunCompactionSummary: 'Compaction summary',
-  kunCompactionSummaryDesc:
-    'Local summaries are fast and free. Model summaries read more naturally but use an extra model request.',
-  kunCompactionSummaryMode: 'Summary mode',
-  kunCompactionSummaryHeuristic: 'Local rules (recommended)',
-  kunCompactionSummaryModel: 'Model generated',
-  kunCompactionSummaryTimeout: 'Summary timeout ms',
-  kunCompactionSummaryMaxTokens: 'Summary max tokens',
-  kunCompactionSummaryInputBytes: 'Summary input bytes',
-  kunStreamIdleTimeout: 'Stream idle timeout (ms)',
-  kunStreamIdleTimeoutDesc:
-    'Fail the turn if the model sends no data for this many milliseconds. Default 45000.',
-  kunToolStorm: 'Repeated tool-call protection',
-  kunToolStormDesc:
-    'When the model repeats the exact same tool call in one turn, suppress the duplicate and ask it to change approach.',
-  kunToolStormLimits: 'Repeat detection',
-  kunToolStormLimitsDesc:
-    'A larger window watches more recent tool calls. A lower threshold suppresses repeated calls sooner.',
-  kunToolStormWindowSize: 'Watch window',
-  kunToolStormThreshold: 'Repeat threshold',
-  kunToolArgumentRepair: 'Tool argument max string',
-  kunToolArgumentRepairDesc:
-    'Single string arguments longer than this byte count are truncated before tool execution.',
-  kunDiagnostics: 'Assistant status',
-  kunDiagnosticsAdvanced: 'View detailed status',
-  kunDiagnosticsAdvancedDesc: 'Runtime abilities, tool connections, and memory records.',
-  kunRuntimeCapabilities: 'Available abilities',
-  kunRuntimeCapabilitiesDesc:
-    'Check whether the local AI assistant service currently has web, skills, attachments, and memory available.',
-  kunRuntimeModel: 'Model',
-  kunRuntimePid: 'Process ID',
-  kunDiagnosticsRefresh: 'Refresh diagnostics',
-  kunToolDiagnostics: 'Tool status',
-  kunToolDiagnosticsDesc:
-    'Check connected tool sources, external tool services, skills, attachments, and memory.',
-  kunDiagnosticsProviders: 'Tool sources',
-  kunDiagnosticsMcpServers: 'External tool services',
-  kunDiagnosticsSkills: 'Skills',
-  kunDiagnosticsAttachments: 'Attachments',
-  kunMemoryRecords: 'Saved memories',
-  kunMemoryRecordsDesc:
-    'Review memories available to this workspace, then disable or delete anything you do not want reused.',
-  kunMemoryEmpty: 'No memory records are visible for this workspace.',
-  kunMemoryDisabled: 'disabled',
-  kunMemoryDisable: 'Disable memory',
-  kunMemoryDelete: 'Delete memory',
-}
-
 function formatCompactNumber(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`
   if (value >= 1_000) return `${(value / 1_000).toFixed(1).replace(/\.0$/, '')}K`
@@ -572,26 +531,26 @@ export function AgentsSettingsSection({
     contextWindowLabel: formatTokenNumber(1_000_000),
     softThresholdLabel: formatTokenNumber(980_000),
     hardThresholdLabel: formatTokenNumber(990_000),
-    sourceLabel: COPY.kunModelContextSourceBuiltIn,
+    sourceLabel: AGENTS_SETTINGS_KUN_MODEL_CONTEXT_SOURCE_BUILT_IN,
   }
 
   return (
     <>
       <div className="agents-settings-jump-row">
-        <SectionJumpButton label={COPY.agentsQuickBase} onClick={() => scrollToSection('agents')} />
-        <SectionJumpButton label={COPY.agentsQuickSkill} onClick={() => scrollToSection('skill')} />
-        <SectionJumpButton label={COPY.agentsQuickMcp} onClick={() => scrollToSection('mcp')} />
+        <SectionJumpButton label={AGENTS_SETTINGS_AGENTS_QUICK_BASE} onClick={() => scrollToSection('agents')} />
+        <SectionJumpButton label={AGENTS_SETTINGS_AGENTS_QUICK_SKILL} onClick={() => scrollToSection('skill')} />
+        <SectionJumpButton label={AGENTS_SETTINGS_AGENTS_QUICK_MCP} onClick={() => scrollToSection('mcp')} />
         <SectionJumpButton
-          label={COPY.agentsQuickPermissions}
+          label={AGENTS_SETTINGS_AGENTS_QUICK_PERMISSIONS}
           onClick={() => scrollToSection('permissions')}
         />
       </div>
 
       <div ref={agentsSectionRef}>
-        <SettingsCard title={COPY.agents}>
+        <SettingsCard title={AGENTS_SETTINGS_AGENTS}>
           <SettingRow
-            title={COPY.autoStart}
-            description={COPY.autoStartDesc}
+            title={AGENTS_SETTINGS_AUTO_START}
+            description={AGENTS_SETTINGS_AUTO_START_DESC}
             control={
               <Toggle
                 checked={settings.autoStart}
@@ -600,8 +559,8 @@ export function AgentsSettingsSection({
             }
           />
           <SettingRow
-            title={COPY.kunProvider}
-            description={COPY.kunProviderSelectDesc}
+            title={AGENTS_SETTINGS_KUN_PROVIDER}
+            description={AGENTS_SETTINGS_KUN_PROVIDER_SELECT_DESC}
             control={
               <select
                 className={SETTINGS_SELECT_CLASS}
@@ -617,19 +576,19 @@ export function AgentsSettingsSection({
             }
           />
           <SettingRow
-            title={COPY.kunModel}
-            description={COPY.kunModelDesc}
+            title={AGENTS_SETTINGS_KUN_MODEL}
+            description={AGENTS_SETTINGS_KUN_MODEL_DESC}
             control={
               <ModelSelect
                 value={settings.model}
                 options={activeProviderModels}
                 optionLabel={(model) =>
                   model === activeProviderModels[0]
-                    ? COPY.modelSelectDefaultSuffix(model)
+                    ? formatAgentsSettingsModelSelectDefaultSuffix(model)
                     : model}
                 allowCustom
-                customLabel={COPY.modelSelectCustomOption}
-                customPlaceholder={COPY.modelSelectCustomPlaceholder}
+                customLabel={AGENTS_SETTINGS_MODEL_SELECT_CUSTOM_OPTION}
+                customPlaceholder={AGENTS_SETTINGS_MODEL_SELECT_CUSTOM_PLACEHOLDER}
                 selectClassName={SETTINGS_SELECT_CLASS}
                 onChange={(model) => {
                   const next = model.trim()
@@ -639,28 +598,28 @@ export function AgentsSettingsSection({
             }
           />
           <SettingRow
-            title={COPY.codePromptPrefix}
-            description={COPY.codePromptPrefixDesc}
+            title={AGENTS_SETTINGS_CODE_PROMPT_PREFIX}
+            description={AGENTS_SETTINGS_CODE_PROMPT_PREFIX_DESC}
             wideControl
             control={
               <textarea
                 value={settings.codePromptPrefix}
                 onChange={(e) => patch({ codePromptPrefix: e.target.value })}
-                placeholder={COPY.codePromptPrefixPlaceholder}
+                placeholder={AGENTS_SETTINGS_CODE_PROMPT_PREFIX_PLACEHOLDER}
                 className="agents-settings-textarea"
               />
             }
           />
           <div className="agents-settings-disclosure-wrap">
             <AdvancedSettingsDisclosure
-              title={COPY.kunAssistantAdvanced}
-              description={COPY.kunAssistantAdvancedDesc}
+              title={AGENTS_SETTINGS_KUN_ASSISTANT_ADVANCED}
+              description={AGENTS_SETTINGS_KUN_ASSISTANT_ADVANCED_DESC}
               defaultOpen={assistantAdvancedOpen}
             >
               <div className="agents-settings-disclosure-rows">
                 <SettingRow
-                  title={COPY.port}
-                  description={COPY.portDesc}
+                  title={AGENTS_SETTINGS_PORT}
+                  description={AGENTS_SETTINGS_PORT_DESC}
                   control={
                     <div>
                       <input
@@ -678,20 +637,20 @@ export function AgentsSettingsSection({
                   }
                 />
                 <SettingRow
-                  title={COPY.kunBinary}
-                  description={COPY.kunBinaryDesc}
+                  title={AGENTS_SETTINGS_KUN_BINARY}
+                  description={AGENTS_SETTINGS_KUN_BINARY_DESC}
                   control={
                     <input
                       className="agents-settings-text-input"
-                      placeholder={COPY.kunBinaryPlaceholder}
+                      placeholder={AGENTS_SETTINGS_KUN_BINARY_PLACEHOLDER}
                       value={settings.binaryPath}
                       onChange={(e) => patch({ binaryPath: e.target.value })}
                     />
                   }
                 />
                 <SettingRow
-                  title={COPY.kunDataDir}
-                  description={COPY.kunDataDirDesc}
+                  title={AGENTS_SETTINGS_KUN_DATA_DIR}
+                  description={AGENTS_SETTINGS_KUN_DATA_DIR_DESC}
                   control={
                     <input
                       className="agents-settings-text-input"
@@ -701,26 +660,26 @@ export function AgentsSettingsSection({
                   }
                 />
                 <SettingRow
-                  title={COPY.runtimeToken}
-                  description={COPY.runtimeTokenDesc}
+                  title={AGENTS_SETTINGS_RUNTIME_TOKEN}
+                  description={AGENTS_SETTINGS_RUNTIME_TOKEN_DESC}
                   control={
                     <SettingsSecretInput
                       value={settings.runtimeToken}
                       onChange={(runtimeToken) => patch({ runtimeToken })}
                       visible={showRuntimeToken}
                       onToggleVisibility={() => setShowRuntimeToken((value) => !value)}
-                      showLabel={COPY.showSecret}
-                      hideLabel={COPY.hideSecret}
+                      showLabel={AGENTS_SETTINGS_SHOW_SECRET}
+                      hideLabel={AGENTS_SETTINGS_HIDE_SECRET}
                       className="agents-settings-secret-input"
                     />
                   }
                 />
                 <SettingRow
-                  title={COPY.kunInsecure}
+                  title={AGENTS_SETTINGS_KUN_INSECURE}
                   description={
                     settings.runtimeToken.trim()
-                      ? COPY.kunInsecureDesc
-                      : COPY.kunInsecureForcedDesc
+                      ? AGENTS_SETTINGS_KUN_INSECURE_DESC
+                      : AGENTS_SETTINGS_KUN_INSECURE_FORCED_DESC
                   }
                   control={
                     <Toggle
@@ -734,8 +693,8 @@ export function AgentsSettingsSection({
             </AdvancedSettingsDisclosure>
           </div>
           <SettingRow
-            title={COPY.kunTokenEconomy}
-            description={COPY.kunTokenEconomyDesc}
+            title={AGENTS_SETTINGS_KUN_TOKEN_ECONOMY}
+            description={AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_DESC}
             control={
               <div className="agents-settings-token-economy-control">
                 <Toggle
@@ -746,14 +705,14 @@ export function AgentsSettingsSection({
                   <div className="agents-settings-savings-pill">
                     {settings.tokenEconomySavingsTokens != null ? (
                       <span>
-                        {COPY.kunTokenEconomySavings(
+                        {formatAgentsSettingsTokenEconomySavings(
                           formatCompactNumber(settings.tokenEconomySavingsTokens),
                         )}
                       </span>
                     ) : settings.tokenEconomyLoading ? (
-                      <span>{COPY.kunTokenEconomySavingsLoading}</span>
+                      <span>{AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_SAVINGS_LOADING}</span>
                     ) : (
-                      <span>{COPY.kunTokenEconomySavingsEmpty}</span>
+                      <span>{AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_SAVINGS_EMPTY}</span>
                     )}
                   </div>
                 ) : null}
@@ -764,40 +723,40 @@ export function AgentsSettingsSection({
       </div>
 
       <div className="agents-settings-section-gap" ref={permissionsSectionRef}>
-        <SettingsCard title={COPY.permissions}>
+        <SettingsCard title={AGENTS_SETTINGS_PERMISSIONS}>
           <div className="agents-settings-notice-wrap">
-            <InlineNoticeView notice={{ tone: 'info', message: COPY.permissionsBehaviorHint }} />
+            <InlineNoticeView notice={{ tone: 'info', message: AGENTS_SETTINGS_PERMISSIONS_BEHAVIOR_HINT }} />
           </div>
           <SettingRow
-            title={COPY.approvalPolicy}
-            description={COPY.approvalPolicyDesc}
+            title={AGENTS_SETTINGS_APPROVAL_POLICY}
+            description={AGENTS_SETTINGS_APPROVAL_POLICY_DESC}
             control={
               <select
                 className={SETTINGS_SELECT_CLASS}
                 value={settings.approvalPolicy}
                 onChange={(e) => patch({ approvalPolicy: e.target.value as ApprovalPolicy })}
               >
-                <option value="auto">{COPY.approvalAuto}</option>
-                <option value="on-request">{COPY.approvalOnRequest}</option>
-                <option value="untrusted">{COPY.approvalUntrusted}</option>
-                <option value="suggest">{COPY.approvalSuggest}</option>
-                <option value="never">{COPY.approvalNever}</option>
+                <option value="auto">{AGENTS_SETTINGS_APPROVAL_AUTO}</option>
+                <option value="on-request">{AGENTS_SETTINGS_APPROVAL_ON_REQUEST}</option>
+                <option value="untrusted">{AGENTS_SETTINGS_APPROVAL_UNTRUSTED}</option>
+                <option value="suggest">{AGENTS_SETTINGS_APPROVAL_SUGGEST}</option>
+                <option value="never">{AGENTS_SETTINGS_APPROVAL_NEVER}</option>
               </select>
             }
           />
           <SettingRow
-            title={COPY.sandboxMode}
-            description={COPY.sandboxModeDesc}
+            title={AGENTS_SETTINGS_SANDBOX_MODE}
+            description={AGENTS_SETTINGS_SANDBOX_MODE_DESC}
             control={
               <select
                 className={SETTINGS_SELECT_CLASS}
                 value={settings.sandboxMode}
                 onChange={(e) => patch({ sandboxMode: e.target.value as SandboxMode })}
               >
-                <option value="workspace-write">{COPY.sandboxWorkspaceWrite}</option>
-                <option value="read-only">{COPY.sandboxReadOnly}</option>
-                <option value="danger-full-access">{COPY.sandboxFullAccess}</option>
-                <option value="external-sandbox">{COPY.sandboxExternal}</option>
+                <option value="workspace-write">{AGENTS_SETTINGS_SANDBOX_WORKSPACE_WRITE}</option>
+                <option value="read-only">{AGENTS_SETTINGS_SANDBOX_READ_ONLY}</option>
+                <option value="danger-full-access">{AGENTS_SETTINGS_SANDBOX_FULL_ACCESS}</option>
+                <option value="external-sandbox">{AGENTS_SETTINGS_SANDBOX_EXTERNAL}</option>
               </select>
             }
           />
@@ -805,17 +764,17 @@ export function AgentsSettingsSection({
       </div>
 
       <div className="agents-settings-section-gap">
-        <SettingsCard title={COPY.computerUseTitle}>
+        <SettingsCard title={AGENTS_SETTINGS_COMPUTER_USE_TITLE}>
           <div className="agents-settings-notice-wrap">
-            <InlineNoticeView notice={{ tone: 'info', message: COPY.computerUseHint }} />
+            <InlineNoticeView notice={{ tone: 'info', message: AGENTS_SETTINGS_COMPUTER_USE_HINT }} />
           </div>
           <div className="agents-settings-amber-banner">
-            <div className="agents-settings-amber-banner-title">{COPY.computerUseModelQualityTitle}</div>
-            <div className="agents-settings-amber-banner-body">{COPY.computerUseModelQualityBody}</div>
+            <div className="agents-settings-amber-banner-title">{AGENTS_SETTINGS_COMPUTER_USE_MODEL_QUALITY_TITLE}</div>
+            <div className="agents-settings-amber-banner-body">{AGENTS_SETTINGS_COMPUTER_USE_MODEL_QUALITY_BODY}</div>
           </div>
           <SettingRow
-            title={COPY.computerUseEnable}
-            description={COPY.computerUseEnableDesc}
+            title={AGENTS_SETTINGS_COMPUTER_USE_ENABLE}
+            description={AGENTS_SETTINGS_COMPUTER_USE_ENABLE_DESC}
             control={
               <Toggle
                 checked={settings.computerUseEnabled}
@@ -826,8 +785,8 @@ export function AgentsSettingsSection({
           {settings.computerUseEnabled ? (
             <>
               <SettingRow
-                title={COPY.computerUseMode}
-                description={COPY.computerUseModeDesc}
+                title={AGENTS_SETTINGS_COMPUTER_USE_MODE}
+                description={AGENTS_SETTINGS_COMPUTER_USE_MODE_DESC}
                 control={
                   <select
                     className={SETTINGS_SELECT_CLASS}
@@ -836,35 +795,35 @@ export function AgentsSettingsSection({
                       patch({ computerUseMode: e.target.value as AgentsSettingsSnapshot['computerUseMode'] })
                     }
                   >
-                    <option value="auto">{COPY.computerUseModeAuto}</option>
-                    <option value="always">{COPY.computerUseModeAlways}</option>
-                    <option value="off">{COPY.computerUseModeOff}</option>
+                    <option value="auto">{AGENTS_SETTINGS_COMPUTER_USE_MODE_AUTO}</option>
+                    <option value="always">{AGENTS_SETTINGS_COMPUTER_USE_MODE_ALWAYS}</option>
+                    <option value="off">{AGENTS_SETTINGS_COMPUTER_USE_MODE_OFF}</option>
                   </select>
                 }
               />
               {showComputerUsePermissions ? (
                 <SettingRow
-                  title={COPY.computerUsePermissions}
-                  description={COPY.computerUsePermissionsDesc}
+                  title={AGENTS_SETTINGS_COMPUTER_USE_PERMISSIONS}
+                  description={AGENTS_SETTINGS_COMPUTER_USE_PERMISSIONS_DESC}
                   control={
                     <div className="agents-settings-permissions-control">
                       <div className="agents-settings-permission-badges">
                         <span className={permissionBadgeClass(computerUseAccessibility)}>
-                          {COPY.computerUseAccessibility}: {COPY.computerUsePermissionGranted}
+                          {AGENTS_SETTINGS_COMPUTER_USE_ACCESSIBILITY}: {AGENTS_SETTINGS_COMPUTER_USE_PERMISSION_GRANTED}
                         </span>
                         <span className={permissionBadgeClass(computerUseScreenRecording)}>
-                          {COPY.computerUseScreenRecording}: {COPY.computerUsePermissionDenied}
+                          {AGENTS_SETTINGS_COMPUTER_USE_SCREEN_RECORDING}: {AGENTS_SETTINGS_COMPUTER_USE_PERMISSION_DENIED}
                         </span>
                       </div>
                       <div className="agents-settings-permission-actions">
                         <button type="button" className="agents-settings-permission-btn">
-                          {COPY.computerUseGrantAccessibility}
+                          {AGENTS_SETTINGS_COMPUTER_USE_GRANT_ACCESSIBILITY}
                         </button>
                         <button type="button" className="agents-settings-permission-btn">
-                          {COPY.computerUseGrantScreenRecording}
+                          {AGENTS_SETTINGS_COMPUTER_USE_GRANT_SCREEN_RECORDING}
                         </button>
                         <button type="button" className="agents-settings-permission-btn">
-                          {COPY.computerUseRecheck}
+                          {AGENTS_SETTINGS_COMPUTER_USE_RECHECK}
                         </button>
                       </div>
                     </div>
@@ -877,13 +836,13 @@ export function AgentsSettingsSection({
       </div>
 
       <div className="agents-settings-section-gap">
-        <SettingsCard title={COPY.designQualityTitle}>
+        <SettingsCard title={AGENTS_SETTINGS_DESIGN_QUALITY_TITLE}>
           <div className="agents-settings-notice-wrap">
-            <InlineNoticeView notice={{ tone: 'info', message: COPY.designQualityHint }} />
+            <InlineNoticeView notice={{ tone: 'info', message: AGENTS_SETTINGS_DESIGN_QUALITY_HINT }} />
           </div>
           <SettingRow
-            title={COPY.designQualityEnable}
-            description={COPY.designQualityEnableDesc}
+            title={AGENTS_SETTINGS_DESIGN_QUALITY_ENABLE}
+            description={AGENTS_SETTINGS_DESIGN_QUALITY_ENABLE_DESC}
             control={
               <Toggle
                 checked={settings.qualityEnabled}
@@ -893,8 +852,8 @@ export function AgentsSettingsSection({
           />
           {settings.qualityEnabled ? (
             <SettingRow
-              title={COPY.designQualityStrictness}
-              description={COPY.designQualityStrictnessDesc}
+              title={AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS}
+              description={AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS_DESC}
               control={
                 <select
                   className={SETTINGS_SELECT_CLASS}
@@ -903,9 +862,9 @@ export function AgentsSettingsSection({
                     patch({ qualityStrictness: e.target.value as AgentsSettingsSnapshot['qualityStrictness'] })
                   }
                 >
-                  <option value="relaxed">{COPY.designQualityStrictnessRelaxed}</option>
-                  <option value="standard">{COPY.designQualityStrictnessStandard}</option>
-                  <option value="strict">{COPY.designQualityStrictnessStrict}</option>
+                  <option value="relaxed">{AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS_RELAXED}</option>
+                  <option value="standard">{AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS_STANDARD}</option>
+                  <option value="strict">{AGENTS_SETTINGS_DESIGN_QUALITY_STRICTNESS_STRICT}</option>
                 </select>
               }
             />
@@ -914,17 +873,17 @@ export function AgentsSettingsSection({
       </div>
 
       <div className="agents-settings-section-gap" ref={skillSectionRef}>
-        <SettingsCard title={COPY.skill}>
+        <SettingsCard title={AGENTS_SETTINGS_SKILL}>
           <SettingRow
-            title={COPY.skillsDetectedDirs}
-            description={COPY.skillsDetectedDirsDesc}
+            title={AGENTS_SETTINGS_SKILLS_DETECTED_DIRS}
+            description={AGENTS_SETTINGS_SKILLS_DETECTED_DIRS_DESC}
             wideControl
             control={
               <div className="agents-settings-skill-roots">
                 {settings.skillRootsLoading && settings.skillRoots.length === 0 ? (
-                  <div className="agents-settings-skill-empty">{COPY.loading}</div>
+                  <div className="agents-settings-skill-empty">{AGENTS_SETTINGS_LOADING}</div>
                 ) : settings.skillRoots.length === 0 ? (
-                  <div className="agents-settings-skill-empty">{COPY.skillsDetectedDirsEmpty}</div>
+                  <div className="agents-settings-skill-empty">{AGENTS_SETTINGS_SKILLS_DETECTED_DIRS_EMPTY}</div>
                 ) : (
                   settings.skillRoots.map((root) => (
                     <div
@@ -942,16 +901,16 @@ export function AgentsSettingsSection({
                           </span>
                           <span className="agents-settings-skill-scope-pill">
                             {root.scope === 'project'
-                              ? COPY.skillsScopeProject
-                              : COPY.skillsScopeGlobal}
+                              ? AGENTS_SETTINGS_SKILLS_SCOPE_PROJECT
+                              : AGENTS_SETTINGS_SKILLS_SCOPE_GLOBAL}
                           </span>
                           {root.exists ? (
                             <span className="agents-settings-skill-count-pill">
-                              {COPY.skillsDirSkillCount(root.skillCount)}
+                              {formatAgentsSettingsSkillsDirSkillCount(root.skillCount)}
                             </span>
                           ) : (
                             <span className="agents-settings-skill-missing-pill">
-                              {COPY.skillsDirNotFound}
+                              {AGENTS_SETTINGS_SKILLS_DIR_NOT_FOUND}
                             </span>
                           )}
                         </div>
@@ -961,8 +920,8 @@ export function AgentsSettingsSection({
                         <button
                           type="button"
                           className="agents-settings-skill-open-btn"
-                          aria-label={COPY.skillsOpenRoot}
-                          title={COPY.skillsOpenRoot}
+                          aria-label={AGENTS_SETTINGS_SKILLS_OPEN_ROOT}
+                          title={AGENTS_SETTINGS_SKILLS_OPEN_ROOT}
                         >
                           <FolderOpen className="agents-settings-skill-open-icon" strokeWidth={1.8} />
                         </button>
@@ -984,8 +943,8 @@ export function AgentsSettingsSection({
             }
           />
           <SettingRow
-            title={COPY.skillsScanDirs}
-            description={COPY.skillsScanDirsDesc}
+            title={AGENTS_SETTINGS_SKILLS_SCAN_DIRS}
+            description={AGENTS_SETTINGS_SKILLS_SCAN_DIRS_DESC}
             wideControl
             control={
               <textarea
@@ -998,14 +957,14 @@ export function AgentsSettingsSection({
             }
           />
           <SettingRow
-            title={COPY.skillsActions}
-            description={COPY.skillsActionsDesc}
+            title={AGENTS_SETTINGS_SKILLS_ACTIONS}
+            description={AGENTS_SETTINGS_SKILLS_ACTIONS_DESC}
             wideControl
             control={
               <div className="agents-settings-skill-actions">
                 <button type="button" className="agents-settings-primary-btn">
                   <Settings className="agents-settings-primary-btn-icon" strokeWidth={1.75} />
-                  {COPY.skillsOpenPlugins}
+                  {AGENTS_SETTINGS_SKILLS_OPEN_PLUGINS}
                 </button>
               </div>
             }
@@ -1014,10 +973,10 @@ export function AgentsSettingsSection({
       </div>
 
       <div className="agents-settings-section-gap" ref={mcpSectionRef}>
-        <SettingsCard title={COPY.mcp}>
+        <SettingsCard title={AGENTS_SETTINGS_MCP}>
           <SettingRow
-            title={COPY.mcpSearchEnabled}
-            description={COPY.mcpSearchEnabledDesc}
+            title={AGENTS_SETTINGS_MCP_SEARCH_ENABLED}
+            description={AGENTS_SETTINGS_MCP_SEARCH_ENABLED_DESC}
             control={
               <Toggle
                 checked={settings.mcpSearchEnabled}
@@ -1027,14 +986,14 @@ export function AgentsSettingsSection({
           />
           <div className="agents-settings-disclosure-wrap">
             <AdvancedSettingsDisclosure
-              title={COPY.mcpAdvanced}
-              description={COPY.mcpAdvancedDesc}
+              title={AGENTS_SETTINGS_MCP_ADVANCED}
+              description={AGENTS_SETTINGS_MCP_ADVANCED_DESC}
               defaultOpen={mcpAdvancedOpen}
             >
               <div className="agents-settings-disclosure-rows">
                 <SettingRow
-                  title={COPY.mcpSearchMode}
-                  description={COPY.mcpSearchModeDesc}
+                  title={AGENTS_SETTINGS_MCP_SEARCH_MODE}
+                  description={AGENTS_SETTINGS_MCP_SEARCH_MODE_DESC}
                   control={
                     <select
                       className={SETTINGS_SELECT_CLASS}
@@ -1044,23 +1003,23 @@ export function AgentsSettingsSection({
                         patch({ mcpSearchMode: e.target.value as AgentsSettingsSnapshot['mcpSearchMode'] })
                       }
                     >
-                      <option value="auto">{COPY.mcpSearchModeAuto}</option>
-                      <option value="search">{COPY.mcpSearchModeSearch}</option>
-                      <option value="direct">{COPY.mcpSearchModeDirect}</option>
+                      <option value="auto">{AGENTS_SETTINGS_MCP_SEARCH_MODE_AUTO}</option>
+                      <option value="search">{AGENTS_SETTINGS_MCP_SEARCH_MODE_SEARCH}</option>
+                      <option value="direct">{AGENTS_SETTINGS_MCP_SEARCH_MODE_DIRECT}</option>
                     </select>
                   }
                 />
                 <SettingRow
-                  title={COPY.mcpSearchLimits}
-                  description={COPY.mcpSearchLimitsDesc}
+                  title={AGENTS_SETTINGS_MCP_SEARCH_LIMITS}
+                  description={AGENTS_SETTINGS_MCP_SEARCH_LIMITS_DESC}
                   wideControl
                   control={
                     <div className="agents-settings-mcp-grid">
                       {[
-                        ['mcpAutoThreshold', COPY.mcpSearchAutoThreshold, settings.mcpAutoThreshold],
-                        ['mcpTopKDefault', COPY.mcpSearchTopKDefault, settings.mcpTopKDefault],
-                        ['mcpTopKMax', COPY.mcpSearchTopKMax, settings.mcpTopKMax],
-                        ['mcpMinScore', COPY.mcpSearchMinScore, settings.mcpMinScore],
+                        ['mcpAutoThreshold', AGENTS_SETTINGS_MCP_SEARCH_AUTO_THRESHOLD, settings.mcpAutoThreshold],
+                        ['mcpTopKDefault', AGENTS_SETTINGS_MCP_SEARCH_TOP_K_DEFAULT, settings.mcpTopKDefault],
+                        ['mcpTopKMax', AGENTS_SETTINGS_MCP_SEARCH_TOP_K_MAX, settings.mcpTopKMax],
+                        ['mcpMinScore', AGENTS_SETTINGS_MCP_SEARCH_MIN_SCORE, settings.mcpMinScore],
                       ].map(([key, label, value]) => (
                         <label key={key} className="agents-settings-field-label">
                           {label}
@@ -1077,31 +1036,31 @@ export function AgentsSettingsSection({
                   }
                 />
                 <SettingRow
-                  title={COPY.mcpSearchDiagnostics}
-                  description={COPY.mcpSearchDiagnosticsDesc}
+                  title={AGENTS_SETTINGS_MCP_SEARCH_DIAGNOSTICS}
+                  description={AGENTS_SETTINGS_MCP_SEARCH_DIAGNOSTICS_DESC}
                   wideControl
                   control={
                     <div className="agents-settings-diagnostics-grid is-three">
                       <div className="agents-settings-diagnostics-cell">
-                        {COPY.mcpSearchStatus}:{' '}
+                        {AGENTS_SETTINGS_MCP_SEARCH_STATUS}:{' '}
                         <span className="agents-settings-mono">
-                          {settings.mcpSearchActive ? COPY.mcpSearchActive : COPY.mcpSearchInactive}
+                          {settings.mcpSearchActive ? AGENTS_SETTINGS_MCP_SEARCH_ACTIVE : AGENTS_SETTINGS_MCP_SEARCH_INACTIVE}
                         </span>
                       </div>
                       <div className="agents-settings-diagnostics-cell">
-                        {COPY.mcpSearchIndexed}:{' '}
+                        {AGENTS_SETTINGS_MCP_SEARCH_INDEXED}:{' '}
                         <span className="agents-settings-mono">{settings.mcpIndexedTools}</span>
                       </div>
                       <div className="agents-settings-diagnostics-cell">
-                        {COPY.mcpSearchAdvertised}:{' '}
+                        {AGENTS_SETTINGS_MCP_SEARCH_ADVERTISED}:{' '}
                         <span className="agents-settings-mono">{settings.mcpAdvertisedTools}</span>
                       </div>
                     </div>
                   }
                 />
                 <SettingRow
-                  title={COPY.configFilePath}
-                  description={COPY.mcpPathDesc}
+                  title={AGENTS_SETTINGS_CONFIG_FILE_PATH}
+                  description={AGENTS_SETTINGS_MCP_PATH_DESC}
                   control={
                     <div className="agents-settings-path-display">
                       <code className="agents-settings-path-code">{settings.mcpConfigPath}</code>
@@ -1109,15 +1068,15 @@ export function AgentsSettingsSection({
                   }
                 />
                 <SettingRow
-                  title={COPY.mcpEditor}
-                  description={COPY.mcpEditorDesc}
+                  title={AGENTS_SETTINGS_MCP_EDITOR}
+                  description={AGENTS_SETTINGS_MCP_EDITOR_DESC}
                   wideControl
                   control={
                     <div className="agents-settings-mcp-editor">
                       <div className="agents-settings-mcp-status">
                         {settings.mcpConfigExists
-                          ? COPY.mcpFileStatusReady
-                          : COPY.mcpFileStatusMissing}
+                          ? AGENTS_SETTINGS_MCP_FILE_STATUS_READY
+                          : AGENTS_SETTINGS_MCP_FILE_STATUS_MISSING}
                       </div>
                       <textarea
                         value={settings.mcpConfigText}
@@ -1129,8 +1088,8 @@ export function AgentsSettingsSection({
                   }
                 />
                 <SettingRow
-                  title={COPY.mcpActions}
-                  description={COPY.mcpRuntimeHint}
+                  title={AGENTS_SETTINGS_MCP_ACTIONS}
+                  description={AGENTS_SETTINGS_MCP_RUNTIME_HINT}
                   wideControl
                   control={
                     <div className="agents-settings-mcp-actions">
@@ -1142,7 +1101,7 @@ export function AgentsSettingsSection({
                         {settings.mcpBusy ? (
                           <Loader2 className="agents-settings-primary-btn-icon is-spinning" strokeWidth={2} />
                         ) : null}
-                        {COPY.mcpSave}
+                        {AGENTS_SETTINGS_MCP_SAVE}
                       </button>
                       <button
                         type="button"
@@ -1153,11 +1112,11 @@ export function AgentsSettingsSection({
                           className={`agents-settings-secondary-btn-icon ${settings.mcpLoading ? 'is-spinning' : ''}`}
                           strokeWidth={1.75}
                         />
-                        {COPY.mcpReload}
+                        {AGENTS_SETTINGS_MCP_RELOAD}
                       </button>
                       <button type="button" className="agents-settings-secondary-btn">
                         <FolderOpen className="agents-settings-secondary-btn-icon" strokeWidth={1.75} />
-                        {COPY.mcpOpenDir}
+                        {AGENTS_SETTINGS_MCP_OPEN_DIR}
                       </button>
                     </div>
                   }
@@ -1169,25 +1128,25 @@ export function AgentsSettingsSection({
       </div>
 
       <div className="agents-settings-section-gap">
-        <SettingsCard title={COPY.kunAdvanced}>
+        <SettingsCard title={AGENTS_SETTINGS_KUN_ADVANCED}>
           <div className="agents-settings-disclosure-wrap">
             <AdvancedSettingsDisclosure
-              title={COPY.kunAdvancedDetails}
-              description={COPY.kunAdvancedDetailsDesc}
+              title={AGENTS_SETTINGS_KUN_ADVANCED_DETAILS}
+              description={AGENTS_SETTINGS_KUN_ADVANCED_DETAILS_DESC}
               defaultOpen={runtimeAdvancedOpen}
             >
               <div className="agents-settings-disclosure-rows">
                 <SettingRow
-                  title={COPY.kunTokenEconomyOptions}
-                  description={COPY.kunTokenEconomyOptionsDesc}
+                  title={AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_OPTIONS}
+                  description={AGENTS_SETTINGS_KUN_TOKEN_ECONOMY_OPTIONS_DESC}
                   wideControl
                   control={
                     <div className="agents-settings-toggle-grid is-three">
                       {(
                         [
-                          ['compressToolDescriptions', COPY.kunCompressToolDescriptions, settings.compressToolDescriptions],
-                          ['compressToolResults', COPY.kunCompressToolResults, settings.compressToolResults],
-                          ['conciseResponses', COPY.kunConciseResponses, settings.conciseResponses],
+                          ['compressToolDescriptions', AGENTS_SETTINGS_KUN_COMPRESS_TOOL_DESCRIPTIONS, settings.compressToolDescriptions],
+                          ['compressToolResults', AGENTS_SETTINGS_KUN_COMPRESS_TOOL_RESULTS, settings.compressToolResults],
+                          ['conciseResponses', AGENTS_SETTINGS_KUN_CONCISE_RESPONSES, settings.conciseResponses],
                         ] as const
                       ).map(([key, label, checked]) => (
                         <label key={key} className="agents-settings-toggle-card">
@@ -1203,16 +1162,16 @@ export function AgentsSettingsSection({
                   }
                 />
                 <SettingRow
-                  title={COPY.kunModelContextProfile}
-                  description={COPY.kunModelContextProfileDesc}
+                  title={AGENTS_SETTINGS_KUN_MODEL_CONTEXT_PROFILE}
+                  description={AGENTS_SETTINGS_KUN_MODEL_CONTEXT_PROFILE_DESC}
                   wideControl
                   control={
                     <div className="agents-settings-context-grid">
                       {[
-                        [COPY.kunModelContextModel, modelContext.modelLabel, modelContext.sourceLabel],
-                        [COPY.kunModelContextWindow, modelContext.contextWindowLabel, null],
-                        [COPY.kunModelContextSoft, modelContext.softThresholdLabel, null],
-                        [COPY.kunModelContextHard, modelContext.hardThresholdLabel, null],
+                        [AGENTS_SETTINGS_KUN_MODEL_CONTEXT_MODEL, modelContext.modelLabel, modelContext.sourceLabel],
+                        [AGENTS_SETTINGS_KUN_MODEL_CONTEXT_WINDOW, modelContext.contextWindowLabel, null],
+                        [AGENTS_SETTINGS_KUN_MODEL_CONTEXT_SOFT, modelContext.softThresholdLabel, null],
+                        [AGENTS_SETTINGS_KUN_MODEL_CONTEXT_HARD, modelContext.hardThresholdLabel, null],
                       ].map(([label, value, sub]) => (
                         <div key={label} className="agents-settings-context-card">
                           <div className="agents-settings-context-label">{label}</div>
@@ -1224,8 +1183,8 @@ export function AgentsSettingsSection({
                   }
                 />
                 <SettingRow
-                  title={COPY.kunStorageBackend}
-                  description={COPY.kunStorageBackendDesc}
+                  title={AGENTS_SETTINGS_KUN_STORAGE_BACKEND}
+                  description={AGENTS_SETTINGS_KUN_STORAGE_BACKEND_DESC}
                   control={
                     <select
                       className={SETTINGS_SELECT_CLASS}
@@ -1234,14 +1193,14 @@ export function AgentsSettingsSection({
                         patch({ storageBackend: e.target.value as AgentsSettingsSnapshot['storageBackend'] })
                       }
                     >
-                      <option value="hybrid">{COPY.kunStorageHybrid}</option>
-                      <option value="file">{COPY.kunStorageFile}</option>
+                      <option value="hybrid">{AGENTS_SETTINGS_KUN_STORAGE_HYBRID}</option>
+                      <option value="file">{AGENTS_SETTINGS_KUN_STORAGE_FILE}</option>
                     </select>
                   }
                 />
                 <SettingRow
-                  title={COPY.kunStreamIdleTimeout}
-                  description={COPY.kunStreamIdleTimeoutDesc}
+                  title={AGENTS_SETTINGS_KUN_STREAM_IDLE_TIMEOUT}
+                  description={AGENTS_SETTINGS_KUN_STREAM_IDLE_TIMEOUT_DESC}
                   control={
                     <input
                       type="number"
@@ -1255,8 +1214,8 @@ export function AgentsSettingsSection({
                   }
                 />
                 <SettingRow
-                  title={COPY.kunToolStorm}
-                  description={COPY.kunToolStormDesc}
+                  title={AGENTS_SETTINGS_KUN_TOOL_STORM}
+                  description={AGENTS_SETTINGS_KUN_TOOL_STORM_DESC}
                   control={
                     <Toggle
                       checked={settings.toolStormEnabled}
@@ -1271,17 +1230,17 @@ export function AgentsSettingsSection({
       </div>
 
       <div className="agents-settings-section-gap">
-        <SettingsCard title={COPY.kunDiagnostics}>
+        <SettingsCard title={AGENTS_SETTINGS_KUN_DIAGNOSTICS}>
           <div className="agents-settings-disclosure-wrap">
             <AdvancedSettingsDisclosure
-              title={COPY.kunDiagnosticsAdvanced}
-              description={COPY.kunDiagnosticsAdvancedDesc}
+              title={AGENTS_SETTINGS_KUN_DIAGNOSTICS_ADVANCED}
+              description={AGENTS_SETTINGS_KUN_DIAGNOSTICS_ADVANCED_DESC}
               defaultOpen={diagnosticsAdvancedOpen}
             >
               <div className="agents-settings-disclosure-rows">
                 <SettingRow
-                  title={COPY.kunRuntimeCapabilities}
-                  description={COPY.kunRuntimeCapabilitiesDesc}
+                  title={AGENTS_SETTINGS_KUN_RUNTIME_CAPABILITIES}
+                  description={AGENTS_SETTINGS_KUN_RUNTIME_CAPABILITIES_DESC}
                   wideControl
                   control={
                     <div className="agents-settings-runtime-diagnostics">
@@ -1295,11 +1254,11 @@ export function AgentsSettingsSection({
                       </div>
                       <div className="agents-settings-diagnostics-grid">
                         <div className="agents-settings-diagnostics-cell">
-                          {COPY.kunRuntimeModel}:{' '}
+                          {AGENTS_SETTINGS_KUN_RUNTIME_MODEL}:{' '}
                           <span className="agents-settings-mono">{settings.runtimeModel}</span>
                         </div>
                         <div className="agents-settings-diagnostics-cell">
-                          {COPY.kunRuntimePid}:{' '}
+                          {AGENTS_SETTINGS_KUN_RUNTIME_PID}:{' '}
                           <span className="agents-settings-mono">{settings.runtimePid}</span>
                         </div>
                         <div className="agents-settings-diagnostics-cell">
@@ -1317,44 +1276,44 @@ export function AgentsSettingsSection({
                           className={`agents-settings-secondary-btn-icon ${settings.diagnosticsBusy ? 'is-spinning' : ''}`}
                           strokeWidth={1.75}
                         />
-                        {COPY.kunDiagnosticsRefresh}
+                        {AGENTS_SETTINGS_KUN_DIAGNOSTICS_REFRESH}
                       </button>
                     </div>
                   }
                 />
                 <SettingRow
-                  title={COPY.kunToolDiagnostics}
-                  description={COPY.kunToolDiagnosticsDesc}
+                  title={AGENTS_SETTINGS_KUN_TOOL_DIAGNOSTICS}
+                  description={AGENTS_SETTINGS_KUN_TOOL_DIAGNOSTICS_DESC}
                   wideControl
                   control={
                     <div className="agents-settings-diagnostics-grid">
                       <div className="agents-settings-diagnostics-cell">
-                        {COPY.kunDiagnosticsProviders}:{' '}
+                        {AGENTS_SETTINGS_KUN_DIAGNOSTICS_PROVIDERS}:{' '}
                         <span className="agents-settings-mono">{settings.toolProviderCount}</span>
                       </div>
                       <div className="agents-settings-diagnostics-cell">
-                        {COPY.kunDiagnosticsMcpServers}:{' '}
+                        {AGENTS_SETTINGS_KUN_DIAGNOSTICS_MCP_SERVERS}:{' '}
                         <span className="agents-settings-mono">{settings.toolMcpServerCount}</span>
                       </div>
                       <div className="agents-settings-diagnostics-cell">
-                        {COPY.kunDiagnosticsSkills}:{' '}
+                        {AGENTS_SETTINGS_KUN_DIAGNOSTICS_SKILLS}:{' '}
                         <span className="agents-settings-mono">{settings.toolSkillCount}</span>
                       </div>
                       <div className="agents-settings-diagnostics-cell">
-                        {COPY.kunDiagnosticsAttachments}:{' '}
+                        {AGENTS_SETTINGS_KUN_DIAGNOSTICS_ATTACHMENTS}:{' '}
                         <span className="agents-settings-mono">{settings.toolAttachmentCount}</span>
                       </div>
                     </div>
                   }
                 />
                 <SettingRow
-                  title={COPY.kunMemoryRecords}
-                  description={COPY.kunMemoryRecordsDesc}
+                  title={AGENTS_SETTINGS_KUN_MEMORY_RECORDS}
+                  description={AGENTS_SETTINGS_KUN_MEMORY_RECORDS_DESC}
                   wideControl
                   control={
                     <div className="agents-settings-memory-list">
                       {settings.memoryRecords.length === 0 ? (
-                        <div className="agents-settings-skill-empty">{COPY.kunMemoryEmpty}</div>
+                        <div className="agents-settings-skill-empty">{AGENTS_SETTINGS_KUN_MEMORY_EMPTY}</div>
                       ) : (
                         settings.memoryRecords.map((memory) => (
                           <div key={memory.id} className="agents-settings-memory-row">
@@ -1363,7 +1322,7 @@ export function AgentsSettingsSection({
                               <div className="agents-settings-memory-meta">
                                 <span className="agents-settings-mono">{memory.scope}</span>
                                 <span className="agents-settings-mono">{memory.id}</span>
-                                {memory.disabledAt ? <span>{COPY.kunMemoryDisabled}</span> : null}
+                                {memory.disabledAt ? <span>{AGENTS_SETTINGS_KUN_MEMORY_DISABLED}</span> : null}
                                 {memory.tags?.length ? <span>{memory.tags.join(', ')}</span> : null}
                               </div>
                             </div>
@@ -1372,16 +1331,16 @@ export function AgentsSettingsSection({
                                 type="button"
                                 disabled={Boolean(memory.disabledAt)}
                                 className="agents-settings-icon-btn"
-                                aria-label={COPY.kunMemoryDisable}
-                                title={COPY.kunMemoryDisable}
+                                aria-label={AGENTS_SETTINGS_KUN_MEMORY_DISABLE}
+                                title={AGENTS_SETTINGS_KUN_MEMORY_DISABLE}
                               >
                                 <Ban className="agents-settings-icon-btn-icon" strokeWidth={1.8} />
                               </button>
                               <button
                                 type="button"
                                 className="agents-settings-icon-btn is-danger"
-                                aria-label={COPY.kunMemoryDelete}
-                                title={COPY.kunMemoryDelete}
+                                aria-label={AGENTS_SETTINGS_KUN_MEMORY_DELETE}
+                                title={AGENTS_SETTINGS_KUN_MEMORY_DELETE}
                               >
                                 <Trash2 className="agents-settings-icon-btn-icon" strokeWidth={1.8} />
                               </button>
