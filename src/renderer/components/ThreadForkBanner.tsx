@@ -4,6 +4,11 @@
 
 import type { ReactElement } from 'react'
 import { GitFork } from 'lucide-react'
+import {
+  formatThreadForkBannerSubtitle,
+  resolveThreadForkPointLabel,
+  THREAD_FORK_BANNER_TITLE,
+} from '../lib/threadForkBanner'
 
 type Props = {
   parentTitle?: string
@@ -11,20 +16,6 @@ type Props = {
 
 /** Sample title for ?threadForkBanner=1 visual verification. */
 export const THREAD_FORK_BANNER_PREVIEW_TITLE = 'Deploy auth middleware refactor'
-
-function bannerSubtitle(parentTitle?: string): string {
-  if (parentTitle?.trim()) {
-    return `Continues from ${parentTitle.trim()}. Earlier messages are inherited; new turns stay in this branch.`
-  }
-  return 'Earlier messages are inherited; new turns stay in this branch.'
-}
-
-function forkPointLabel(parentTitle?: string): string {
-  if (parentTitle?.trim()) {
-    return `Branch from ${parentTitle.trim()} starts here`
-  }
-  return 'Branch starts here'
-}
 
 export function ThreadForkBanner({ parentTitle }: Props): ReactElement {
   return (
@@ -34,8 +25,10 @@ export function ThreadForkBanner({ parentTitle }: Props): ReactElement {
           <GitFork className="thread-fork-banner-icon" strokeWidth={1.85} />
         </span>
         <span className="thread-fork-banner-copy">
-          <span className="thread-fork-banner-title">Forked conversation</span>
-          <span className="thread-fork-banner-subtitle">{bannerSubtitle(parentTitle)}</span>
+          <span className="thread-fork-banner-title">{THREAD_FORK_BANNER_TITLE}</span>
+          <span className="thread-fork-banner-subtitle">
+            {formatThreadForkBannerSubtitle(parentTitle)}
+          </span>
         </span>
       </div>
     </div>
@@ -43,7 +36,7 @@ export function ThreadForkBanner({ parentTitle }: Props): ReactElement {
 }
 
 export function ThreadForkPoint({ parentTitle }: Props): ReactElement {
-  const label = forkPointLabel(parentTitle)
+  const label = resolveThreadForkPointLabel(parentTitle)
 
   return (
     <div className="thread-fork-point">
