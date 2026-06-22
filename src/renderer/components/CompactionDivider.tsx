@@ -3,19 +3,12 @@
 // Visual only: parent supplies compaction block snapshots.
 
 import type { ReactElement } from 'react'
+import {
+  resolveCompactionDividerLabel,
+  type CompactionDividerSnapshot,
+} from '../lib/compactionDivider'
 
-export type CompactionDividerSnapshot = {
-  status: 'running' | 'done' | 'error'
-  auto?: boolean
-  summary?: string
-}
-
-const COPY = {
-  running: 'Compacting context',
-  autoCompleted: 'Auto-compacted context',
-  manualCompleted: 'Compacted context',
-  failed: 'Context compaction failed',
-} as const
+export type { CompactionDividerSnapshot } from '../lib/compactionDivider'
 
 /** Sample snapshots for ?compactionDivider preview hooks. */
 export const COMPACTION_DIVIDER_PREVIEW = {
@@ -31,19 +24,13 @@ export const COMPACTION_DIVIDER_PREVIEW = {
 
 export type CompactionDividerPreviewMode = keyof typeof COMPACTION_DIVIDER_PREVIEW
 
-function compactionDividerLabel(block: CompactionDividerSnapshot): string {
-  if (block.status === 'running') return COPY.running
-  if (block.status === 'error') return block.summary?.trim() || COPY.failed
-  return block.auto === true ? COPY.autoCompleted : COPY.manualCompleted
-}
-
 type Props = {
   block: CompactionDividerSnapshot
 }
 
 export function CompactionDivider({ block }: Props): ReactElement {
   const error = block.status === 'error'
-  const label = compactionDividerLabel(block)
+  const label = resolveCompactionDividerLabel(block)
 
   return (
     <div
