@@ -20,6 +20,25 @@ import {
   RefreshCw,
   Terminal,
 } from 'lucide-react'
+import {
+  WORKBENCH_EDITOR_LINE_BADGE,
+  WORKBENCH_EDITOR_PICKER_MENU_TITLE,
+  WORKBENCH_EDITOR_PICKER_TITLE,
+  WORKBENCH_GUI_UPDATE_INSTALL_LABEL,
+  WORKBENCH_RIGHT_PANEL_BROWSER_LABEL,
+  WORKBENCH_RIGHT_PANEL_CHANGES_LABEL,
+  WORKBENCH_RIGHT_PANEL_FILES_LABEL,
+  WORKBENCH_RIGHT_PANEL_PLAN_LABEL,
+  WORKBENCH_RIGHT_PANEL_TERMINAL_LABEL,
+  WORKBENCH_RIGHT_PANEL_TODO_LABEL,
+  WORKBENCH_SIDE_PANEL_OPEN_LABEL,
+  formatEditorPickerTitleWithEditor,
+  formatGuiUpdateAvailable,
+  formatGuiUpdateAvailableManual,
+  formatGuiUpdateTopbarAvailable,
+  formatGuiUpdateTopbarDownloading,
+  formatGuiUpdateTopbarManual,
+} from '../lib/workbenchTopBar'
 
 export type RightPanelMode =
   | 'todo'
@@ -65,20 +84,6 @@ type Props = {
   className?: string
 }
 
-const COPY = {
-  rightPanelTodo: 'Todos',
-  rightPanelPlan: 'Plan',
-  rightPanelChanges: 'Changes',
-  rightPanelBrowser: 'Browser',
-  rightPanelTerminal: 'Terminal',
-  rightPanelFiles: 'Files',
-  sidePanelOpen: 'Side conversations',
-  editorPickerTitle: 'Open in editor',
-  editorPickerTitleWithEditor: (editor: string) => `Open in ${editor}`,
-  editorPickerMenuTitle: 'Preferred editor',
-  editorLineBadge: 'Line',
-}
-
 /** Sample editors for ?workbenchTopBarPreview hooks. */
 export const WORKBENCH_TOP_BAR_PREVIEW_EDITORS: WorkbenchEditorInfo[] = [
   { id: 'cursor', label: 'Cursor', kind: 'code', supportsLine: true },
@@ -89,24 +94,24 @@ export const WORKBENCH_TOP_BAR_PREVIEW_EDITORS: WorkbenchEditorInfo[] = [
 
 export const WORKBENCH_TOP_BAR_PREVIEW_GUI_UPDATE = {
   available: {
-    label: 'Update to 0.9.2',
-    title: 'Update available: 0.9.1 → 0.9.2',
+    label: formatGuiUpdateTopbarAvailable('0.9.2'),
+    title: formatGuiUpdateAvailable('0.9.1', '0.9.2'),
     status: 'available',
   },
   downloading: {
-    label: 'Downloading… 42%',
-    title: 'Downloading update 0.9.2',
+    label: formatGuiUpdateTopbarDownloading(42),
+    title: formatGuiUpdateAvailable('0.9.1', '0.9.2'),
     status: 'downloading',
     percent: 42,
   },
   downloaded: {
-    label: 'Restart to update',
-    title: 'Update 0.9.2 ready to install',
+    label: WORKBENCH_GUI_UPDATE_INSTALL_LABEL,
+    title: formatGuiUpdateAvailable('0.9.1', '0.9.2'),
     status: 'downloaded',
   },
   manual: {
-    label: 'Get 0.9.2',
-    title: 'Manual update available: 0.9.1 → 0.9.2',
+    label: formatGuiUpdateTopbarManual('0.9.2'),
+    title: formatGuiUpdateAvailableManual('0.9.1', '0.9.2'),
     status: 'manual',
   },
 } satisfies Record<string, WorkbenchGuiUpdatePreview>
@@ -176,12 +181,12 @@ export function WorkbenchTopBar({
   const selectedEditor = editors.find((editor) => editor.id === effectiveEditorId) ?? editors[0]
 
   const items = [
-    { mode: 'todo' as const, label: COPY.rightPanelTodo, icon: ListTodo },
+    { mode: 'todo' as const, label: WORKBENCH_RIGHT_PANEL_TODO_LABEL, icon: ListTodo },
     ...(planPanelEnabled
-      ? [{ mode: 'plan' as const, label: COPY.rightPanelPlan, icon: ClipboardList }]
+      ? [{ mode: 'plan' as const, label: WORKBENCH_RIGHT_PANEL_PLAN_LABEL, icon: ClipboardList }]
       : []),
-    { mode: 'changes' as const, label: COPY.rightPanelChanges, icon: FileEdit },
-    { mode: 'browser' as const, label: COPY.rightPanelBrowser, icon: Globe2 },
+    { mode: 'changes' as const, label: WORKBENCH_RIGHT_PANEL_CHANGES_LABEL, icon: FileEdit },
+    { mode: 'browser' as const, label: WORKBENCH_RIGHT_PANEL_BROWSER_LABEL, icon: Globe2 },
   ]
 
   const guiUpdateBusy = guiUpdate?.status === 'downloading'
@@ -227,16 +232,12 @@ export function WorkbenchTopBar({
           type="button"
           onClick={() => setEditorMenuOpen((value) => !value)}
           className="workbench-topbar-icon-button workbench-topbar-editor-trigger"
-          aria-label={
-            selectedEditor
-              ? COPY.editorPickerTitleWithEditor(selectedEditor.label)
-              : COPY.editorPickerTitle
-          }
+          aria-label={WORKBENCH_EDITOR_PICKER_TITLE}
           aria-expanded={editorMenuOpen}
           title={
             selectedEditor
-              ? COPY.editorPickerTitleWithEditor(selectedEditor.label)
-              : COPY.editorPickerTitle
+              ? formatEditorPickerTitleWithEditor(selectedEditor.label)
+              : WORKBENCH_EDITOR_PICKER_TITLE
           }
         >
           {renderEditorIcon(selectedEditor, 'workbench-topbar-editor-icon')}
@@ -245,7 +246,7 @@ export function WorkbenchTopBar({
 
         {editorMenuOpen ? (
           <div className="workbench-topbar-editor-menu">
-            <div className="workbench-topbar-editor-menu-title">{COPY.editorPickerMenuTitle}</div>
+            <div className="workbench-topbar-editor-menu-title">{WORKBENCH_EDITOR_PICKER_MENU_TITLE}</div>
             {editors.map((editor) => {
               const active = editor.id === selectedEditor?.id
               return (
@@ -262,7 +263,7 @@ export function WorkbenchTopBar({
                   {renderEditorIcon(editor, 'workbench-topbar-editor-row-icon')}
                   <span className="workbench-topbar-editor-row-label">{editor.label}</span>
                   {editor.supportsLine ? (
-                    <span className="workbench-topbar-editor-line-badge">{COPY.editorLineBadge}</span>
+                    <span className="workbench-topbar-editor-line-badge">{WORKBENCH_EDITOR_LINE_BADGE}</span>
                   ) : null}
                   {active ? (
                     <Check className="workbench-topbar-editor-check" strokeWidth={2} />
@@ -284,9 +285,9 @@ export function WorkbenchTopBar({
               ? 'workbench-topbar-icon-button is-active workbench-topbar-sidechat-button'
               : 'workbench-topbar-icon-button workbench-topbar-sidechat-button'
           }
-          aria-label={COPY.sidePanelOpen}
+          aria-label={WORKBENCH_SIDE_PANEL_OPEN_LABEL}
           aria-pressed={sideChatOpen}
-          title={COPY.sidePanelOpen}
+          title={WORKBENCH_SIDE_PANEL_OPEN_LABEL}
         >
           <MessageCircleMore className="workbench-topbar-panel-icon" strokeWidth={1.75} />
           {sideChatCount > 0 ? (
@@ -327,9 +328,9 @@ export function WorkbenchTopBar({
                     ? 'workbench-topbar-icon-button is-active'
                     : 'workbench-topbar-icon-button'
                 }
-                aria-label={COPY.rightPanelTerminal}
+                aria-label={WORKBENCH_RIGHT_PANEL_TERMINAL_LABEL}
                 aria-pressed={terminalOpen}
-                title={COPY.rightPanelTerminal}
+                title={WORKBENCH_RIGHT_PANEL_TERMINAL_LABEL}
               >
                 <Terminal className="workbench-topbar-panel-icon" strokeWidth={1.75} />
               </button>
@@ -348,9 +349,9 @@ export function WorkbenchTopBar({
               ? 'workbench-topbar-icon-button is-active'
               : 'workbench-topbar-icon-button'
           }
-          aria-label={COPY.rightPanelFiles}
+          aria-label={WORKBENCH_RIGHT_PANEL_FILES_LABEL}
           aria-pressed={fileTreeOpen}
-          title={COPY.rightPanelFiles}
+          title={WORKBENCH_RIGHT_PANEL_FILES_LABEL}
         >
           <Files className="workbench-topbar-panel-icon" strokeWidth={1.75} />
         </button>
