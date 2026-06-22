@@ -108,7 +108,7 @@ test('general settings section copy matches Kun locale strings', () => {
   )
   assert.equal(GENERAL_SETTINGS_DESKTOP_BEHAVIOR_TITLE, 'Desktop behavior')
   assert.equal(GENERAL_SETTINGS_OPEN_AT_LOGIN_LABEL, 'Open at login')
-  assert.equal(GENERAL_SETTINGS_OPEN_AT_LOGIN_DESC, 'Start Navi automatically after you sign in.')
+  assert.equal(GENERAL_SETTINGS_OPEN_AT_LOGIN_DESC, 'Start Kun automatically after you sign in.')
   assert.equal(
     GENERAL_SETTINGS_OPEN_AT_LOGIN_UNSUPPORTED_DESC,
     'Open at login is available on Windows and macOS.',
@@ -147,7 +147,7 @@ test('general settings section copy matches Kun locale strings', () => {
   assert.equal(GENERAL_SETTINGS_LEGACY_IMPORT_TITLE, 'Import legacy conversations')
   assert.equal(
     GENERAL_SETTINGS_LEGACY_IMPORT_DESC,
-    'Bring conversations from a previous DeepSeek GUI installation into Navi.',
+    'Bring conversations from a previous DeepSeek GUI installation into Kun.',
   )
   assert.equal(
     GENERAL_SETTINGS_LEGACY_IMPORT_SCANNING,

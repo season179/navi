@@ -73,9 +73,9 @@ export const GENERAL_SETTINGS_DESKTOP_BEHAVIOR_TITLE = 'Desktop behavior'
 /** English copy matching Kun's desktopOpenAtLogin locale string. */
 export const GENERAL_SETTINGS_OPEN_AT_LOGIN_LABEL = 'Open at login'
 
-/** Navi-branded equivalent of Kun's desktopOpenAtLoginDesc locale string. */
+/** English copy matching Kun's desktopOpenAtLoginDesc locale string. */
 export const GENERAL_SETTINGS_OPEN_AT_LOGIN_DESC =
-  'Start Navi automatically after you sign in.'
+  'Start Kun automatically after you sign in.'
 
 /** English copy matching Kun's desktopOpenAtLoginUnsupportedDesc locale string. */
 export const GENERAL_SETTINGS_OPEN_AT_LOGIN_UNSUPPORTED_DESC =
@@ -126,9 +126,9 @@ export const GENERAL_SETTINGS_ONBOARDING_PREVIEW_OPEN = 'Open guide'
 /** English copy matching Kun's legacyImportTitle locale string. */
 export const GENERAL_SETTINGS_LEGACY_IMPORT_TITLE = 'Import legacy conversations'
 
-/** Navi-branded equivalent of Kun's legacyImportDesc locale string. */
+/** English copy matching Kun's legacyImportDesc locale string. */
 export const GENERAL_SETTINGS_LEGACY_IMPORT_DESC =
-  'Bring conversations from a previous DeepSeek GUI installation into Navi.'
+  'Bring conversations from a previous DeepSeek GUI installation into Kun.'
 
 /** English copy matching Kun's legacyImportScanning locale string. */
 export const GENERAL_SETTINGS_LEGACY_IMPORT_SCANNING =
