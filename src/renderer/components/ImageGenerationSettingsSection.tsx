@@ -4,6 +4,36 @@
 
 import { useEffect, useState, type ReactElement } from 'react'
 import {
+  formatImageGenerationSettingsModelSelectDefaultOption,
+  formatImageGenerationSettingsProviderMissingKey,
+  IMAGE_GENERATION_SETTINGS_API_KEY_DESC,
+  IMAGE_GENERATION_SETTINGS_API_KEY_LABEL,
+  IMAGE_GENERATION_SETTINGS_BASE_URL_DESC,
+  IMAGE_GENERATION_SETTINGS_BASE_URL_LABEL,
+  IMAGE_GENERATION_SETTINGS_BASE_URL_PLACEHOLDER,
+  IMAGE_GENERATION_SETTINGS_DEFAULT_SIZE_DESC,
+  IMAGE_GENERATION_SETTINGS_DEFAULT_SIZE_LABEL,
+  IMAGE_GENERATION_SETTINGS_ENABLED_DESC,
+  IMAGE_GENERATION_SETTINGS_ENABLED_LABEL,
+  IMAGE_GENERATION_SETTINGS_MODEL_DESC,
+  IMAGE_GENERATION_SETTINGS_MODEL_LABEL,
+  IMAGE_GENERATION_SETTINGS_MODEL_PLACEHOLDER,
+  IMAGE_GENERATION_SETTINGS_MODEL_QUALITY_HINT,
+  IMAGE_GENERATION_SETTINGS_PROTOCOL_DESC,
+  IMAGE_GENERATION_SETTINGS_PROTOCOL_LABEL,
+  IMAGE_GENERATION_SETTINGS_PROVIDER_CUSTOM,
+  IMAGE_GENERATION_SETTINGS_PROVIDER_DESC,
+  IMAGE_GENERATION_SETTINGS_PROVIDER_LABEL,
+  IMAGE_GENERATION_SETTINGS_TIMEOUT_DESC,
+  IMAGE_GENERATION_SETTINGS_TIMEOUT_LABEL,
+  IMAGE_GENERATION_SETTINGS_TITLE,
+  resolveImageGenerationSettingsProtocolLabel,
+} from '../lib/imageGenerationSettingsSection'
+import {
+  PROVIDERS_SETTINGS_HIDE_SECRET,
+  PROVIDERS_SETTINGS_SHOW_SECRET,
+} from '../lib/providersSettingsSection'
+import {
   InlineNoticeView,
   ModelSelect,
   SETTINGS_SELECT_CLASS,
@@ -71,43 +101,6 @@ export const IMAGE_GENERATION_PREVIEW_DEFAULT: ImageGenerationSettings = {
   timeoutMs: 180000,
 }
 
-const COPY = {
-  imageGen: 'Image generation',
-  imageGenEnabled: 'Enable image generation',
-  imageGenEnabledDesc:
-    'Enables the generate_image tool in agent chats and powers infographic generation in Write. MiniMax can reuse the key from Providers; custom OpenAI-compatible image APIs are still supported.',
-  imageGenProvider: 'Image provider',
-  imageGenProviderDesc:
-    'Choose a configured provider that has image models, or use a custom image API.',
-  imageGenProviderCustom: 'Custom image API',
-  imageGenProviderMissingKey: (provider: string) =>
-    `${provider} has no API key yet. Add it in Providers.`,
-  imageGenProtocol: 'Image protocol',
-  imageGenProtocolDesc: 'Request shape used by the custom image API.',
-  imageGenProtocolOpenAi: 'OpenAI Images',
-  imageGenProtocolMiniMax: 'MiniMax image_generation',
-  imageGenBaseUrl: 'API base URL',
-  imageGenBaseUrlDesc:
-    'OpenAI-compatible endpoint root; the tool calls {baseUrl}/images/generations.',
-  imageGenBaseUrlPlaceholder: 'https://api.siliconflow.cn/v1',
-  imageGenApiKey: 'API key',
-  imageGenApiKeyDesc: 'Key for the image provider. Independent from the chat model key.',
-  imageGenModel: 'Image model',
-  imageGenModelDesc: 'Model id sent to the provider, e.g. gpt-image-1 or Kwai-Kolors/Kolors.',
-  imageGenModelQualityHint:
-    'For production design drafts and infographics, prefer GPT Image or Gemini image models. Current domestic image models are still inconsistent at layout and text-heavy work, and may not meet directly usable quality standards.',
-  imageGenModelPlaceholder: 'gpt-image-1',
-  imageGenDefaultSize: 'Default size',
-  imageGenDefaultSizeDesc:
-    'Optional "WxH" or "auto" used when the assistant does not pick a ratio. Leave empty for the provider default. Note: 2K previews may exceed the 5 MB attachment limit; the file is still saved to the workspace.',
-  imageGenTimeout: 'Timeout (ms)',
-  imageGenTimeoutDesc:
-    'Per-request timeout for the image API. Image models can take minutes at high resolutions.',
-  showSecret: 'Show',
-  hideSecret: 'Hide',
-  modelSelectDefaultOption: (model: string) => (model ? `Default (${model})` : 'Default'),
-}
-
 type Props = {
   settings: ImageGenerationSettings
   onSettingsChange?: (next: ImageGenerationSettings) => void
@@ -137,10 +130,10 @@ export function ImageGenerationSettingsSection({
   }
 
   return (
-    <SettingsCard title={COPY.imageGen}>
+    <SettingsCard title={IMAGE_GENERATION_SETTINGS_TITLE}>
       <SettingRow
-        title={COPY.imageGenEnabled}
-        description={COPY.imageGenEnabledDesc}
+        title={IMAGE_GENERATION_SETTINGS_ENABLED_LABEL}
+        description={IMAGE_GENERATION_SETTINGS_ENABLED_DESC}
         control={
           <Toggle
             checked={settings.enabled}
@@ -151,8 +144,8 @@ export function ImageGenerationSettingsSection({
       {settings.enabled ? (
         <>
           <SettingRow
-            title={COPY.imageGenProvider}
-            description={COPY.imageGenProviderDesc}
+            title={IMAGE_GENERATION_SETTINGS_PROVIDER_LABEL}
+            description={IMAGE_GENERATION_SETTINGS_PROVIDER_DESC}
             control={
               <div className="image-generation-provider-control">
                 <select
@@ -182,12 +175,12 @@ export function ImageGenerationSettingsSection({
                     </option>
                   ))}
                   <option value={CUSTOM_IMAGE_GENERATION_PROVIDER_ID}>
-                    {COPY.imageGenProviderCustom}
+                    {IMAGE_GENERATION_SETTINGS_PROVIDER_CUSTOM}
                   </option>
                 </select>
                 {!usingCustomProvider && !selectedProvider?.hasApiKey ? (
                   <p className="image-generation-provider-warning">
-                    {COPY.imageGenProviderMissingKey(
+                    {formatImageGenerationSettingsProviderMissingKey(
                       selectedProvider?.name ?? selectedProviderId,
                     )}
                   </p>
@@ -198,8 +191,8 @@ export function ImageGenerationSettingsSection({
           {usingCustomProvider ? (
             <>
               <SettingRow
-                title={COPY.imageGenProtocol}
-                description={COPY.imageGenProtocolDesc}
+                title={IMAGE_GENERATION_SETTINGS_PROTOCOL_LABEL}
+                description={IMAGE_GENERATION_SETTINGS_PROTOCOL_DESC}
                 control={
                   <select
                     className={SETTINGS_SELECT_CLASS}
@@ -212,29 +205,27 @@ export function ImageGenerationSettingsSection({
                   >
                     {IMAGE_GENERATION_PROTOCOLS.map((protocol) => (
                       <option key={protocol} value={protocol}>
-                        {protocol === 'minimax-image'
-                          ? COPY.imageGenProtocolMiniMax
-                          : COPY.imageGenProtocolOpenAi}
+                        {resolveImageGenerationSettingsProtocolLabel(protocol)}
                       </option>
                     ))}
                   </select>
                 }
               />
               <SettingRow
-                title={COPY.imageGenBaseUrl}
-                description={COPY.imageGenBaseUrlDesc}
+                title={IMAGE_GENERATION_SETTINGS_BASE_URL_LABEL}
+                description={IMAGE_GENERATION_SETTINGS_BASE_URL_DESC}
                 control={
                   <input
                     className="settings-text-input image-generation-text-input"
                     value={settings.baseUrl}
-                    placeholder={COPY.imageGenBaseUrlPlaceholder}
+                    placeholder={IMAGE_GENERATION_SETTINGS_BASE_URL_PLACEHOLDER}
                     onChange={(event) => updateSettings({ baseUrl: event.target.value })}
                   />
                 }
               />
               <SettingRow
-                title={COPY.imageGenApiKey}
-                description={COPY.imageGenApiKeyDesc}
+                title={IMAGE_GENERATION_SETTINGS_API_KEY_LABEL}
+                description={IMAGE_GENERATION_SETTINGS_API_KEY_DESC}
                 control={
                   <SettingsSecretInput
                     value={settings.apiKey}
@@ -242,8 +233,8 @@ export function ImageGenerationSettingsSection({
                     visible={showApiKey}
                     onToggleVisibility={() => setShowApiKey((value) => !value)}
                     autoComplete="off"
-                    showLabel={COPY.showSecret}
-                    hideLabel={COPY.hideSecret}
+                    showLabel={PROVIDERS_SETTINGS_SHOW_SECRET}
+                    hideLabel={PROVIDERS_SETTINGS_HIDE_SECRET}
                     className="image-generation-secret-input"
                   />
                 }
@@ -251,22 +242,24 @@ export function ImageGenerationSettingsSection({
             </>
           ) : null}
           <SettingRow
-            title={COPY.imageGenModel}
-            description={COPY.imageGenModelDesc}
+            title={IMAGE_GENERATION_SETTINGS_MODEL_LABEL}
+            description={IMAGE_GENERATION_SETTINGS_MODEL_DESC}
             control={
               <div className="image-generation-model-control">
                 {usingCustomProvider ? (
                   <input
                     className="settings-text-input"
                     value={settings.model}
-                    placeholder={COPY.imageGenModelPlaceholder}
+                    placeholder={IMAGE_GENERATION_SETTINGS_MODEL_PLACEHOLDER}
                     onChange={(event) => updateSettings({ model: event.target.value })}
                   />
                 ) : (
                   <ModelSelect
                     value={imageModelOptions.includes(settings.model) ? settings.model : ''}
                     options={imageModelOptions}
-                    defaultLabel={COPY.modelSelectDefaultOption(imageModelOptions[0] ?? '')}
+                    defaultLabel={formatImageGenerationSettingsModelSelectDefaultOption(
+                      imageModelOptions[0] ?? '',
+                    )}
                     selectClassName={SETTINGS_SELECT_CLASS}
                     onChange={(model) => updateSettings({ model })}
                   />
@@ -275,11 +268,13 @@ export function ImageGenerationSettingsSection({
             }
           />
           <div className="image-generation-quality-hint">
-            <InlineNoticeView notice={{ tone: 'info', message: COPY.imageGenModelQualityHint }} />
+            <InlineNoticeView
+              notice={{ tone: 'info', message: IMAGE_GENERATION_SETTINGS_MODEL_QUALITY_HINT }}
+            />
           </div>
           <SettingRow
-            title={COPY.imageGenDefaultSize}
-            description={COPY.imageGenDefaultSizeDesc}
+            title={IMAGE_GENERATION_SETTINGS_DEFAULT_SIZE_LABEL}
+            description={IMAGE_GENERATION_SETTINGS_DEFAULT_SIZE_DESC}
             control={
               <input
                 className="settings-text-input image-generation-size-input"
@@ -291,8 +286,8 @@ export function ImageGenerationSettingsSection({
             }
           />
           <SettingRow
-            title={COPY.imageGenTimeout}
-            description={COPY.imageGenTimeoutDesc}
+            title={IMAGE_GENERATION_SETTINGS_TIMEOUT_LABEL}
+            description={IMAGE_GENERATION_SETTINGS_TIMEOUT_DESC}
             control={
               <input
                 type="number"
