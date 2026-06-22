@@ -5,6 +5,7 @@
 import { useState, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { ProcessEntryDetail } from './ProcessEntryDetail'
+import { resolveProcessExpandCollapseLabel } from '../lib/processTimeline'
 import { ProcessSummaryText } from './ProcessFileReference'
 import { type ProcessStackEntrySnapshot } from './ProcessSectionRow'
 
@@ -146,7 +147,7 @@ function ProcessStackEntryRow({
       {canExpand ? (
         <button
           type="button"
-          aria-label={open ? 'Collapse detail' : 'Expand detail'}
+          aria-label={resolveProcessExpandCollapseLabel(open)}
           aria-expanded={open}
           disabled={!canToggle}
           className={`process-stack-entry-toggle ${canToggle ? '' : 'is-static'}`}

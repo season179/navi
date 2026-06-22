@@ -3,9 +3,7 @@
 // Visual only: click handlers are omitted; mousedown stops row toggle like Kun.
 
 import type { MouseEvent, ReactElement } from 'react'
-
-const PROCESS_FILE_REFERENCE_HINT =
-  'Click to preview file. Double-click to open in editor.'
+import { PROCESS_FILE_REFERENCE_HINT } from '../lib/processTimeline'
 
 type ProcessFileReferenceProps = {
   path: string

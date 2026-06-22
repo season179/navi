@@ -17,6 +17,7 @@ import {
   RUNTIME_META_BADGES_PREVIEW,
 } from './RuntimeMetaBadges'
 import { type RuntimeMetaChipsSnapshot } from './RuntimeMetaChips'
+import { resolveProcessExpandCollapseLabel } from '../lib/processTimeline'
 
 export type ProcessEntrySnapshot = {
   verb: string
@@ -428,7 +429,7 @@ export function ProcessEntryRow({
       {canExpand ? (
         <button
           type="button"
-          aria-label={isOpen ? 'Collapse detail' : 'Expand detail'}
+          aria-label={resolveProcessExpandCollapseLabel(isOpen)}
           aria-expanded={isOpen}
           disabled={!canToggle}
           className={`process-entry-row-toggle ${canToggle ? 'is-clickable' : ''}`}
