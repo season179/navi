@@ -158,6 +158,11 @@ import {
   COMPOSER_PLUS_MENU_PREVIEW_DEFAULT,
   COMPOSER_PLUS_MENU_TITLE,
 } from '../lib/composerPlusMenu'
+import {
+  CONTEXT_CAPACITY_TITLE,
+  formatContextCapacityChipAria,
+  formatContextCapacityPercent,
+} from '../lib/composerContextCapacity'
 
 export type { ComposerChangedFile } from '../lib/composerChangeSummary'
 export { COMPOSER_CHANGE_SUMMARY_PREVIEW } from '../lib/composerChangeSummary'
@@ -330,10 +335,6 @@ const ATTACHMENTS_PREVIEW: ComposerImageAttachment[] = COMPOSER_ATTACHMENTS_PREV
 
 
 const CHANGED_FILES_PREVIEW: ChangedFilePreview[] = COMPOSER_CHANGE_SUMMARY_PREVIEW.files
-
-function formatPercent(value: number): string {
-  return `${Math.round(value * 100)}%`
-}
 
 export function ComposerImageAttachmentPreview({
   attachment,
@@ -1241,6 +1242,10 @@ export function FloatingComposer({
                         type="button"
                         className="floating-composer-context-chip"
                         aria-expanded={snapshot.contextCapacityOpen}
+                        aria-label={formatContextCapacityChipAria(
+                          formatContextCapacityPercent(snapshot.contextCapacity.usedRatio),
+                        )}
+                        title={CONTEXT_CAPACITY_TITLE}
                       >
                         <span className="floating-composer-context-bar" aria-hidden>
                           <span
@@ -1255,7 +1260,9 @@ export function FloatingComposer({
                             }}
                           />
                         </span>
-                        <span>{formatPercent(snapshot.contextCapacity.usedRatio)}</span>
+                        <span>
+                          {formatContextCapacityPercent(snapshot.contextCapacity.usedRatio)}
+                        </span>
                       </button>
                       {snapshot.contextCapacityOpen ? (
                         <div className="floating-composer-context-popover">

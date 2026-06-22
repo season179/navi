@@ -3,8 +3,19 @@
 // only: parent supplies a ContextCapacity snapshot; no live token accounting.
 
 import type { ReactElement } from 'react'
+import {
+  CONTEXT_CAPACITY_CATEGORY_LABELS,
+  CONTEXT_CAPACITY_ESTIMATED_ALL,
+  CONTEXT_CAPACITY_ESTIMATED_BREAKDOWN,
+  CONTEXT_CAPACITY_TITLE,
+  formatContextCapacityBarAria,
+  formatContextCapacityPercent,
+  formatContextCapacityThresholdLabel,
+  resolveContextCapacityStatusText,
+  type ContextCapacityCategoryKey,
+} from '../lib/composerContextCapacity'
 
-export type ContextCategoryKey = 'tools' | 'system' | 'skills' | 'messages' | 'other'
+export type ContextCategoryKey = ContextCapacityCategoryKey
 
 export type ContextCategory = {
   key: ContextCategoryKey
@@ -36,17 +47,7 @@ const CATEGORY_COLORS: Record<ContextCategoryKey, string> = {
   other: '#d8910d',
 }
 
-const CATEGORY_LABELS: Record<ContextCategoryKey, string> = {
-  tools: 'Tools',
-  system: 'System',
-  skills: 'Skills',
-  messages: 'Messages',
-  other: 'Other',
-}
-
 const CATEGORY_ORDER: ContextCategoryKey[] = ['tools', 'system', 'skills', 'messages', 'other']
-
-const WARN_RATIO = 0.75
 
 function formatCompactNumber(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
@@ -54,16 +55,9 @@ function formatCompactNumber(value: number): string {
   return new Intl.NumberFormat().format(value)
 }
 
-function formatPercent(value: number | null): string {
-  if (value == null || !Number.isFinite(value)) return '-'
-  const percent = Math.max(0, Math.min(100, value * 100))
-  if (percent === 0 || percent >= 10) return `${Math.round(percent)}%`
-  return `${percent.toFixed(1)}%`
-}
-
 function stateColor(usedRatio: number, thresholdRatio: number): string {
   if (usedRatio >= thresholdRatio) return '#d9544e'
-  if (usedRatio >= WARN_RATIO) return '#d9920f'
+  if (usedRatio >= 0.75) return '#d9920f'
   return 'var(--ds-accent)'
 }
 
@@ -99,21 +93,21 @@ export function ContextCapacityPopover({
     capacity.categories.find((c) => c.key === key)
   ).filter((c): c is ContextCategory => Boolean(c) && (c?.tokens ?? 0) > 0)
 
-  const statusText =
-    capacity.usedRatio >= thresholdRatio
-      ? 'Context window is nearly full'
-      : capacity.usedRatio >= WARN_RATIO
-        ? 'Approaching context limit'
-        : 'Share of context window used'
+  const usedPercent = formatContextCapacityPercent(capacity.usedRatio)
+  const thresholdPercent = formatContextCapacityPercent(thresholdRatio)
+  const statusText = resolveContextCapacityStatusText(
+    capacity.usedRatio,
+    thresholdRatio,
+  )
 
   return (
     <div
       className="context-capacity-popover"
       role="dialog"
-      aria-label="Context capacity"
+      aria-label={CONTEXT_CAPACITY_TITLE}
     >
       <div className="context-capacity-header">
-        <span className="context-capacity-title">Context capacity</span>
+        <span className="context-capacity-title">{CONTEXT_CAPACITY_TITLE}</span>
         <span className="context-capacity-total">
           <span className="context-capacity-total-used" style={{ color: accent }}>
             {formatCompactNumber(capacity.usedTokens)}
@@ -122,7 +116,7 @@ export function ContextCapacityPopover({
           {formatCompactNumber(capacity.windowTokens)}
           {' · '}
           <span className="context-capacity-total-used" style={{ color: accent }}>
-            {formatPercent(capacity.usedRatio)}
+            {usedPercent}
           </span>
         </span>
       </div>
@@ -131,7 +125,7 @@ export function ContextCapacityPopover({
         <div
           className="context-capacity-bar"
           role="img"
-          aria-label={`${formatPercent(capacity.usedRatio)} of context window used`}
+          aria-label={formatContextCapacityBarAria(usedPercent)}
         >
           {visibleSegments.map((segment) => (
             <span
@@ -148,7 +142,7 @@ export function ContextCapacityPopover({
         <span
           className="context-capacity-threshold"
           style={{ left: `${thresholdRatio * 100}%` }}
-          title={`Compaction threshold · ${formatPercent(thresholdRatio)}`}
+          title={formatContextCapacityThresholdLabel(thresholdPercent)}
           aria-hidden="true"
         />
       </div>
@@ -158,7 +152,7 @@ export function ContextCapacityPopover({
           {statusText}
         </span>
         <span className="context-capacity-threshold-label">
-          Compaction threshold · {formatPercent(thresholdRatio)}
+          {formatContextCapacityThresholdLabel(thresholdPercent)}
         </span>
       </div>
 
@@ -172,23 +166,29 @@ export function ContextCapacityPopover({
                 className="context-capacity-swatch"
                 style={{ background: CATEGORY_COLORS[key] }}
               />
-              <span className="context-capacity-row-label">{CATEGORY_LABELS[key]}</span>
+              <span className="context-capacity-row-label">
+                {CONTEXT_CAPACITY_CATEGORY_LABELS[key]}
+              </span>
               <span className="context-capacity-row-tokens">
                 {formatCompactNumber(category.tokens)}
               </span>
-              <span className="context-capacity-row-ratio">{formatPercent(category.ratio)}</span>
+              <span className="context-capacity-row-ratio">
+                {formatContextCapacityPercent(category.ratio)}
+              </span>
             </div>
           )
         })}
 
         <div className="context-capacity-row context-capacity-row-free">
           <span className="context-capacity-swatch context-capacity-swatch-free" />
-          <span className="context-capacity-row-label context-capacity-row-label-muted">Free</span>
+          <span className="context-capacity-row-label context-capacity-row-label-muted">
+            {CONTEXT_CAPACITY_CATEGORY_LABELS.free}
+          </span>
           <span className="context-capacity-row-tokens context-capacity-row-label-muted">
             {formatCompactNumber(capacity.freeTokens)}
           </span>
           <span className="context-capacity-row-ratio context-capacity-row-label-muted">
-            {formatPercent(capacity.freeRatio)}
+            {formatContextCapacityPercent(capacity.freeRatio)}
           </span>
         </div>
       </div>
@@ -196,8 +196,8 @@ export function ContextCapacityPopover({
       {capacity.estimated ? (
         <p className="context-capacity-footnote">
           {capacity.hasMeasuredTotal
-            ? 'Category breakdown is estimated; total is measured from the latest turn.'
-            : 'Capacity is estimated until the first model turn completes.'}
+            ? CONTEXT_CAPACITY_ESTIMATED_BREAKDOWN
+            : CONTEXT_CAPACITY_ESTIMATED_ALL}
         </p>
       ) : null}
     </div>

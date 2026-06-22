@@ -59,11 +59,12 @@ import {
   ContextCapacityPopover,
   type ContextCapacity,
 } from './ContextCapacityPopover'
+import {
+  CONTEXT_CAPACITY_TITLE,
+  formatContextCapacityChipAria,
+  formatContextCapacityPercent,
+} from '../lib/composerContextCapacity'
 import type { SkillSummary } from '../../shared/flue'
-
-function formatContextPercent(value: number): string {
-  return `${Math.round(value * 100)}%`
-}
 
 interface ComposerProps {
   value: string
@@ -720,8 +721,10 @@ export function Composer({
                         type="button"
                         className="floating-composer-context-chip"
                         aria-expanded={contextCapacityOpen}
-                        aria-label={`Context capacity ${formatContextPercent(contextCapacity.usedRatio)}`}
-                        title="Context capacity"
+                        aria-label={formatContextCapacityChipAria(
+                          formatContextCapacityPercent(contextCapacity.usedRatio),
+                        )}
+                        title={CONTEXT_CAPACITY_TITLE}
                         onClick={() => setContextCapacityOpen((open) => !open)}
                       >
                         <span className="floating-composer-context-bar" aria-hidden>
@@ -737,7 +740,7 @@ export function Composer({
                             }}
                           />
                         </span>
-                        <span>{formatContextPercent(contextCapacity.usedRatio)}</span>
+                        <span>{formatContextCapacityPercent(contextCapacity.usedRatio)}</span>
                       </button>
                       {contextCapacityOpen ? (
                         <div className="floating-composer-context-popover">
