@@ -11,6 +11,42 @@ import {
   RefreshCw,
   Sparkles,
 } from 'lucide-react'
+import {
+  USAGE_HEATMAP_CACHE,
+  USAGE_HEATMAP_CACHE_SAVINGS,
+  USAGE_HEATMAP_CONTEXT_SAVINGS,
+  USAGE_HEATMAP_COST,
+  USAGE_HEATMAP_LOADING,
+  USAGE_HEATMAP_MESSAGES,
+  USAGE_HEATMAP_MODEL_TOOLTIP_CACHED_INPUT,
+  USAGE_HEATMAP_MODEL_TOOLTIP_OUTPUT,
+  USAGE_HEATMAP_MODEL_TOOLTIP_UNCACHED_INPUT,
+  USAGE_HEATMAP_REFRESH,
+  USAGE_HEATMAP_SESSIONS,
+  USAGE_HEATMAP_TAB_MODELS,
+  USAGE_HEATMAP_TAB_OVERVIEW,
+  USAGE_HEATMAP_TOKENS,
+  USAGE_HEATMAP_TOTAL_TOKENS,
+  USAGE_HEATMAP_ACTIVE_DAYS,
+  USAGE_HEATMAP_CURRENT_STREAK,
+  USAGE_HEATMAP_GRID_LABEL,
+  USAGE_HEATMAP_LONGEST_STREAK,
+  formatUsageHeatmapDaySummary,
+  formatUsageHeatmapModelTokenBreakdown,
+  formatUsageHeatmapModelTooltip,
+  formatUsageHeatmapModelTooltipTotalTokens,
+  formatUsageHeatmapModelsEmpty,
+  formatUsageHeatmapOverviewCaption,
+  formatUsageHeatmapSavedTokens,
+  formatUsageHeatmapStreakDays,
+  resolveUsageHeatmapExpandCollapseLabel,
+  resolveUsageHeatmapHeroSub,
+  resolveUsageHeatmapHeroTitle,
+  resolveUsageHeatmapRangeLabel,
+  resolveUsageHeatmapWarmupBadge,
+  resolveUsageHeatmapWarmupSub,
+  resolveUsageHeatmapWarmupTitle,
+} from '../lib/initialSessionUsageHeatmap'
 import { RuntimeWakeStage } from './RuntimeWakeStage'
 
 export type DailyUsageBucket = {
@@ -83,66 +119,6 @@ const MODEL_USAGE_BREAKDOWN_COLORS = {
   output: '#245fd7',
 } as const
 const EMPTY_DAILY_USAGE_BUCKETS: DailyUsageBucket[] = []
-
-const COPY = {
-  title: 'Your recent agent rhythm',
-  sub: 'Start from the work pattern you have already built. Each day is colored by token usage, with turns, cost, threads, and cache detail available from the cells.',
-  tabOverview: 'Overview',
-  tabModels: 'Models',
-  range: { all: 'All', '90d': '90d', '30d': '30d', '7d': '7d' } as Record<UsageRangeKey, string>,
-  gridLabel: 'Daily usage calendar',
-  loading: 'Loading recent usage…',
-  collapse: 'Collapse calendar',
-  expand: 'Expand calendar',
-  refresh: 'Refresh',
-  sessions: 'Sessions',
-  messages: 'Messages',
-  totalTokens: 'Total tokens',
-  activeDays: 'Active days',
-  currentStreak: 'Current streak',
-  longestStreak: 'Longest streak',
-  cost: 'Cost',
-  cacheSavings: 'Cache hits saved',
-  contextSavings: 'Context saved',
-  cache: 'Cache',
-  tokens: 'Tokens',
-  modelsEmpty: (model: string) => `No model usage for ${model} yet.`,
-  overviewCaption: (tokens: string, activeDays: number) =>
-    `You've used ${tokens} tokens across ${activeDays} active days.`,
-  streakDays: (count: number) => `${count}d`,
-  savedTokens: (tokens: string) => `${tokens} tokens`,
-  heroTitle: {
-    loading: 'Preparing your usage calendar',
-    empty: 'Start your agent rhythm',
-    error: 'Start now, sync usage later',
-  },
-  heroSub: {
-    loading: 'Navi is checking recent activity. The starter prompts stay ready while the calendar warms up.',
-    empty: 'Once your first turn completes, this space will turn into a daily usage calendar.',
-    error: 'Usage history is not available yet, but the workspace is ready for a new conversation.',
-  },
-  warmupBadge: {
-    loading: 'Checking history',
-    empty: 'Navi usage',
-    error: 'Usage delayed',
-  },
-  warmupTitle: {
-    loading: 'Looking for recent activity',
-    empty: 'No usage has been recorded yet',
-    error: 'Usage can be retried later',
-  },
-  warmupSub: {
-    loading: 'This usually resolves quickly after Navi answers. You can still pick a prompt below.',
-    empty: 'Send a request and finish a turn; the first active day will appear here automatically.',
-    error: 'The usage endpoint did not respond, so the calendar is paused for now. New chats still work.',
-  },
-  modelTooltipCachedInput: 'Input (cache hit)',
-  modelTooltipUncachedInput: 'Input (cache miss)',
-  modelTooltipOutput: 'Output',
-  modelTooltipTotalTokens: (value: string) => `${value} tokens`,
-  modelTokenBreakdown: (input: string, output: string, cacheHit: string, cacheMiss: string) =>
-    `${input} in · ${output} out · ${cacheHit} hit · ${cacheMiss} miss`,
-} as const
 
 function formatCompactNumber(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
@@ -279,7 +255,15 @@ function usageTotalsFromBuckets(buckets: DailyUsageBucket[]): UsageTotalsBucket 
 }
 
 function dailySummary(bucket: DailyUsageBucket): string {
-  return `${bucket.date} · ${formatCompactNumber(bucket.totalTokens)} tokens · ${formatCost(bucket.costUsd, bucket.costCny)} · ${formatCompactNumber(bucket.cachedTokens)} cached tokens · ${bucket.turns} turns · ${bucket.threadCount} threads · ${formatPercent(bucket.cacheHitRate)} cache`
+  return formatUsageHeatmapDaySummary({
+    date: bucket.date,
+    tokens: formatCompactNumber(bucket.totalTokens),
+    cost: formatCost(bucket.costUsd, bucket.costCny),
+    saved: formatCompactNumber(bucket.cachedTokens),
+    turns: bucket.turns,
+    threads: bucket.threadCount,
+    cache: formatPercent(bucket.cacheHitRate),
+  })
 }
 
 function usageHasActivity(state: DailyUsageState): boolean {
@@ -309,7 +293,14 @@ function modelUsageChartBreakdown(
 }
 
 function modelUsageBreakdownSummary(label: string, bucket: DailyUsageBucket, locale: string): string {
-  return `${label} · ${formatTokenCount(bucket.totalTokens, locale)} tokens total · ${formatTokenCount(bucket.inputTokens, locale)} input · ${formatTokenCount(bucket.outputTokens, locale)} output · ${formatTokenCount(bucket.cachedTokens, locale)} cache hit · ${formatTokenCount(bucket.cacheMissTokens, locale)} cache miss`
+  return formatUsageHeatmapModelTooltip({
+    label,
+    total: formatTokenCount(bucket.totalTokens, locale),
+    input: formatTokenCount(bucket.inputTokens, locale),
+    output: formatTokenCount(bucket.outputTokens, locale),
+    cacheHit: formatTokenCount(bucket.cachedTokens, locale),
+    cacheMiss: formatTokenCount(bucket.cacheMissTokens, locale),
+  })
 }
 
 function previewBucket(date: string, totalTokens: number, turns = 1): DailyUsageBucket {
@@ -459,7 +450,7 @@ function HeatmapGrid({
         <div
           className="usage-heatmap-grid"
           style={{ gridTemplateColumns: `repeat(${weekCount}, minmax(0, 1fr))` }}
-          aria-label={COPY.gridLabel}
+          aria-label={USAGE_HEATMAP_GRID_LABEL}
         >
           {loading
             ? skeletonWeeks.map((week) => (
@@ -569,14 +560,14 @@ function WarmupStatePanel({
       <div className="usage-heatmap-warmup-side">
         <div className={`usage-heatmap-warmup-badge usage-heatmap-warmup-badge--${mode}`}>
           {icon}
-          <span>{COPY.warmupBadge[mode]}</span>
+          <span>{resolveUsageHeatmapWarmupBadge(mode)}</span>
         </div>
-        <h2 className="usage-heatmap-warmup-title">{COPY.warmupTitle[mode]}</h2>
-        <p className="usage-heatmap-warmup-sub">{COPY.warmupSub[mode]}</p>
+        <h2 className="usage-heatmap-warmup-title">{resolveUsageHeatmapWarmupTitle(mode)}</h2>
+        <p className="usage-heatmap-warmup-sub">{resolveUsageHeatmapWarmupSub(mode)}</p>
         {mode === 'error' ? (
           <button type="button" className="usage-heatmap-refresh-btn" onClick={onRefresh}>
             <RefreshCw strokeWidth={1.8} />
-            <span>{COPY.refresh}</span>
+            <span>{USAGE_HEATMAP_REFRESH}</span>
           </button>
         ) : null}
       </div>
@@ -642,19 +633,19 @@ function ModelUsagePanel({
     ? [
         {
           key: 'cached-input',
-          label: COPY.modelTooltipCachedInput,
+          label: USAGE_HEATMAP_MODEL_TOOLTIP_CACHED_INPUT,
           value: activeBreakdown.cachedInput,
           color: MODEL_USAGE_BREAKDOWN_COLORS.cachedInput,
         },
         {
           key: 'uncached-input',
-          label: COPY.modelTooltipUncachedInput,
+          label: USAGE_HEATMAP_MODEL_TOOLTIP_UNCACHED_INPUT,
           value: activeBreakdown.uncachedInput,
           color: MODEL_USAGE_BREAKDOWN_COLORS.uncachedInput,
         },
         {
           key: 'output',
-          label: COPY.modelTooltipOutput,
+          label: USAGE_HEATMAP_MODEL_TOOLTIP_OUTPUT,
           value: activeBreakdown.output,
           color: MODEL_USAGE_BREAKDOWN_COLORS.output,
         },
@@ -662,13 +653,13 @@ function ModelUsagePanel({
     : []
 
   if (state.loading && !usage) {
-    return <div className="usage-heatmap-models-loading">{COPY.loading}</div>
+    return <div className="usage-heatmap-models-loading">{USAGE_HEATMAP_LOADING}</div>
   }
 
   if (modelBuckets.length === 0) {
     return (
       <div className="usage-heatmap-models-empty">
-        {COPY.modelsEmpty(fallbackModel || '-')}
+        {formatUsageHeatmapModelsEmpty(fallbackModel || '-')}
       </div>
     )
   }
@@ -676,7 +667,7 @@ function ModelUsagePanel({
   return (
     <div className="usage-heatmap-models">
       <div className="usage-heatmap-models-header">
-        <span className="usage-heatmap-models-header-label">{COPY.tokens}</span>
+        <span className="usage-heatmap-models-header-label">{USAGE_HEATMAP_TOKENS}</span>
         <span className="usage-heatmap-models-header-value">
           {formatTokenCount(usage?.totals.totalTokens ?? 0, locale)}
         </span>
@@ -698,7 +689,7 @@ function ModelUsagePanel({
               <div className="usage-heatmap-model-tooltip-header">
                 <span className="usage-heatmap-model-tooltip-date">{activeDay.date}</span>
                 <span className="usage-heatmap-model-tooltip-total">
-                  {COPY.modelTooltipTotalTokens(formatTokenCount(activeBreakdown.total, locale))}
+                  {formatUsageHeatmapModelTooltipTotalTokens(formatTokenCount(activeBreakdown.total, locale))}
                 </span>
               </div>
               <div className="usage-heatmap-model-tooltip-rows">
@@ -707,7 +698,7 @@ function ModelUsagePanel({
                     <span className="usage-heatmap-model-tooltip-swatch" style={{ backgroundColor: row.color }} aria-hidden />
                     <span className="usage-heatmap-model-tooltip-label">{row.label}</span>
                     <span className="usage-heatmap-model-tooltip-value">
-                      {COPY.modelTooltipTotalTokens(formatTokenCount(row.value, locale))}
+                      {formatUsageHeatmapModelTooltipTotalTokens(formatTokenCount(row.value, locale))}
                     </span>
                   </div>
                 ))}
@@ -779,7 +770,7 @@ function ModelUsagePanel({
                 <span className="usage-heatmap-models-list-model">{bucket.model}</span>
               </span>
               <span className="usage-heatmap-models-list-breakdown">
-                {COPY.modelTokenBreakdown(
+                {formatUsageHeatmapModelTokenBreakdown(
                   formatCompactNumber(bucket.inputTokens),
                   formatCompactNumber(bucket.outputTokens),
                   formatCompactNumber(bucket.cachedTokens),
@@ -803,7 +794,7 @@ function UsageHeroToggle({
   onToggle: () => void
 }): ReactElement {
   const Icon = expanded ? ChevronUp : ChevronDown
-  const label = expanded ? COPY.collapse : COPY.expand
+  const label = resolveUsageHeatmapExpandCollapseLabel(expanded)
   return (
     <button
       type="button"
@@ -886,19 +877,19 @@ export function InitialSessionUsageHeatmapView({
   const mode = usageViewMode(state)
   const streaks = useMemo(() => usageStreaks(metricBuckets), [metricBuckets])
   const overviewMetrics = [
-    { label: COPY.sessions, value: formatCompactNumber(totals.threadCount) },
-    { label: COPY.messages, value: formatCompactNumber(totals.turns) },
-    { label: COPY.totalTokens, value: formatCompactNumber(totals.totalTokens) },
-    { label: COPY.activeDays, value: String(totals.activeDays) },
-    { label: COPY.currentStreak, value: COPY.streakDays(streaks.current) },
-    { label: COPY.longestStreak, value: COPY.streakDays(streaks.longest) },
-    { label: COPY.cost, value: formatCost(totals.costUsd, totals.costCny) },
-    { label: COPY.cacheSavings, value: COPY.savedTokens(formatCompactNumber(totals.cachedTokens)) },
-    { label: COPY.contextSavings, value: COPY.savedTokens(formatCompactNumber(totals.tokenEconomySavingsTokens)) },
-    { label: COPY.cache, value: formatPercent(totals.cacheHitRate) },
+    { label: USAGE_HEATMAP_SESSIONS, value: formatCompactNumber(totals.threadCount) },
+    { label: USAGE_HEATMAP_MESSAGES, value: formatCompactNumber(totals.turns) },
+    { label: USAGE_HEATMAP_TOTAL_TOKENS, value: formatCompactNumber(totals.totalTokens) },
+    { label: USAGE_HEATMAP_ACTIVE_DAYS, value: String(totals.activeDays) },
+    { label: USAGE_HEATMAP_CURRENT_STREAK, value: formatUsageHeatmapStreakDays(streaks.current) },
+    { label: USAGE_HEATMAP_LONGEST_STREAK, value: formatUsageHeatmapStreakDays(streaks.longest) },
+    { label: USAGE_HEATMAP_COST, value: formatCost(totals.costUsd, totals.costCny) },
+    { label: USAGE_HEATMAP_CACHE_SAVINGS, value: formatUsageHeatmapSavedTokens(formatCompactNumber(totals.cachedTokens)) },
+    { label: USAGE_HEATMAP_CONTEXT_SAVINGS, value: formatUsageHeatmapSavedTokens(formatCompactNumber(totals.tokenEconomySavingsTokens)) },
+    { label: USAGE_HEATMAP_CACHE, value: formatPercent(totals.cacheHitRate) },
   ]
-  const heroTitle = mode === 'populated' ? COPY.title : COPY.heroTitle[mode]
-  const heroSub = mode === 'populated' ? COPY.sub : COPY.heroSub[mode]
+  const heroTitle = resolveUsageHeatmapHeroTitle(mode)
+  const heroSub = resolveUsageHeatmapHeroSub(mode)
 
   return (
     <div className="initial-session-usage-heatmap">
@@ -920,16 +911,16 @@ export function InitialSessionUsageHeatmapView({
                       aria-pressed={activeTab === 'overview'}
                       onClick={() => setActiveTab('overview')}
                     >
-                      {COPY.tabOverview}
+                      {USAGE_HEATMAP_TAB_OVERVIEW}
                     </button>
                     <button
                       type="button"
                       className={`usage-heatmap-tab${activeTab === 'models' ? ' usage-heatmap-tab--active' : ''}`}
                       aria-pressed={activeTab === 'models'}
-                      title={COPY.tabModels}
+                      title={USAGE_HEATMAP_TAB_MODELS}
                       onClick={() => setActiveTab('models')}
                     >
-                      {COPY.tabModels}
+                      {USAGE_HEATMAP_TAB_MODELS}
                     </button>
                   </div>
                   <div className="usage-heatmap-toolbar-right">
@@ -942,7 +933,7 @@ export function InitialSessionUsageHeatmapView({
                           aria-pressed={rangeKey === key}
                           onClick={() => onRangeChange?.(key)}
                         >
-                          {COPY.range[key]}
+                          {resolveUsageHeatmapRangeLabel(key)}
                         </button>
                       ))}
                     </div>
@@ -963,7 +954,7 @@ export function InitialSessionUsageHeatmapView({
                       onSelect={setActiveBucket}
                     />
                     <p className="usage-heatmap-caption">
-                      {COPY.overviewCaption(formatCompactNumber(totals.totalTokens), totals.activeDays)}
+                      {formatUsageHeatmapOverviewCaption(formatCompactNumber(totals.totalTokens), totals.activeDays)}
                     </p>
                   </>
                 ) : (
@@ -984,10 +975,10 @@ export function InitialSessionUsageHeatmapView({
                       className="usage-heatmap-refresh-btn usage-heatmap-refresh-btn--toolbar"
                       onClick={onRefresh}
                       disabled={state.loading}
-                      title={COPY.refresh}
+                      title={USAGE_HEATMAP_REFRESH}
                     >
                       <RefreshCw className={state.loading ? 'usage-heatmap-warmup-icon--spin' : ''} strokeWidth={1.8} />
-                      <span>{COPY.refresh}</span>
+                      <span>{USAGE_HEATMAP_REFRESH}</span>
                     </button>
                     <UsageHeroToggle expanded onToggle={() => setCollapsed(true)} />
                   </div>
