@@ -5,6 +5,14 @@
 import { useEffect, useId, useState, type ReactElement } from 'react'
 import { createPortal } from 'react-dom'
 import { Download, Minus, Plus, X } from 'lucide-react'
+import {
+  IMAGE_PREVIEW_LIGHTBOX_CLOSE,
+  IMAGE_PREVIEW_LIGHTBOX_RESET_ZOOM,
+  IMAGE_PREVIEW_LIGHTBOX_ZOOM_IN,
+  IMAGE_PREVIEW_LIGHTBOX_ZOOM_OUT,
+  resolveImagePreviewLightboxDownloadLabel,
+  resolveImagePreviewLightboxTitle,
+} from '../lib/imagePreviewLightbox'
 
 export type ImagePreviewLightboxProps = {
   open: boolean
@@ -62,9 +70,9 @@ export function ImagePreviewLightbox({
 }: ImagePreviewLightboxProps): ReactElement | null {
   const [zoom, setZoom] = useState(1)
   const titleId = useId()
-  const closeLabel = 'Close'
-  const resolvedTitle = title || alt || 'Image preview'
-  const resolvedDownloadLabel = downloadLabel ?? 'Download'
+  const closeLabel = IMAGE_PREVIEW_LIGHTBOX_CLOSE
+  const resolvedTitle = resolveImagePreviewLightboxTitle(title, alt)
+  const resolvedDownloadLabel = resolveImagePreviewLightboxDownloadLabel(downloadLabel)
 
   useEffect(() => {
     if (!open || typeof window === 'undefined') return
@@ -148,8 +156,8 @@ export function ImagePreviewLightbox({
           type="button"
           onClick={() => setZoom((value) => clampZoom(value - ZOOM_STEP))}
           disabled={zoom <= MIN_ZOOM}
-          aria-label="Zoom out"
-          title="Zoom out"
+          aria-label={IMAGE_PREVIEW_LIGHTBOX_ZOOM_OUT}
+          title={IMAGE_PREVIEW_LIGHTBOX_ZOOM_OUT}
           className="image-preview-lightbox-zoom-btn"
         >
           <Minus strokeWidth={2} />
@@ -157,8 +165,8 @@ export function ImagePreviewLightbox({
         <button
           type="button"
           onClick={() => setZoom(1)}
-          aria-label="Reset zoom"
-          title="Reset zoom"
+          aria-label={IMAGE_PREVIEW_LIGHTBOX_RESET_ZOOM}
+          title={IMAGE_PREVIEW_LIGHTBOX_RESET_ZOOM}
           className="image-preview-lightbox-zoom-label"
         >
           {zoomPercent}
@@ -167,8 +175,8 @@ export function ImagePreviewLightbox({
           type="button"
           onClick={() => setZoom((value) => clampZoom(value + ZOOM_STEP))}
           disabled={zoom >= MAX_ZOOM}
-          aria-label="Zoom in"
-          title="Zoom in"
+          aria-label={IMAGE_PREVIEW_LIGHTBOX_ZOOM_IN}
+          title={IMAGE_PREVIEW_LIGHTBOX_ZOOM_IN}
           className="image-preview-lightbox-zoom-btn"
         >
           <Plus strokeWidth={2} />
