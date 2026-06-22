@@ -21,6 +21,20 @@ import {
   TerminalSquare,
   X,
 } from 'lucide-react'
+import {
+  formatTerminalTabTitle,
+  TERMINAL_CLOSE_ALL_TABS_LABEL,
+  TERMINAL_CLOSE_OTHER_TABS_LABEL,
+  TERMINAL_CLOSE_TAB_LABEL,
+  TERMINAL_EXIT_MESSAGE,
+  TERMINAL_NEW_TAB_LABEL,
+  TERMINAL_PANEL_COLLAPSE_LABEL,
+  TERMINAL_PANEL_TITLE,
+  TERMINAL_RENAME_TAB_LABEL,
+  TERMINAL_RESTART_LABEL,
+  TERMINAL_TAB_MENU_TITLE,
+  TERMINAL_UNAVAILABLE_LABEL,
+} from '../lib/terminalPanel'
 
 export type TerminalPreviewMode = 'default' | 'single' | 'error' | 'exited'
 
@@ -46,21 +60,6 @@ type TabContextMenuState = {
   y: number
 }
 
-const COPY = {
-  terminalPanelTitle: 'Terminal',
-  terminalRestart: 'Restart terminal',
-  terminalNewTab: 'New terminal tab',
-  terminalCloseTab: 'Close terminal tab',
-  terminalTabMenuTitle: 'Terminal tab actions',
-  terminalRenameTab: 'Rename terminal tab',
-  terminalCloseOtherTabs: 'Close other terminal tabs',
-  terminalCloseAllTabs: 'Close all terminal tabs',
-  terminalExitMessage: 'Process exited — click to restart',
-  terminalUnavailable: 'Terminal unavailable',
-  rightPanelCollapse: 'Collapse panel',
-  tabTitle: (index: number) => `Terminal ${index}`,
-}
-
 const MAX_TABS = 8
 const INITIAL_TAB_ID = 'main'
 
@@ -82,7 +81,7 @@ const MOCK_SHELL_LINES = [
 ]
 
 function getTabTitle(tab: TerminalTabSnapshot): string {
-  return tab.title?.trim() || COPY.tabTitle(tab.index)
+  return tab.title?.trim() || formatTerminalTabTitle(tab.index)
 }
 
 function clampMenuPosition(x: number, y: number, width: number, height: number) {
@@ -121,7 +120,7 @@ function TerminalTabContextMenu({
   return (
     <div
       role="menu"
-      aria-label={COPY.terminalTabMenuTitle}
+      aria-label={TERMINAL_TAB_MENU_TITLE}
       className="terminal-panel-tab-menu"
       style={{ left: state.x, top: state.y }}
       onPointerDown={(event) => event.stopPropagation()}
@@ -129,7 +128,7 @@ function TerminalTabContextMenu({
     >
       <button type="button" role="menuitem" className="terminal-panel-tab-menu-item" onClick={onRename}>
         <PencilLine className="terminal-panel-tab-menu-icon" strokeWidth={1.9} />
-        <span>{COPY.terminalRenameTab}</span>
+        <span>{TERMINAL_RENAME_TAB_LABEL}</span>
       </button>
       <div className="terminal-panel-tab-menu-divider" />
       <button
@@ -140,7 +139,7 @@ function TerminalTabContextMenu({
         onClick={onCloseOthers}
       >
         <PanelRightClose className="terminal-panel-tab-menu-icon" strokeWidth={1.9} />
-        <span>{COPY.terminalCloseOtherTabs}</span>
+        <span>{TERMINAL_CLOSE_OTHER_TABS_LABEL}</span>
       </button>
       <button
         type="button"
@@ -149,7 +148,7 @@ function TerminalTabContextMenu({
         onClick={onCloseAll}
       >
         <PanelsTopLeft className="terminal-panel-tab-menu-icon" strokeWidth={1.9} />
-        <span>{COPY.terminalCloseAllTabs}</span>
+        <span>{TERMINAL_CLOSE_ALL_TABS_LABEL}</span>
       </button>
     </div>
   )
@@ -272,7 +271,7 @@ export function TerminalPanel({
         <div
           className="terminal-panel-tablist"
           role="tablist"
-          aria-label={COPY.terminalPanelTitle}
+          aria-label={TERMINAL_PANEL_TITLE}
           onPointerDownCapture={(event) => {
             if (!activeTab || event.button !== 2) return
             openTabContextMenu(event, activeTab.id)
@@ -307,7 +306,7 @@ export function TerminalPanel({
                       }
                     }}
                     className="terminal-panel-tab-rename-input"
-                    aria-label={COPY.terminalRenameTab}
+                    aria-label={TERMINAL_RENAME_TAB_LABEL}
                   />
                 ) : (
                   <button
@@ -332,8 +331,8 @@ export function TerminalPanel({
                 {tabs.length > 1 ? (
                   <button
                     type="button"
-                    aria-label={COPY.terminalCloseTab}
-                    title={COPY.terminalCloseTab}
+                    aria-label={TERMINAL_CLOSE_TAB_LABEL}
+                    title={TERMINAL_CLOSE_TAB_LABEL}
                     onClick={(event) => {
                       event.stopPropagation()
                       handleCloseTab(tab.id)
@@ -351,8 +350,8 @@ export function TerminalPanel({
             onClick={handleNewTab}
             disabled={tabs.length >= MAX_TABS}
             className="terminal-panel-new-tab"
-            aria-label={COPY.terminalNewTab}
-            title={COPY.terminalNewTab}
+            aria-label={TERMINAL_NEW_TAB_LABEL}
+            title={TERMINAL_NEW_TAB_LABEL}
           >
             <Plus className="terminal-panel-new-tab-icon" strokeWidth={1.8} />
           </button>
@@ -361,8 +360,8 @@ export function TerminalPanel({
           <button
             type="button"
             className="terminal-panel-toolbar-btn"
-            aria-label={COPY.terminalRestart}
-            title={COPY.terminalRestart}
+            aria-label={TERMINAL_RESTART_LABEL}
+            title={TERMINAL_RESTART_LABEL}
           >
             <RotateCw className="terminal-panel-toolbar-icon" strokeWidth={1.75} />
           </button>
@@ -370,8 +369,8 @@ export function TerminalPanel({
             type="button"
             onClick={onCollapse}
             className="terminal-panel-toolbar-btn"
-            aria-label={COPY.rightPanelCollapse}
-            title={COPY.rightPanelCollapse}
+            aria-label={TERMINAL_PANEL_COLLAPSE_LABEL}
+            title={TERMINAL_PANEL_COLLAPSE_LABEL}
           >
             <X className="terminal-panel-toolbar-icon" strokeWidth={1.85} />
           </button>
@@ -395,10 +394,10 @@ export function TerminalPanel({
         {error ? (
           <div className="terminal-panel-error-overlay">
             <div>
-              <div className="terminal-panel-error-title">{COPY.terminalUnavailable}</div>
+              <div className="terminal-panel-error-title">{TERMINAL_UNAVAILABLE_LABEL}</div>
               <div className="terminal-panel-error-detail">{error}</div>
               <button type="button" className="terminal-panel-error-restart">
-                {COPY.terminalRestart}
+                {TERMINAL_RESTART_LABEL}
               </button>
             </div>
           </div>
@@ -406,7 +405,7 @@ export function TerminalPanel({
         {exited && !error ? (
           <div className="terminal-panel-exited-overlay">
             <button type="button" className="terminal-panel-exited-restart">
-              {COPY.terminalExitMessage}
+              {TERMINAL_EXIT_MESSAGE}
             </button>
           </div>
         ) : null}
