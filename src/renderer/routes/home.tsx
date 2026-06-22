@@ -4168,10 +4168,10 @@ function HomePage() {
           <div className="workbench-chat-column">
             <div className="workbench-chat-stage production-chat-stage-column">
               <div className="ds-stage-inset workbench-chat-stage-inset production-chat-stage-inset">
-                <header className="chat-topbar ds-topbar-surface workbench-chat-topbar">
-                  <div className="chat-topbar-grid">
+                <header className="chat-topbar ds-topbar-surface workbench-chat-topbar relative z-10 mt-3 flex min-h-[46px] w-full shrink-0 items-stretch overflow-visible rounded-[24px]">
+                  <div className="chat-topbar-grid grid w-full min-w-0 items-start gap-2.5 px-3 py-2 sm:px-4 md:pl-5 md:pr-2">
                     <div
-                      className={`chat-topbar-session${
+                      className={`chat-topbar-session flex min-w-0 items-center gap-2.5${
                         collapsed ? ' ds-window-controls-safe-inset' : ''
                       }`}
                     >
@@ -4186,7 +4186,7 @@ function HomePage() {
                         className="workbench-session-header"
                       />
                     </div>
-                    <div className="chat-topbar-actions">
+                    <div className="chat-topbar-actions flex min-w-0 flex-wrap items-center justify-end gap-2 self-start">
                       {busy ? <span className="workbench-running-pill">{SESSION_HEADER_RUNNING_LABEL}</span> : null}
                       <WorkbenchTopBar
                         planPanelEnabled
