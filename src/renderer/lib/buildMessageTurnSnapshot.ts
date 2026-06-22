@@ -2,20 +2,20 @@
 // Echoes Kun's MessageTurn block→section wiring
 // (../Kun/src/renderer/src/components/chat/MessageTimeline.tsx).
 
-import type { CompactionDividerSnapshot } from '../components/CompactionDivider'
+import type { CompactionDividerSnapshot } from '../components/chat/CompactionDivider'
 import type {
   AssistantMessageSnapshot,
   MessageBubbleSnapshot,
   UserMessageSnapshot,
-} from '../components/MessageBubble'
-import type { MediaReference } from '../components/MediaPreviewTile'
-import type { ProcessOutputEntrySnapshot } from '../components/ProcessOutputSection'
+} from '../components/chat/MessageBubble'
+import type { MediaReference } from '../components/chat/MediaPreviewTile'
+import type { ProcessOutputEntrySnapshot } from '../components/chat/ProcessOutputSection'
 import type {
   ProcessSectionSnapshot,
   ProcessStackEntrySnapshot,
-} from '../components/ProcessSectionRow'
-import type { ReviewSummarySnapshot } from '../components/ReviewSummaryCard'
-import type { TurnChangeSnapshot } from '../components/TurnChangeSummary'
+} from '../components/chat/ProcessSectionRow'
+import type { ReviewSummarySnapshot } from '../components/chat/ReviewSummaryCard'
+import type { TurnChangeSnapshot } from '../components/chat/TurnChangeSummary'
 import { deriveTurnSections } from './deriveTurnSections'
 import { groupProcessSections } from './groupProcessSections'
 import { splitThink, type TimelineChatBlock, type Turn } from './messageTimelineTurns'

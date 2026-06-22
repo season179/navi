@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
 import { createRoute } from '@tanstack/react-router'
 import { rootRoute } from './__root'
-import { SidebarTitlebarToggleButton } from '../components/SidebarPrimitives'
+import { SidebarTitlebarToggleButton } from '../components/sidebar/SidebarPrimitives'
 import {
   ContextCapacityPopover,
   CONTEXT_CAPACITY_PREVIEW,
-} from '../components/ContextCapacityPopover'
-import { Composer } from '../components/Composer'
+} from '../components/chat/ContextCapacityPopover'
+import { Composer } from '../components/chat/Composer'
 import {
   COMPOSER_FILE_REFERENCES_PREVIEW,
   resolveComposerFileMentionPreview,
@@ -40,36 +40,36 @@ import { resolveComposerSlashCommandsPreview } from '../lib/composerSlashCommand
 import { resolveComposerContextCapacityPreview } from '../lib/composerContextCapacity'
 import {
   QUEUED_MESSAGES_PREVIEW,
-} from '../components/FloatingComposerQueuedMessages'
+} from '../components/chat/FloatingComposerQueuedMessages'
 import {
   FloatingComposerExecutionPicker,
   EXECUTION_PICKER_PREVIEW,
   type ComposerExecutionSettings,
-} from '../components/FloatingComposerExecutionPicker'
+} from '../components/chat/FloatingComposerExecutionPicker'
 import {
   GitBranchPicker,
   GIT_BRANCH_PICKER_PREVIEW,
   GIT_BRANCH_PICKER_PREVIEW_ERROR,
   type GitBranchesSnapshot,
-} from '../components/GitBranchPicker'
+} from '../components/chat/GitBranchPicker'
 import {
   WorkspaceProjectPicker,
   WORKSPACE_PROJECT_PICKER_PREVIEW,
   WORKSPACE_PROJECT_PICKER_PREVIEW_EMPTY,
   type WorkspaceProjectsSnapshot,
-} from '../components/WorkspaceProjectPicker'
+} from '../components/workbench/WorkspaceProjectPicker'
 import {
   ImagePreviewLightbox,
   IMAGE_PREVIEW_LIGHTBOX_SAMPLE,
-} from '../components/ImagePreviewLightbox'
+} from '../components/chat/ImagePreviewLightbox'
 import {
   DevPreviewLaunchCard,
   DEV_PREVIEW_LAUNCH_CARD_PREVIEW,
-} from '../components/DevPreviewLaunchCard'
+} from '../components/chat/DevPreviewLaunchCard'
 import {
   ReviewPlanCard,
   REVIEW_PLAN_CARD_PREVIEW,
-} from '../components/ReviewPlanCard'
+} from '../components/chat/ReviewPlanCard'
 import {
   ReviewSummaryCard,
   REVIEW_SUMMARY_CARD_PREVIEW,
@@ -77,50 +77,50 @@ import {
   REVIEW_SUMMARY_CARD_PREVIEW_INCORRECT,
   REVIEW_SUMMARY_CARD_PREVIEW_NO_FINDINGS,
   REVIEW_SUMMARY_CARD_PREVIEW_RUNNING,
-} from '../components/ReviewSummaryCard'
+} from '../components/chat/ReviewSummaryCard'
 import {
   WorkMetaRow,
   WORK_META_ROW_PREVIEW,
   type WorkMetaRowPreviewMode,
-} from '../components/WorkMetaRow'
+} from '../components/chat/WorkMetaRow'
 import {
   ProcessSectionRow,
   PROCESS_SECTION_ROW_PREVIEW,
   type ProcessSectionRowPreviewMode,
-} from '../components/ProcessSectionRow'
+} from '../components/chat/ProcessSectionRow'
 import {
   ProcessEntryRow,
   PROCESS_ENTRY_ROW_PREVIEW,
   type ProcessEntryRowPreviewMode,
-} from '../components/ProcessEntryRow'
+} from '../components/chat/ProcessEntryRow'
 import {
   TurnChangeSummary,
   TURN_CHANGE_SUMMARY_PREVIEW,
   TURN_CHANGE_SUMMARY_PREVIEW_SINGLE,
   type TurnChangeSummaryPreviewMode,
-} from '../components/TurnChangeSummary'
-import { ModelMetaTag, MODEL_META_TAG_PREVIEW } from '../components/ModelMetaTag'
+} from '../components/chat/TurnChangeSummary'
+import { ModelMetaTag, MODEL_META_TAG_PREVIEW } from '../components/chat/ModelMetaTag'
 import {
   WritePromptMetaDisclosure,
   WRITE_PROMPT_META_DISCLOSURE_PREVIEW,
   WRITE_PROMPT_META_DISCLOSURE_PREVIEW_QUOTES,
-} from '../components/WritePromptMetaDisclosure'
+} from '../components/write/WritePromptMetaDisclosure'
 import {
   ClawInboundMessageCard,
   CLAW_INBOUND_MESSAGE_CARD_PREVIEW,
   CLAW_INBOUND_MESSAGE_CARD_PREVIEW_MINIMAL,
-} from '../components/ClawInboundMessageCard'
+} from '../components/claw/ClawInboundMessageCard'
 import {
   UserFileReferenceChips,
   USER_FILE_REFERENCE_CHIPS_PREVIEW,
   USER_FILE_REFERENCE_CHIPS_PREVIEW_DIRECTORY,
-} from '../components/UserFileReferenceChips'
+} from '../components/chat/UserFileReferenceChips'
 import {
   RuntimeMetaChips,
   RUNTIME_META_CHIPS_PREVIEW,
   RUNTIME_META_CHIPS_PREVIEW_MINIMAL,
   RUNTIME_META_CHIPS_PREVIEW_TOOL,
-} from '../components/RuntimeMetaChips'
+} from '../components/runtime/RuntimeMetaChips'
 import {
   MediaPreviewTile,
   MediaAttachmentGallery,
@@ -128,11 +128,11 @@ import {
   MEDIA_PREVIEW_TILE_PREVIEW_VIDEO,
   MEDIA_PREVIEW_TILE_PREVIEW_FILE,
   MEDIA_ATTACHMENT_GALLERY_PREVIEW,
-} from '../components/MediaPreviewTile'
+} from '../components/chat/MediaPreviewTile'
 import {
   CopyFeedbackButton,
   COPY_FEEDBACK_BUTTON_PREVIEW_TEXT,
-} from '../components/CopyFeedbackButton'
+} from '../components/common/CopyFeedbackButton'
 import {
   UserInputBubble,
   USER_INPUT_BUBBLE_PREVIEW,
@@ -141,13 +141,13 @@ import {
   USER_INPUT_BUBBLE_PREVIEW_FREEFORM,
   USER_INPUT_BUBBLE_PREVIEW_MULTI,
   USER_INPUT_BUBBLE_PREVIEW_SUBMITTED,
-} from '../components/UserInputBubble'
+} from '../components/chat/UserInputBubble'
 import {
   GeneratedFilesPanel,
   GENERATED_FILES_PANEL_PREVIEW,
   GENERATED_FILES_PANEL_PREVIEW_MIXED,
   GENERATED_FILES_PANEL_PREVIEW_SINGLE,
-} from '../components/GeneratedFilesPanel'
+} from '../components/chat/GeneratedFilesPanel'
 import {
   ToolEntry,
   TOOL_ENTRY_PREVIEW,
@@ -155,81 +155,81 @@ import {
   TOOL_ENTRY_PREVIEW_ERROR,
   TOOL_ENTRY_PREVIEW_RUNNING,
   type ToolBlockSnapshot,
-} from '../components/ToolEntry'
+} from '../components/chat/ToolEntry'
 import {
   ThreadForkBanner,
   ThreadForkPoint,
   THREAD_FORK_BANNER_PREVIEW_TITLE,
-} from '../components/ThreadForkBanner'
+} from '../components/chat/ThreadForkBanner'
 import {
   COMPACTION_DIVIDER_PREVIEW,
   CompactionDividerPreview,
   type CompactionDividerPreviewMode,
-} from '../components/CompactionDivider'
+} from '../components/chat/CompactionDivider'
 import {
   LiveTurnProgressRowPreview,
   type LiveTurnProgressRowPreviewMode,
-} from '../components/LiveTurnProgressRow'
+} from '../components/chat/LiveTurnProgressRow'
 import {
   TimelineJumpRailPreview,
   type TimelineJumpRailPreviewMode,
-} from '../components/TimelineJumpRail'
+} from '../components/chat/TimelineJumpRail'
 import {
   TimelinePaginationControlsPreview,
   type TimelinePaginationControlsPreviewMode,
-} from '../components/TimelinePaginationControls'
+} from '../components/chat/TimelinePaginationControls'
 import {
   MessageBubblePreview,
   type MessageBubblePreviewMode,
-} from '../components/MessageBubble'
+} from '../components/chat/MessageBubble'
 import {
   RuntimeWakeHero,
   RUNTIME_WAKE_HERO_PREVIEW_ERROR,
-} from '../components/RuntimeWakeHero'
+} from '../components/runtime/RuntimeWakeHero'
 import {
   RuntimeStatusBanner,
   RUNTIME_STATUS_BANNER_PREVIEW,
   type RuntimeStatusBannerPreviewMode,
-} from '../components/RuntimeStatusBanner'
+} from '../components/runtime/RuntimeStatusBanner'
 import {
   RuntimeBanner,
   RUNTIME_BANNER_PREVIEW,
   type RuntimeBannerPreviewMode,
-} from '../components/RuntimeBanner'
+} from '../components/runtime/RuntimeBanner'
 import {
   SessionHeader,
   SESSION_HEADER_PREVIEW,
   SESSION_HEADER_PREVIEW_EMPTY,
   type SessionHeaderPreviewMode,
   type SessionHeaderSnapshot,
-} from '../components/SessionHeader'
+} from '../components/chat/SessionHeader'
 import {
   WorkbenchTopBar,
   WORKBENCH_TOP_BAR_PREVIEW_GUI_UPDATE,
   type RightPanelMode,
   type WorkbenchTopBarPreviewMode,
-} from '../components/WorkbenchTopBar'
+} from '../components/workbench/WorkbenchTopBar'
 import {
   TodoPanel,
   TODO_PANEL_PREVIEW_ITEMS,
   type ThreadTodoItem,
   type TodoPanelPreviewMode,
-} from '../components/TodoPanel'
+} from '../components/todo/TodoPanel'
 import {
   ChangeInspector,
   CHANGE_INSPECTOR_PREVIEW_ITEMS,
   type ChangeInspectorItem,
   type ChangeInspectorPreviewMode,
-} from '../components/ChangeInspector'
+} from '../components/workbench/ChangeInspector'
 import {
   DevBrowserPanel,
   DEV_BROWSER_PANEL_PREVIEW,
   type DevBrowserPanelPreviewState,
   type DevBrowserPreviewMode,
-} from '../components/DevBrowserPanel'
+} from '../components/workbench/DevBrowserPanel'
 import {
   PlanPanel,
-} from '../components/PlanPanel'
+} from '../components/plan/PlanPanel'
 import {
   resolvePlanPanelPreviewSnapshot,
   resolveProductionPlanPanelMode,
@@ -241,12 +241,12 @@ import {
   ChatFileTreePanel,
   CHAT_FILE_TREE_PREVIEW,
   type ChatFileTreePreviewMode,
-} from '../components/ChatFileTreePanel'
+} from '../components/chat/ChatFileTreePanel'
 import {
   TerminalPanel,
   TERMINAL_PANEL_PREVIEW_TABS,
   type TerminalPreviewMode,
-} from '../components/TerminalPanel'
+} from '../components/terminal/TerminalPanel'
 import {
   SideConversationPanel,
   SIDE_CONVERSATION_PANEL_PREVIEW_ERROR,
@@ -254,7 +254,7 @@ import {
   SIDE_CONVERSATION_PANEL_PREVIEW_SIDES,
   type SideConversationPanelPreviewMode,
   type SideConversationSnapshot,
-} from '../components/SideConversationPanel'
+} from '../components/chat/SideConversationPanel'
 import {
   WorkspaceFilePreviewPanel,
   WORKSPACE_FILE_PREVIEW_DIFF_RESULT,
@@ -267,204 +267,204 @@ import {
   type WorkspaceFilePreviewMode,
   type WorkspaceFilePreviewResult,
   type WorkspaceFileTarget,
-} from '../components/WorkspaceFilePreviewPanel'
+} from '../components/workbench/WorkspaceFilePreviewPanel'
 import {
   AppErrorFallback,
   APP_ERROR_BOUNDARY_PREVIEW,
   type AppErrorBoundaryPreviewMode,
-} from '../components/AppErrorBoundary'
+} from '../components/app/AppErrorBoundary'
 import {
   GuiUpdateControl,
   GUI_UPDATE_CONTROL_PREVIEW,
   type GuiUpdateControlPreviewMode,
-} from '../components/GuiUpdateControl'
+} from '../components/settings/GuiUpdateControl'
 import {
   SettingsSidebar,
   SettingsSidebarPreviewContent,
   resolveSettingsSidebarPreviewCategory,
   type SettingsCategory,
   type SettingsSidebarPreviewMode,
-} from '../components/SettingsSidebar'
+} from '../components/settings/SettingsSidebar'
 import {
   SettingsControlsPreview,
   type SettingsControlsPreviewMode,
-} from '../components/SettingsControls'
+} from '../components/settings/SettingsControls'
 import {
   GeneralSettingsSectionPreview,
   type GeneralSettingsPreviewMode,
-} from '../components/GeneralSettingsSection'
+} from '../components/settings/GeneralSettingsSection'
 import {
   KeyboardShortcutsSettingsSectionPreview,
   type KeyboardShortcutsPreviewMode,
-} from '../components/KeyboardShortcutsSettingsSection'
+} from '../components/settings/KeyboardShortcutsSettingsSection'
 import {
   EasterEggSettingsSectionPreview,
   type EasterEggPreviewMode,
-} from '../components/EasterEggSettingsSection'
+} from '../components/settings/EasterEggSettingsSection'
 import {
   ArchivedThreadsSettingsSectionPreview,
   type ArchivedThreadsPreviewMode,
-} from '../components/ArchivedThreadsSettingsSection'
+} from '../components/settings/ArchivedThreadsSettingsSection'
 import {
   UpdatesSettingsSectionPreview,
   type UpdatesSettingsPreviewMode,
-} from '../components/UpdatesSettingsSection'
+} from '../components/settings/UpdatesSettingsSection'
 import {
   LlmDebugSettingsSectionPreview,
   type LlmDebugPreviewMode,
-} from '../components/LlmDebugSettingsSection'
+} from '../components/settings/LlmDebugSettingsSection'
 import {
   MemorySettingsSectionPreview,
   type MemoryPreviewMode,
-} from '../components/MemorySettingsSection'
+} from '../components/settings/MemorySettingsSection'
 import {
   SpeechToTextSettingsSectionPreview,
   type SpeechToTextPreviewMode,
-} from '../components/SpeechToTextSettingsSection'
+} from '../components/settings/SpeechToTextSettingsSection'
 import {
   ImageGenerationSettingsSectionPreview,
   type ImageGenerationPreviewMode,
-} from '../components/ImageGenerationSettingsSection'
+} from '../components/settings/ImageGenerationSettingsSection'
 import {
   MediaGenerationSettingsSectionPreview,
   type MediaGenerationPreviewMode,
-} from '../components/MediaGenerationSettingsSection'
+} from '../components/settings/MediaGenerationSettingsSection'
 import {
   WorktreeSettingsSectionPreview,
   type WorktreePreviewMode,
-} from '../components/WorktreeSettingsSection'
+} from '../components/settings/WorktreeSettingsSection'
 import {
   ClawSettingsSectionPreview,
   type ClawPreviewMode,
-} from '../components/ClawSettingsSection'
+} from '../components/settings/ClawSettingsSection'
 import {
   WriteSettingsSectionPreview,
   type WritePreviewMode,
-} from '../components/WriteSettingsSection'
+} from '../components/settings/WriteSettingsSection'
 import {
   ProvidersSettingsSectionPreview,
   type ProvidersPreviewMode,
-} from '../components/ProvidersSettingsSection'
+} from '../components/settings/ProvidersSettingsSection'
 import {
   AgentsSettingsSectionPreview,
   type AgentsPreviewMode,
-} from '../components/AgentsSettingsSection'
+} from '../components/settings/AgentsSettingsSection'
 import {
   ClawEmptyHero,
   CLAW_EMPTY_HERO_PREVIEW_AGENT_NAME,
-} from '../components/ClawEmptyHero'
-import { WorkspaceSelectEmptyHero } from '../components/WorkspaceSelectEmptyHero'
+} from '../components/claw/ClawEmptyHero'
+import { WorkspaceSelectEmptyHero } from '../components/workbench/WorkspaceSelectEmptyHero'
 import {
   MessageTimelineEmptyHero,
   MessageTimelineEmptyHeroPreview,
   type MessageTimelineEmptyHeroPreviewMode,
-} from '../components/MessageTimelineEmptyHero'
+} from '../components/chat/MessageTimelineEmptyHero'
 import {
   MessageTimelinePreview,
   type MessageTimelinePreviewMode,
-} from '../components/MessageTimeline'
+} from '../components/chat/MessageTimeline'
 import {
   WorkbenchPreview,
   type WorkbenchPreviewMode,
-} from '../components/Workbench'
+} from '../components/workbench/Workbench'
 import {
   AppShellPreview,
   type AppShellPreviewMode,
-} from '../components/AppShell'
+} from '../components/app/AppShell'
 import {
   AppPreview,
   type AppPreviewMode,
-} from '../components/App'
+} from '../components/app/App'
 import { resolveComposerChangeSummaryPreview } from '../lib/composerChangeSummary'
 import {
   FloatingComposerPreview,
   buildComposerSlashCommandsPreview,
   type FloatingComposerPreviewMode,
-} from '../components/FloatingComposer'
+} from '../components/chat/FloatingComposer'
 import {
   FloatingComposerModelPickerPreview,
-} from '../components/FloatingComposerModelPicker'
+} from '../components/chat/FloatingComposerModelPicker'
 import {
   WriteWorkspaceEmptyState,
   WRITE_WORKSPACE_EMPTY_STATE_PREVIEW_ERROR,
   type WriteWorkspaceEmptyStatePreviewMode,
-} from '../components/WriteWorkspaceEmptyState'
+} from '../components/write/WriteWorkspaceEmptyState'
 import {
   WriteWorkspaceStart,
   WRITE_WORKSPACE_START_PREVIEW,
-} from '../components/WriteWorkspaceStart'
+} from '../components/write/WriteWorkspaceStart'
 import {
   WriteFontSizeControlPreview,
   type WriteFontSizeControlPreviewMode,
-} from '../components/WriteFontSizeControl'
+} from '../components/write/WriteFontSizeControl'
 import {
   WriteWorkspaceToolbarPreview,
   type WriteWorkspaceToolbarPreviewMode,
-} from '../components/WriteWorkspaceToolbar'
+} from '../components/write/WriteWorkspaceToolbar'
 import {
   WriteImagePreviewPreview,
   type WriteImagePreviewPreviewMode,
-} from '../components/WriteImagePreview'
+} from '../components/write/WriteImagePreview'
 import {
   WriteFileTreePreview,
   type WriteFileTreePreviewMode,
-} from '../components/WriteFileTree'
+} from '../components/write/WriteFileTree'
 import {
   WriteSidebarPreview,
   type WriteSidebarPreviewMode,
-} from '../components/WriteSidebar'
+} from '../components/write/WriteSidebar'
 import {
   WriteInlineAgentPreview,
   type WriteInlineAgentPreviewMode,
-} from '../components/WriteInlineAgent'
+} from '../components/write/WriteInlineAgent'
 import {
   WriteAssistantPanelPreview,
   type WriteAssistantPanelPreviewMode,
-} from '../components/WriteAssistantPanel'
+} from '../components/write/WriteAssistantPanel'
 import {
   SddAssistantPanelPreview,
   type SddAssistantPanelPreviewMode,
-} from '../components/SddAssistantPanel'
+} from '../components/sdd/SddAssistantPanel'
 import {
   SddDraftEditorViewPreview,
   SddDraftProductionView,
   type SddDraftEditorViewPreviewMode,
-} from '../components/SddDraftEditorView'
+} from '../components/sdd/SddDraftEditorView'
 import {
   WriteMarkdownPreviewPreview,
   type WriteMarkdownPreviewPreviewMode,
-} from '../components/WriteMarkdownPreview'
+} from '../components/write/WriteMarkdownPreview'
 import { resolveWriteMarkdownPreviewMode } from '../lib/writeMarkdownImageWidgets'
 import {
   WriteInfographicPendingPreview,
   type WriteInfographicPendingPreviewMode,
-} from '../components/WriteInfographicPending'
+} from '../components/write/WriteInfographicPending'
 import {
   WriteHtmlEmbedPreview,
   type WriteHtmlEmbedPreviewMode,
-} from '../components/WriteHtmlEmbed'
+} from '../components/write/WriteHtmlEmbed'
 import {
   WritePdfViewerPreview,
   type WritePdfViewerPreviewMode,
-} from '../components/WritePdfViewer'
+} from '../components/write/WritePdfViewer'
 import {
   WriteMarkdownEditorPreview,
   type WriteMarkdownEditorPreviewMode,
-} from '../components/WriteMarkdownEditor'
+} from '../components/write/WriteMarkdownEditor'
 import {
   WriteRichEditorPreview,
   type WriteRichEditorPreviewMode,
-} from '../components/WriteRichEditor'
+} from '../components/write/WriteRichEditor'
 import { resolveWriteRichEditorPreviewMode } from '../lib/writeMarkdownInlineCompletionPreview'
 import {
   WriteWorkspaceDocumentPanePreview,
   type WriteWorkspaceDocumentPanePreviewMode,
-} from '../components/WriteWorkspaceDocumentPane'
+} from '../components/write/WriteWorkspaceDocumentPane'
 import {
   WriteWorkspaceViewPreview,
   WriteWorkspaceProductionView,
   type WriteWorkspaceViewPreviewMode,
-} from '../components/WriteWorkspaceView'
+} from '../components/write/WriteWorkspaceView'
 import { resolveWriteWorkspaceViewPreviewMode } from '../lib/writeWorkspacePreviewModes'
 import { resolveWriteInlineAgentPreviewMode } from '../lib/writeInlineAgentPreviewModes'
 import { resolveWriteWorkspaceDocumentPanePreviewMode } from '../lib/writeWorkspaceDocumentPanePreviewModes'
@@ -472,51 +472,51 @@ import { resolveWriteWorkspaceToolbarPreviewMode } from '../lib/writeWorkspaceTo
 import {
   WriteDebugLogModalPreview,
   type WriteDebugLogModalPreviewMode,
-} from '../components/WriteDebugLogModal'
+} from '../components/write/WriteDebugLogModal'
 import {
   ClawSidebarPreview,
   type ClawSidebarPreviewMode,
-} from '../components/ClawSidebar'
+} from '../components/claw/ClawSidebar'
 import {
   ClawAddImDialogPreview,
   type ClawAddImDialogPreviewMode,
-} from '../components/ClawAddImDialog'
+} from '../components/claw/ClawAddImDialog'
 import {
   WindowsTitleBarPreview,
   type WindowsTitleBarPreviewMode,
-} from '../components/WindowsTitleBar'
+} from '../components/app/WindowsTitleBar'
 import {
   ScheduleDefaultsDialogPreview,
   type ScheduleDefaultsDialogPreviewMode,
-} from '../components/ScheduleDefaultsDialog'
+} from '../components/schedule/ScheduleDefaultsDialog'
 import {
   ScheduleTasksViewPreview,
   ScheduleTasksProductionView,
   type ScheduleTasksPreviewMode,
-} from '../components/ScheduleTasksView'
+} from '../components/schedule/ScheduleTasksView'
 import {
   SettingsViewPreview,
   type SettingsViewPreviewMode,
-} from '../components/SettingsView'
+} from '../components/settings/SettingsView'
 import {
   InitialSetupDialogPreview,
   type InitialSetupDialogPreviewMode,
-} from '../components/InitialSetupDialog'
+} from '../components/app/InitialSetupDialog'
 import {
   PluginMarketplaceViewPreview,
   PluginMarketplaceProductionView,
   type PluginMarketplacePreviewMode,
-} from '../components/PluginMarketplaceView'
+} from '../components/plugins/PluginMarketplaceView'
 import {
   ConnectPhoneViewPreview,
   ConnectPhoneSidebarPreview,
   type ConnectPhoneViewPreviewMode,
   type ConnectPhoneSidebarPreviewMode,
-} from '../components/ConnectPhoneView'
+} from '../components/claw/ConnectPhoneView'
 import {
   SidebarPreview,
   type SidebarPreviewMode,
-} from '../components/Sidebar'
+} from '../components/sidebar/Sidebar'
 import {
   AnimatedWorkLogoPreview,
   IkunCameoLayer,
@@ -526,41 +526,41 @@ import {
   type AnimatedWorkLogoPreviewMode,
   type IkunCameoPreviewMode,
   type KunCelebrationPreviewMode,
-} from '../components/AnimatedWorkLogo'
+} from '../components/workbench/AnimatedWorkLogo'
 import {
   SidebarProjectsSectionPreview,
   type SidebarProjectsPreviewMode,
-} from '../components/SidebarProjectsSection'
-import { InitialSessionUsageHeatmap } from '../components/InitialSessionUsageHeatmap'
+} from '../components/sidebar/SidebarProjectsSection'
+import { InitialSessionUsageHeatmap } from '../components/chat/InitialSessionUsageHeatmap'
 import { PencilLine, PanelLeft } from 'lucide-react'
-import { ChatThread } from '../components/ChatThread'
+import { ChatThread } from '../components/chat/ChatThread'
 import {
   FloatingModelPicker,
   FloatingModelPickerPreview,
   type FloatingModelPickerPreviewMode,
-} from '../components/FloatingModelPicker'
+} from '../components/chat/FloatingModelPicker'
 import {
   MarkdownFileReferencesPreview,
   type MarkdownFileReferencesPreviewMode,
-} from '../components/MarkdownFileReferencesPreview'
-import { ProvidersSettings } from '../components/providers/ProvidersSettings'
+} from '../components/common/MarkdownFileReferencesPreview'
+import { ProvidersSettings } from '../components/settings/providers/ProvidersSettings'
 import {
   ModelChipsInputPreview,
   type ModelChipsInputPreviewMode,
-} from '../components/providers/ModelChipsInput'
+} from '../components/settings/providers/ModelChipsInput'
 import {
   SecretInputPreview,
   type SecretInputPreviewMode,
-} from '../components/providers/SecretInput'
+} from '../components/settings/providers/SecretInput'
 import {
   ProviderModelImportDialogPreview,
   type ProviderModelImportDialogPreviewMode,
-} from '../components/providers/ProviderModelImportDialog'
+} from '../components/settings/providers/ProviderModelImportDialog'
 import {
   ProviderModelsManagerPreview,
   type ProviderModelsManagerPreviewMode,
-} from '../components/providers/ProviderModelsManager'
-import { SkillsSettings } from '../components/skills/SkillsSettings'
+} from '../components/settings/providers/ProviderModelsManager'
+import { SkillsSettings } from '../components/settings/skills/SkillsSettings'
 import { hasUsableProvider, type SkillSummary } from '../../shared/flue'
 import { useNaviList, useNaviThread } from '../flue/NaviChatContext'
 import { useSidebar } from '../sidebar'

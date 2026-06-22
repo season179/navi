@@ -10,7 +10,7 @@ import {
   Moon,
   Smartphone,
 } from 'lucide-react'
-import { FocusModeToggle, SidebarMascot } from '../components/Sidebar'
+import { FocusModeToggle, SidebarMascot } from '../components/sidebar/Sidebar'
 import { useTheme } from '../theme'
 import { SidebarContext } from '../sidebar'
 import { SidebarRouteProvider, useSidebarRoute } from '../sidebar-route'
@@ -24,28 +24,28 @@ import {
   RUNTIME_STATUS_BANNER_PREVIEW,
   type RuntimeStatusBannerPreviewMode,
   type RuntimeStatusSnapshot,
-} from '../components/RuntimeStatusBanner'
+} from '../components/runtime/RuntimeStatusBanner'
 import { SidebarProjects } from './SidebarProjects'
 import {
   WorkspaceModeTabs,
-} from '../components/WorkspaceModeTabs'
-import { SidebarCommandRow, SidebarFrame } from '../components/SidebarPrimitives'
+} from '../components/workbench/WorkspaceModeTabs'
+import { SidebarCommandRow, SidebarFrame } from '../components/sidebar/SidebarPrimitives'
 import {
   WindowsTitleBar,
   supportsDesktopTitleBar,
-} from '../components/WindowsTitleBar'
+} from '../components/app/WindowsTitleBar'
 import {
   ConnectPhoneSidebarPanel,
   CONNECT_PHONE_SIDEBAR_PREVIEW_CHANNELS,
   type ConnectPhoneQrStatus,
-} from '../components/ConnectPhoneView'
-import { WriteSidebarProductionPanel } from '../components/WriteSidebar'
-import { ClawSidebarProductionPanel } from '../components/ClawSidebar'
+} from '../components/claw/ConnectPhoneView'
+import { WriteSidebarProductionPanel } from '../components/write/WriteSidebar'
+import { ClawSidebarProductionPanel } from '../components/claw/ClawSidebar'
 import {
   ClawAddImDialogProduction,
   type ClawImDialogMode,
   type ClawInstallTarget,
-} from '../components/ClawAddImDialog'
+} from '../components/claw/ClawAddImDialog'
 
 function resolveProductionPlatform(): string {
   if (typeof window === 'undefined') return 'darwin'

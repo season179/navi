@@ -5,7 +5,7 @@ import { useSettings } from '../settings'
 import {
   SidebarProjectsSection,
   type SidebarWorkspaceGroup,
-} from '../components/SidebarProjectsSection'
+} from '../components/sidebar/SidebarProjectsSection'
 
 const DEFAULT_PROJECT_ID = 'navi-default'
 

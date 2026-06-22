@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { type WorkspaceModeView } from './components/WorkspaceModeTabs'
+import { type WorkspaceModeView } from './components/workbench/WorkspaceModeTabs'
 
 export interface WorkspaceModeContextValue {
   /** Active Code/Write tab view, accounting for schedule override and preview hooks. */

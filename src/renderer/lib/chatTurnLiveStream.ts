@@ -1,5 +1,5 @@
 import type { ChatMessage } from '../flue/useNaviChat'
-import type { MessageTurnSnapshot } from '../components/MessageTurn'
+import type { MessageTurnSnapshot } from '../components/chat/MessageTurn'
 import type { TimelineChatBlock } from './messageTimelineTurns'
 import { applyTimelineLiveStreamToTurn } from './applyTimelineLiveStream'
 

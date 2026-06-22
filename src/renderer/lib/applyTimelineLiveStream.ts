@@ -1,4 +1,4 @@
-import type { MessageTurnSnapshot } from '../components/MessageTurn'
+import type { MessageTurnSnapshot } from '../components/chat/MessageTurn'
 
 /** Kun passes timeline-level liveReasoning/live only to the latest MessageTurn. */
 export function applyTimelineLiveStreamToTurn(

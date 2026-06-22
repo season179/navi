@@ -26825,6 +26825,7 @@ html[data-theme='dark'] .cm-write-md-code-block-html > pre span {
   height: 8px;
   flex-shrink: 0;
   border-radius: 999px;
+  margin-inline: 4px;
 }
 
 .claw-sidebar-status-dot.is-live {

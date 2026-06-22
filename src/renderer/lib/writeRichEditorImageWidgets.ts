@@ -1,11 +1,11 @@
 // Write rich editor image widget helpers echoing Kun's WriteLocalImage node views
 // (../Kun/src/renderer/src/write/tiptap/local-image.ts). Visual only: no IPC.
 
-import type { WriteHtmlEmbedVisualState } from '../components/WriteHtmlEmbed'
+import type { WriteHtmlEmbedVisualState } from '../components/write/WriteHtmlEmbed'
 import type {
   WriteInfographicPendingKind,
   WriteInfographicPendingState,
-} from '../components/WriteInfographicPending'
+} from '../components/write/WriteInfographicPending'
 
 export type WriteRichEditorImageWidgetPreviewMode =
   | 'imageError'

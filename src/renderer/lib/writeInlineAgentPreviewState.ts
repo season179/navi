@@ -4,7 +4,7 @@ import {
   WRITE_SETTINGS_PREVIEW_DEFAULT,
   type WriteAgentPresetSnapshot,
   type WriteQuickActionSnapshot,
-} from '../components/WriteSettingsSection'
+} from '../components/settings/WriteSettingsSection'
 import type { WriteInlineAgentPreviewMode } from './writeInlineAgentPreviewModes'
 
 export type WriteInlineAgentPreviewState = {

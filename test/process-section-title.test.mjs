@@ -17,7 +17,7 @@ buildSync({
 })
 
 buildSync({
-  entryPoints: [join(ROOT, 'src', 'renderer', 'components', 'processSectionTitles.ts')],
+  entryPoints: [join(ROOT, 'src', 'renderer', 'components', 'chat', 'processSectionTitles.ts')],
   outfile: titlesOut,
   bundle: true,
   platform: 'node',
