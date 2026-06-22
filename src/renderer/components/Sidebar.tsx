@@ -30,6 +30,19 @@ import {
   type ConnectPhoneQrStatus,
 } from './ConnectPhoneView'
 import { type ClawInstallTarget } from './ClawAddImDialog'
+import {
+  SIDEBAR_APP_NAME,
+  SIDEBAR_CLAW_LABEL,
+  SIDEBAR_FOCUS_MODE_LABEL,
+  SIDEBAR_FOCUS_MODE_TOGGLE_ARIA_LABEL,
+  SIDEBAR_NEW_AGENT_LABEL,
+  SIDEBAR_PLUGINS_LABEL,
+  SIDEBAR_RUNTIME_ACTION_NEEDS_CONNECTION,
+  SIDEBAR_SCHEDULE_LABEL,
+  SIDEBAR_SDD_NEW_REQUIREMENT_LABEL,
+  SIDEBAR_SETTINGS_LABEL,
+  formatFocusModeToggleTitle,
+} from '../lib/sidebar'
 
 export type SidebarPreviewMode =
   | 'default'
@@ -46,22 +59,6 @@ export type SidebarPreviewMode =
   | 'contextMenu'
 
 const SIDEBAR_MASCOT_INTERVAL_MS = 10000
-
-const COPY = {
-  appName: 'Navi',
-  focusMode: 'Focus',
-  switchOn: 'On',
-  switchOff: 'Off',
-  focusModeToggleTitle: 'Focus mode',
-  focusModeToggleLabel: 'Toggle focus mode',
-  claw: 'Claw',
-  settings: 'Settings',
-  newAgent: 'New agent',
-  sddNewRequirement: 'New requirement',
-  plugins: 'Plugins',
-  schedule: 'Schedule',
-  runtimeActionNeedsConnection: 'Connect a provider first',
-}
 
 const PREVIEW_CLAW_CHANNELS: ClawImChannelSidebarSnapshot[] = [
   {
@@ -158,14 +155,14 @@ export function FocusModeToggle({
       type="button"
       role="switch"
       aria-checked={enabled}
-      aria-label={COPY.focusModeToggleLabel}
-      title={`${COPY.focusModeToggleTitle} · ${enabled ? COPY.switchOn : COPY.switchOff}`}
+      aria-label={SIDEBAR_FOCUS_MODE_TOGGLE_ARIA_LABEL}
+      title={formatFocusModeToggleTitle(enabled)}
       onClick={onToggle}
       className={`sidebar-focus-toggle ${enabled ? 'is-enabled' : ''}`}
     >
       <span className="sidebar-focus-toggle-label">
         <Focus className="sidebar-focus-toggle-icon" strokeWidth={1.8} aria-hidden="true" />
-        <span className="sidebar-focus-toggle-text">{COPY.focusMode}</span>
+        <span className="sidebar-focus-toggle-text">{SIDEBAR_FOCUS_MODE_LABEL}</span>
       </span>
       <span className="sidebar-focus-toggle-track" aria-hidden="true">
         <span className="sidebar-focus-toggle-thumb" />
@@ -256,14 +253,14 @@ function SidebarFooter({
       </div>
       <SidebarCommandRow
         icon={<Smartphone className="h-4 w-4" strokeWidth={1.75} />}
-        label={COPY.claw}
+        label={SIDEBAR_CLAW_LABEL}
         onClick={onToggleConnectPhone}
         active={connectPhoneSidebarOpen}
         variant="footer"
       />
       <SidebarCommandRow
         icon={<Settings className="h-4 w-4" strokeWidth={1.75} />}
-        label={COPY.settings}
+        label={SIDEBAR_SETTINGS_LABEL}
         variant="footer"
       />
     </div>
@@ -286,7 +283,7 @@ export function Sidebar({
 
   return (
     <SidebarFrame
-      title={COPY.appName}
+      title={SIDEBAR_APP_NAME}
       footer={
         <SidebarFooter
           focusModeEnabled={snapshot.focusModeEnabled}
@@ -307,28 +304,28 @@ export function Sidebar({
           <>
             <SidebarCommandRow
               icon={<Plus className="h-4 w-4" strokeWidth={2} />}
-              label={COPY.newAgent}
+              label={SIDEBAR_NEW_AGENT_LABEL}
               disabled={!snapshot.runtimeReady}
-              disabledHint={COPY.runtimeActionNeedsConnection}
+              disabledHint={SIDEBAR_RUNTIME_ACTION_NEEDS_CONNECTION}
               variant="accent"
             />
             <SidebarCommandRow
               icon={<FileQuestion className="h-4 w-4" strokeWidth={1.9} />}
-              label={COPY.sddNewRequirement}
+              label={SIDEBAR_SDD_NEW_REQUIREMENT_LABEL}
               disabled={!snapshot.runtimeReady}
-              disabledHint={COPY.runtimeActionNeedsConnection}
+              disabledHint={SIDEBAR_RUNTIME_ACTION_NEEDS_CONNECTION}
               variant="accent"
             />
           </>
         ) : null}
         <SidebarCommandRow
           icon={<LayoutGrid className="h-4 w-4" strokeWidth={1.75} />}
-          label={COPY.plugins}
+          label={SIDEBAR_PLUGINS_LABEL}
           active={snapshot.pluginsActive}
         />
         <SidebarCommandRow
           icon={<Clock3 className="h-4 w-4" strokeWidth={1.75} />}
-          label={COPY.schedule}
+          label={SIDEBAR_SCHEDULE_LABEL}
           active={snapshot.activeView === 'schedule'}
         />
       </div>
