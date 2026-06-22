@@ -4,19 +4,25 @@
 
 import { useEffect, useRef, useState, type ReactElement } from 'react'
 import { Check, ChevronDown, ShieldAlert, ShieldCheck } from 'lucide-react'
+import {
+  APPROVAL_POLICY_LABELS,
+  COMPOSER_ACCESS_COMMANDS_HINT,
+  COMPOSER_ACCESS_SHORT_LABEL,
+  COMPOSER_APPROVAL_SHORT_LABEL,
+  COMPOSER_EXECUTION_APPLYING_LABEL,
+  COMPOSER_EXECUTION_LABEL,
+  EXECUTION_PICKER_PREVIEW,
+  SANDBOX_MODE_LABELS,
+  formatComposerExecutionPickerTitle,
+  sandboxModeLabel,
+  type ApprovalPolicy,
+  type ComposerExecutionSettings,
+  type SandboxMode,
+} from '../lib/composerExecutionPicker'
 
-export type ApprovalPolicy = 'auto' | 'on-request' | 'untrusted' | 'suggest' | 'never'
+export type { ApprovalPolicy, SandboxMode, ComposerExecutionSettings }
 
-export type SandboxMode =
-  | 'workspace-write'
-  | 'read-only'
-  | 'danger-full-access'
-  | 'external-sandbox'
-
-export type ComposerExecutionSettings = {
-  approvalPolicy: ApprovalPolicy
-  sandboxMode: SandboxMode
-}
+export { EXECUTION_PICKER_PREVIEW }
 
 type Props = {
   value: ComposerExecutionSettings
@@ -25,44 +31,15 @@ type Props = {
   onChange: (patch: Partial<ComposerExecutionSettings>) => void
 }
 
-type ApprovalOption = {
-  value: ApprovalPolicy
-  label: string
-}
+const APPROVAL_OPTIONS = Object.entries(APPROVAL_POLICY_LABELS).map(([value, label]) => ({
+  value: value as ApprovalPolicy,
+  label,
+}))
 
-type SandboxOption = {
-  value: SandboxMode
-  label: string
-}
-
-const APPROVAL_OPTIONS: ApprovalOption[] = [
-  { value: 'auto', label: 'Auto' },
-  { value: 'on-request', label: 'Ask first' },
-  { value: 'untrusted', label: 'Risky only' },
-  { value: 'suggest', label: 'Suggest' },
-  { value: 'never', label: 'Never' },
-]
-
-const SANDBOX_OPTIONS: SandboxOption[] = [
-  { value: 'workspace-write', label: 'Workspace write' },
-  { value: 'read-only', label: 'Read only' },
-  { value: 'danger-full-access', label: 'Full access' },
-  { value: 'external-sandbox', label: 'External' },
-]
-
-function approvalLabel(policy: ApprovalPolicy): string {
-  return APPROVAL_OPTIONS.find((option) => option.value === policy)?.label ?? 'Auto'
-}
-
-function sandboxLabel(mode: SandboxMode): string {
-  return SANDBOX_OPTIONS.find((option) => option.value === mode)?.label ?? 'Workspace write'
-}
-
-/** Sample settings for ?executionPickerPreview=1 visual verification. */
-export const EXECUTION_PICKER_PREVIEW: ComposerExecutionSettings = {
-  approvalPolicy: 'on-request',
-  sandboxMode: 'workspace-write',
-}
+const SANDBOX_OPTIONS = Object.entries(SANDBOX_MODE_LABELS).map(([value, label]) => ({
+  value: value as SandboxMode,
+  label,
+}))
 
 export function FloatingComposerExecutionPicker({
   value,
@@ -74,7 +51,7 @@ export function FloatingComposerExecutionPicker({
   const rootRef = useRef<HTMLDivElement | null>(null)
   const fullAccess = value.sandboxMode === 'danger-full-access'
   const Icon = fullAccess ? ShieldAlert : ShieldCheck
-  const title = `Approval: ${approvalLabel(value.approvalPolicy)} / Access: ${sandboxLabel(value.sandboxMode)}`
+  const title = formatComposerExecutionPickerTitle(value.approvalPolicy, value.sandboxMode)
 
   useEffect(() => {
     if (!open) return
@@ -102,18 +79,18 @@ export function FloatingComposerExecutionPicker({
         title={title}
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label="Execution"
+        aria-label={COMPOSER_EXECUTION_LABEL}
       >
         <Icon strokeWidth={1.8} />
         <span className="execution-picker-label">
-          {applying ? 'Applying…' : sandboxLabel(value.sandboxMode)}
+          {applying ? COMPOSER_EXECUTION_APPLYING_LABEL : sandboxModeLabel(value.sandboxMode)}
         </span>
         <ChevronDown strokeWidth={1.8} />
       </button>
 
       {open ? (
         <div role="menu" className="execution-picker-menu">
-          <div className="execution-picker-section-label">Approval</div>
+          <div className="execution-picker-section-label">{COMPOSER_APPROVAL_SHORT_LABEL}</div>
           {APPROVAL_OPTIONS.map((option) => (
             <ExecutionRow
               key={option.value}
@@ -125,10 +102,8 @@ export function FloatingComposerExecutionPicker({
 
           <div className="execution-picker-divider" />
 
-          <div className="execution-picker-section-label">Access</div>
-          <div className="execution-picker-hint">
-            Only Full access can run terminal commands (bash).
-          </div>
+          <div className="execution-picker-section-label">{COMPOSER_ACCESS_SHORT_LABEL}</div>
+          <div className="execution-picker-hint">{COMPOSER_ACCESS_COMMANDS_HINT}</div>
           {SANDBOX_OPTIONS.map((option) => (
             <ExecutionRow
               key={option.value}
