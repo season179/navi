@@ -4,6 +4,11 @@
 
 import type { ReactElement } from 'react'
 import { FileEdit, Hammer, ListTodo } from 'lucide-react'
+import {
+  REVIEW_PLAN_BUILD_LABEL,
+  REVIEW_PLAN_CARD_HINT,
+  REVIEW_PLAN_OPEN_LABEL,
+} from '../lib/reviewPlanCard'
 
 type Props = {
   title: string
@@ -33,9 +38,7 @@ export function ReviewPlanCard({
       </div>
       <div className="review-plan-card-body">
         <div className="review-plan-card-title">{title}</div>
-        <div className="review-plan-card-hint">
-          Plan ready — review or edit it on the right.
-        </div>
+        <div className="review-plan-card-hint">{REVIEW_PLAN_CARD_HINT}</div>
       </div>
       {onOpen ? (
         <button
@@ -44,7 +47,7 @@ export function ReviewPlanCard({
           className="review-plan-card-open-btn"
         >
           <FileEdit strokeWidth={1.9} />
-          Open
+          {REVIEW_PLAN_OPEN_LABEL}
         </button>
       ) : null}
       {onBuild ? (
@@ -55,7 +58,7 @@ export function ReviewPlanCard({
           className="review-plan-card-build-btn"
         >
           <Hammer strokeWidth={1.9} />
-          Build
+          {REVIEW_PLAN_BUILD_LABEL}
         </button>
       ) : null}
     </div>
