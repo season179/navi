@@ -4,167 +4,25 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
 import { Keyboard, RotateCcw, Search } from 'lucide-react'
+import {
+  formatKeyboardShortcutsSettingsConflict,
+  KEYBOARD_SHORTCUT_SETTINGS_COMMANDS,
+  KEYBOARD_SHORTCUTS_SETTINGS_BINDING_COLUMN,
+  KEYBOARD_SHORTCUTS_SETTINGS_CAPTURE_HINT,
+  KEYBOARD_SHORTCUTS_SETTINGS_COMMAND_COLUMN,
+  KEYBOARD_SHORTCUTS_SETTINGS_RECORDING,
+  KEYBOARD_SHORTCUTS_SETTINGS_RESET,
+  KEYBOARD_SHORTCUTS_SETTINGS_SEARCH_PLACEHOLDER,
+  KEYBOARD_SHORTCUTS_SETTINGS_SHORTCUT_SETTINGS,
+  KEYBOARD_SHORTCUTS_SETTINGS_TITLE,
+  KEYBOARD_SHORTCUTS_SETTINGS_UNASSIGNED,
+  resolveKeyboardShortcutsSettingsCommandLabel,
+  type KeyboardShortcutSettingsCommandId,
+} from '../lib/keyboardShortcutsSettingsSection'
 import { InlineNoticeView, SettingsCard, type InlineNotice } from './SettingsControls'
 
-type KeyboardShortcutCommandId =
-  | 'toggle-plan-mode'
-  | 'new-chat'
-  | 'choose-workspace'
-  | 'settings'
-  | 'quit'
-  | 'undo'
-  | 'redo'
-  | 'cut'
-  | 'copy'
-  | 'paste'
-  | 'select-all'
-  | 'reload'
-  | 'zoom-in'
-  | 'zoom-out'
-  | 'reset-zoom'
-  | 'toggle-devtools'
-  | 'close'
-  | 'minimize'
-  | 'toggle-maximize'
-
-type KeyboardShortcutCommand = {
-  id: KeyboardShortcutCommandId
-  label: string
-  description: string
-  defaultBindings: string[]
-}
-
 type KeyboardShortcutsConfig = {
-  bindings: Partial<Record<KeyboardShortcutCommandId, string[]>>
-}
-
-const KEYBOARD_SHORTCUT_COMMANDS: readonly KeyboardShortcutCommand[] = [
-  {
-    id: 'toggle-plan-mode',
-    label: 'Toggle Plan mode',
-    description: 'Switch the composer between Agent and Plan mode.',
-    defaultBindings: ['Shift+Tab'],
-  },
-  {
-    id: 'new-chat',
-    label: 'New chat',
-    description: 'Start a new chat in the current workspace.',
-    defaultBindings: ['Ctrl+N'],
-  },
-  {
-    id: 'choose-workspace',
-    label: 'Choose workspace',
-    description: 'Open the workspace picker.',
-    defaultBindings: ['Ctrl+O'],
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    description: 'Open settings.',
-    defaultBindings: ['Ctrl+,'],
-  },
-  {
-    id: 'quit',
-    label: 'Quit',
-    description: 'Quit the app.',
-    defaultBindings: ['Alt+F4'],
-  },
-  {
-    id: 'undo',
-    label: 'Undo',
-    description: 'Undo the current edit.',
-    defaultBindings: ['Ctrl+Z'],
-  },
-  {
-    id: 'redo',
-    label: 'Redo',
-    description: 'Redo the current edit.',
-    defaultBindings: ['Ctrl+Y'],
-  },
-  {
-    id: 'cut',
-    label: 'Cut',
-    description: 'Cut the current selection.',
-    defaultBindings: ['Ctrl+X'],
-  },
-  {
-    id: 'copy',
-    label: 'Copy',
-    description: 'Copy the current selection.',
-    defaultBindings: ['Ctrl+C'],
-  },
-  {
-    id: 'paste',
-    label: 'Paste',
-    description: 'Paste from the clipboard.',
-    defaultBindings: ['Ctrl+V'],
-  },
-  {
-    id: 'select-all',
-    label: 'Select all',
-    description: 'Select content in the focused view.',
-    defaultBindings: ['Ctrl+A'],
-  },
-  {
-    id: 'reload',
-    label: 'Reload',
-    description: 'Reload the app window.',
-    defaultBindings: ['Ctrl+R'],
-  },
-  {
-    id: 'zoom-in',
-    label: 'Zoom in',
-    description: 'Increase the window zoom level.',
-    defaultBindings: ['Ctrl++'],
-  },
-  {
-    id: 'zoom-out',
-    label: 'Zoom out',
-    description: 'Decrease the window zoom level.',
-    defaultBindings: ['Ctrl+-'],
-  },
-  {
-    id: 'reset-zoom',
-    label: 'Reset zoom',
-    description: 'Reset the window zoom level.',
-    defaultBindings: ['Ctrl+0'],
-  },
-  {
-    id: 'toggle-devtools',
-    label: 'Developer tools',
-    description: 'Toggle developer tools.',
-    defaultBindings: ['Ctrl+Shift+I'],
-  },
-  {
-    id: 'close',
-    label: 'Close window',
-    description: 'Close the main window.',
-    defaultBindings: ['Ctrl+W'],
-  },
-  {
-    id: 'minimize',
-    label: 'Minimize window',
-    description: 'Minimize the main window.',
-    defaultBindings: [],
-  },
-  {
-    id: 'toggle-maximize',
-    label: 'Maximize window',
-    description: 'Maximize or restore the main window.',
-    defaultBindings: [],
-  },
-]
-
-const COPY = {
-  keyboardShortcuts: 'Keyboard shortcuts',
-  shortcutSearchPlaceholder: 'Search shortcuts',
-  shortcutCommandColumn: 'Command',
-  shortcutBindingColumn: 'Key binding',
-  shortcutCaptureHint: 'Press the new shortcut. Press Esc to cancel.',
-  shortcutRecording: 'Press keys',
-  shortcutUnassigned: 'Unassigned',
-  shortcutReset: 'Reset shortcut',
-  shortcutConflict: (command: string) => `Already used by "${command}".`,
+  bindings: Partial<Record<KeyboardShortcutSettingsCommandId, string[]>>
 }
 
 export const KEYBOARD_SHORTCUTS_PREVIEW_CONFIG: KeyboardShortcutsConfig = {
@@ -173,9 +31,9 @@ export const KEYBOARD_SHORTCUTS_PREVIEW_CONFIG: KeyboardShortcutsConfig = {
 
 function resolveKeyboardShortcutBindings(
   settings: KeyboardShortcutsConfig,
-): Record<KeyboardShortcutCommandId, string[]> {
-  const bindings = {} as Record<KeyboardShortcutCommandId, string[]>
-  for (const command of KEYBOARD_SHORTCUT_COMMANDS) {
+): Record<KeyboardShortcutSettingsCommandId, string[]> {
+  const bindings = {} as Record<KeyboardShortcutSettingsCommandId, string[]>
+  for (const command of KEYBOARD_SHORTCUT_SETTINGS_COMMANDS) {
     const configured = settings.bindings[command.id]
     bindings[command.id] =
       configured && configured.length > 0 ? configured : [...command.defaultBindings]
@@ -184,26 +42,22 @@ function resolveKeyboardShortcutBindings(
 }
 
 function findKeyboardShortcutConflict(
-  bindings: Record<KeyboardShortcutCommandId, string[]>,
-  commandId: KeyboardShortcutCommandId,
+  bindings: Record<KeyboardShortcutSettingsCommandId, string[]>,
+  commandId: KeyboardShortcutSettingsCommandId,
   shortcut: string,
-): KeyboardShortcutCommandId | null {
-  for (const command of KEYBOARD_SHORTCUT_COMMANDS) {
+): KeyboardShortcutSettingsCommandId | null {
+  for (const command of KEYBOARD_SHORTCUT_SETTINGS_COMMANDS) {
     if (command.id === commandId) continue
     if (bindings[command.id].includes(shortcut)) return command.id
   }
   return null
 }
 
-function commandLabel(commandId: KeyboardShortcutCommandId): string {
-  return KEYBOARD_SHORTCUT_COMMANDS.find((item) => item.id === commandId)?.label ?? commandId
-}
-
 type Props = {
   config: KeyboardShortcutsConfig
   onChange: (config: KeyboardShortcutsConfig) => void
   initialQuery?: string
-  initialCapturingCommandId?: KeyboardShortcutCommandId | null
+  initialCapturingCommandId?: KeyboardShortcutSettingsCommandId | null
   initialNotice?: InlineNotice | null
 }
 
@@ -215,7 +69,7 @@ export function KeyboardShortcutsSettingsSection({
   initialNotice = null,
 }: Props): ReactElement {
   const [query, setQuery] = useState(initialQuery)
-  const [capturingCommandId, setCapturingCommandId] = useState<KeyboardShortcutCommandId | null>(
+  const [capturingCommandId, setCapturingCommandId] = useState<KeyboardShortcutSettingsCommandId | null>(
     initialCapturingCommandId,
   )
   const [notice, setNotice] = useState<InlineNotice | null>(initialNotice)
@@ -227,8 +81,8 @@ export function KeyboardShortcutsSettingsSection({
 
   const filteredCommands = useMemo(() => {
     const needle = query.trim().toLowerCase()
-    if (!needle) return KEYBOARD_SHORTCUT_COMMANDS
-    return KEYBOARD_SHORTCUT_COMMANDS.filter((command) => {
+    if (!needle) return KEYBOARD_SHORTCUT_SETTINGS_COMMANDS
+    return KEYBOARD_SHORTCUT_SETTINGS_COMMANDS.filter((command) => {
       const haystack = [
         command.id,
         command.label,
@@ -242,7 +96,7 @@ export function KeyboardShortcutsSettingsSection({
   }, [effectiveBindings, query])
 
   const updateBinding = useCallback(
-    (commandId: KeyboardShortcutCommandId, shortcuts: string[]) => {
+    (commandId: KeyboardShortcutSettingsCommandId, shortcuts: string[]) => {
       onChange({
         bindings: {
           ...config.bindings,
@@ -278,7 +132,9 @@ export function KeyboardShortcutsSettingsSection({
       if (conflictId) {
         setNotice({
           tone: 'error',
-          message: COPY.shortcutConflict(commandLabel(conflictId)),
+          message: formatKeyboardShortcutsSettingsConflict(
+            resolveKeyboardShortcutsSettingsCommandLabel(conflictId),
+          ),
         })
         return
       }
@@ -299,7 +155,7 @@ export function KeyboardShortcutsSettingsSection({
         <input
           className="keyboard-shortcuts-search-input"
           value={query}
-          placeholder={COPY.shortcutSearchPlaceholder}
+          placeholder={KEYBOARD_SHORTCUTS_SETTINGS_SEARCH_PLACEHOLDER}
           onChange={(event) => setQuery(event.target.value)}
         />
         <Keyboard className="keyboard-shortcuts-search-icon" strokeWidth={1.75} />
@@ -311,10 +167,10 @@ export function KeyboardShortcutsSettingsSection({
         </div>
       ) : null}
 
-      <SettingsCard title={COPY.keyboardShortcuts}>
+      <SettingsCard title={KEYBOARD_SHORTCUTS_SETTINGS_TITLE}>
         <div className="keyboard-shortcuts-table-header">
-          <div>{COPY.shortcutCommandColumn}</div>
-          <div>{COPY.shortcutBindingColumn}</div>
+          <div>{KEYBOARD_SHORTCUTS_SETTINGS_COMMAND_COLUMN}</div>
+          <div>{KEYBOARD_SHORTCUTS_SETTINGS_BINDING_COLUMN}</div>
           <div aria-hidden />
         </div>
         <div className="keyboard-shortcuts-table-body">
@@ -331,7 +187,7 @@ export function KeyboardShortcutsSettingsSection({
                   type="button"
                   onClick={() => {
                     setCapturingCommandId(command.id)
-                    setNotice({ tone: 'info', message: COPY.shortcutCaptureHint })
+                    setNotice({ tone: 'info', message: KEYBOARD_SHORTCUTS_SETTINGS_CAPTURE_HINT })
                   }}
                   className={
                     capturing
@@ -340,7 +196,9 @@ export function KeyboardShortcutsSettingsSection({
                   }
                 >
                   {capturing ? (
-                    <span className="keyboard-shortcuts-binding-recording">{COPY.shortcutRecording}</span>
+                    <span className="keyboard-shortcuts-binding-recording">
+                      {KEYBOARD_SHORTCUTS_SETTINGS_RECORDING}
+                    </span>
                   ) : shortcuts.length > 0 ? (
                     shortcuts.map((shortcut) => (
                       <span key={shortcut} className="keyboard-shortcuts-binding-pill">
@@ -348,15 +206,17 @@ export function KeyboardShortcutsSettingsSection({
                       </span>
                     ))
                   ) : (
-                    <span className="keyboard-shortcuts-binding-empty">{COPY.shortcutUnassigned}</span>
+                    <span className="keyboard-shortcuts-binding-empty">
+                      {KEYBOARD_SHORTCUTS_SETTINGS_UNASSIGNED}
+                    </span>
                   )}
                 </button>
                 <button
                   type="button"
                   onClick={() => updateBinding(command.id, [])}
                   className="keyboard-shortcuts-reset"
-                  aria-label={COPY.shortcutReset}
-                  title={COPY.shortcutReset}
+                  aria-label={KEYBOARD_SHORTCUTS_SETTINGS_RESET}
+                  title={KEYBOARD_SHORTCUTS_SETTINGS_RESET}
                 >
                   <RotateCcw className="keyboard-shortcuts-reset-icon" strokeWidth={1.75} />
                 </button>
@@ -409,9 +269,14 @@ export function KeyboardShortcutsSettingsSectionPreview({
       initialCapturingCommandId={mode === 'capturing' ? 'settings' : null}
       initialNotice={
         mode === 'capturing'
-          ? { tone: 'info', message: COPY.shortcutCaptureHint }
+          ? { tone: 'info', message: KEYBOARD_SHORTCUTS_SETTINGS_CAPTURE_HINT }
           : mode === 'conflict'
-            ? { tone: 'error', message: COPY.shortcutConflict('Settings') }
+            ? {
+                tone: 'error',
+                message: formatKeyboardShortcutsSettingsConflict(
+                  KEYBOARD_SHORTCUTS_SETTINGS_SHORTCUT_SETTINGS,
+                ),
+              }
             : null
       }
     />
