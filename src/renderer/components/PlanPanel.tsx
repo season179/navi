@@ -17,6 +17,23 @@ import {
 import { WriteMarkdownEditor } from './WriteMarkdownEditor'
 import { WriteRichEditor } from './WriteRichEditor'
 import {
+  formatPlanCoverageLabel,
+  formatPlanCoverageUncovered,
+  formatPlanSddChangedBanner,
+  PLAN_BUILD_LABEL,
+  PLAN_EMPTY_DESCRIPTION,
+  PLAN_EMPTY_TITLE,
+  PLAN_NO_ACTIVE_FILE_LABEL,
+  PLAN_NO_WORKSPACE_LABEL,
+  PLAN_OPEN_FILE_LABEL,
+  PLAN_PANEL_COLLAPSE_LABEL,
+  PLAN_PANEL_TITLE,
+  PLAN_REFINE_HINT,
+  PLAN_SDD_REPLAN_LABEL,
+  PLAN_VERIFY_LABEL,
+  resolvePlanStatusLabel,
+} from '../lib/planPanel'
+import {
   PLAN_PANEL_PREVIEW,
   PREVIEW_COVERAGE,
   PREVIEW_DRIFT,
@@ -52,44 +69,6 @@ type Props = {
   onBuildPlan?: () => void
   onVerifyPlan?: () => void
   onReplanChanged?: () => void
-}
-
-const COPY = {
-  rightPanelCollapse: 'Collapse panel',
-  planPanelTitle: 'Plan',
-  planNoActiveFile: 'No plan file selected',
-  planNoWorkspace: 'Choose a working directory first.',
-  planEmptyTitle: 'No plan file',
-  planEmptySub:
-    'Create a plan from the composer or reopen a recent plan for this workspace.',
-  planOpenFile: 'Open plan file',
-  planRefineHint:
-    'Want changes? Keep chatting on the left and the model will update this plan.',
-  planBuild: 'Build',
-  planStatusDrafting: 'Drafting',
-  planStatusRefining: 'Refining',
-  planStatusBuilding: 'Building',
-  planStatusSaving: 'Saving',
-  planStatusDirty: 'Unsaved',
-  planStatusSaved: 'Saved',
-  planStatusError: 'Needs attention',
-  planCoverageLabel: (covered: number, total: number) => `Coverage ${covered}/${total}`,
-  planCoverageUncovered: (ids: string) => `Uncovered: ${ids}`,
-  planVerify: 'Verify',
-  planVerifyRunning: 'Verifying…',
-  sddChangedBanner: (ids: string) =>
-    `Requirements ${ids} changed after planning; the plan may be stale`,
-  sddReplanButton: 'Replan affected steps',
-}
-
-function statusLabel(saveStatus: PlanSaveStatus, operationStatus: PlanOperationStatus): string {
-  if (operationStatus === 'drafting') return COPY.planStatusDrafting
-  if (operationStatus === 'refining') return COPY.planStatusRefining
-  if (operationStatus === 'building') return COPY.planStatusBuilding
-  if (operationStatus === 'error' || saveStatus === 'error') return COPY.planStatusError
-  if (saveStatus === 'saving') return COPY.planStatusSaving
-  if (saveStatus === 'dirty') return COPY.planStatusDirty
-  return COPY.planStatusSaved
 }
 
 function isStatusBusy(saveStatus: PlanSaveStatus, operationStatus: PlanOperationStatus): boolean {
@@ -188,7 +167,7 @@ export function PlanPanel({
 }: Props): ReactElement {
   const hasWorkspace = Boolean(workspaceRoot.trim())
   const hasPlan = Boolean(activePlan)
-  const statusText = statusLabel(saveStatus, operationStatus)
+  const statusText = resolvePlanStatusLabel(saveStatus, operationStatus)
   const statusBusy = isStatusBusy(saveStatus, operationStatus)
   const showCoverageRow = Boolean(coverage && coverage.total > 0)
   const driftIds = coverage?.driftIds ?? []
@@ -201,15 +180,15 @@ export function PlanPanel({
             type="button"
             onClick={onCollapse}
             className="ds-sidebar-toggle-button plan-panel-collapse-btn"
-            aria-label={COPY.rightPanelCollapse}
-            title={COPY.rightPanelCollapse}
+            aria-label={PLAN_PANEL_COLLAPSE_LABEL}
+            title={PLAN_PANEL_COLLAPSE_LABEL}
           >
             <PanelRightClose className="plan-panel-collapse-icon" strokeWidth={1.85} />
           </button>
           <div className="plan-panel-title-chip">
             <ClipboardList className="plan-panel-title-icon" strokeWidth={1.8} />
             <span className="plan-panel-title">
-              {activePlan?.featureName || COPY.planPanelTitle}
+              {activePlan?.featureName || PLAN_PANEL_TITLE}
             </span>
           </div>
           <button
@@ -217,15 +196,15 @@ export function PlanPanel({
             onClick={onOpenPlanFile}
             disabled={!activePlan}
             className="ds-sidebar-toggle-button plan-panel-open-btn"
-            aria-label={COPY.planOpenFile}
-            title={COPY.planOpenFile}
+            aria-label={PLAN_OPEN_FILE_LABEL}
+            title={PLAN_OPEN_FILE_LABEL}
           >
             <ExternalLink className="plan-panel-open-icon" strokeWidth={1.9} />
           </button>
         </div>
         <div className="plan-panel-meta-row">
           <div className="plan-panel-path-pill">
-            {activePlan?.relativePath ?? COPY.planNoActiveFile}
+            {activePlan?.relativePath ?? PLAN_NO_ACTIVE_FILE_LABEL}
           </div>
           <div className="plan-panel-status-pill">
             {statusBusy ? (
@@ -239,32 +218,32 @@ export function PlanPanel({
         {showCoverageRow && coverage ? (
           <div className="plan-panel-coverage-row">
             <span className="plan-panel-coverage-badge">
-              {COPY.planCoverageLabel(coverage.covered, coverage.total)}
+              {formatPlanCoverageLabel(coverage.covered, coverage.total)}
             </span>
             {coverage.uncoveredIds.length > 0 ? (
               <span className="plan-panel-uncovered-badge">
                 <TriangleAlert className="plan-panel-uncovered-icon" strokeWidth={2} />
                 <span className="plan-panel-uncovered-text">
-                  {COPY.planCoverageUncovered(coverage.uncoveredIds.join(', '))}
+                  {formatPlanCoverageUncovered(coverage.uncoveredIds.join(', '))}
                 </span>
               </span>
             ) : null}
             {onVerifyPlan ? (
               <button type="button" onClick={onVerifyPlan} className="plan-panel-verify-btn">
                 <ShieldCheck className="plan-panel-verify-icon" strokeWidth={2} />
-                {COPY.planVerify}
+                {PLAN_VERIFY_LABEL}
               </button>
             ) : null}
             {driftIds.length > 0 ? (
               <div className="plan-panel-drift-banner">
                 <TriangleAlert className="plan-panel-drift-icon" strokeWidth={2} />
                 <span className="plan-panel-drift-text">
-                  {COPY.sddChangedBanner(driftIds.join(', '))}
+                  {formatPlanSddChangedBanner(driftIds.join(', '))}
                 </span>
                 {onReplanChanged ? (
                   <button type="button" onClick={onReplanChanged} className="plan-panel-replan-btn">
                     <RefreshCw className="plan-panel-replan-icon" strokeWidth={2} />
-                    {COPY.sddReplanButton}
+                    {PLAN_SDD_REPLAN_LABEL}
                   </button>
                 ) : null}
               </div>
@@ -275,14 +254,14 @@ export function PlanPanel({
 
       <div className="plan-panel-body">
         {!hasWorkspace ? (
-          <div className="plan-panel-no-workspace">{COPY.planNoWorkspace}</div>
+          <div className="plan-panel-no-workspace">{PLAN_NO_WORKSPACE_LABEL}</div>
         ) : !hasPlan ? (
           <div className="plan-panel-empty">
             <div className="plan-panel-empty-icon-wrap">
               <ClipboardList className="plan-panel-empty-icon" strokeWidth={1.9} />
             </div>
-            <div className="plan-panel-empty-title">{COPY.planEmptyTitle}</div>
-            <p className="plan-panel-empty-description">{COPY.planEmptySub}</p>
+            <div className="plan-panel-empty-title">{PLAN_EMPTY_TITLE}</div>
+            <p className="plan-panel-empty-description">{PLAN_EMPTY_DESCRIPTION}</p>
           </div>
         ) : (
           <div className="plan-panel-editor-shell">
@@ -305,10 +284,10 @@ export function PlanPanel({
       {hasPlan ? (
         <div className="plan-panel-footer">
           {error ? <div className="plan-panel-error">{error}</div> : null}
-          <p className="plan-panel-refine-hint">{COPY.planRefineHint}</p>
+          <p className="plan-panel-refine-hint">{PLAN_REFINE_HINT}</p>
           <button type="button" onClick={onBuildPlan} className="plan-panel-build-btn">
             <Hammer className="plan-panel-build-icon" strokeWidth={1.9} />
-            {COPY.planBuild}
+            {PLAN_BUILD_LABEL}
           </button>
         </div>
       ) : null}
