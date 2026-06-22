@@ -5,6 +5,44 @@
 import { useState, type ReactElement } from 'react'
 import { Loader2, PlugZap } from 'lucide-react'
 import {
+  formatSpeechToTextSettingsModelSelectDefaultOption,
+  formatSpeechToTextSettingsProviderMissingKey,
+  formatSpeechToTextSettingsTestFailed,
+  SPEECH_TO_TEXT_SETTINGS_ADVANCED_DESC,
+  SPEECH_TO_TEXT_SETTINGS_ADVANCED_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_API_KEY_DESC,
+  SPEECH_TO_TEXT_SETTINGS_API_KEY_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_BASE_URL_DESC,
+  SPEECH_TO_TEXT_SETTINGS_BASE_URL_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_BASE_URL_PLACEHOLDER,
+  SPEECH_TO_TEXT_SETTINGS_ENABLED_DESC,
+  SPEECH_TO_TEXT_SETTINGS_ENABLED_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_LANGUAGE_DESC,
+  SPEECH_TO_TEXT_SETTINGS_LANGUAGE_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_MODEL_DESC,
+  SPEECH_TO_TEXT_SETTINGS_MODEL_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_MODEL_PLACEHOLDER,
+  SPEECH_TO_TEXT_SETTINGS_PROTOCOL_DESC,
+  SPEECH_TO_TEXT_SETTINGS_PROTOCOL_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_PROVIDER_CUSTOM,
+  SPEECH_TO_TEXT_SETTINGS_PROVIDER_DESC,
+  SPEECH_TO_TEXT_SETTINGS_PROVIDER_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_TEST_ACTION,
+  SPEECH_TO_TEXT_SETTINGS_TEST_DESC,
+  SPEECH_TO_TEXT_SETTINGS_TEST_EMPTY_OK,
+  SPEECH_TO_TEXT_SETTINGS_TEST_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_TESTING,
+  SPEECH_TO_TEXT_SETTINGS_TIMEOUT_DESC,
+  SPEECH_TO_TEXT_SETTINGS_TIMEOUT_LABEL,
+  SPEECH_TO_TEXT_SETTINGS_TITLE,
+  resolveSpeechToTextSettingsLanguageLabel,
+  resolveSpeechToTextSettingsProtocolLabel,
+} from '../lib/speechToTextSettingsSection'
+import {
+  PROVIDERS_SETTINGS_HIDE_SECRET,
+  PROVIDERS_SETTINGS_SHOW_SECRET,
+} from '../lib/providersSettingsSection'
+import {
   AdvancedSettingsDisclosure,
   InlineNoticeView,
   ModelSelect,
@@ -76,55 +114,6 @@ export const SPEECH_TO_TEXT_PREVIEW_DEFAULT: SpeechToTextSettings = {
   timeoutMs: 60000,
 }
 
-const COPY = {
-  speechToText: 'Speech to text',
-  speechToTextEnabled: 'Enable speech to text',
-  speechToTextEnabledDesc:
-    'Adds a voice input button to the chat composer; recordings are transcribed by the selected provider. Xiaomi (MiMo) can reuse the key from Providers; custom OpenAI-compatible speech APIs are also supported.',
-  speechToTextProvider: 'Speech provider',
-  speechToTextProviderDesc:
-    'Choose a configured provider that has speech models, or use a custom speech API.',
-  speechToTextProviderCustom: 'Custom speech API',
-  speechToTextProviderMissingKey: (provider: string) =>
-    `${provider} has no API key yet. Add it in Providers.`,
-  speechToTextProtocol: 'Speech protocol',
-  speechToTextProtocolDesc:
-    'Request shape used by the custom speech API. OpenAI Transcriptions calls {baseUrl}/audio/transcriptions; MiMo ASR sends base64 audio via chat/completions.',
-  speechProtocolOpenAi: 'OpenAI Transcriptions',
-  speechProtocolMimoAsr: 'MiMo ASR',
-  speechToTextBaseUrl: 'Speech API base URL',
-  speechToTextBaseUrlDesc: 'Speech endpoint root, e.g. https://api.xiaomimimo.com/v1.',
-  speechToTextBaseUrlPlaceholder: 'https://api.xiaomimimo.com/v1',
-  speechToTextApiKey: 'API key',
-  speechToTextApiKeyDesc: 'Key for the speech provider. Independent from the chat model key.',
-  speechToTextModel: 'Speech model',
-  speechToTextModelDesc: 'Model id sent to the provider, e.g. mimo-v2.5-asr or whisper-1.',
-  speechToTextModelPlaceholder: 'mimo-v2.5-asr',
-  speechToTextLanguage: 'Language',
-  speechToTextLanguageDesc: 'Optional language hint such as zh or en. Leave empty for auto-detect.',
-  speechLanguage_auto: 'Auto detect',
-  speechLanguage_zh: 'Chinese',
-  speechLanguage_en: 'English',
-  speechLanguage_ja: 'Japanese',
-  speechLanguage_ko: 'Korean',
-  speechToTextAdvanced: 'Advanced options',
-  speechToTextAdvancedDesc: 'Rarely needed settings such as the request timeout.',
-  speechToTextTimeout: 'Timeout (ms)',
-  speechToTextTimeoutDesc: 'Per-request timeout for the speech transcription API.',
-  speechToTextTest: 'Test transcription',
-  speechToTextTestDesc:
-    'Send a built-in test clip to verify the current provider, key, and model configuration.',
-  speechToTextTestAction: 'Test',
-  speechToTextTesting: 'Testing…',
-  speechToTextTestSuccess: (text: string) => `Transcription works. Returned: ${text}`,
-  speechToTextTestEmptyOk:
-    'Auth and endpoint are working (the test tone having no transcript is expected).',
-  speechToTextTestFailed: (message: string) => `Test failed: ${message}`,
-  showSecret: 'Show',
-  hideSecret: 'Hide',
-  modelSelectDefaultOption: (model: string) => (model ? `Default (${model})` : 'Default'),
-}
-
 type Props = {
   settings: SpeechToTextSettings
   onSettingsChange?: (next: SpeechToTextSettings) => void
@@ -154,20 +143,11 @@ export function SpeechToTextSettingsSection({
     onSettingsChange?.({ ...settings, ...patch })
   }
 
-  const languageLabel = (language: string): string => {
-    if (language === 'zh') return COPY.speechLanguage_zh
-    if (language === 'en') return COPY.speechLanguage_en
-    if (language === 'ja') return COPY.speechLanguage_ja
-    if (language === 'ko') return COPY.speechLanguage_ko
-    if (!language) return COPY.speechLanguage_auto
-    return language
-  }
-
   return (
-    <SettingsCard title={COPY.speechToText}>
+    <SettingsCard title={SPEECH_TO_TEXT_SETTINGS_TITLE}>
       <SettingRow
-        title={COPY.speechToTextEnabled}
-        description={COPY.speechToTextEnabledDesc}
+        title={SPEECH_TO_TEXT_SETTINGS_ENABLED_LABEL}
+        description={SPEECH_TO_TEXT_SETTINGS_ENABLED_DESC}
         control={
           <Toggle
             checked={settings.enabled}
@@ -178,8 +158,8 @@ export function SpeechToTextSettingsSection({
       {settings.enabled ? (
         <>
           <SettingRow
-            title={COPY.speechToTextProvider}
-            description={COPY.speechToTextProviderDesc}
+            title={SPEECH_TO_TEXT_SETTINGS_PROVIDER_LABEL}
+            description={SPEECH_TO_TEXT_SETTINGS_PROVIDER_DESC}
             control={
               <div className="speech-to-text-provider-control">
                 <select
@@ -213,12 +193,12 @@ export function SpeechToTextSettingsSection({
                     </option>
                   ))}
                   <option value={CUSTOM_SPEECH_TO_TEXT_PROVIDER_ID}>
-                    {COPY.speechToTextProviderCustom}
+                    {SPEECH_TO_TEXT_SETTINGS_PROVIDER_CUSTOM}
                   </option>
                 </select>
                 {!usingCustomProvider && !selectedProvider?.hasApiKey ? (
                   <p className="speech-to-text-provider-warning">
-                    {COPY.speechToTextProviderMissingKey(
+                    {formatSpeechToTextSettingsProviderMissingKey(
                       selectedProvider?.name ?? selectedProviderId,
                     )}
                   </p>
@@ -229,8 +209,8 @@ export function SpeechToTextSettingsSection({
           {usingCustomProvider ? (
             <>
               <SettingRow
-                title={COPY.speechToTextProtocol}
-                description={COPY.speechToTextProtocolDesc}
+                title={SPEECH_TO_TEXT_SETTINGS_PROTOCOL_LABEL}
+                description={SPEECH_TO_TEXT_SETTINGS_PROTOCOL_DESC}
                 control={
                   <select
                     className={SETTINGS_SELECT_CLASS}
@@ -241,29 +221,27 @@ export function SpeechToTextSettingsSection({
                   >
                     {SPEECH_TO_TEXT_PROTOCOLS.map((protocol) => (
                       <option key={protocol} value={protocol}>
-                        {protocol === 'mimo-asr'
-                          ? COPY.speechProtocolMimoAsr
-                          : COPY.speechProtocolOpenAi}
+                        {resolveSpeechToTextSettingsProtocolLabel(protocol)}
                       </option>
                     ))}
                   </select>
                 }
               />
               <SettingRow
-                title={COPY.speechToTextBaseUrl}
-                description={COPY.speechToTextBaseUrlDesc}
+                title={SPEECH_TO_TEXT_SETTINGS_BASE_URL_LABEL}
+                description={SPEECH_TO_TEXT_SETTINGS_BASE_URL_DESC}
                 control={
                   <input
                     className="settings-text-input speech-to-text-text-input"
                     value={settings.baseUrl}
-                    placeholder={COPY.speechToTextBaseUrlPlaceholder}
+                    placeholder={SPEECH_TO_TEXT_SETTINGS_BASE_URL_PLACEHOLDER}
                     onChange={(event) => updateSettings({ baseUrl: event.target.value })}
                   />
                 }
               />
               <SettingRow
-                title={COPY.speechToTextApiKey}
-                description={COPY.speechToTextApiKeyDesc}
+                title={SPEECH_TO_TEXT_SETTINGS_API_KEY_LABEL}
+                description={SPEECH_TO_TEXT_SETTINGS_API_KEY_DESC}
                 control={
                   <SettingsSecretInput
                     value={settings.apiKey}
@@ -271,8 +249,8 @@ export function SpeechToTextSettingsSection({
                     visible={showApiKey}
                     onToggleVisibility={() => setShowApiKey((value) => !value)}
                     autoComplete="off"
-                    showLabel={COPY.showSecret}
-                    hideLabel={COPY.hideSecret}
+                    showLabel={PROVIDERS_SETTINGS_SHOW_SECRET}
+                    hideLabel={PROVIDERS_SETTINGS_HIDE_SECRET}
                     className="speech-to-text-secret-input"
                   />
                 }
@@ -280,22 +258,24 @@ export function SpeechToTextSettingsSection({
             </>
           ) : null}
           <SettingRow
-            title={COPY.speechToTextModel}
-            description={COPY.speechToTextModelDesc}
+            title={SPEECH_TO_TEXT_SETTINGS_MODEL_LABEL}
+            description={SPEECH_TO_TEXT_SETTINGS_MODEL_DESC}
             control={
               <div className="speech-to-text-model-control">
                 {usingCustomProvider ? (
                   <input
                     className="settings-text-input"
                     value={settings.model}
-                    placeholder={COPY.speechToTextModelPlaceholder}
+                    placeholder={SPEECH_TO_TEXT_SETTINGS_MODEL_PLACEHOLDER}
                     onChange={(event) => updateSettings({ model: event.target.value })}
                   />
                 ) : (
                   <ModelSelect
                     value={speechModelOptions.includes(settings.model) ? settings.model : ''}
                     options={speechModelOptions}
-                    defaultLabel={COPY.modelSelectDefaultOption(speechModelOptions[0] ?? '')}
+                    defaultLabel={formatSpeechToTextSettingsModelSelectDefaultOption(
+                      speechModelOptions[0] ?? '',
+                    )}
                     selectClassName={SETTINGS_SELECT_CLASS}
                     onChange={(model) => updateSettings({ model })}
                   />
@@ -304,8 +284,8 @@ export function SpeechToTextSettingsSection({
             }
           />
           <SettingRow
-            title={COPY.speechToTextLanguage}
-            description={COPY.speechToTextLanguageDesc}
+            title={SPEECH_TO_TEXT_SETTINGS_LANGUAGE_LABEL}
+            description={SPEECH_TO_TEXT_SETTINGS_LANGUAGE_DESC}
             control={
               <select
                 className={SETTINGS_SELECT_CLASS}
@@ -314,7 +294,7 @@ export function SpeechToTextSettingsSection({
               >
                 {SPEECH_LANGUAGE_OPTIONS.map((language) => (
                   <option key={language || 'auto'} value={language}>
-                    {languageLabel(language)}
+                    {resolveSpeechToTextSettingsLanguageLabel(language)}
                   </option>
                 ))}
                 {!SPEECH_LANGUAGE_OPTIONS.includes(
@@ -327,14 +307,14 @@ export function SpeechToTextSettingsSection({
           />
           <div className="speech-to-text-advanced-wrap">
             <AdvancedSettingsDisclosure
-              title={COPY.speechToTextAdvanced}
-              description={COPY.speechToTextAdvancedDesc}
+              title={SPEECH_TO_TEXT_SETTINGS_ADVANCED_LABEL}
+              description={SPEECH_TO_TEXT_SETTINGS_ADVANCED_DESC}
               defaultOpen={initialAdvancedOpen}
             >
               <div className="speech-to-text-advanced-rows">
                 <SettingRow
-                  title={COPY.speechToTextTimeout}
-                  description={COPY.speechToTextTimeoutDesc}
+                  title={SPEECH_TO_TEXT_SETTINGS_TIMEOUT_LABEL}
+                  description={SPEECH_TO_TEXT_SETTINGS_TIMEOUT_DESC}
                   control={
                     <input
                       type="number"
@@ -353,8 +333,8 @@ export function SpeechToTextSettingsSection({
             </AdvancedSettingsDisclosure>
           </div>
           <SettingRow
-            title={COPY.speechToTextTest}
-            description={COPY.speechToTextTestDesc}
+            title={SPEECH_TO_TEXT_SETTINGS_TEST_LABEL}
+            description={SPEECH_TO_TEXT_SETTINGS_TEST_DESC}
             control={
               <div className="speech-to-text-test-control">
                 <button
@@ -368,7 +348,9 @@ export function SpeechToTextSettingsSection({
                   ) : (
                     <PlugZap className="speech-to-text-test-icon" strokeWidth={1.9} />
                   )}
-                  {testState === 'busy' ? COPY.speechToTextTesting : COPY.speechToTextTestAction}
+                  {testState === 'busy'
+                    ? SPEECH_TO_TEXT_SETTINGS_TESTING
+                    : SPEECH_TO_TEXT_SETTINGS_TEST_ACTION}
                 </button>
                 {typeof testState === 'object' ? <InlineNoticeView notice={testState} /> : null}
               </div>
@@ -425,11 +407,13 @@ export function SpeechToTextSettingsSectionPreview({
     mode === 'testing'
       ? 'busy'
       : mode === 'testSuccess'
-        ? { tone: 'success', message: COPY.speechToTextTestEmptyOk }
+        ? { tone: 'success', message: SPEECH_TO_TEXT_SETTINGS_TEST_EMPTY_OK }
         : mode === 'testError'
           ? {
               tone: 'error',
-              message: COPY.speechToTextTestFailed('401 Unauthorized — invalid API key'),
+              message: formatSpeechToTextSettingsTestFailed(
+                '401 Unauthorized — invalid API key',
+              ),
             }
           : 'idle'
 
