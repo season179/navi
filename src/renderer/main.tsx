@@ -5,10 +5,6 @@ import { router } from './router'
 import { ThemeContext, type Theme } from './theme'
 import { NaviChatProvider } from './flue/NaviChatContext'
 
-import './styles/tokens.css'
-import './styles/app.css'
-import './styles/markdown.css'
-
 function getInitialTheme(): Theme {
   const stored = localStorage.getItem('navi-theme') as Theme | null
   if (stored === 'dark' || stored === 'light') return stored

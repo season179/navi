@@ -11,7 +11,8 @@
     "typecheck": "tsc",
     "build:main": "esbuild src/main/main.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/main/main.cjs --sourcemap",
     "build:preload": "esbuild src/main/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/main/preload.cjs --sourcemap",
-    "build:renderer": "esbuild src/renderer/main.tsx --bundle --platform=browser --define:process.env.NODE_ENV='\"production\"' --minify --splitting --format=esm --outdir=dist/renderer --entry-names=renderer --sourcemap",
+    "build:renderer:css": "tailwindcss -i src/renderer/styles/index.css -o dist/renderer/renderer.css --minify",
+    "build:renderer": "npm run build:renderer:css && esbuild src/renderer/main.tsx --bundle --platform=browser --define:process.env.NODE_ENV='\"production\"' --minify --splitting --format=esm --outdir=dist/renderer --entry-names=renderer --sourcemap",
     "build:flue": "flue build --target node && node scripts/patch-flue-server.mjs",
     "build": "npm run build:flue && npm run build:main && npm run build:preload && npm run build:renderer",
     "start": "npm run build && electron .",
@@ -20,10 +21,12 @@
   },
   "devDependencies": {
     "@flue/cli": "1.0.0-beta.1",
+    "@tailwindcss/cli": "^4.3.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "electron": "42.4.1",
     "esbuild": "0.28.1",
+    "tailwindcss": "^4.3.1",
     "typescript": "6.0.3"
   },
   "dependencies": {
