@@ -13,6 +13,28 @@ import {
   XCircle,
 } from 'lucide-react'
 import { SettingRow, SettingsCard } from './SettingsControls'
+import {
+  WORKTREE_SETTINGS_BUSY_LABEL,
+  WORKTREE_SETTINGS_CLEANUP_ALL_LABEL,
+  WORKTREE_SETTINGS_CREATE_LABEL,
+  WORKTREE_SETTINGS_EMPTY_LABEL,
+  WORKTREE_SETTINGS_IDLE_LABEL,
+  WORKTREE_SETTINGS_IN_USE_LABEL,
+  WORKTREE_SETTINGS_MAIN_BRANCH_LABEL,
+  WORKTREE_SETTINGS_MERGE_TITLE,
+  WORKTREE_SETTINGS_NOT_CREATED_LABEL,
+  WORKTREE_SETTINGS_NOT_GIT_REPO,
+  WORKTREE_SETTINGS_OVERVIEW_DESC,
+  WORKTREE_SETTINGS_OVERVIEW_TITLE,
+  WORKTREE_SETTINGS_POOL_DIR_LABEL,
+  WORKTREE_SETTINGS_POOL_LABEL,
+  WORKTREE_SETTINGS_REFRESH_LABEL,
+  WORKTREE_SETTINGS_RELEASE_LABEL,
+  WORKTREE_SETTINGS_REMOVE_TITLE,
+  WORKTREE_SETTINGS_SECTION_TITLE,
+  WORKTREE_SETTINGS_SYNC_TITLE,
+  WORKTREE_SETTINGS_UNCOMMITTED_LABEL,
+} from '../lib/worktreeSettingsSection'
 
 export const MAX_WORKTREE_POOL_SIZE = 3
 
@@ -46,30 +68,6 @@ export type WorktreeSyncResultSnapshot = {
   success: boolean
   message: string
   conflictedFiles: string[]
-}
-
-const COPY = {
-  sectionWorktree: 'Worktree pool',
-  worktreeOverview: 'Parallel worktree pool',
-  worktreeOverviewDesc:
-    'Manage isolated git worktrees for parallel agent tasks on the same repository.',
-  worktreeMainBranch: 'Main branch',
-  worktreeInUse: 'In use',
-  worktreePoolDir: 'Pool directory',
-  worktreeRefresh: 'Refresh',
-  worktreeNotGitRepo: 'The selected workspace is not a git repository.',
-  worktreePool: 'Pool',
-  worktreeBusy: 'In use',
-  worktreeIdle: 'Idle',
-  worktreeEmpty: 'Empty',
-  worktreeNotCreated: 'Not created',
-  worktreeUncommitted: 'uncommitted',
-  worktreeCreate: 'Create',
-  worktreeMergeTitle: 'Merge into main',
-  worktreeSyncTitle: 'Sync from main',
-  worktreeRemove: 'Remove worktree',
-  worktreeRelease: 'Release',
-  worktreeCleanupAll: 'Remove all idle worktrees',
 }
 
 export const WORKTREE_POOL_PREVIEW: WorktreePoolStatusSnapshot = {
@@ -168,28 +166,28 @@ export function WorktreeSettingsSection({
   const pools = poolStatus?.worktrees ?? []
 
   return (
-    <SettingsCard title={COPY.sectionWorktree}>
+    <SettingsCard title={WORKTREE_SETTINGS_SECTION_TITLE}>
       <SettingRow
-        title={COPY.worktreeOverview}
-        description={COPY.worktreeOverviewDesc}
+        title={WORKTREE_SETTINGS_OVERVIEW_TITLE}
+        description={WORKTREE_SETTINGS_OVERVIEW_DESC}
         wideControl
         control={
           <div className="worktree-control">
             <div className="worktree-overview-stats">
               <div className="worktree-stat-card">
-                <div className="worktree-stat-label">{COPY.worktreeMainBranch}</div>
+                <div className="worktree-stat-label">{WORKTREE_SETTINGS_MAIN_BRANCH_LABEL}</div>
                 <div className="worktree-stat-value worktree-stat-value-mono">
                   {poolStatus?.mainBranch ?? '—'}
                 </div>
               </div>
               <div className="worktree-stat-card">
-                <div className="worktree-stat-label">{COPY.worktreeInUse}</div>
+                <div className="worktree-stat-label">{WORKTREE_SETTINGS_IN_USE_LABEL}</div>
                 <div className="worktree-stat-value worktree-stat-value-count">
                   {poolStatus?.inUseCount ?? 0} / {MAX_WORKTREE_POOL_SIZE}
                 </div>
               </div>
               <div className="worktree-stat-card">
-                <div className="worktree-stat-label">{COPY.worktreePoolDir}</div>
+                <div className="worktree-stat-label">{WORKTREE_SETTINGS_POOL_DIR_LABEL}</div>
                 <div
                   className="worktree-stat-value worktree-stat-value-path"
                   title={poolStatus?.poolDir}
@@ -208,13 +206,13 @@ export function WorktreeSettingsSection({
                     className={`worktree-refresh-icon ${loading ? 'worktree-refresh-icon-spin' : ''}`}
                     strokeWidth={1.8}
                   />
-                  {COPY.worktreeRefresh}
+                  {WORKTREE_SETTINGS_REFRESH_LABEL}
                 </button>
               </div>
             </div>
 
             {poolStatus?.isGitRepo === false ? (
-              <div className="worktree-warning">{COPY.worktreeNotGitRepo}</div>
+              <div className="worktree-warning">{WORKTREE_SETTINGS_NOT_GIT_REPO}</div>
             ) : error ? (
               <div className="worktree-error">{error}</div>
             ) : null}
@@ -234,28 +232,28 @@ export function WorktreeSettingsSection({
                         <div className="worktree-pool-copy">
                           <div className="worktree-pool-title-row">
                             <span>
-                              {COPY.worktreePool} {index}
+                              {WORKTREE_SETTINGS_POOL_LABEL} {index}
                             </span>
                             {worktree?.inUse ? (
                               <span className="worktree-status-badge worktree-status-badge-busy">
                                 <span className="worktree-status-dot" />
-                                {COPY.worktreeBusy}
+                                {WORKTREE_SETTINGS_BUSY_LABEL}
                               </span>
                             ) : worktree ? (
                               <span className="worktree-status-badge worktree-status-badge-idle">
-                                {COPY.worktreeIdle}
+                                {WORKTREE_SETTINGS_IDLE_LABEL}
                               </span>
                             ) : (
                               <span className="worktree-status-badge worktree-status-badge-empty">
-                                {COPY.worktreeEmpty}
+                                {WORKTREE_SETTINGS_EMPTY_LABEL}
                               </span>
                             )}
                           </div>
                           <div className="worktree-pool-path" title={worktree?.path}>
-                            {worktree ? worktree.path : COPY.worktreeNotCreated}
+                            {worktree ? worktree.path : WORKTREE_SETTINGS_NOT_CREATED_LABEL}
                             {worktree && worktree.changesCount > 0 ? (
                               <span className="worktree-pool-changes">
-                                · {worktree.changesCount} {COPY.worktreeUncommitted}
+                                · {worktree.changesCount} {WORKTREE_SETTINGS_UNCOMMITTED_LABEL}
                               </span>
                             ) : null}
                           </div>
@@ -270,7 +268,7 @@ export function WorktreeSettingsSection({
                         ) : null}
                         {!worktree && !isBusy ? (
                           <button type="button" className="worktree-action-text">
-                            {COPY.worktreeCreate}
+                            {WORKTREE_SETTINGS_CREATE_LABEL}
                           </button>
                         ) : null}
                         {worktree && !worktree.inUse && !isBusy ? (
@@ -278,14 +276,14 @@ export function WorktreeSettingsSection({
                             <button
                               type="button"
                               className="worktree-action-icon"
-                              title={COPY.worktreeMergeTitle}
+                              title={WORKTREE_SETTINGS_MERGE_TITLE}
                             >
                               <GitMerge className="worktree-action-icon-svg" strokeWidth={1.8} />
                             </button>
                             <button
                               type="button"
                               className="worktree-action-icon"
-                              title={COPY.worktreeSyncTitle}
+                              title={WORKTREE_SETTINGS_SYNC_TITLE}
                             >
                               <RefreshCw
                                 className="worktree-action-icon-svg"
@@ -295,7 +293,7 @@ export function WorktreeSettingsSection({
                             <button
                               type="button"
                               className="worktree-action-icon worktree-action-icon-danger"
-                              title={COPY.worktreeRemove}
+                              title={WORKTREE_SETTINGS_REMOVE_TITLE}
                             >
                               <Trash2 className="worktree-action-icon-svg" strokeWidth={1.8} />
                             </button>
@@ -303,7 +301,7 @@ export function WorktreeSettingsSection({
                         ) : null}
                         {worktree?.inUse && !isBusy ? (
                           <button type="button" className="worktree-action-text">
-                            {COPY.worktreeRelease}
+                            {WORKTREE_SETTINGS_RELEASE_LABEL}
                           </button>
                         ) : null}
                       </div>
@@ -381,7 +379,7 @@ export function WorktreeSettingsSection({
                 disabled={busyPool === -1 || pools.length === 0}
                 className="worktree-cleanup-btn"
               >
-                {COPY.worktreeCleanupAll}
+                {WORKTREE_SETTINGS_CLEANUP_ALL_LABEL}
               </button>
             </div>
           </div>
