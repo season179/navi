@@ -4,6 +4,16 @@
 
 import type { ReactElement } from 'react'
 import { ChevronDown, ChevronRight, MessageSquareQuote, SearchCode } from 'lucide-react'
+import {
+  WRITE_PROMPT_ACTIVE_FILE,
+  WRITE_PROMPT_CONTEXT_LABEL,
+  WRITE_PROMPT_REFERENCE,
+  WRITE_PROMPT_RETRIEVAL_LABEL,
+  WRITE_PROMPT_WORKSPACE,
+  buildWritePromptMetaSummary,
+  formatWritePromptRetrievalMatched,
+  resolveWritePromptQuoteRangeLabel,
+} from '../lib/writePromptMetaDisclosure'
 
 export type WritePromptDisplayContext = {
   workspaceRoot?: string
@@ -44,17 +54,11 @@ export type WritePromptDisplay = {
 }
 
 function writePromptMetaSummary(display: WritePromptDisplay): string {
-  const parts: string[] = []
-  if (display.quotes.length > 0) {
-    parts.push(`${display.quotes.length} ref`)
-  }
-  if (display.retrieval && display.retrieval.snippets.length > 0) {
-    parts.push(`${display.retrieval.snippets.length} retrieved`)
-  }
-  if (display.context) {
-    parts.push('Context')
-  }
-  return parts.join(' · ')
+  return buildWritePromptMetaSummary({
+    quotesCount: display.quotes.length,
+    retrievalCount: display.retrieval?.snippets.length ?? 0,
+    hasContext: display.context != null,
+  })
 }
 
 /** Sample data for ?writePromptMetaDisclosure=1 visual verification. */
@@ -150,10 +154,10 @@ export function WritePromptMetaDisclosure({
         <div className="write-prompt-meta-disclosure-body">
           {display.context ? (
             <div className="write-prompt-context-card">
-              <div className="write-prompt-context-label">Writing context</div>
+              <div className="write-prompt-context-label">{WRITE_PROMPT_CONTEXT_LABEL}</div>
               {display.context.activeFile ? (
                 <div className="write-prompt-context-row">
-                  <span className="write-prompt-context-key">Current file </span>
+                  <span className="write-prompt-context-key">{WRITE_PROMPT_ACTIVE_FILE} </span>
                   <span className="write-prompt-context-value">{display.context.activeFile}</span>
                 </div>
               ) : null}
@@ -162,7 +166,7 @@ export function WritePromptMetaDisclosure({
                   className="write-prompt-context-row is-tight"
                   title={display.context.workspaceRoot}
                 >
-                  <span className="write-prompt-context-key">Workspace </span>
+                  <span className="write-prompt-context-key">{WRITE_PROMPT_WORKSPACE} </span>
                   <span className="write-prompt-context-value">{display.context.workspaceRoot}</span>
                 </div>
               ) : null}
@@ -183,24 +187,14 @@ export function WritePromptMetaDisclosure({
 }
 
 function WritePromptQuoteCard({ quote }: { quote: WritePromptDisplayQuote }): ReactElement {
-  const lineLabel =
-    quote.lineStart != null && quote.lineEnd != null
-      ? `lines ${quote.lineStart}-${quote.lineEnd}`
-      : null
-  const pageLabel =
-    quote.pageStart != null && quote.pageEnd != null
-      ? quote.pageStart === quote.pageEnd
-        ? `page ${quote.pageStart}`
-        : `pages ${quote.pageStart}-${quote.pageEnd}`
-      : null
-  const rangeLabel = lineLabel ?? pageLabel
+  const rangeLabel = resolveWritePromptQuoteRangeLabel(quote)
 
   return (
     <figure className="write-prompt-quote-card">
       <figcaption className="write-prompt-quote-caption">
         <MessageSquareQuote className="write-prompt-meta-disclosure-icon" strokeWidth={1.9} />
         <span className="write-prompt-quote-title">
-          {quote.sourceTitle || 'Text reference'}
+          {quote.sourceTitle || WRITE_PROMPT_REFERENCE}
         </span>
         {rangeLabel ? (
           <span className="write-prompt-range-badge">{rangeLabel}</span>
@@ -227,7 +221,7 @@ function WritePromptRetrievalCard({
     <div className="write-prompt-retrieval-card">
       <div className="write-prompt-retrieval-header">
         <SearchCode className="write-prompt-meta-disclosure-icon" strokeWidth={1.9} />
-        <span className="write-prompt-retrieval-label">Retrieved snippets</span>
+        <span className="write-prompt-retrieval-label">{WRITE_PROMPT_RETRIEVAL_LABEL}</span>
         {retrieval.keywords ? (
           <span className="write-prompt-range-badge is-truncate" title={retrieval.keywords}>
             {retrieval.keywords}
@@ -249,7 +243,7 @@ function WritePromptRetrievalCard({
             <div className="write-prompt-retrieval-snippet-text">{snippet.text}</div>
             {snippet.keywords ? (
               <div className="write-prompt-retrieval-matched" title={snippet.keywords}>
-                Matched: {snippet.keywords}
+                {formatWritePromptRetrievalMatched(snippet.keywords)}
               </div>
             ) : null}
           </div>
