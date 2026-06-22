@@ -12,6 +12,94 @@ import {
   SettingsCard,
   Toggle,
 } from './SettingsControls'
+import {
+  GENERAL_SETTINGS_BROWSE_LABEL,
+  GENERAL_SETTINGS_RESTORE_WORKSPACE_DEFAULT,
+} from '../lib/generalSettingsSection'
+import {
+  WRITE_EDITOR_FONT_SIZE_MAX,
+  WRITE_EDITOR_FONT_SIZE_MIN,
+  WRITE_SETTINGS_AGENT_PRESET_ADD,
+  WRITE_SETTINGS_AGENT_PRESET_NAME_PLACEHOLDER,
+  WRITE_SETTINGS_AGENT_PRESET_REMOVE,
+  WRITE_SETTINGS_AGENT_PRESETS_DESC,
+  WRITE_SETTINGS_AGENT_PRESETS_TITLE,
+  WRITE_SETTINGS_AGENT_PERSONA_PLACEHOLDER,
+  WRITE_SETTINGS_DEBUG_LOG_DESC,
+  WRITE_SETTINGS_DEBUG_LOG_OPEN_BUTTON,
+  WRITE_SETTINGS_DEBUG_LOG_OPEN_LABEL,
+  WRITE_SETTINGS_DEBUG_LOG_TITLE,
+  WRITE_SETTINGS_DESIGN_DRAFT_PROMPT_DESC,
+  WRITE_SETTINGS_DESIGN_DRAFT_PROMPT_LABEL,
+  WRITE_SETTINGS_FONT_CUSTOM_PLACEHOLDER,
+  WRITE_SETTINGS_FONT_PRESET_DESC,
+  WRITE_SETTINGS_FONT_PRESET_LABEL,
+  WRITE_SETTINGS_FONT_PRESET_LABELS,
+  WRITE_SETTINGS_FONT_SIZE_LABEL,
+  WRITE_SETTINGS_INFOGRAPHIC_PROMPT_DESC,
+  WRITE_SETTINGS_INFOGRAPHIC_PROMPT_LABEL,
+  WRITE_SETTINGS_INLINE_COMPLETION_ADVANCED_DESC,
+  WRITE_SETTINGS_INLINE_COMPLETION_ADVANCED_TITLE,
+  WRITE_SETTINGS_INLINE_COMPLETION_DEBOUNCE_DESC,
+  WRITE_SETTINGS_INLINE_COMPLETION_DEBOUNCE_LABEL,
+  WRITE_SETTINGS_INLINE_COMPLETION_DELAY_BALANCED,
+  WRITE_SETTINGS_INLINE_COMPLETION_DELAY_CALM,
+  WRITE_SETTINGS_INLINE_COMPLETION_DELAY_FAST,
+  WRITE_SETTINGS_INLINE_COMPLETION_DELAY_SLOW,
+  WRITE_SETTINGS_INLINE_COMPLETION_ENABLED_DESC,
+  WRITE_SETTINGS_INLINE_COMPLETION_ENABLED_LABEL,
+  WRITE_SETTINGS_INLINE_COMPLETION_MAX_TOKENS_DESC,
+  WRITE_SETTINGS_INLINE_COMPLETION_MAX_TOKENS_LABEL,
+  WRITE_SETTINGS_INLINE_COMPLETION_MODEL_DESC,
+  WRITE_SETTINGS_INLINE_COMPLETION_MODEL_LABEL,
+  WRITE_SETTINGS_INLINE_COMPLETION_PROVIDER_DESC,
+  WRITE_SETTINGS_INLINE_COMPLETION_PROVIDER_LABEL,
+  WRITE_SETTINGS_INLINE_COMPLETION_RETRIEVAL_DESC,
+  WRITE_SETTINGS_INLINE_COMPLETION_RETRIEVAL_LABEL,
+  WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_BALANCED,
+  WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_CREATIVE,
+  WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_DESC,
+  WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_LABEL,
+  WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_STRICT,
+  WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_VERY_STRICT,
+  WRITE_SETTINGS_INLINE_COMPLETION_TITLE,
+  WRITE_SETTINGS_INLINE_LONG_COMPLETION_DESC,
+  WRITE_SETTINGS_INLINE_LONG_COMPLETION_LABEL,
+  WRITE_SETTINGS_INLINE_LONG_COMPLETION_MAX_TOKENS_DESC,
+  WRITE_SETTINGS_INLINE_LONG_COMPLETION_MAX_TOKENS_LABEL,
+  WRITE_SETTINGS_LINE_HEIGHT_DESC,
+  WRITE_SETTINGS_LINE_HEIGHT_LABEL,
+  WRITE_SETTINGS_MODEL_PROVIDER_DEFAULT,
+  WRITE_SETTINGS_MODEL_SELECT_CUSTOM_OPTION,
+  WRITE_SETTINGS_MODEL_SELECT_CUSTOM_PLACEHOLDER,
+  WRITE_SETTINGS_PROTOTYPE_PROMPT_DESC,
+  WRITE_SETTINGS_PROTOTYPE_PROMPT_LABEL,
+  WRITE_SETTINGS_QUICK_ACTION_ADD,
+  WRITE_SETTINGS_QUICK_ACTION_LABEL_PLACEHOLDER,
+  WRITE_SETTINGS_QUICK_ACTION_MODE_CHAT,
+  WRITE_SETTINGS_QUICK_ACTION_MODE_EDIT,
+  WRITE_SETTINGS_QUICK_ACTION_MODE_LABEL,
+  WRITE_SETTINGS_QUICK_ACTION_PROMPT_PLACEHOLDER,
+  WRITE_SETTINGS_QUICK_ACTION_REMOVE,
+  WRITE_SETTINGS_QUICK_ACTIONS_DESC,
+  WRITE_SETTINGS_QUICK_ACTIONS_LABEL,
+  WRITE_SETTINGS_QUICK_ACTIONS_RESET,
+  WRITE_SETTINGS_SECTION_TITLE,
+  WRITE_SETTINGS_SELECTION_ASSIST_ADVANCED_DESC,
+  WRITE_SETTINGS_SELECTION_ASSIST_ADVANCED_TITLE,
+  WRITE_SETTINGS_SELECTION_ASSIST_TITLE,
+  WRITE_SETTINGS_TYPOGRAPHY_RESET_BUTTON,
+  WRITE_SETTINGS_TYPOGRAPHY_RESET_DESC,
+  WRITE_SETTINGS_TYPOGRAPHY_RESET_LABEL,
+  WRITE_SETTINGS_TYPOGRAPHY_TITLE,
+  WRITE_SETTINGS_WORKSPACE_ROOT_DESC,
+  WRITE_SETTINGS_WORKSPACE_ROOT_LABEL,
+  WRITE_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER,
+  formatWriteSettingsFontSizeDesc,
+  formatWriteSettingsInlineCompletionProviderInherit,
+  formatWriteSettingsModelSelectDefaultOption,
+  type WriteFontPreset,
+} from '../lib/writeSettingsSection'
 
 const WRITE_FONT_PRESETS = [
   'system',
@@ -22,11 +110,7 @@ const WRITE_FONT_PRESETS = [
   'simsun',
   'kaiti',
   'custom',
-] as const
-type WriteFontPreset = (typeof WRITE_FONT_PRESETS)[number]
-
-const WRITE_EDITOR_FONT_SIZE_MIN = 13
-const WRITE_EDITOR_FONT_SIZE_MAX = 22
+] as const satisfies readonly WriteFontPreset[]
 const WRITE_EDITOR_LINE_HEIGHT_MIN = 1.35
 const WRITE_EDITOR_LINE_HEIGHT_MAX = 2.1
 const WRITE_QUICK_ACTION_MAX_COUNT = 8
@@ -163,105 +247,6 @@ export const WRITE_SETTINGS_PREVIEW_DEFAULT: WriteSettingsSnapshot = {
   ],
 }
 
-const FONT_PRESET_LABELS: Record<WriteFontPreset, string> = {
-  system: 'System default',
-  sourceHanSans: 'Source Han Sans',
-  yahei: 'Microsoft YaHei',
-  pingfang: 'PingFang SC',
-  simhei: 'SimHei',
-  simsun: 'SimSun',
-  kaiti: 'KaiTi',
-  custom: 'Custom font family',
-}
-
-const COPY = {
-  sectionWrite: 'Write workspace',
-  writeWorkspaceRoot: 'Default write workspace',
-  writeWorkspaceRootDesc: 'Root folder for write-mode documents and assets.',
-  writeWorkspaceRootPlaceholder: '/Users/you/Documents/write',
-  restoreWorkspaceDefault: 'Restore default',
-  browse: 'Browse',
-  writeTypography: 'Typography',
-  writeFontPreset: 'Font preset',
-  writeFontPresetDesc: 'Editor font stack for write mode.',
-  writeFontCustomPlaceholder: 'e.g. "Georgia", "Times New Roman", serif',
-  writeFontSize: 'Font size',
-  writeFontSizeDesc: `Editor font size (${WRITE_EDITOR_FONT_SIZE_MIN}–${WRITE_EDITOR_FONT_SIZE_MAX}px).`,
-  writeLineHeight: 'Line height',
-  writeLineHeightDesc: 'Line spacing multiplier for the write editor.',
-  writeTypographyReset: 'Reset typography',
-  writeTypographyResetDesc: 'Restore default font preset, size, and line height.',
-  writeTypographyResetButton: 'Reset',
-  writeInlineCompletion: 'Inline completion',
-  writeInlineCompletionEnabled: 'Enable inline completion',
-  writeInlineCompletionEnabledDesc:
-    'Suggest continuations while typing in write mode using the selected provider and model.',
-  writeInlineCompletionProvider: 'Completion provider',
-  writeInlineCompletionProviderDesc:
-    'Inherit the assistant provider or choose a dedicated write completion provider.',
-  writeInlineCompletionProviderInherit: (value: string) => `Inherit (${value})`,
-  writeInlineCompletionModel: 'Completion model',
-  writeInlineCompletionModelDesc: 'Model used for inline write suggestions.',
-  modelSelectDefaultOption: (model: string) => `Default (${model})`,
-  modelSelectCustomOption: 'Custom model…',
-  modelSelectCustomPlaceholder: 'Enter model id',
-  writeInlineCompletionRetrieval: 'Workspace retrieval',
-  writeInlineCompletionRetrievalDesc:
-    'Include nearby workspace snippets as context for inline completion.',
-  writeInlineCompletionAdvanced: 'Advanced completion options',
-  writeInlineCompletionAdvancedDesc: 'Debounce, quality threshold, token limits, and long completion.',
-  writeInlineCompletionDelayFast: 'Fast (300 ms)',
-  writeInlineCompletionDelayBalanced: 'Balanced (650 ms)',
-  writeInlineCompletionDelayCalm: 'Calm (1000 ms)',
-  writeInlineCompletionDelaySlow: 'Slow (1500 ms)',
-  writeInlineCompletionDebounce: 'Debounce',
-  writeInlineCompletionDebounceDesc: 'Delay before requesting a completion after typing stops.',
-  writeInlineCompletionThresholdCreative: 'Creative (0.38)',
-  writeInlineCompletionThresholdBalanced: 'Balanced (0.52)',
-  writeInlineCompletionThresholdStrict: 'Strict (0.68)',
-  writeInlineCompletionThresholdVeryStrict: 'Very strict (0.82)',
-  writeInlineCompletionThreshold: 'Accept threshold',
-  writeInlineCompletionThresholdDesc: 'Minimum score required before showing a suggestion.',
-  writeInlineCompletionMaxTokens: 'Max tokens',
-  writeInlineCompletionMaxTokensDesc: 'Token cap for standard inline completions.',
-  writeInlineLongCompletion: 'Long completion',
-  writeInlineLongCompletionDesc: 'Allow longer multi-sentence continuations on demand.',
-  writeInlineLongCompletionMaxTokens: 'Long max tokens',
-  writeInlineLongCompletionMaxTokensDesc: 'Token cap when long completion is triggered.',
-  writeSelectionAssistTitle: 'Selection assist',
-  writeSelectionAssistAdvanced: 'Selection assist prompts',
-  writeSelectionAssistAdvancedDesc:
-    'Custom prompts for infographic, design draft, prototype, and quick actions.',
-  writeInfographicPromptLabel: 'Infographic prompt',
-  writeInfographicPromptDesc: 'Prompt template for turning selection into an infographic brief.',
-  writeDesignDraftPromptLabel: 'Design draft prompt',
-  writeDesignDraftPromptDesc: 'Prompt template for generating a visual design draft from selection.',
-  writePrototypePromptLabel: 'Prototype prompt',
-  writePrototypePromptDesc: 'Prompt template for turning selection into a UI prototype brief.',
-  writeQuickActionsLabel: 'Quick actions',
-  writeQuickActionsDesc: 'Toolbar actions shown when text is selected in write mode.',
-  writeQuickActionLabelPlaceholder: 'Action label',
-  writeQuickActionPromptPlaceholder: 'Prompt sent when the action is triggered',
-  writeQuickActionModeLabel: 'Mode',
-  writeQuickActionModeEdit: 'Edit selection',
-  writeQuickActionModeChat: 'Send to chat',
-  writeQuickActionRemove: 'Remove action',
-  writeQuickActionAdd: 'Add action',
-  writeQuickActionsReset: 'Reset quick actions',
-  writeAgentPresets: 'Write agent presets',
-  writeAgentPresetsDesc:
-    'Preset personas available when starting a write-mode agent session.',
-  writeAgentPresetNamePlaceholder: 'Preset name',
-  writeAgentPersonaPlaceholder: 'Persona and behavior instructions for this preset',
-  writeAgentPresetRemove: 'Remove preset',
-  writeAgentPresetAdd: 'Add preset',
-  writeDebugLogTitle: 'Write debug log',
-  writeDebugLogOpen: 'Open debug log',
-  writeDebugLogDesc: 'Inspect recent inline completion and selection-assist requests.',
-  writeDebugLogOpenButton: 'Open log',
-  modelProviderDefault: 'Default provider',
-}
-
 function resolveWriteInlineModelOptions(providerModels: readonly string[]): string[] {
   const scopedModels = providerModels.map((model) => model.trim()).filter(Boolean)
   return scopedModels.length > 0 ? [...new Set(scopedModels)] : [...WRITE_INLINE_COMPLETION_MODEL_IDS]
@@ -327,10 +312,10 @@ export function WriteSettingsSection({
 
   return (
     <>
-      <SettingsCard title={COPY.sectionWrite}>
+      <SettingsCard title={WRITE_SETTINGS_SECTION_TITLE}>
         <SettingRow
-          title={COPY.writeWorkspaceRoot}
-          description={COPY.writeWorkspaceRootDesc}
+          title={WRITE_SETTINGS_WORKSPACE_ROOT_LABEL}
+          description={WRITE_SETTINGS_WORKSPACE_ROOT_DESC}
           control={
             <div className="write-settings-workspace">
               <div className="write-settings-workspace-row">
@@ -338,13 +323,13 @@ export function WriteSettingsSection({
                   className="settings-text-input"
                   value={settings.defaultWorkspaceRoot}
                   onChange={(e) => updateSettings({ defaultWorkspaceRoot: e.target.value })}
-                  placeholder={COPY.writeWorkspaceRootPlaceholder}
+                  placeholder={WRITE_SETTINGS_WORKSPACE_ROOT_PLACEHOLDER}
                 />
                 <button type="button" className="settings-action-button">
-                  {COPY.restoreWorkspaceDefault}
+                  {GENERAL_SETTINGS_RESTORE_WORKSPACE_DEFAULT}
                 </button>
                 <button type="button" className="settings-action-button">
-                  {COPY.browse}
+                  {GENERAL_SETTINGS_BROWSE_LABEL}
                 </button>
               </div>
               {workspacePickerError ? (
@@ -355,10 +340,10 @@ export function WriteSettingsSection({
         />
       </SettingsCard>
 
-      <SettingsCard title={COPY.writeTypography} className="settings-card-spaced">
+      <SettingsCard title={WRITE_SETTINGS_TYPOGRAPHY_TITLE} className="settings-card-spaced">
         <SettingRow
-          title={COPY.writeFontPreset}
-          description={COPY.writeFontPresetDesc}
+          title={WRITE_SETTINGS_FONT_PRESET_LABEL}
+          description={WRITE_SETTINGS_FONT_PRESET_DESC}
           control={
             <div className="write-settings-font-control">
               <select
@@ -370,7 +355,7 @@ export function WriteSettingsSection({
               >
                 {WRITE_FONT_PRESETS.map((preset) => (
                   <option key={preset} value={preset}>
-                    {FONT_PRESET_LABELS[preset]}
+                    {WRITE_SETTINGS_FONT_PRESET_LABELS[preset]}
                   </option>
                 ))}
               </select>
@@ -379,15 +364,18 @@ export function WriteSettingsSection({
                   className="settings-text-input write-settings-font-custom"
                   value={typography.customFontFamily}
                   onChange={(e) => updateTypography({ customFontFamily: e.target.value })}
-                  placeholder={COPY.writeFontCustomPlaceholder}
+                  placeholder={WRITE_SETTINGS_FONT_CUSTOM_PLACEHOLDER}
                 />
               ) : null}
             </div>
           }
         />
         <SettingRow
-          title={COPY.writeFontSize}
-          description={COPY.writeFontSizeDesc}
+          title={WRITE_SETTINGS_FONT_SIZE_LABEL}
+          description={formatWriteSettingsFontSizeDesc(
+            WRITE_EDITOR_FONT_SIZE_MIN,
+            WRITE_EDITOR_FONT_SIZE_MAX,
+          )}
           control={
             <div className="write-settings-range-control">
               <input
@@ -398,15 +386,15 @@ export function WriteSettingsSection({
                 value={typography.fontSizePx}
                 onChange={(e) => updateTypography({ fontSizePx: Number(e.target.value) })}
                 className="write-settings-range-input"
-                aria-label={COPY.writeFontSize}
+                aria-label={WRITE_SETTINGS_FONT_SIZE_LABEL}
               />
               <span className="write-settings-range-value">{typography.fontSizePx}px</span>
             </div>
           }
         />
         <SettingRow
-          title={COPY.writeLineHeight}
-          description={COPY.writeLineHeightDesc}
+          title={WRITE_SETTINGS_LINE_HEIGHT_LABEL}
+          description={WRITE_SETTINGS_LINE_HEIGHT_DESC}
           control={
             <div className="write-settings-range-control">
               <input
@@ -417,7 +405,7 @@ export function WriteSettingsSection({
                 value={typography.lineHeight}
                 onChange={(e) => updateTypography({ lineHeight: Number(e.target.value) })}
                 className="write-settings-range-input"
-                aria-label={COPY.writeLineHeight}
+                aria-label={WRITE_SETTINGS_LINE_HEIGHT_LABEL}
               />
               <span className="write-settings-range-value">
                 {typography.lineHeight.toFixed(2)}
@@ -426,8 +414,8 @@ export function WriteSettingsSection({
           }
         />
         <SettingRow
-          title={COPY.writeTypographyReset}
-          description={COPY.writeTypographyResetDesc}
+          title={WRITE_SETTINGS_TYPOGRAPHY_RESET_LABEL}
+          description={WRITE_SETTINGS_TYPOGRAPHY_RESET_DESC}
           control={
             <button
               type="button"
@@ -442,16 +430,16 @@ export function WriteSettingsSection({
               }
             >
               <RotateCcw className="write-settings-button-icon" strokeWidth={1.8} />
-              {COPY.writeTypographyResetButton}
+              {WRITE_SETTINGS_TYPOGRAPHY_RESET_BUTTON}
             </button>
           }
         />
       </SettingsCard>
 
-      <SettingsCard title={COPY.writeInlineCompletion} className="settings-card-spaced">
+      <SettingsCard title={WRITE_SETTINGS_INLINE_COMPLETION_TITLE} className="settings-card-spaced">
         <SettingRow
-          title={COPY.writeInlineCompletionEnabled}
-          description={COPY.writeInlineCompletionEnabledDesc}
+          title={WRITE_SETTINGS_INLINE_COMPLETION_ENABLED_LABEL}
+          description={WRITE_SETTINGS_INLINE_COMPLETION_ENABLED_DESC}
           control={
             <Toggle
               checked={inline.enabled}
@@ -462,8 +450,8 @@ export function WriteSettingsSection({
         {inline.enabled ? (
           <>
             <SettingRow
-              title={COPY.writeInlineCompletionProvider}
-              description={COPY.writeInlineCompletionProviderDesc}
+              title={WRITE_SETTINGS_INLINE_COMPLETION_PROVIDER_LABEL}
+              description={WRITE_SETTINGS_INLINE_COMPLETION_PROVIDER_DESC}
               control={
                 <div className="write-settings-inline-control">
                   <select
@@ -478,8 +466,8 @@ export function WriteSettingsSection({
                     }}
                   >
                     <option value="">
-                      {COPY.writeInlineCompletionProviderInherit(
-                        effectiveWriteProvider?.name ?? COPY.modelProviderDefault,
+                      {formatWriteSettingsInlineCompletionProviderInherit(
+                        effectiveWriteProvider?.name ?? WRITE_SETTINGS_MODEL_PROVIDER_DEFAULT,
                       )}
                     </option>
                     {providers.map((item) => (
@@ -492,17 +480,17 @@ export function WriteSettingsSection({
               }
             />
             <SettingRow
-              title={COPY.writeInlineCompletionModel}
-              description={COPY.writeInlineCompletionModelDesc}
+              title={WRITE_SETTINGS_INLINE_COMPLETION_MODEL_LABEL}
+              description={WRITE_SETTINGS_INLINE_COMPLETION_MODEL_DESC}
               control={
                 <div className="write-settings-inline-control">
                   <ModelSelect
                     value={writeInlineModelInherited ? '' : inline.model}
                     options={writeInlineModelOptions}
-                    defaultLabel={COPY.modelSelectDefaultOption(writeInlineInheritDefault)}
+                    defaultLabel={formatWriteSettingsModelSelectDefaultOption(writeInlineInheritDefault)}
                     allowCustom
-                    customLabel={COPY.modelSelectCustomOption}
-                    customPlaceholder={COPY.modelSelectCustomPlaceholder}
+                    customLabel={WRITE_SETTINGS_MODEL_SELECT_CUSTOM_OPTION}
+                    customPlaceholder={WRITE_SETTINGS_MODEL_SELECT_CUSTOM_PLACEHOLDER}
                     selectClassName={SETTINGS_SELECT_CLASS}
                     onChange={(value) => {
                       const model = value.trim()
@@ -516,8 +504,8 @@ export function WriteSettingsSection({
               }
             />
             <SettingRow
-              title={COPY.writeInlineCompletionRetrieval}
-              description={COPY.writeInlineCompletionRetrievalDesc}
+              title={WRITE_SETTINGS_INLINE_COMPLETION_RETRIEVAL_LABEL}
+              description={WRITE_SETTINGS_INLINE_COMPLETION_RETRIEVAL_DESC}
               control={
                 <Toggle
                   checked={inline.retrievalEnabled}
@@ -527,14 +515,14 @@ export function WriteSettingsSection({
             />
             <div className="write-settings-advanced-wrap">
               <AdvancedSettingsDisclosure
-                title={COPY.writeInlineCompletionAdvanced}
-                description={COPY.writeInlineCompletionAdvancedDesc}
+                title={WRITE_SETTINGS_INLINE_COMPLETION_ADVANCED_TITLE}
+                description={WRITE_SETTINGS_INLINE_COMPLETION_ADVANCED_DESC}
                 defaultOpen={inlineAdvancedOpen}
               >
                 <div className="write-settings-advanced-rows">
                   <SettingRow
-                    title={COPY.writeInlineCompletionDebounce}
-                    description={COPY.writeInlineCompletionDebounceDesc}
+                    title={WRITE_SETTINGS_INLINE_COMPLETION_DEBOUNCE_LABEL}
+                    description={WRITE_SETTINGS_INLINE_COMPLETION_DEBOUNCE_DESC}
                     control={
                       <select
                         className={SETTINGS_SELECT_CLASS}
@@ -543,16 +531,16 @@ export function WriteSettingsSection({
                           updateInlineCompletion({ debounceMs: Number(e.target.value) })
                         }
                       >
-                        <option value={300}>{COPY.writeInlineCompletionDelayFast}</option>
-                        <option value={650}>{COPY.writeInlineCompletionDelayBalanced}</option>
-                        <option value={1000}>{COPY.writeInlineCompletionDelayCalm}</option>
-                        <option value={1500}>{COPY.writeInlineCompletionDelaySlow}</option>
+                        <option value={300}>{WRITE_SETTINGS_INLINE_COMPLETION_DELAY_FAST}</option>
+                        <option value={650}>{WRITE_SETTINGS_INLINE_COMPLETION_DELAY_BALANCED}</option>
+                        <option value={1000}>{WRITE_SETTINGS_INLINE_COMPLETION_DELAY_CALM}</option>
+                        <option value={1500}>{WRITE_SETTINGS_INLINE_COMPLETION_DELAY_SLOW}</option>
                       </select>
                     }
                   />
                   <SettingRow
-                    title={COPY.writeInlineCompletionThreshold}
-                    description={COPY.writeInlineCompletionThresholdDesc}
+                    title={WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_LABEL}
+                    description={WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_DESC}
                     control={
                       <select
                         className={SETTINGS_SELECT_CLASS}
@@ -561,18 +549,18 @@ export function WriteSettingsSection({
                           updateInlineCompletion({ minAcceptScore: Number(e.target.value) })
                         }
                       >
-                        <option value={0.38}>{COPY.writeInlineCompletionThresholdCreative}</option>
-                        <option value={0.52}>{COPY.writeInlineCompletionThresholdBalanced}</option>
-                        <option value={0.68}>{COPY.writeInlineCompletionThresholdStrict}</option>
+                        <option value={0.38}>{WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_CREATIVE}</option>
+                        <option value={0.52}>{WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_BALANCED}</option>
+                        <option value={0.68}>{WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_STRICT}</option>
                         <option value={0.82}>
-                          {COPY.writeInlineCompletionThresholdVeryStrict}
+                          {WRITE_SETTINGS_INLINE_COMPLETION_THRESHOLD_VERY_STRICT}
                         </option>
                       </select>
                     }
                   />
                   <SettingRow
-                    title={COPY.writeInlineCompletionMaxTokens}
-                    description={COPY.writeInlineCompletionMaxTokensDesc}
+                    title={WRITE_SETTINGS_INLINE_COMPLETION_MAX_TOKENS_LABEL}
+                    description={WRITE_SETTINGS_INLINE_COMPLETION_MAX_TOKENS_DESC}
                     control={
                       <input
                         type="number"
@@ -588,8 +576,8 @@ export function WriteSettingsSection({
                     }
                   />
                   <SettingRow
-                    title={COPY.writeInlineLongCompletion}
-                    description={COPY.writeInlineLongCompletionDesc}
+                    title={WRITE_SETTINGS_INLINE_LONG_COMPLETION_LABEL}
+                    description={WRITE_SETTINGS_INLINE_LONG_COMPLETION_DESC}
                     control={
                       <Toggle
                         checked={inline.longCompletionEnabled}
@@ -600,8 +588,8 @@ export function WriteSettingsSection({
                     }
                   />
                   <SettingRow
-                    title={COPY.writeInlineLongCompletionMaxTokens}
-                    description={COPY.writeInlineLongCompletionMaxTokensDesc}
+                    title={WRITE_SETTINGS_INLINE_LONG_COMPLETION_MAX_TOKENS_LABEL}
+                    description={WRITE_SETTINGS_INLINE_LONG_COMPLETION_MAX_TOKENS_DESC}
                     control={
                       <input
                         type="number"
@@ -623,17 +611,17 @@ export function WriteSettingsSection({
         ) : null}
       </SettingsCard>
 
-      <SettingsCard title={COPY.writeSelectionAssistTitle} className="settings-card-spaced">
+      <SettingsCard title={WRITE_SETTINGS_SELECTION_ASSIST_TITLE} className="settings-card-spaced">
         <div className="write-settings-advanced-wrap">
           <AdvancedSettingsDisclosure
-            title={COPY.writeSelectionAssistAdvanced}
-            description={COPY.writeSelectionAssistAdvancedDesc}
+            title={WRITE_SETTINGS_SELECTION_ASSIST_ADVANCED_TITLE}
+            description={WRITE_SETTINGS_SELECTION_ASSIST_ADVANCED_DESC}
             defaultOpen={selectionAssistAdvancedOpen}
           >
             <div className="write-settings-selection-body">
               <div className="write-settings-prompt-block">
-                <div className="write-settings-prompt-title">{COPY.writeInfographicPromptLabel}</div>
-                <p className="write-settings-prompt-desc">{COPY.writeInfographicPromptDesc}</p>
+                <div className="write-settings-prompt-title">{WRITE_SETTINGS_INFOGRAPHIC_PROMPT_LABEL}</div>
+                <p className="write-settings-prompt-desc">{WRITE_SETTINGS_INFOGRAPHIC_PROMPT_DESC}</p>
                 <textarea
                   className="write-settings-textarea"
                   value={selectionAssist.infographicPrompt}
@@ -643,8 +631,8 @@ export function WriteSettingsSection({
               </div>
 
               <div className="write-settings-prompt-block">
-                <div className="write-settings-prompt-title">{COPY.writeDesignDraftPromptLabel}</div>
-                <p className="write-settings-prompt-desc">{COPY.writeDesignDraftPromptDesc}</p>
+                <div className="write-settings-prompt-title">{WRITE_SETTINGS_DESIGN_DRAFT_PROMPT_LABEL}</div>
+                <p className="write-settings-prompt-desc">{WRITE_SETTINGS_DESIGN_DRAFT_PROMPT_DESC}</p>
                 <textarea
                   className="write-settings-textarea"
                   value={selectionAssist.designDraftPrompt}
@@ -654,8 +642,8 @@ export function WriteSettingsSection({
               </div>
 
               <div className="write-settings-prompt-block">
-                <div className="write-settings-prompt-title">{COPY.writePrototypePromptLabel}</div>
-                <p className="write-settings-prompt-desc">{COPY.writePrototypePromptDesc}</p>
+                <div className="write-settings-prompt-title">{WRITE_SETTINGS_PROTOTYPE_PROMPT_LABEL}</div>
+                <p className="write-settings-prompt-desc">{WRITE_SETTINGS_PROTOTYPE_PROMPT_DESC}</p>
                 <textarea
                   className="write-settings-textarea"
                   value={selectionAssist.prototypePrompt}
@@ -665,8 +653,8 @@ export function WriteSettingsSection({
               </div>
 
               <div className="write-settings-prompt-block">
-                <div className="write-settings-prompt-title">{COPY.writeQuickActionsLabel}</div>
-                <p className="write-settings-prompt-desc">{COPY.writeQuickActionsDesc}</p>
+                <div className="write-settings-prompt-title">{WRITE_SETTINGS_QUICK_ACTIONS_LABEL}</div>
+                <p className="write-settings-prompt-desc">{WRITE_SETTINGS_QUICK_ACTIONS_DESC}</p>
                 <div className="write-settings-quick-actions">
                   {selectionAssist.quickActions.map((action, index) => (
                     <div key={action.id} className="write-settings-quick-action-card">
@@ -674,7 +662,7 @@ export function WriteSettingsSection({
                         <input
                           className="settings-text-input write-settings-quick-action-label"
                           value={action.label}
-                          placeholder={COPY.writeQuickActionLabelPlaceholder}
+                          placeholder={WRITE_SETTINGS_QUICK_ACTION_LABEL_PLACEHOLDER}
                           spellCheck={false}
                           onChange={(e) => {
                             const next = [...selectionAssist.quickActions]
@@ -685,8 +673,8 @@ export function WriteSettingsSection({
                         <select
                           className={SETTINGS_SELECT_CLASS}
                           value={action.mode}
-                          title={COPY.writeQuickActionModeLabel}
-                          aria-label={COPY.writeQuickActionModeLabel}
+                          title={WRITE_SETTINGS_QUICK_ACTION_MODE_LABEL}
+                          aria-label={WRITE_SETTINGS_QUICK_ACTION_MODE_LABEL}
                           onChange={(e) => {
                             const next = [...selectionAssist.quickActions]
                             next[index] = {
@@ -696,14 +684,14 @@ export function WriteSettingsSection({
                             updateQuickActions(next)
                           }}
                         >
-                          <option value="edit">{COPY.writeQuickActionModeEdit}</option>
-                          <option value="chat">{COPY.writeQuickActionModeChat}</option>
+                          <option value="edit">{WRITE_SETTINGS_QUICK_ACTION_MODE_EDIT}</option>
+                          <option value="chat">{WRITE_SETTINGS_QUICK_ACTION_MODE_CHAT}</option>
                         </select>
                         <button
                           type="button"
                           className="write-settings-remove-button"
-                          title={COPY.writeQuickActionRemove}
-                          aria-label={COPY.writeQuickActionRemove}
+                          title={WRITE_SETTINGS_QUICK_ACTION_REMOVE}
+                          aria-label={WRITE_SETTINGS_QUICK_ACTION_REMOVE}
                           onClick={() =>
                             updateQuickActions(
                               selectionAssist.quickActions.filter((item) => item.id !== action.id),
@@ -716,7 +704,7 @@ export function WriteSettingsSection({
                       <textarea
                         className="write-settings-textarea is-compact"
                         value={action.prompt}
-                        placeholder={COPY.writeQuickActionPromptPlaceholder}
+                        placeholder={WRITE_SETTINGS_QUICK_ACTION_PROMPT_PLACEHOLDER}
                         spellCheck={false}
                         onChange={(e) => {
                           const next = [...selectionAssist.quickActions]
@@ -745,7 +733,7 @@ export function WriteSettingsSection({
                     }
                   >
                     <Plus className="write-settings-button-icon" strokeWidth={2} />
-                    {COPY.writeQuickActionAdd}
+                    {WRITE_SETTINGS_QUICK_ACTION_ADD}
                   </button>
                   <button
                     type="button"
@@ -757,7 +745,7 @@ export function WriteSettingsSection({
                     }
                   >
                     <RotateCcw className="write-settings-button-icon" strokeWidth={1.8} />
-                    {COPY.writeQuickActionsReset}
+                    {WRITE_SETTINGS_QUICK_ACTIONS_RESET}
                   </button>
                 </div>
               </div>
@@ -766,8 +754,8 @@ export function WriteSettingsSection({
         </div>
       </SettingsCard>
 
-      <SettingsCard title={COPY.writeAgentPresets} className="settings-card-spaced">
-        <p className="write-settings-agent-presets-desc">{COPY.writeAgentPresetsDesc}</p>
+      <SettingsCard title={WRITE_SETTINGS_AGENT_PRESETS_TITLE} className="settings-card-spaced">
+        <p className="write-settings-agent-presets-desc">{WRITE_SETTINGS_AGENT_PRESETS_DESC}</p>
         <div className="write-settings-agent-presets">
           {settings.agentPresets.map((preset, index) => (
             <div key={preset.id} className="write-settings-agent-preset-card">
@@ -786,7 +774,7 @@ export function WriteSettingsSection({
                 <input
                   className="settings-text-input write-settings-agent-name-input"
                   value={preset.name}
-                  placeholder={COPY.writeAgentPresetNamePlaceholder}
+                  placeholder={WRITE_SETTINGS_AGENT_PRESET_NAME_PLACEHOLDER}
                   spellCheck={false}
                   onChange={(e) => {
                     const next = [...settings.agentPresets]
@@ -797,8 +785,8 @@ export function WriteSettingsSection({
                 <button
                   type="button"
                   className="write-settings-remove-button"
-                  title={COPY.writeAgentPresetRemove}
-                  aria-label={COPY.writeAgentPresetRemove}
+                  title={WRITE_SETTINGS_AGENT_PRESET_REMOVE}
+                  aria-label={WRITE_SETTINGS_AGENT_PRESET_REMOVE}
                   onClick={() =>
                     updateAgentPresets(
                       settings.agentPresets.filter((item) => item.id !== preset.id),
@@ -811,7 +799,7 @@ export function WriteSettingsSection({
               <textarea
                 className="write-settings-textarea"
                 value={preset.persona}
-                placeholder={COPY.writeAgentPersonaPlaceholder}
+                placeholder={WRITE_SETTINGS_AGENT_PERSONA_PLACEHOLDER}
                 spellCheck={false}
                 onChange={(e) => {
                   const next = [...settings.agentPresets]
@@ -840,19 +828,19 @@ export function WriteSettingsSection({
             }
           >
             <Plus className="write-settings-button-icon" strokeWidth={2} />
-            {COPY.writeAgentPresetAdd}
+            {WRITE_SETTINGS_AGENT_PRESET_ADD}
           </button>
         </div>
       </SettingsCard>
 
-      <SettingsCard title={COPY.writeDebugLogTitle} className="settings-card-spaced">
+      <SettingsCard title={WRITE_SETTINGS_DEBUG_LOG_TITLE} className="settings-card-spaced">
         <SettingRow
-          title={COPY.writeDebugLogOpen}
-          description={COPY.writeDebugLogDesc}
+          title={WRITE_SETTINGS_DEBUG_LOG_OPEN_LABEL}
+          description={WRITE_SETTINGS_DEBUG_LOG_DESC}
           control={
             <button type="button" className="write-settings-ghost-button">
               <PencilLine className="write-settings-button-icon" strokeWidth={1.75} />
-              {COPY.writeDebugLogOpenButton}
+              {WRITE_SETTINGS_DEBUG_LOG_OPEN_BUTTON}
             </button>
           }
         />
