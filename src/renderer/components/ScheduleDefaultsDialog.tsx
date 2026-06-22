@@ -4,6 +4,23 @@
 
 import { useMemo, useState, type ReactElement } from 'react'
 import { X } from 'lucide-react'
+import {
+  SCHEDULE_CANCEL_LABEL,
+  SCHEDULE_CLOSE_LABEL,
+  SCHEDULE_CONFIRM_LABEL,
+  SCHEDULE_DEFAULT_SKILLS_LABEL,
+  SCHEDULE_DEFAULT_SKILLS_PLACEHOLDER,
+  SCHEDULE_DEFAULT_WORKSPACE_LABEL,
+  SCHEDULE_DEFAULTS_TITLE,
+  SCHEDULE_EXTRA_SKILL_DIRS_LABEL,
+  SCHEDULE_EXTRA_SKILL_DIRS_PLACEHOLDER,
+  SCHEDULE_GLOBAL_ENABLED_LABEL,
+  SCHEDULE_MODEL_LABEL,
+  SCHEDULE_PROMPT_PREFIX_LABEL,
+  SCHEDULE_PROMPT_PREFIX_PLACEHOLDER,
+  SCHEDULE_PROVIDER_LABEL,
+  SCHEDULE_WORKSPACE_PLACEHOLDER,
+} from '../lib/scheduleTasksView'
 
 export type ScheduleDefaultsSnapshot = {
   enabled: boolean
@@ -19,24 +36,6 @@ export type ScheduleModelProviderOption = {
   providerId: string
   label: string
   modelIds: string[]
-}
-
-const COPY = {
-  scheduleDefaultsTitle: 'Schedule defaults',
-  scheduleGlobalEnabled: 'Enable Schedule',
-  scheduleProvider: 'Provider',
-  scheduleModel: 'Model',
-  scheduleDefaultWorkspace: 'Default workspace',
-  scheduleWorkspacePlaceholder: 'Use Schedule default workspace',
-  schedulePromptPrefix: 'Prompt prefix',
-  schedulePromptPrefixPlaceholder: 'Prepended to scheduled task prompts',
-  scheduleDefaultSkills: 'Default Skills',
-  scheduleDefaultSkillsPlaceholder: 'Comma or newline separated',
-  scheduleExtraSkillDirs: 'Extra Skill directories',
-  scheduleExtraSkillDirsPlaceholder: 'One path per line',
-  cancel: 'Cancel',
-  confirm: 'Confirm',
-  close: 'Close',
 }
 
 const DEFAULT_SCHEDULE_MODEL = 'deepseek-chat'
@@ -203,13 +202,13 @@ export function ScheduleDefaultsDialog({
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="schedule-defaults-dialog-header">
-          <h2 className="schedule-defaults-dialog-title">{COPY.scheduleDefaultsTitle}</h2>
+          <h2 className="schedule-defaults-dialog-title">{SCHEDULE_DEFAULTS_TITLE}</h2>
           <button
             type="button"
             onClick={() => onClose?.()}
             className="schedule-defaults-dialog-close"
-            aria-label={COPY.close}
-            title={COPY.close}
+            aria-label={SCHEDULE_CLOSE_LABEL}
+            title={SCHEDULE_CLOSE_LABEL}
           >
             <X className="schedule-defaults-dialog-close-icon" strokeWidth={1.7} />
           </button>
@@ -217,7 +216,7 @@ export function ScheduleDefaultsDialog({
 
         <div className="schedule-defaults-dialog-toggle-row">
           <span className="schedule-defaults-dialog-toggle-label">
-            {COPY.scheduleGlobalEnabled}
+            {SCHEDULE_GLOBAL_ENABLED_LABEL}
           </span>
           <label className="schedule-defaults-dialog-toggle">
             <input
@@ -238,7 +237,7 @@ export function ScheduleDefaultsDialog({
 
         <div className="schedule-defaults-dialog-grid schedule-defaults-dialog-grid--two">
           <label className="schedule-defaults-dialog-field">
-            {COPY.scheduleProvider}
+            {SCHEDULE_PROVIDER_LABEL}
             <select
               value={selection.providerId}
               onChange={(event) => updateProvider(event.target.value)}
@@ -252,7 +251,7 @@ export function ScheduleDefaultsDialog({
             </select>
           </label>
           <label className="schedule-defaults-dialog-field">
-            {COPY.scheduleModel}
+            {SCHEDULE_MODEL_LABEL}
             <select
               value={selection.model}
               onChange={(event) => updateModel(event.target.value)}
@@ -268,41 +267,41 @@ export function ScheduleDefaultsDialog({
         </div>
 
         <label className="schedule-defaults-dialog-field schedule-defaults-dialog-field--full">
-          {COPY.scheduleDefaultWorkspace}
+          {SCHEDULE_DEFAULT_WORKSPACE_LABEL}
           <input
             value={draft.defaultWorkspaceRoot}
             onChange={(event) => update({ defaultWorkspaceRoot: event.target.value })}
-            placeholder={COPY.scheduleWorkspacePlaceholder}
+            placeholder={SCHEDULE_WORKSPACE_PLACEHOLDER}
             className="schedule-defaults-dialog-input"
           />
         </label>
 
         <label className="schedule-defaults-dialog-field schedule-defaults-dialog-field--full">
-          {COPY.schedulePromptPrefix}
+          {SCHEDULE_PROMPT_PREFIX_LABEL}
           <textarea
             value={draft.promptPrefix}
             onChange={(event) => update({ promptPrefix: event.target.value })}
-            placeholder={COPY.schedulePromptPrefixPlaceholder}
+            placeholder={SCHEDULE_PROMPT_PREFIX_PLACEHOLDER}
             className="schedule-defaults-dialog-textarea schedule-defaults-dialog-textarea--tall"
           />
         </label>
 
         <div className="schedule-defaults-dialog-grid schedule-defaults-dialog-grid--two">
           <label className="schedule-defaults-dialog-field">
-            {COPY.scheduleDefaultSkills}
+            {SCHEDULE_DEFAULT_SKILLS_LABEL}
             <textarea
               value={draft.defaultNames}
               onChange={(event) => update({ defaultNames: event.target.value })}
-              placeholder={COPY.scheduleDefaultSkillsPlaceholder}
+              placeholder={SCHEDULE_DEFAULT_SKILLS_PLACEHOLDER}
               className="schedule-defaults-dialog-textarea"
             />
           </label>
           <label className="schedule-defaults-dialog-field">
-            {COPY.scheduleExtraSkillDirs}
+            {SCHEDULE_EXTRA_SKILL_DIRS_LABEL}
             <textarea
               value={draft.extraDirs}
               onChange={(event) => update({ extraDirs: event.target.value })}
-              placeholder={COPY.scheduleExtraSkillDirsPlaceholder}
+              placeholder={SCHEDULE_EXTRA_SKILL_DIRS_PLACEHOLDER}
               className="schedule-defaults-dialog-textarea"
             />
           </label>
@@ -314,14 +313,14 @@ export function ScheduleDefaultsDialog({
             onClick={() => onClose?.()}
             className="schedule-defaults-dialog-btn schedule-defaults-dialog-btn--secondary"
           >
-            {COPY.cancel}
+            {SCHEDULE_CANCEL_LABEL}
           </button>
           <button
             type="button"
             onClick={save}
             className="schedule-defaults-dialog-btn schedule-defaults-dialog-btn--primary"
           >
-            {COPY.confirm}
+            {SCHEDULE_CONFIRM_LABEL}
           </button>
         </div>
       </div>

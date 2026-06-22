@@ -30,6 +30,14 @@ const {
   SCHEDULE_CURRENT_STATUS_LABEL,
   SCHEDULE_DAILY_TIME_LABEL,
   SCHEDULE_DEFAULTS_TITLE,
+  SCHEDULE_DEFAULT_SKILLS_LABEL,
+  SCHEDULE_DEFAULT_SKILLS_PLACEHOLDER,
+  SCHEDULE_DEFAULT_WORKSPACE_LABEL,
+  SCHEDULE_EXTRA_SKILL_DIRS_LABEL,
+  SCHEDULE_EXTRA_SKILL_DIRS_PLACEHOLDER,
+  SCHEDULE_GLOBAL_ENABLED_LABEL,
+  SCHEDULE_PROMPT_PREFIX_LABEL,
+  SCHEDULE_PROMPT_PREFIX_PLACEHOLDER,
   SCHEDULE_DELETE_TASK_LABEL,
   SCHEDULE_EDIT_TASK_TITLE,
   SCHEDULE_EMPTY_TEXT,
@@ -108,6 +116,17 @@ test('schedule tasks view copy matches Kun locale strings', () => {
   assert.equal(SCHEDULE_EXPAND_RESULT_LABEL, 'Expand')
   assert.equal(SCHEDULE_COLLAPSE_RESULT_LABEL, 'Collapse')
   assert.equal(SCHEDULE_DEFAULTS_TITLE, 'Schedule defaults')
+  assert.equal(SCHEDULE_GLOBAL_ENABLED_LABEL, 'Enable Schedule')
+  assert.equal(SCHEDULE_DEFAULT_WORKSPACE_LABEL, 'Default workspace')
+  assert.equal(SCHEDULE_PROMPT_PREFIX_LABEL, 'Prompt prefix')
+  assert.equal(
+    SCHEDULE_PROMPT_PREFIX_PLACEHOLDER,
+    'Prepended to scheduled task prompts',
+  )
+  assert.equal(SCHEDULE_DEFAULT_SKILLS_LABEL, 'Default Skills')
+  assert.equal(SCHEDULE_DEFAULT_SKILLS_PLACEHOLDER, 'Comma or newline separated')
+  assert.equal(SCHEDULE_EXTRA_SKILL_DIRS_LABEL, 'Extra Skill directories')
+  assert.equal(SCHEDULE_EXTRA_SKILL_DIRS_PLACEHOLDER, 'One path per line')
   assert.equal(SCHEDULE_SIDEBAR_EXPAND_LABEL, 'Expand sidebar')
   assert.equal(SCHEDULE_SIDEBAR_COLLAPSE_LABEL, 'Collapse sidebar')
   assert.equal(SCHEDULE_TASK_SECTION_CONTENT, 'Task content')

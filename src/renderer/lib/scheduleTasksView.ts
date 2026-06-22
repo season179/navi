@@ -81,6 +81,31 @@ export const SCHEDULE_COLLAPSE_RESULT_LABEL = 'Collapse'
 /** English copy matching Kun's scheduleDefaultsTitle locale string. */
 export const SCHEDULE_DEFAULTS_TITLE = 'Schedule defaults'
 
+/** English copy matching Kun's scheduleGlobalEnabled locale string. */
+export const SCHEDULE_GLOBAL_ENABLED_LABEL = 'Enable Schedule'
+
+/** English copy matching Kun's scheduleDefaultWorkspace locale string. */
+export const SCHEDULE_DEFAULT_WORKSPACE_LABEL = 'Default workspace'
+
+/** English copy matching Kun's schedulePromptPrefix locale string. */
+export const SCHEDULE_PROMPT_PREFIX_LABEL = 'Prompt prefix'
+
+/** English copy matching Kun's schedulePromptPrefixPlaceholder locale string. */
+export const SCHEDULE_PROMPT_PREFIX_PLACEHOLDER =
+  'Prepended to scheduled task prompts'
+
+/** English copy matching Kun's scheduleDefaultSkills locale string. */
+export const SCHEDULE_DEFAULT_SKILLS_LABEL = 'Default Skills'
+
+/** English copy matching Kun's scheduleDefaultSkillsPlaceholder locale string. */
+export const SCHEDULE_DEFAULT_SKILLS_PLACEHOLDER = 'Comma or newline separated'
+
+/** English copy matching Kun's scheduleExtraSkillDirs locale string. */
+export const SCHEDULE_EXTRA_SKILL_DIRS_LABEL = 'Extra Skill directories'
+
+/** English copy matching Kun's scheduleExtraSkillDirsPlaceholder locale string. */
+export const SCHEDULE_EXTRA_SKILL_DIRS_PLACEHOLDER = 'One path per line'
+
 /** English copy matching Kun's sidebarExpand locale string. */
 export const SCHEDULE_SIDEBAR_EXPAND_LABEL = 'Expand sidebar'
 
