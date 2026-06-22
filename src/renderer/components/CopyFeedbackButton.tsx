@@ -4,13 +4,17 @@
 
 import { Check, Copy } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactElement } from 'react'
+import {
+  resolveCopyFeedbackLabel,
+  type CopyFeedbackStatus,
+} from '../lib/copyFeedbackButton'
 
 const COPY_FEEDBACK_RESET_MS = 1600
 
 export const COPY_FEEDBACK_BUTTON_PREVIEW_TEXT =
   'Can you refactor the auth middleware to use JWT validation?'
 
-type CopyStatus = 'idle' | 'success' | 'error'
+type CopyStatus = CopyFeedbackStatus
 
 type Props = {
   text: string
@@ -57,7 +61,7 @@ export function CopyFeedbackButton({
 
   const success = effectiveStatus === 'success'
   const error = effectiveStatus === 'error'
-  const label = success ? 'Copied' : error ? 'Copy failed' : 'Copy message'
+  const label = resolveCopyFeedbackLabel(effectiveStatus)
 
   return (
     <button
