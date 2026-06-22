@@ -103,9 +103,9 @@ export const MEMORY_SETTINGS_LAST_INJECTED_LABEL = 'Last injected'
 export const MEMORY_SETTINGS_LAST_INJECTED_DESC =
   'Memory record IDs that were injected into the most recent turn.'
 
-/** Navi-branded equivalent of Kun's memoryDisabledHint locale string. */
+/** English copy matching Kun's memoryDisabledHint locale string. */
 export const MEMORY_SETTINGS_DISABLED_HINT =
-  'Memory is currently disabled. Enable it in the runtime configuration (navi config) to create and use memory records.'
+  'Memory is currently disabled. Enable it in the runtime configuration (kun config) to create and use memory records.'
 
 /** Resolve scope filter button labels matching Kun's memoryScope_* keys. */
 export function resolveMemorySettingsScopeLabel(scope: MemorySettingsScopeFilter): string {

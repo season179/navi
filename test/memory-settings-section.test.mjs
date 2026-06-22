@@ -25,10 +25,10 @@ test('memory settings section copy matches Kun locale strings', () => {
   assert.equal(mod.MEMORY_SETTINGS_EMPTY_TEXT, 'No memory records yet. The assistant will create them automatically as it learns your preferences, or add one manually.')
 })
 
-test('memory settings section disabled hint uses Navi branding', () => {
+test('memory settings section disabled hint matches Kun locale string', () => {
   assert.equal(
     mod.MEMORY_SETTINGS_DISABLED_HINT,
-    'Memory is currently disabled. Enable it in the runtime configuration (navi config) to create and use memory records.',
+    'Memory is currently disabled. Enable it in the runtime configuration (kun config) to create and use memory records.',
   )
 })
 
